@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="sh"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.1"/></filter>
+  </defs>
+
+  <text x="400" y="26" text-anchor="middle" font-size="18" font-weight="800" fill="#0F172A">🔋 Torso — Power Distribution &amp; Compute Bays</text>
+  <text x="400" y="44" text-anchor="middle" font-size="10" fill="#64748B">4 isolated power rails · 3 ESP32 nodes · central compute · storage bay</text>
+
+  <!-- ═══════ POWER ARCHITECTURE ═══════ -->
+  <rect x="20" y="60" width="760" height="195" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5" filter="url(#sh)"/>
+  <rect x="20" y="60" width="760" height="30" rx="10" fill="#F59E0B"/>
+  <rect x="20" y="80" width="760" height="10" fill="#F59E0B"/>
+  <text x="400" y="80" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">⚡ Power Distribution — 4 Isolated Rails</text>
+
+  <!-- Rail 1: Jetson -->
+  <rect x="40" y="100" width="170" height="80" rx="8" fill="#FFFBEB" stroke="#FBBF24"/>
+  <text x="125" y="120" text-anchor="middle" font-size="10" font-weight="700" fill="#92400E">🚀 Rail 1 — Jetson</text>
+  <text x="125" y="138" text-anchor="middle" font-size="8" fill="#78350F">19V DC Barrel Jack</text>
+  <text x="125" y="153" text-anchor="middle" font-size="7" fill="#B45309">→ Jetson Orin Nano</text>
+  <text x="125" y="168" text-anchor="middle" font-size="7" fill="#B45309">→ Touchscreen 7"</text>
+
+  <!-- Rail 2: Motor -->
+  <rect x="225" y="100" width="170" height="80" rx="8" fill="#FFFBEB" stroke="#FBBF24"/>
+  <text x="310" y="120" text-anchor="middle" font-size="10" font-weight="700" fill="#92400E">🔧 Rail 2 — Motors</text>
+  <text x="310" y="138" text-anchor="middle" font-size="8" fill="#78350F">12V Li-Ion 3S Pack</text>
+  <text x="310" y="153" text-anchor="middle" font-size="7" fill="#B45309">→ 8× Linear Actuators</text>
+  <text x="310" y="168" text-anchor="middle" font-size="7" fill="#B45309">→ 6× Rotary Joints</text>
+
+  <!-- Rail 3: ESP32 -->
+  <rect x="410" y="100" width="170" height="80" rx="8" fill="#FFFBEB" stroke="#FBBF24"/>
+  <text x="495" y="120" text-anchor="middle" font-size="10" font-weight="700" fill="#92400E">📡 Rail 3 — ESP32</text>
+  <text x="495" y="138" text-anchor="middle" font-size="8" fill="#78350F">USB-C PD 5V banks</text>
+  <text x="495" y="153" text-anchor="middle" font-size="7" fill="#B45309">→ Head ESP32-S3</text>
+  <text x="495" y="168" text-anchor="middle" font-size="7" fill="#B45309">→ Arm ESP32-S3 ×2</text>
+
+  <!-- Rail 4: Pebbles -->
+  <rect x="595" y="100" width="170" height="80" rx="8" fill="#FFFBEB" stroke="#FBBF24"/>
+  <text x="680" y="120" text-anchor="middle" font-size="10" font-weight="700" fill="#92400E">🪨 Rail 4 — Pebbles</text>
+  <text x="680" y="138" text-anchor="middle" font-size="8" fill="#78350F">3× 5000mAh Banks</text>
+  <text x="680" y="153" text-anchor="middle" font-size="7" fill="#B45309">→ Leg ESP32 ×2</text>
+  <text x="680" y="168" text-anchor="middle" font-size="7" fill="#B45309">→ Foot Sensors</text>
+
+  <!-- Isolated rails note -->
+  <text x="400" y="200" text-anchor="middle" font-size="8" fill="#B45309">⚡ All rails galvanically isolated — motor inrush cannot brown-out Jetson. INU2604 volt meters on each rail. 22 AWG power sink cables with hard ports.</text>
+
+  <rect x="40" y="210" width="720" height="35" rx="6" fill="#FDE68A"/>
+  <text x="400" y="225" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">🔌 Each ESP32 Node: 5000mAh Power Bank · INU2604 Volt Meter · Replaceable USB-C Port · 22 AWG Hard Port Cable</text>
+
+  <!-- ═══════ TORSO BAYS ═══════ -->
+  <rect x="20" y="270" width="760" height="255" rx="10" fill="#ECFDF5" stroke="#34D399" stroke-width="1.5" filter="url(#sh)"/>
+  <rect x="20" y="270" width="760" height="30" rx="10" fill="#059669"/>
+  <rect x="20" y="290" width="760" height="10" fill="#059669"/>
+  <text x="400" y="290" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">📦 Torso Compartments — Compute · Storage · Expansion</text>
+
+  <!-- Bay 1: Main Compute -->
+  <rect x="40" y="310" width="350" height="95" rx="8" fill="#D1FAE5" stroke="#6EE7B7" filter="url(#sh)"/>
+  <text x="215" y="330" text-anchor="middle" font-size="11" font-weight="700" fill="#065F46">🖥️ Bay 1 — Main Compute</text>
+  <rect x="55" y="340" width="155" height="50" rx="5" fill="#A7F3D0"/>
+  <text x="132" y="356" text-anchor="middle" font-size="9" font-weight="600" fill="#047857">NVIDIA Jetson Orin Nano</text>
+  <text x="132" y="370" text-anchor="middle" font-size="7" fill="#065F46">+ PCIe NVMe 256GB</text>
+  <text x="132" y="383" text-anchor="middle" font-size="7" fill="#065F46">+ Smart Fan (PWM)</text>
+
+  <rect x="225" y="340" width="150" height="50" rx="5" fill="#A7F3D0"/>
+  <text x="300" y="356" text-anchor="middle" font-size="9" font-weight="600" fill="#047857">Arduino UNO R4 WiFi</text>
+  <text x="300" y="370" text-anchor="middle" font-size="7" fill="#065F46">Real-time Motor Ctrl</text>
+  <text x="300" y="383" text-anchor="middle" font-size="7" fill="#065F46">Serial → Jetson</text>
+
+  <!-- Bay 2: Storage -->
+  <rect x="405" y="310" width="160" height="95" rx="8" fill="#D1FAE5" stroke="#6EE7B7" filter="url(#sh)"/>
+  <text x="485" y="330" text-anchor="middle" font-size="11" font-weight="700" fill="#065F46">💾 Bay 2 — Storage</text>
+  <text x="485" y="352" text-anchor="middle" font-size="8" fill="#047857">M.2 SSD 1TB</text>
+  <text x="485" y="368" text-anchor="middle" font-size="8" fill="#047857">USB 3.0 HDD</text>
+  <text x="485" y="384" text-anchor="middle" font-size="8" fill="#047857">SD Card Slot</text>
+  <text x="485" y="398" text-anchor="middle" font-size="7" fill="#065F46">NAS / Samba Share</text>
+
+  <!-- Bay 3: ESP32 Nodes -->
+  <rect x="580" y="310" width="185" height="95" rx="8" fill="#D1FAE5" stroke="#6EE7B7" filter="url(#sh)"/>
+  <text x="672" y="330" text-anchor="middle" font-size="11" font-weight="700" fill="#065F46">📡 Bay 3 — ESP32 Nodes</text>
+  <rect x="595" y="340" width="75" height="25" rx="4" fill="#A7F3D0"/>
+  <text x="632" y="356" text-anchor="middle" font-size="7" font-weight="600" fill="#047857">ESP32 CAM</text>
+  <rect x="678" y="340" width="75" height="25" rx="4" fill="#A7F3D0"/>
+  <text x="715" y="356" text-anchor="middle" font-size="7" font-weight="600" fill="#047857">ESP32 MOD</text>
+
+  <rect x="595" y="373" width="155" height="25" rx="4" fill="#A7F3D0"/>
+  <text x="672" y="389" text-anchor="middle" font-size="7" font-weight="600" fill="#047857">Leg Combustion Module</text>
+
+  <!-- Bay 4: Pebbles -->
+  <rect x="40" y="415" width="725" height="50" rx="8" fill="#FEF3C7" stroke="#FBBF24" filter="url(#sh)"/>
+  <text x="400" y="435" text-anchor="middle" font-size="11" font-weight="700" fill="#92400E">🪨 Bay 4 — Power Pebble Docks (×3)</text>
+
+  <g transform="translate(60, 443)">
+    <rect x="0" y="0" width="200" height="18" rx="4" fill="#FDE68A"/>
+    <text x="100" y="13" text-anchor="middle" font-size="7" fill="#92400E">Pebble 1: ESP32 Head · 5000mAh</text>
+
+    <rect x="220" y="0" width="200" height="18" rx="4" fill="#FDE68A"/>
+    <text x="320" y="13" text-anchor="middle" font-size="7" fill="#92400E">Pebble 2: ESP32 Cam · 5000mAh</text>
+
+    <rect x="440" y="0" width="200" height="18" rx="4" fill="#FDE68A"/>
+    <text x="540" y="13" text-anchor="middle" font-size="7" fill="#92400E">Pebble 3: ESP32 Legs · 5000mAh</text>
+  </g>
+
+  <!-- Interconnect -->
+  <text x="400" y="490" text-anchor="middle" font-size="8" fill="#64748B">All bays connected via rubber tubing data looms + 22 AWG power sink cables · Replaceable USB-C ports on every node</text>
+</svg>

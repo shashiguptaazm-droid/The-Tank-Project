@@ -38,12 +38,20 @@
 ## 🖼️ System Diagrams
 
 <p align="center">
+  <img src="images/blueprint-master.svg" alt="Full Blueprint" width="48%">
+  <img src="images/head-neck-closeup.svg" alt="Head & Neck" width="48%">
+</p>
+<p align="center">
+  <img src="images/torso-power-distribution.svg" alt="Torso & Power" width="48%">
+  <img src="images/arm-hand-actuators.svg" alt="Arm & Hand" width="48%">
+</p>
+<p align="center">
   <img src="images/architecture.svg" alt="Architecture" width="32%">
   <img src="images/wiring.svg" alt="Wiring" width="32%">
   <img src="images/cognitive.svg" alt="Cognitive" width="32%">
 </p>
 
-> Full-resolution SVGs in [`images/`](images/) — Architecture, Wiring Schematic, and 22-system Cognitive Architecture.
+> Full-resolution SVGs in [`images/`](images/) — 7 diagrams covering the full humanoid blueprint, system architecture, wiring, and cognitive pipeline. Traced from original hand-drawn schematics.
 
 ---
 

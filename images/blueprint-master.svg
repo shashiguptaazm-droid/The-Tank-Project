@@ -1,0 +1,384 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="sh"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.12"/></filter>
+    <linearGradient id="headGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1E40AF"/><stop offset="100%" stop-color="#3B82F6"/></linearGradient>
+    <linearGradient id="neckGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#A78BFA"/></linearGradient>
+    <linearGradient id="torsoGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#059669"/><stop offset="100%" stop-color="#34D399"/></linearGradient>
+    <linearGradient id="armGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#DC2626"/><stop offset="100%" stop-color="#F87171"/></linearGradient>
+    <linearGradient id="legGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#D97706"/><stop offset="100%" stop-color="#FBBF24"/></linearGradient>
+  </defs>
+
+  <!-- Title -->
+  <text x="700" y="28" text-anchor="middle" font-size="20" font-weight="800" fill="#0F172A">🧬 The Tank Project — Humanoid Robot Blueprint</text>
+  <text x="700" y="46" text-anchor="middle" font-size="11" fill="#64748B">Jetson Orin Nano · Arduino UNO · ESP32-S3 Nodes · Linear Actuators · 5-Finger Hands</text>
+
+  <!-- ═══════════════ HEAD SECTION (Top-Left) ═══════════════ -->
+  <g transform="translate(10, 60)">
+    <rect x="0" y="0" width="430" height="260" rx="10" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5" filter="url(#sh)"/>
+    <rect x="0" y="0" width="430" height="32" rx="10" fill="url(#headGrad)"/>
+    <rect x="0" y="22" width="430" height="10" fill="url(#headGrad)"/>
+    <text x="215" y="21" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">🧠 The Head — Sensor &amp; AI Array</text>
+
+    <!-- Head outline -->
+    <ellipse cx="215" cy="135" rx="85" ry="105" fill="#DBEAFE" stroke="#60A5FA" stroke-width="2"/>
+    <!-- Eyes -->
+    <circle cx="180" cy="100" r="20" fill="#93C5FD" stroke="#3B82F6" stroke-width="1.5"/>
+    <circle cx="250" cy="100" r="20" fill="#93C5FD" stroke="#3B82F6" stroke-width="1.5"/>
+    <text x="180" y="103" text-anchor="middle" font-size="7" fill="#1E40AF">LCD</text>
+    <text x="250" y="103" text-anchor="middle" font-size="7" fill="#1E40AF">LCD</text>
+
+    <!-- Labels on head -->
+    <text x="215" y="73" text-anchor="middle" font-size="7" fill="#1E40AF">MPU6050</text>
+    <text x="215" y="155" text-anchor="middle" font-size="7" fill="#1E40AF">Speaker</text>
+    <text x="215" y="170" text-anchor="middle" font-size="7" fill="#1E40AF">NVIDIA Jetson</text>
+    <text x="165" y="190" text-anchor="middle" font-size="6" fill="#2563EB">AI Cam</text>
+    <text x="265" y="190" text-anchor="middle" font-size="6" fill="#2563EB">Ultrasonic</text>
+
+    <!-- Hardware list -->
+    <g transform="translate(10, 35)" font-size="8">
+      <text x="0" y="14" font-weight="700" fill="#1E40AF">Hardware List:</text>
+      <text x="6" y="30" fill="#334155">1. NVIDIA Jetson Orin Nano Super — USB-C</text>
+      <text x="6" y="44" fill="#334155">2. Waveshare 1.28" Dual Round Eyes — USB-C</text>
+      <text x="6" y="58" fill="#334155">3. DFRobot AI Camera — USB-C</text>
+      <text x="6" y="72" fill="#334155">4. Optional Intel RealSense Depth Camera — USB-C</text>
+      <text x="6" y="86" fill="#334155">5. MLX90640 Thermal Camera Module (32×24 px)</text>
+      <text x="6" y="100" fill="#334155">6. Waveshare 2Ω Speaker Module</text>
+      <text x="6" y="114" fill="#334155">7. MPU6050 6-Axis Gyro+Accel Sensor</text>
+      <text x="6" y="128" fill="#334155">8. RPi Hub Module — USB-C (I²C/SPI expander)</text>
+    </g>
+
+    <!-- Right-side notes -->
+    <g transform="translate(320, 40)" font-size="7">
+      <text x="0" y="0" font-weight="700" fill="#1E40AF">Head Bus:</text>
+      <text x="4" y="14" fill="#64748B">All sensors → USB-C Hub</text>
+      <text x="4" y="26" fill="#64748B">Eyes ← ESP32-S3 SPI</text>
+      <text x="4" y="38" fill="#64748B">Speaker ← I²S DAC</text>
+      <text x="4" y="50" fill="#64748B">AI Cam ← USB UVC</text>
+      <text x="4" y="62" fill="#64748B">Thermal ← I²C 0x33</text>
+    </g>
+  </g>
+
+  <!-- ═══════════════ NECK SECTION (Top-Middle) ═══════════════ -->
+  <g transform="translate(455, 60)">
+    <rect x="0" y="0" width="220" height="160" rx="10" fill="#F5F3FF" stroke="#A78BFA" stroke-width="1.5" filter="url(#sh)"/>
+    <rect x="0" y="0" width="220" height="28" rx="10" fill="url(#neckGrad)"/>
+    <rect x="0" y="18" width="220" height="10" fill="url(#neckGrad)"/>
+    <text x="110" y="19" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">🔗 The Neck</text>
+
+    <!-- Neck diagram -->
+    <rect x="70" y="42" width="80" height="18" rx="4" fill="#DDD6FE" stroke="#8B5CF6"/>
+    <text x="110" y="54" text-anchor="middle" font-size="7" fill="#5B21B6">Linear Actuator (Z-axis)</text>
+    <line x1="110" y1="60" x2="110" y2="68" stroke="#8B5CF6" stroke-width="1.5"/>
+    <!-- Rotation joint -->
+    <ellipse cx="110" cy="76" rx="30" ry="12" fill="#C4B5FD" stroke="#7C3AED"/>
+    <text x="110" y="79" text-anchor="middle" font-size="7" fill="#5B21B6">Rotational 360° Joint</text>
+    <line x1="110" y1="88" x2="110" y2="100" stroke="#8B5CF6" stroke-width="1.5"/>
+
+    <g font-size="7">
+      <text x="6" y="120" fill="#5B21B6">• Mini Industrial Grade Servos</text>
+      <text x="6" y="133" fill="#5B21B6">• Charging Pebble (wireless dock)</text>
+      <text x="6" y="146" fill="#5B21B6">• Power + Data passthrough</text>
+    </g>
+  </g>
+
+  <!-- ═══════════════ DISPLAY &amp; POWER (Top-Right) ═══════════════ -->
+  <g transform="translate(690, 60)">
+    <rect x="0" y="0" width="340" height="160" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5" filter="url(#sh)"/>
+    <rect x="0" y="0" width="340" height="28" rx="10" fill="#F59E0B"/>
+    <rect x="0" y="18" width="340" height="10" fill="#F59E0B"/>
+    <text x="170" y="19" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">🖥️ Display &amp; Power Module</text>
+
+    <!-- Screen -->
+    <rect x="12" y="38" width="155" height="100" rx="6" fill="#FFFBEB" stroke="#FBBF24"/>
+    <rect x="22" y="48" width="135" height="78" rx="4" fill="#FDE68A"/>
+    <text x="89" y="78" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">7" Waveshare</text>
+    <text x="89" y="93" text-anchor="middle" font-size="7" fill="#B45309">Touchscreen Display</text>
+    <text x="89" y="108" text-anchor="middle" font-size="7" fill="#B45309">HDMI + USB Touch</text>
+
+    <!-- Power module -->
+    <rect x="178" y="38" width="150" height="100" rx="6" fill="#FFFBEB" stroke="#FBBF24"/>
+    <text x="253" y="55" text-anchor="middle" font-size="8" font-weight="600" fill="#92400E">🔋 Power System</text>
+    <text x="253" y="72" text-anchor="middle" font-size="7" fill="#78350F">20000 mAh Power Bank ×3</text>
+    <text x="253" y="86" text-anchor="middle" font-size="7" fill="#78350F">Jetson 19V Barrel Jack</text>
+    <text x="253" y="100" text-anchor="middle" font-size="7" fill="#78350F">ESP32 5V USB-C ×5</text>
+    <text x="253" y="114" text-anchor="middle" font-size="7" fill="#78350F">Motor 12V Li-Ion Rail</text>
+    <text x="253" y="128" text-anchor="middle" font-size="7" fill="#78350F">Galvanically Isolated Rails</text>
+  </g>
+
+  <!-- ═══════════════ TORSO (Center) ═══════════════ -->
+  <g transform="translate(350, 235)">
+    <rect x="0" y="0" width="340" height="310" rx="12" fill="#ECFDF5" stroke="#34D399" stroke-width="2" filter="url(#sh)"/>
+    <rect x="0" y="0" width="340" height="32" rx="12" fill="url(#torsoGrad)"/>
+    <rect x="0" y="22" width="340" height="10" fill="url(#torsoGrad)"/>
+    <text x="170" y="21" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">⚙️ The Torso — Central Compute &amp; Distribution</text>
+
+    <!-- Torso shape -->
+    <path d="M60,40 L280,40 L300,280 L40,280 Z" fill="#D1FAE5" stroke="#6EE7B7" stroke-width="1.5"/>
+
+    <!-- Upper torso comparts -->
+    <rect x="80" y="55" width="180" height="30" rx="4" fill="#A7F3D0" stroke="#34D399"/>
+    <text x="170" y="66" text-anchor="middle" font-size="8" font-weight="600" fill="#065F46">NVIDIA Jetson Orin Nano + PCIe</text>
+    <text x="170" y="78" text-anchor="middle" font-size="6" fill="#047857">Main AI Compute · M.2 NVMe · CUDA</text>
+
+    <rect x="80" y="95" width="85" height="22" rx="3" fill="#6EE7B7" stroke="#34D399"/>
+    <text x="122" y="109" text-anchor="middle" font-size="7" fill="#064E3B">ESP32 CAM Mod</text>
+    <rect x="173" y="95" width="87" height="22" rx="3" fill="#6EE7B7" stroke="#34D399"/>
+    <text x="216" y="109" text-anchor="middle" font-size="7" fill="#064E3B">Smart Fan (PWM)</text>
+
+    <!-- Middle -->
+    <rect x="60" y="130" width="220" height="35" rx="4" fill="#fff" stroke="#34D399" stroke-dasharray="4"/>
+    <text x="170" y="144" text-anchor="middle" font-size="8" font-weight="600" fill="#065F46">📦 External Storage Bay</text>
+    <text x="170" y="157" text-anchor="middle" font-size="6" fill="#047857">M.2 SSD · USB HDD · SD Card · Network Share</text>
+
+    <rect x="60" y="175" width="220" height="35" rx="4" fill="#fff" stroke="#F59E0B" stroke-dasharray="4"/>
+    <text x="170" y="189" text-anchor="middle" font-size="8" font-weight="600" fill="#92400E">🔋 ESP32 Power Pebble Bay (×3)</text>
+    <text x="170" y="202" text-anchor="middle" font-size="6" fill="#B45309">Each: 5000mAh Bank · INU2604 Volt Meter · USB-C Port</text>
+
+    <!-- Lower torso -->
+    <rect x="60" y="220" width="105" height="30" rx="4" fill="#A7F3D0" stroke="#34D399"/>
+    <text x="112" y="232" text-anchor="middle" font-size="7" font-weight="600" fill="#065F46">ESP32 CAM Hub</text>
+    <text x="112" y="244" text-anchor="middle" font-size="6" fill="#047857">I²C + SPI Expander</text>
+
+    <rect x="175" y="220" width="105" height="30" rx="4" fill="#A7F3D0" stroke="#34D399"/>
+    <text x="227" y="232" text-anchor="middle" font-size="7" font-weight="600" fill="#065F46">ESP32 MOD Hub</text>
+    <text x="227" y="244" text-anchor="middle" font-size="6" fill="#047857">GPIO + UART Bridge</text>
+
+    <rect x="80" y="260" width="180" height="25" rx="4" fill="#D1FAE5" stroke="#6EE7B7"/>
+    <text x="170" y="276" text-anchor="middle" font-size="7" fill="#065F46">Leg Combustion Module · Rubber Tubing</text>
+  </g>
+
+  <!-- ═══════════════ LEFT ARM (Center-Left) ═══════════════ -->
+  <g transform="translate(10, 240)">
+    <rect x="0" y="0" width="330" height="340" rx="10" fill="#FEF2F2" stroke="#F87171" stroke-width="1.5" filter="url(#sh)"/>
+    <rect x="0" y="0" width="330" height="28" rx="10" fill="url(#armGrad)"/>
+    <rect x="0" y="18" width="330" height="10" fill="url(#armGrad)"/>
+    <text x="165" y="19" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">🦾 Left Arm — Actuator &amp; Manipulation</text>
+
+    <!-- Shoulder -->
+    <ellipse cx="165" cy="65" rx="35" ry="25" fill="#FECACA" stroke="#EF4444"/>
+    <text x="165" y="60" text-anchor="middle" font-size="7" font-weight="600" fill="#991B1B">SHOULDER</text>
+    <text x="165" y="72" text-anchor="middle" font-size="6" fill="#DC2626">3× Linear Actuators</text>
+    <text x="165" y="82" text-anchor="middle" font-size="5" fill="#B91C1C">Ethernet Port · Rubber Tubing</text>
+
+    <!-- Upper arm -->
+    <rect x="128" y="90" width="74" height="85" rx="8" fill="#FEE2E2" stroke="#FCA5A5"/>
+    <text x="165" y="108" text-anchor="middle" font-size="7" font-weight="600" fill="#991B1B">UPPER ARM</text>
+    <text x="165" y="122" text-anchor="middle" font-size="6" fill="#DC2626">HAMMER USB-C</text>
+    <text x="165" y="136" text-anchor="middle" font-size="6" fill="#DC2626">Hub-FO Interface</text>
+    <text x="165" y="150" text-anchor="middle" font-size="6" fill="#DC2626">USB-C SPHERE</text>
+    <text x="165" y="164" text-anchor="middle" font-size="6" fill="#DC2626">ESP32 Cam Module</text>
+
+    <!-- Elbow -->
+    <circle cx="165" cy="180" r="10" fill="#FCA5A5" stroke="#EF4444"/>
+    <text x="165" y="183" text-anchor="middle" font-size="6" fill="#991B1B">ELBOW</text>
+
+    <!-- Forearm -->
+    <rect x="128" y="195" width="74" height="75" rx="8" fill="#FEE2E2" stroke="#FCA5A5"/>
+    <text x="165" y="213" text-anchor="middle" font-size="7" font-weight="600" fill="#991B1B">FOREARM</text>
+    <text x="165" y="228" text-anchor="middle" font-size="6" fill="#DC2626">ESP32-S3 DevKit</text>
+    <text x="165" y="242" text-anchor="middle" font-size="6" fill="#DC2626">Hand Manager</text>
+    <text x="165" y="256" text-anchor="middle" font-size="5" fill="#B91C1C">Servo PWM ×5 channels</text>
+
+    <!-- Wrist -->
+    <rect x="145" y="275" width="40" height="15" rx="5" fill="#FCA5A5"/>
+    <text x="165" y="285" text-anchor="middle" font-size="6" fill="#991B1B">WRIST</text>
+
+    <!-- Fingers -->
+    <g transform="translate(135, 295)" fill="#FECACA" stroke="#EF4444">
+      <rect x="0" y="0" width="10" height="30" rx="4"/>
+      <rect x="14" y="0" width="10" height="30" rx="4"/>
+      <rect x="28" y="0" width="10" height="30" rx="4"/>
+      <rect x="42" y="0" width="10" height="30" rx="4"/>
+      <rect x="56" y="0" width="10" height="14" rx="4"/>
+    </g>
+    <text x="165" y="340" text-anchor="middle" font-size="6" fill="#991B1B">Servo Lines 1–5</text>
+  </g>
+
+  <!-- ═══════════════ LEFT HAND / PALM (Center-Right) ═══════════════ -->
+  <g transform="translate(710, 280)">
+    <rect x="0" y="0" width="250" height="165" rx="10" fill="#FFF7ED" stroke="#F97316" stroke-width="1.5" filter="url(#sh)"/>
+    <rect x="0" y="0" width="250" height="26" rx="10" fill="#F97316"/>
+    <rect x="0" y="16" width="250" height="10" fill="#F97316"/>
+    <text x="125" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">✋ Right Hand — 5-Finger Gripper</text>
+
+    <!-- Palm -->
+    <rect x="40" y="38" width="170" height="55" rx="10" fill="#FED7AA" stroke="#FB923C"/>
+    <text x="125" y="58" text-anchor="middle" font-size="8" font-weight="600" fill="#9A3412">PALM — Acrylic 3× Plate</text>
+    <text x="125" y="72" text-anchor="middle" font-size="6" fill="#C2410C">Mini Micro Servo Sockets ×5</text>
+    <text x="125" y="84" text-anchor="middle" font-size="6" fill="#C2410C">3D-Printed TPU Finger Joints</text>
+
+    <!-- Fingers -->
+    <g font-size="5" fill="#9A3412">
+      <rect x="55" y="100" width="14" height="40" rx="5" fill="#FDBA74"/>
+      <text x="62" y="122" text-anchor="middle">1</text>
+      <rect x="80" y="100" width="14" height="44" rx="5" fill="#FDBA74"/>
+      <text x="87" y="122" text-anchor="middle">2</text>
+      <rect x="105" y="100" width="14" height="47" rx="5" fill="#FDBA74"/>
+      <text x="112" y="122" text-anchor="middle">3</text>
+      <rect x="130" y="100" width="14" height="42" rx="5" fill="#FDBA74"/>
+      <text x="137" y="122" text-anchor="middle">4</text>
+      <rect x="155" y="100" width="14" height="24" rx="5" fill="#FDBA74"/>
+      <text x="162" y="114" text-anchor="middle">5</text>
+    </g>
+    <text x="125" y="155" text-anchor="middle" font-size="6" fill="#9A3412">Servo Lines → ESP32-S3 Hand Manager</text>
+  </g>
+
+  <!-- ═══════════════ LEGS (Bottom-Center) ═══════════════ -->
+  <g transform="translate(30, 560)">
+    <rect x="0" y="0" width="500" height="310" rx="10" fill="#FFFBEB" stroke="#FBBF24" stroke-width="1.5" filter="url(#sh)"/>
+    <rect x="0" y="0" width="500" height="28" rx="10" fill="url(#legGrad)"/>
+    <rect x="0" y="18" width="500" height="10" fill="url(#legGrad)"/>
+    <text x="250" y="19" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">🦿 Legs &amp; Lower Torso — Mobility &amp; Power</text>
+
+    <!-- Left Leg -->
+    <rect x="30" y="45" width="200" height="250" rx="10" fill="#FEF3C7" stroke="#F59E0B"/>
+    <text x="130" y="62" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">LEFT LEG</text>
+
+    <!-- Hip -->
+    <ellipse cx="130" cy="85" rx="30" ry="15" fill="#FDE68A" stroke="#D97706"/>
+    <text x="130" y="88" text-anchor="middle" font-size="6" fill="#92400E">HIP — Rotary Joint</text>
+
+    <!-- Thigh -->
+    <rect x="75" y="105" width="110" height="75" rx="8" fill="#FEF3C7" stroke="#F59E0B"/>
+    <text x="130" y="122" text-anchor="middle" font-size="7" fill="#78350F">THIGH</text>
+    <text x="130" y="138" text-anchor="middle" font-size="6" fill="#B45309">Linear DC Actuator</text>
+    <text x="130" y="152" text-anchor="middle" font-size="6" fill="#B45309">Lead Walker AC</text>
+    <text x="130" y="166" text-anchor="middle" font-size="6" fill="#B45309">Back Actuator</text>
+
+    <!-- Knee -->
+    <circle cx="130" cy="190" r="12" fill="#FDE68A" stroke="#D97706"/>
+    <text x="130" y="193" text-anchor="middle" font-size="6" fill="#92400E">KNEE</text>
+
+    <!-- Calf -->
+    <rect x="85" y="210" width="90" height="55" rx="8" fill="#FEF3C7" stroke="#F59E0B"/>
+    <text x="130" y="228" text-anchor="middle" font-size="7" fill="#78350F">CALF</text>
+    <text x="130" y="244" text-anchor="middle" font-size="6" fill="#B45309">Rotary Joint</text>
+    <text x="130" y="258" text-anchor="middle" font-size="6" fill="#B45309">DC Actuator</text>
+
+    <!-- Foot -->
+    <rect x="75" y="270" width="110" height="20" rx="6" fill="#FDE68A"/>
+    <text x="130" y="283" text-anchor="middle" font-size="7" fill="#92400E">FOOT — Pressure Sensors</text>
+
+    <!-- Right Leg -->
+    <rect x="260" y="45" width="200" height="250" rx="10" fill="#FEF3C7" stroke="#F59E0B"/>
+    <text x="360" y="62" text-anchor="middle" font-size="9" font-weight="600" fill="#92400E">RIGHT LEG</text>
+
+    <ellipse cx="360" cy="85" rx="30" ry="15" fill="#FDE68A" stroke="#D97706"/>
+    <text x="360" y="88" text-anchor="middle" font-size="6" fill="#92400E">HIP — Rotary Joint</text>
+
+    <rect x="305" y="105" width="110" height="75" rx="8" fill="#FEF3C7" stroke="#F59E0B"/>
+    <text x="360" y="122" text-anchor="middle" font-size="7" fill="#78350F">THIGH</text>
+    <text x="360" y="138" text-anchor="middle" font-size="6" fill="#B45309">Linear DC Actuator</text>
+    <text x="360" y="152" text-anchor="middle" font-size="6" fill="#B45309">Lead Walker AC</text>
+    <text x="360" y="166" text-anchor="middle" font-size="6" fill="#B45309">Back Actuator</text>
+
+    <circle cx="360" cy="190" r="12" fill="#FDE68A" stroke="#D97706"/>
+    <text x="360" y="193" text-anchor="middle" font-size="6" fill="#92400E">KNEE</text>
+
+    <rect x="315" y="210" width="90" height="55" rx="8" fill="#FEF3C7" stroke="#F59E0B"/>
+    <text x="360" y="228" text-anchor="middle" font-size="7" fill="#78350F">CALF</text>
+    <text x="360" y="244" text-anchor="middle" font-size="6" fill="#B45309">Rotary Joint</text>
+    <text x="360" y="258" text-anchor="middle" font-size="6" fill="#B45309">DC Actuator</text>
+
+    <rect x="305" y="270" width="110" height="20" rx="6" fill="#FDE68A"/>
+    <text x="360" y="283" text-anchor="middle" font-size="7" fill="#92400E">FOOT — Pressure Sensors</text>
+  </g>
+
+  <!-- ═══════════════ CIRCUIT BOARD (Bottom-Left) ═══════════════ -->
+  <g transform="translate(545, 560)">
+    <rect x="0" y="0" width="230" height="155" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5" filter="url(#sh)"/>
+    <rect x="0" y="0" width="230" height="26" rx="10" fill="#475569"/>
+    <rect x="0" y="16" width="230" height="10" fill="#475569"/>
+    <text x="115" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">🔌 ESP32 Power Circuit Board</text>
+
+    <!-- PCB outline -->
+    <rect x="15" y="38" width="200" height="105" rx="4" fill="#E2E8F0" stroke="#94A3B8"/>
+    <!-- Chips -->
+    <rect x="30" y="50" width="80" height="30" rx="3" fill="#CBD5E1" stroke="#64748B"/>
+    <text x="70" y="63" text-anchor="middle" font-size="8" font-weight="600" fill="#334155">ESP32-S3</text>
+    <text x="70" y="75" text-anchor="middle" font-size="6" fill="#475569">WiFi + BLE</text>
+
+    <rect x="125" y="50" width="75" height="30" rx="3" fill="#CBD5E1" stroke="#64748B"/>
+    <text x="162" y="68" text-anchor="middle" font-size="7" font-weight="600" fill="#334155">PMIC PCG2885</text>
+    <text x="162" y="80" text-anchor="middle" font-size="5" fill="#475569">Power Mgmt IC</text>
+
+    <rect x="30" y="90" width="90" height="22" rx="3" fill="#CBD5E1" stroke="#64748B"/>
+    <text x="75" y="104" text-anchor="middle" font-size="7" fill="#334155">Pebble Charger</text>
+
+    <rect x="130" y="90" width="70" height="22" rx="3" fill="#CBD5E1" stroke="#64748B"/>
+    <text x="165" y="104" text-anchor="middle" font-size="7" fill="#334155">USB-C Hub</text>
+
+    <text x="115" y="132" text-anchor="middle" font-size="6" fill="#64748B">22 AWG Power Sink Cables · Hard Port</text>
+  </g>
+
+  <!-- ═══════════════ ROTARY JOINT (Bottom-Right) ═══════════════ -->
+  <g transform="translate(545, 725)">
+    <rect x="0" y="0" width="230" height="145" rx="10" fill="#FEF2F2" stroke="#F87171" stroke-width="1.5" filter="url(#sh)"/>
+    <rect x="0" y="0" width="230" height="26" rx="10" fill="#DC2626"/>
+    <rect x="0" y="16" width="230" height="10" fill="#DC2626"/>
+    <text x="115" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">⚙️ Rotary Joint Module</text>
+
+    <!-- Concentric rings -->
+    <circle cx="115" cy="75" r="48" fill="none" stroke="#FCA5A5" stroke-width="2"/>
+    <circle cx="115" cy="75" r="32" fill="none" stroke="#F87171" stroke-width="1.5"/>
+    <circle cx="115" cy="75" r="16" fill="#FEE2E2" stroke="#EF4444"/>
+
+    <text x="115" y="42" text-anchor="middle" font-size="7" font-weight="600" fill="#991B1B">USB-C Hub Ring</text>
+    <text x="115" y="65" text-anchor="middle" font-size="7" fill="#DC2626">Movement Ring</text>
+    <text x="115" y="93" text-anchor="middle" font-size="6" fill="#B91C1C">Non-Moving Silicon</text>
+    <text x="115" y="105" text-anchor="middle" font-size="6" fill="#B91C1C">Rubber Board Wiring</text>
+
+    <text x="115" y="128" text-anchor="middle" font-size="6" fill="#991B1B">360° Continuous Rotation</text>
+  </g>
+
+  <!-- ═══════════════ DATA FLOW ARROWS ═══════════════ -->
+  <g stroke="#94A3B8" stroke-width="1.2" fill="none" stroke-dasharray="5">
+    <!-- Head → Neck -->
+    <line x1="440" y1="150" x2="455" y2="120"/>
+    <!-- Neck → Torso -->
+    <line x1="565" y1="220" x2="520" y2="235"/>
+    <!-- Torso → Arms -->
+    <line x1="350" y1="370" x2="340" y2="370"/>
+    <line x1="690" y1="370" x2="710" y2="345"/>
+    <!-- Torso → Legs -->
+    <line x1="400" y1="545" x2="250" y2="560"/>
+    <line x1="570" y1="545" x2="450" y2="560"/>
+  </g>
+
+  <!-- ═══════════════ LEGEND ═══════════════ -->
+  <g transform="translate(795, 560)">
+    <rect x="0" y="0" width="240" height="310" rx="10" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" filter="url(#sh)"/>
+    <text x="120" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#0F172A">📋 Component Legend</text>
+    <line x1="10" y1="32" x2="230" y2="32" stroke="#E2E8F0"/>
+
+    <g font-size="8">
+      <!-- Compute -->
+      <text x="10" y="50" font-weight="700" fill="#1E40AF">🧠 Compute</text>
+      <text x="16" y="65" fill="#334155">• NVIDIA Jetson Orin Nano (×1)</text>
+      <text x="16" y="78" fill="#334155">• ESP32-S3 DevKit (×6)</text>
+      <text x="16" y="91" fill="#334155">• Arduino UNO R4 WiFi (×1)</text>
+      <text x="16" y="104" fill="#334155">• RPi Hub Module (×1)</text>
+
+      <text x="10" y="122" font-weight="700" fill="#059669">👁️ Sensors</text>
+      <text x="16" y="137" fill="#334155">• DFRobot AI Camera</text>
+      <text x="16" y="150" fill="#334155">• Intel RealSense Depth</text>
+      <text x="16" y="163" fill="#334155">• MLX90640 Thermal (32×24)</text>
+      <text x="16" y="176" fill="#334155">• MPU6050 6-Axis IMU (×4)</text>
+      <text x="16" y="189" fill="#334155">• Ultrasonic HC-SR04 (×2)</text>
+
+      <text x="10" y="207" font-weight="700" fill="#DC2626">⚡ Actuators</text>
+      <text x="16" y="222" fill="#334155">• Linear DC Actuators (×8)</text>
+      <text x="16" y="235" fill="#334155">• Mini Industrial Servos (×10)</text>
+      <text x="16" y="248" fill="#334155">• Rotary Joint Modules (×6)</text>
+
+      <text x="10" y="266" font-weight="700" fill="#D97706">🔋 Power</text>
+      <text x="16" y="281" fill="#334155">• 20000mAh Banks (×3)</text>
+      <text x="16" y="294" fill="#334155">• 5000mAh Pebbles (×3)</text>
+    </g>
+  </g>
+
+  <!-- RESUME link -->
+  <text x="700" y="895" text-anchor="middle" font-size="8" fill="#94A3B8">
+    Generated from original hand-drawn blueprint · The Tank Project — Competition Submission · MIT Licensed
+  </text>
+</svg>

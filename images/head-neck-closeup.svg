@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="sh"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.1"/></filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10" fill="#3B82F6"/>
+    </marker>
+  </defs>
+
+  <text x="400" y="26" text-anchor="middle" font-size="18" font-weight="800" fill="#0F172A">🔍 Head &amp; Neck — Sensor Array Close-up</text>
+  <text x="400" y="44" text-anchor="middle" font-size="10" fill="#64748B">All sensors route through USB-C hub → Jetson Orin Nano</text>
+
+  <!-- Head casing -->
+  <ellipse cx="220" cy="250" rx="150" ry="180" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2.5"/>
+
+  <!-- Interior components -->
+  <!-- Jetson brain -->
+  <rect x="145" y="280" width="150" height="50" rx="8" fill="#DBEAFE" stroke="#60A5FA" stroke-width="2" filter="url(#sh)"/>
+  <text x="220" y="300" text-anchor="middle" font-size="11" font-weight="700" fill="#1E40AF">NVIDIA Jetson</text>
+  <text x="220" y="316" text-anchor="middle" font-size="8" fill="#2563EB">Orin Nano Super</text>
+
+  <!-- Left eye -->
+  <circle cx="155" cy="170" r="40" fill="#BFDBFE" stroke="#3B82F6" stroke-width="2" filter="url(#sh)"/>
+  <circle cx="155" cy="170" r="28" fill="#93C5FD"/>
+  <circle cx="155" cy="170" r="12" fill="#60A5FA"/>
+  <text x="155" y="220" text-anchor="middle" font-size="8" font-weight="600" fill="#1E40AF">LEFT EYE</text>
+  <text x="155" y="232" text-anchor="middle" font-size="7" fill="#3B82F6">GC9A01 240×240</text>
+  <text x="155" y="244" text-anchor="middle" font-size="6" fill="#64748B">SPI ← ESP32-S3</text>
+
+  <!-- Right eye -->
+  <circle cx="285" cy="170" r="40" fill="#BFDBFE" stroke="#3B82F6" stroke-width="2" filter="url(#sh)"/>
+  <circle cx="285" cy="170" r="28" fill="#93C5FD"/>
+  <circle cx="285" cy="170" r="12" fill="#60A5FA"/>
+  <text x="285" y="220" text-anchor="middle" font-size="8" font-weight="600" fill="#1E40AF">RIGHT EYE</text>
+  <text x="285" y="232" text-anchor="middle" font-size="7" fill="#3B82F6">GC9A01 240×240</text>
+  <text x="285" y="244" text-anchor="middle" font-size="6" fill="#64748B">SPI ← ESP32-S3</text>
+
+  <!-- AI Camera -->
+  <rect x="100" y="105" width="55" height="30" rx="5" fill="#FEE2E2" stroke="#F87171" filter="url(#sh)"/>
+  <text x="127" y="118" text-anchor="middle" font-size="7" font-weight="600" fill="#991B1B">AI Cam</text>
+  <text x="127" y="130" text-anchor="middle" font-size="5" fill="#DC2626">USB-C</text>
+
+  <!-- Depth Camera -->
+  <rect x="285" y="105" width="55" height="30" rx="5" fill="#FEE2E2" stroke="#F87171" filter="url(#sh)"/>
+  <text x="312" y="118" text-anchor="middle" font-size="7" font-weight="600" fill="#991B1B">Depth</text>
+  <text x="312" y="130" text-anchor="middle" font-size="5" fill="#DC2626">USB-C</text>
+
+  <!-- Thermal -->
+  <rect x="195" y="80" width="50" height="22" rx="4" fill="#FEF3C7" stroke="#F59E0B" filter="url(#sh)"/>
+  <text x="220" y="87" text-anchor="middle" font-size="6" font-weight="600" fill="#92400E">MLX90640</text>
+  <text x="220" y="97" text-anchor="middle" font-size="5" fill="#B45309">I²C 0x33</text>
+
+  <!-- MPU6050 -->
+  <rect x="195" y="125" width="50" height="22" rx="4" fill="#E0E7FF" stroke="#818CF8" filter="url(#sh)"/>
+  <text x="220" y="138" text-anchor="middle" font-size="7" font-weight="600" fill="#3730A3">MPU6050</text>
+  <text x="220" y="148" text-anchor="middle" font-size="5" fill="#6366F1">I²C 0x68</text>
+
+  <!-- Ultrasonic -->
+  <rect x="340" y="170" width="40" height="45" rx="4" fill="#ECFDF5" stroke="#34D399" filter="url(#sh)"/>
+  <text x="360" y="187" text-anchor="middle" font-size="6" font-weight="600" fill="#065F46">HC</text>
+  <text x="360" y="197" text-anchor="middle" font-size="6" font-weight="600" fill="#065F46">SR04</text>
+  <text x="360" y="209" text-anchor="middle" font-size="4" fill="#047857">GPIO</text>
+
+  <!-- Speaker -->
+  <rect x="100" y="170" width="40" height="30" rx="5" fill="#FEF2F2" stroke="#F87171" filter="url(#sh)"/>
+  <text x="120" y="183" text-anchor="middle" font-size="6" font-weight="600" fill="#991B1B">Speaker</text>
+  <text x="120" y="195" text-anchor="middle" font-size="5" fill="#DC2626">2Ω I²S</text>
+
+  <!-- USB-C Hub -->
+  <rect x="135" y="340" width="170" height="35" rx="6" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1.5" filter="url(#sh)"/>
+  <text x="220" y="355" text-anchor="middle" font-size="9" font-weight="600" fill="#334155">RPi USB-C Hub Module</text>
+  <text x="220" y="368" text-anchor="middle" font-size="6" fill="#64748B">I²C/SPI/UART Expander · All sensors ⇄</text>
+
+  <!-- Data bus lines from hub to sensors -->
+  <g stroke="#3B82F6" stroke-width="1" stroke-dasharray="3" opacity="0.5">
+    <line x1="170" y1="340" x2="127" y2="310"/>
+    <line x1="220" y1="340" x2="220" y2="310"/>
+    <line x1="280" y1="340" x2="312" y2="310"/>
+    <line x1="200" y1="340" x2="155" y2="310"/>
+    <line x1="250" y1="340" x2="285" y2="310"/>
+  </g>
+
+  <!-- ═══════════ NECK ═══════════ -->
+  <line x1="220" y1="430" x2="220" y2="460" stroke="#7C3AED" stroke-width="2"/>
+  <!-- Linear actuator -->
+  <rect x="185" y="435" width="70" height="20" rx="5" fill="#DDD6FE" stroke="#8B5CF6" filter="url(#sh)"/>
+  <text x="220" y="448" text-anchor="middle" font-size="7" font-weight="600" fill="#5B21B6">Linear Actuator</text>
+  <text x="220" y="459" text-anchor="middle" font-size="5" fill="#7C3AED">Z-axis ↑↓ · 12V · PWM</text>
+
+  <!-- Rotation joint -->
+  <ellipse cx="220" cy="475" rx="38" ry="14" fill="#C4B5FD" stroke="#7C3AED" stroke-width="1.5" filter="url(#sh)"/>
+  <text x="220" y="479" text-anchor="middle" font-size="8" font-weight="600" fill="#5B21B6">Rotational Joint</text>
+  <text x="220" y="492" text-anchor="middle" font-size="5" fill="#7C3AED">360° H-Bridge Servo · 24V</text>
+
+  <line x1="220" y1="489" x2="220" y2="510" stroke="#7C3AED" stroke-width="1.5"/>
+
+  <!-- ═══════════ Callouts ═══════════ -->
+  <g transform="translate(430, 60)" font-size="8">
+    <text x="0" y="0" font-weight="700" fill="#0F172A">📋 Sensor Bus Map</text>
+    <line x1="0" y1="6" x2="300" y2="6" stroke="#E2E8F0"/>
+
+    <g transform="translate(0, 16)">
+      <rect x="0" y="0" width="12" height="12" rx="2" fill="#DBEAFE"/>
+      <text x="18" y="10" fill="#334155">Jetson ← USB-C Hub (all upstream)</text>
+
+      <rect x="0" y="22" width="12" height="12" rx="2" fill="#93C5FD"/>
+      <text x="18" y="32" fill="#334155">Eyes ← ESP32-S3 SPI → GC9A01</text>
+
+      <rect x="0" y="44" width="12" height="12" rx="2" fill="#FEE2E2"/>
+      <text x="18" y="54" fill="#334155">AI/Depth Camera ← USB UVC</text>
+
+      <rect x="0" y="66" width="12" height="12" rx="2" fill="#FEF3C7"/>
+      <text x="18" y="76" fill="#334155">Thermal MLX90640 ← I²C 0x33</text>
+
+      <rect x="0" y="88" width="12" height="12" rx="2" fill="#E0E7FF"/>
+      <text x="18" y="98" fill="#334155">MPU6050 ← I²C 0x68</text>
+
+      <rect x="0" y="110" width="12" height="12" rx="2" fill="#ECFDF5"/>
+      <text x="18" y="120" fill="#334155">Ultrasonic ← GPIO Trig/Echo</text>
+
+      <rect x="0" y="132" width="12" height="12" rx="2" fill="#FEF2F2"/>
+      <text x="18" y="142" fill="#334155">Speaker ← I²S MAX98357 DAC</text>
+    </g>
+
+    <text x="0" y="172" font-weight="700" fill="#0F172A">⚡ Neck Joint Specs</text>
+    <line x1="0" y1="178" x2="300" y2="178" stroke="#E2E8F0"/>
+
+    <g transform="translate(0, 188)">
+      <rect x="0" y="0" width="12" height="12" rx="2" fill="#DDD6FE"/>
+      <text x="18" y="10" fill="#334155">Z-Axis: 100mm stroke · 12V 2A · 50N</text>
+
+      <rect x="0" y="22" width="12" height="12" rx="2" fill="#C4B5FD"/>
+      <text x="18" y="32" fill="#334155">Rotation: H-Bridge PWM · 360° · 24V</text>
+
+      <rect x="0" y="44" width="12" height="12" rx="2" fill="#F1F5F9"/>
+      <text x="18" y="54" fill="#334155">Charging Pebble: Wireless Qi dock</text>
+    </g>
+  </g>
+</svg>

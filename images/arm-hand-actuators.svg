@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="sh"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.1"/></filter>
+  </defs>
+
+  <text x="400" y="26" text-anchor="middle" font-size="18" font-weight="800" fill="#0F172A">🦾 Arm &amp; Hand — Actuator Chain &amp; Servo Mapping</text>
+  <text x="400" y="44" text-anchor="middle" font-size="10" fill="#64748B">Left arm identical · 3× linear actuators · ESP32-S3 Hand Manager · 5× micro servos</text>
+
+  <!-- ═══════ ARM CHAIN ═══════ -->
+  <g transform="translate(40, 65)">
+
+    <!-- Shoulder -->
+    <rect x="0" y="0" width="200" height="95" rx="10" fill="#FEF2F2" stroke="#F87171" stroke-width="2" filter="url(#sh)"/>
+    <text x="100" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#991B1B">🏋️ SHOULDER</text>
+    <text x="100" y="40" text-anchor="middle" font-size="8" fill="#DC2626">3× Linear DC Actuators</text>
+
+    <g font-size="7" fill="#7F1D1D">
+      <text x="12" y="58">• Actuator A: X-axis (forward/reach)</text>
+      <text x="12" y="72">• Actuator B: Y-axis (lift/lower)</text>
+      <text x="12" y="86">• Actuator C: Z-axis (rotation)</text>
+    </g>
+
+    <!-- Ethernet + Hub -->
+    <rect x="215" y="0" width="80" height="95" rx="8" fill="#FEE2E2" stroke="#FCA5A5"/>
+    <text x="255" y="22" text-anchor="middle" font-size="8" font-weight="600" fill="#991B1B">Ethernet</text>
+    <text x="255" y="38" text-anchor="middle" font-size="6" fill="#DC2626">RJ-45</text>
+    <text x="255" y="54" text-anchor="middle" font-size="8" font-weight="600" fill="#991B1B">Hub-FO</text>
+    <text x="255" y="68" text-anchor="middle" font-size="6" fill="#DC2626">Fiber Optic</text>
+    <text x="255" y="84" text-anchor="middle" font-size="5" fill="#B91C1C">(optional)</text>
+
+    <!-- Connection -->
+    <line x1="200" y1="48" x2="215" y2="48" stroke="#EF4444" stroke-width="1.5" marker-end="none"/>
+
+    <!-- Upper Arm -->
+    <rect x="310" y="0" width="180" height="95" rx="10" fill="#FEF2F2" stroke="#F87171" stroke-width="2" filter="url(#sh)"/>
+    <text x="400" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#991B1B">💪 UPPER ARM</text>
+
+    <g font-size="7" fill="#7F1D1D">
+      <text x="320" y="42">Connector stack:</text>
+      <text x="326" y="56">• HAMMER USB-C (tool interface)</text>
+      <text x="326" y="70">• USB-C SPHERE (rotation data)</text>
+      <text x="326" y="84">• ESP32 Camera Module (context)</text>
+    </g>
+
+    <!-- Elbow -->
+    <rect x="505" y="0" width="60" height="95" rx="8" fill="#FEE2E2" stroke="#FCA5A5"/>
+    <circle cx="535" cy="48" r="18" fill="#FCA5A5" stroke="#EF4444"/>
+    <text x="535" y="52" text-anchor="middle" font-size="8" font-weight="600" fill="#991B1B">ELBOW</text>
+
+    <!-- Forearm -->
+    <rect x="580" y="0" width="180" height="95" rx="10" fill="#FEF2F2" stroke="#F87171" stroke-width="2" filter="url(#sh)"/>
+    <text x="670" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#991B1B">✋ FOREARM</text>
+
+    <g font-size="7" fill="#7F1D1D">
+      <text x="590" y="42">ESP32-S3 DevKit Hand Manager:</text>
+      <text x="596" y="56">• 5× PWM channels (50 Hz)</text>
+      <text x="596" y="70">• I²C force sensors</text>
+      <text x="596" y="84">• UART → Jetson command bridge</text>
+    </g>
+
+  </g>
+
+  <!-- ═══════ HAND / PALM ═══════ -->
+  <g transform="translate(40, 180)">
+    <rect x="0" y="0" width="720" height="125" rx="10" fill="#FFF7ED" stroke="#F97316" stroke-width="2" filter="url(#sh)"/>
+    <text x="360" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#9A3412">✋ HAND — 5-Finger Gripper with Touch Sensing</text>
+
+    <!-- Palm plate -->
+    <rect x="100" y="38" width="520" height="45" rx="8" fill="#FED7AA" stroke="#FB923C"/>
+    <text x="360" y="58" text-anchor="middle" font-size="9" font-weight="600" fill="#9A3412">ACRYLIC 3× PLATE · MINI MICRO SERVO SOCKETS · 3D-PRINTED TPU JOINTS</text>
+    <text x="360" y="73" text-anchor="middle" font-size="7" fill="#C2410C">ESP32 Hand Manager mounted on dorsal plate · Rubber tubing cable loom through wrist</text>
+
+    <!-- 5 Fingers -->
+    <g font-size="7" text-anchor="middle">
+      <!-- Thumb -->
+      <rect x="100" y="92" width="65" height="28" rx="5" fill="#FDBA74"/>
+      <text x="132" y="105" font-weight="600" fill="#9A3412">THUMB</text>
+      <text x="132" y="116" font-size="5" fill="#C2410C">Servo 1 · 2 DOF</text>
+
+      <!-- Index -->
+      <rect x="180" y="92" width="90" height="28" rx="5" fill="#FDBA74"/>
+      <text x="225" y="105" font-weight="600" fill="#9A3412">INDEX</text>
+      <text x="225" y="116" font-size="5" fill="#C2410C">Servo 2 · 2 DOF</text>
+
+      <!-- Middle -->
+      <rect x="285" y="92" width="90" height="28" rx="5" fill="#FDBA74"/>
+      <text x="330" y="105" font-weight="600" fill="#9A3412">MIDDLE</text>
+      <text x="330" y="116" font-size="5" fill="#C2410C">Servo 3 · 2 DOF</text>
+
+      <!-- Ring -->
+      <rect x="390" y="92" width="90" height="28" rx="5" fill="#FDBA74"/>
+      <text x="435" y="105" font-weight="600" fill="#9A3412">RING</text>
+      <text x="435" y="116" font-size="5" fill="#C2410C">Servo 4 · 2 DOF</text>
+
+      <!-- Pinky -->
+      <rect x="495" y="92" width="125" height="28" rx="5" fill="#FDBA74"/>
+      <text x="557" y="105" font-weight="600" fill="#9A3412">PINKY</text>
+      <text x="557" y="116" font-size="5" fill="#C2410C">Servo 5 · 2 DOF</text>
+    </g>
+  </g>
+
+  <!-- ═══════ RIGHT SIDEBAR: Specs ═══════ -->
+  <rect x="40" y="325" width="720" height="155" rx="10" fill="#F8FAFC" stroke="#E2E8F0" filter="url(#sh)"/>
+  <text x="400" y="348" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">📐 Actuator Specifications</text>
+  <line x1="60" y1="356" x2="740" y2="356" stroke="#E2E8F0"/>
+
+  <g font-size="8">
+    <!-- Column 1 -->
+    <g transform="translate(60, 370)">
+      <text x="0" y="0" font-weight="700" fill="#991B1B">Shoulder Actuators (3×)</text>
+      <text x="8" y="16" fill="#475569">• Type: Linear DC 12V</text>
+      <text x="8" y="30" fill="#475569">• Stroke: 100mm</text>
+      <text x="8" y="44" fill="#475569">• Force: 50N / 150N peak</text>
+      <text x="8" y="58" fill="#475569">• Control: PWM via ESP32</text>
+      <text x="8" y="72" fill="#475569">• Feedback: Potentiometer</text>
+    </g>
+
+    <!-- Column 2 -->
+    <g transform="translate(310, 370)">
+      <text x="0" y="0" font-weight="700" fill="#9A3412">Finger Servos (5×)</text>
+      <text x="8" y="16" fill="#475569">• Type: Micro Servo SG90</text>
+      <text x="8" y="30" fill="#475569">• Range: 0-180°</text>
+      <text x="8" y="44" fill="#475569">• Torque: 1.5 kg·cm</text>
+      <text x="8" y="58" fill="#475569">• PWM: 50 Hz on ESP32</text>
+      <text x="8" y="72" fill="#475569">• 2 DOF per finger</text>
+    </g>
+
+    <!-- Column 3 -->
+    <g transform="translate(560, 370)">
+      <text x="0" y="0" font-weight="700" fill="#334155">ESP32-S3 Hand Manager</text>
+      <text x="8" y="16" fill="#475569">• 5× hardware PWM channels</text>
+      <text x="8" y="30" fill="#475569">• I²C force sensor array</text>
+      <text x="8" y="44" fill="#475569">• Serial bridge to Jetson</text>
+      <text x="8" y="58" fill="#475569">• USB-C powered (5V)</text>
+      <text x="8" y="72" fill="#475569">• Wi-Fi mesh (ESP-NOW)</text>
+    </g>
+  </g>
+</svg>
