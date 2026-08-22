@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-07-30T14:37:18.436224",
+  "query": "machine learning",
+  "duration_ms": 584.2,
+  "total_results": 3,
+  "results_by_source": {
+    "github": {
+      "count": 3,
+      "items": [
+        {
+          "source": "github",
+          "title": "tensorflow/tensorflow",
+          "url": "https://github.com/tensorflow/tensorflow",
+          "description": "An Open Source Machine Learning Framework for Everyone",
+          "stars": 196606,
+          "language": "C++",
+          "updated": "2026-07-30T12:35:39Z"
+        },
+        {
+          "source": "github",
+          "title": "huggingface/transformers",
+          "url": "https://github.com/huggingface/transformers",
+          "description": "\ud83e\udd17 Transformers: the model-definition framework for state-of-the-art machine learning models in text, vision, audio, and multimodal models, for both inference and training. ",
+          "stars": 163166,
+          "language": "Python",
+          "updated": "2026-07-30T12:34:55Z"
+        },
+        {
+          "source": "github",
+          "title": "microsoft/ML-For-Beginners",
+          "url": "https://github.com/microsoft/ML-For-Beginners",
+          "description": "12 weeks, 26 lessons, 52 quizzes, classic Machine Learning for all",
+          "stars": 88754,
+          "language": "Jupyter Notebook",
+          "updated": "2026-07-30T12:16:22Z"
+        }
+      ]
+    }
+  }
+}

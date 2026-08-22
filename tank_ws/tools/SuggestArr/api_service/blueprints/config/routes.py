@@ -1,0 +1,777 @@
+import os
+from flask import Blueprint, request, jsonify
+import yaml
+import requests
+from api_service.auth.middleware import require_role
+from api_service.config.config import (
+    load_env_vars, save_env_vars, clear_env_vars,
+    get_config_sections, get_config_section, save_config_section, INTEGRATION_TO_FLAT,
+    is_setup_complete
+)
+from api_service.config.logger_manager import LoggerManager
+from api_service.db.database_manager import DatabaseManager
+from api_service.services.config_service import ConfigService
+
+logger = LoggerManager.get_logger("ConfigRoute")
+config_bp = Blueprint('config', __name__)
+
+# Keys whose plaintext values must never appear in API responses.
+_SECRET_KEYS = frozenset({
+    'TMDB_API_KEY', 'OMDB_API_KEY',
+    'PLEX_TOKEN', 'JELLYFIN_TOKEN',
+    'SEER_TOKEN', 'SEER_USER_PSW', 'SEER_SESSION_TOKEN',
+    'DB_PASSWORD',
+    'OPENAI_API_KEY',
+    'TRAKT_CLIENT_SECRET', 'TRAKT_ACCESS_TOKEN', 'TRAKT_REFRESH_TOKEN',
+})
+
+_REDACTED = "***"
+
+# Bidirectional mapping between flat config keys (YAML / API format) and the
+# DB integrations table (service / field format).
+_FLAT_TO_INTEGRATION: dict = {
+    flat_key: (service, db_field)
+    for service, field_map in INTEGRATION_TO_FLAT.items()
+    for db_field, flat_key in field_map.items()
+}
+
+
+def _expand_integrations_into_flat(flat: dict, integrations: dict) -> None:
+    """Inject non-empty DB integration values into a flat config dict (in-place).
+
+    The integrations table is authoritative for the keys in ``_INTEGRATION_TO_FLAT``.
+    Only non-empty values from the DB override the flat dict, so YAML-only keys
+    (e.g. PLEX_TOKEN) are left untouched.
+
+    Args:
+        flat: Flat config dict to update (e.g. from ``load_env_vars``).
+        integrations: Nested dict returned by ``get_all_integrations``.
+    """
+    for service, field_map in INTEGRATION_TO_FLAT.items():
+        svc_cfg = integrations.get(service) or {}
+        for db_field, flat_key in field_map.items():
+            val = svc_cfg.get(db_field)
+            if val:
+                flat[flat_key] = val
+
+
+def _sync_integrations_from_flat(db, flat: dict) -> None:
+    """Upsert DB integration rows from a flat config dict.
+
+    Only keys present in *flat* with a non-empty, non-redacted value are written.
+    Missing keys leave the existing DB row untouched (merge, not replace).
+
+    Args:
+        db: ``DatabaseManager`` instance.
+        flat: Flat config dict (e.g. from ``request.json`` or ``load_env_vars``).
+    """
+    service_updates: dict = {}
+    for flat_key, (service, db_field) in _FLAT_TO_INTEGRATION.items():
+        val = flat.get(flat_key)
+        if val and val != _REDACTED:
+            service_updates.setdefault(service, {})[db_field] = val
+
+    for service, changes in service_updates.items():
+        existing = db.get_integration(service) or {}
+        db.set_integration(service, {**existing, **changes})
+
+
+def _redact_config(config: dict) -> dict:
+    """Return a copy of config with non-empty secret values replaced by '***'."""
+    return {k: (_REDACTED if k in _SECRET_KEYS and v else v) for k, v in config.items()}
+
+
+def _merge_secrets(incoming: dict, existing: dict) -> dict:
+    """Replace '***' sentinel values in incoming with the real value from existing config.
+
+    Falls back to the DB integrations table for keys that are only stored there
+    (not in config.yaml / ``existing``).
+    """
+    merged = dict(incoming)
+    # Build a flat view of DB-backed values as a fallback for redacted secrets.
+    db_flat: dict = {}
+    try:
+        _expand_integrations_into_flat(db_flat, DatabaseManager().get_all_integrations())
+    except Exception:
+        pass
+    for key in _SECRET_KEYS:
+        if merged.get(key) == _REDACTED:
+            merged[key] = existing.get(key) or db_flat.get(key)
+    return merged
+
+@config_bp.route('/fetch', methods=['GET'])
+@require_role('admin')
+def fetch_config():
+    """
+    Load current configuration in JSON format (admin sees real keys).
+
+    DB-backed integration values (TMDB_API_KEY, JELLYFIN_TOKEN, etc.) are
+    injected into the flat response so the frontend can read them directly,
+    even when config.yaml does not contain them.
+
+    Secrets are returned as-is for admin users; the UI is responsible for
+    masking them (reveal-on-demand pattern).  Non-admin access is blocked
+    upstream by the require_role('admin') decorator.
+    """
+    try:
+        config = load_env_vars()
+        db = DatabaseManager()
+        db_integrations = db.get_all_integrations()
+        # Surface DB-backed keys in the flat format the frontend expects.
+        _expand_integrations_into_flat(config, db_integrations)
+        config['integrations'] = db_integrations
+        return jsonify(config), 200
+    except Exception as e:
+        logger.error(f'Error loading configuration: {str(e)}', exc_info=True)
+        return jsonify({'message': 'Error loading configuration', 'status': 'error'}), 500
+    
+@config_bp.route('/save', methods=['POST'])
+@require_role('admin')
+def save_config():
+    """
+    Save environment variables and sync the DB integrations table.
+    """
+    try:
+        config_data = _merge_secrets(request.json or {}, load_env_vars())
+        save_env_vars(config_data)
+        db = DatabaseManager()
+        _sync_integrations_from_flat(db, config_data)
+        db.refresh_config()
+        return jsonify({'message': 'Configuration saved successfully!', 'status': 'success'}), 200
+    except Exception as e:
+        logger.error(f'Error saving configuration: {str(e)}', exc_info=True)
+        return jsonify({'message': 'Error saving configuration', 'status': 'error'}), 500
+
+@config_bp.route('/reset', methods=['POST'])
+@require_role('admin')
+def reset_config():
+    """
+    Reset environment variables.
+    """
+    try:
+        clear_env_vars()
+        return jsonify({'message': 'Configuration cleared successfully!', 'status': 'success'}), 200
+    except Exception as e:
+        logger.error(f'Error clearing configuration: {str(e)}', exc_info=True)
+        return jsonify({'message': 'Error clearing configuration', 'status': 'error'}), 500
+
+@config_bp.route('/test-db-connection', methods=['POST'])
+@require_role('admin')
+def test_db_connection():
+    """
+    Test database connection.
+    """
+    try:
+        # Extract DB configuration data from the request
+        db_config = request.json
+
+        # Check if the necessary data has been provided
+        required_keys = ['DB_TYPE', 'DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD', 'DB_NAME']
+        if any(key not in db_config for key in required_keys):
+            return jsonify({'message': 'Missing required database configuration parameters.', 'status': 'error'}), 400
+
+        # Create an instance of the DatabaseManager
+        db_manager = DatabaseManager()
+
+        # Call the connection test method
+        result = db_manager.test_connection(db_config)
+
+        # Respond with the test result
+        return jsonify(result), 200 if result['status'] == 'success' else 500
+
+    except Exception as e:
+        logger.error(f'Error testing database connection: {str(e)}', exc_info=True)
+        return jsonify({'message': 'Error testing database connection', 'status': 'error'}), 500
+
+@config_bp.route('/sections', methods=['GET'])
+@require_role('admin')
+def get_config_sections_endpoint():
+    """
+    Get available configuration sections.
+    """
+    try:
+        from api_service.config.config import get_config_sections as _get_sections
+        sections = _get_sections()
+        return jsonify({
+            'sections': sections,
+            'status': 'success'
+        }), 200
+    except Exception as e:
+        logger.error(f'Error getting configuration sections: {str(e)}', exc_info=True)
+        return jsonify({'message': 'Error getting configuration sections', 'status': 'error'}), 500
+
+@config_bp.route('/section/<section_name>', methods=['GET'])
+@require_role('admin')
+def get_config_section_endpoint(section_name):
+    """
+    Get a specific configuration section (admin only – real keys, no redaction).
+
+    DB-backed integration values are injected so the response is always
+    up-to-date even when config.yaml is stale or missing those keys.
+    """
+    try:
+        section_data = get_config_section(section_name)
+        _expand_integrations_into_flat(section_data, DatabaseManager().get_all_integrations())
+        return jsonify({
+            'section': section_name,
+            'data': section_data,
+            'status': 'success'
+        }), 200
+    except ValueError as e:
+        logger.error(f'Invalid configuration section: {str(e)}')
+        return jsonify({'message': f'Invalid configuration section: {str(e)}', 'status': 'error'}), 400
+    except Exception as e:
+        logger.error(f'Error getting configuration section {section_name}: {str(e)}', exc_info=True)
+        return jsonify({'message': 'Error getting configuration section', 'status': 'error'}), 500
+
+@config_bp.route('/section/<section_name>', methods=['POST'])
+@require_role('admin')
+def save_config_section_endpoint(section_name):
+    """
+    Save a specific configuration section and sync the DB integrations table.
+    """
+    try:
+        section_data = request.json
+        if not section_data:
+            return jsonify({'message': 'No configuration data provided', 'status': 'error'}), 400
+
+        section_data = _merge_secrets(section_data, load_env_vars())
+        save_config_section(section_name, section_data)
+        # Keep the integrations table in sync whenever service credentials are saved.
+        db = DatabaseManager()
+        _sync_integrations_from_flat(db, section_data)
+        return jsonify({
+            'message': f'Configuration section {section_name} saved successfully!',
+            'section': section_name,
+            'status': 'success'
+        }), 200
+    except ValueError as e:
+        logger.error(f'Invalid configuration section: {str(e)}')
+        return jsonify({'message': f'Invalid configuration section: {str(e)}', 'status': 'error'}), 400
+    except Exception as e:
+        logger.error(f'Error saving configuration section {section_name}: {str(e)}', exc_info=True)
+        return jsonify({'message': 'Error saving configuration section', 'status': 'error'}), 500
+
+from api_service.auth.limiter import limiter
+
+@config_bp.route('/status', methods=['GET'])
+@limiter.exempt
+def get_setup_status():
+    """
+    Get setup completion status.
+
+    The integrations table is checked as a fallback so that ``has_tmdb_key``
+    and ``is_complete`` remain accurate even when config.yaml is missing
+    DB-backed keys (e.g. after an import or a clean migration).
+    """
+    try:
+        config = load_env_vars()
+        # Inject DB-backed values so is_setup_complete sees the real state.
+        try:
+            _expand_integrations_into_flat(config, DatabaseManager().get_all_integrations())
+        except Exception:
+            pass
+        setup_completed = config.get('SETUP_COMPLETED', False)
+        is_complete = is_setup_complete(config)
+
+        return jsonify({
+            'setup_completed': setup_completed,
+            'is_complete': is_complete,
+            'selected_service': config.get('SELECTED_SERVICE'),
+            'has_tmdb_key': bool(config.get('TMDB_API_KEY')),
+            'trakt_app_configured': bool(config.get('TRAKT_CLIENT_ID') and config.get('TRAKT_CLIENT_SECRET')),
+            'status': 'success'
+        }), 200
+    except Exception as e:
+        logger.error(f'Error getting setup status: {str(e)}', exc_info=True)
+        return jsonify({'message': 'Error getting setup status', 'status': 'error'}), 500
+
+@config_bp.route('/complete-setup', methods=['POST'])
+@require_role('admin')
+def complete_setup():
+    """
+    Mark setup as completed.
+    """
+    try:
+        config = load_env_vars()
+
+        # Verify setup is actually complete before marking
+        if not is_setup_complete(config):
+            return jsonify({
+                'message': 'Cannot complete setup: Essential configuration is missing',
+                'status': 'error'
+            }), 400
+
+        config['SETUP_COMPLETED'] = True
+        save_env_vars(config)
+
+        return jsonify({
+            'message': 'Setup marked as completed successfully!',
+            'status': 'success'
+        }), 200
+    except Exception as e:
+        logger.error(f'Error completing setup: {str(e)}', exc_info=True)
+        return jsonify({'message': 'Error completing setup', 'status': 'error'}), 500
+
+@config_bp.route('/log-level', methods=['GET'])
+@require_role('admin')
+def get_log_level():
+    """
+    Get current log level.
+    """
+    try:
+        current_level = LoggerManager.get_current_log_level()
+        return jsonify({
+            'log_level': current_level,
+            'available_levels': ['DEBUG', 'INFO', 'WARNING', 'ERROR'],
+            'status': 'success'
+        }), 200
+    except Exception as e:
+        logger.error(f'Error getting log level: {str(e)}', exc_info=True)
+        return jsonify({'message': 'Error getting log level', 'status': 'error'}), 500
+
+@config_bp.route('/log-level', methods=['POST'])
+@require_role('admin')
+def set_log_level():
+    """
+    Set log level.
+    """
+    try:
+        data = request.json
+        if not data or 'level' not in data:
+            return jsonify({'message': 'Log level is required', 'status': 'error'}), 400
+
+        level = data['level'].upper()
+        old_level = LoggerManager.get_current_log_level()
+        LoggerManager.set_log_level(level)
+        logger.info(f'Log level changed from {old_level} to {level}')
+
+        return jsonify({
+            'message': f'Log level set to {level} successfully!',
+            'log_level': level,
+            'previous_level': old_level,
+            'status': 'success'
+        }), 200
+    except ValueError as e:
+        logger.error(f'Invalid log level: {str(e)}')
+        return jsonify({'message': str(e), 'status': 'error'}), 400
+    except Exception as e:
+        logger.error(f'Error setting log level: {str(e)}', exc_info=True)
+        return jsonify({'message': 'Error setting log level', 'status': 'error'}), 500
+
+@config_bp.route('/pool-stats', methods=['GET'])
+@require_role('admin')
+def get_pool_statistics():
+    """
+    Get database connection pool statistics.
+    """
+    try:
+        db_manager = DatabaseManager()
+        pool_stats = db_manager.get_pool_stats()
+        all_stats = {'status': 'direct_connection', 'message': 'Connection pooling has been removed for better performance'}
+        
+        return jsonify({
+            'message': 'Connection pool statistics retrieved successfully',
+            'current_pool': pool_stats,
+            'all_pools': all_stats,
+            'status': 'success'
+        }), 200
+    except Exception as e:
+        logger.error(f'Error getting pool statistics: {str(e)}', exc_info=True)
+        return jsonify({'message': 'Error getting pool statistics', 'status': 'error'}), 500
+
+@config_bp.route('/force_run', methods=['POST'])
+@require_role('admin')
+def force_run_automation():
+    """
+    Force run the automation script immediately.
+    """
+    try:
+        from api_service.utils.utils import execute_automation
+        logger.info("Force run automation script requested")
+        
+        # Execute automation in background
+        execute_automation(force_run=True)
+        
+        return jsonify({
+            'message': 'Automation script forced successfully!',
+            'status': 'success'
+        }), 200
+    except Exception as e:
+        logger.error(f'Error forcing automation run: {str(e)}', exc_info=True)
+        return jsonify({'message': 'Error forcing automation run', 'status': 'error'}), 500
+
+@config_bp.route('/test-db', methods=['POST'])
+@require_role('admin')
+def test_database_connection():
+    """
+    Test database connection with current configuration.
+    """
+    try:
+        config = load_env_vars()
+        db_config = {
+            'DB_TYPE': config.get('DB_TYPE', 'sqlite'),
+            'DB_HOST': config.get('DB_HOST'),
+            'DB_PORT': config.get('DB_PORT'),
+            'DB_USER': config.get('DB_USER'),
+            'DB_PASSWORD': config.get('DB_PASSWORD'),
+            'DB_NAME': config.get('DB_NAME'),
+            'DB_PATH': os.path.join(os.path.dirname(__file__), '..', '..', 'config', 'config_files', 'requests.db')
+        }
+        
+        db_manager = DatabaseManager()
+        result = db_manager.test_connection(db_config)
+        
+        return jsonify(result), 200
+    except Exception as e:
+        logger.error(f'Error testing database connection: {str(e)}', exc_info=True)
+        return jsonify({
+            'message': 'Error testing database connection',
+            'status': 'error'
+        }), 500
+
+@config_bp.route('/docker-info', methods=['GET'])
+def get_docker_info():
+    """
+    Get Docker container information using multiple reliable methods.
+    Prioritizes build args passed as ENV/LABELs.
+    """
+    try:
+        import os
+        import json
+        
+        docker_tag = os.environ.get('DOCKER_TAG') or os.environ.get('DOCKER_IMAGE_TAG')
+        build_date = os.environ.get('BUILD_DATE')
+        
+        if docker_tag:
+            logger.info(f'Docker info from ENV: tag={docker_tag}, source=environment')
+            return jsonify({
+                'tag': docker_tag,
+                'build_date': build_date,
+                'source': 'environment',
+                'status': 'success'
+            }), 200
+        
+        metadata_file = '/app/.docker_metadata'
+        if os.path.exists(metadata_file):
+            try:
+                with open(metadata_file, 'r') as f:
+                    metadata = json.load(f)
+                    logger.info(f'Docker info from metadata file: {metadata.get("tag")}')
+                    return jsonify({
+                        'tag': metadata.get('tag', 'latest'),
+                        'build_date': metadata.get('build_date'),
+                        'source': 'metadata_file',
+                        'status': 'success'
+                    }), 200
+            except Exception as e:
+                logger.warning(f'Metadata file read error: {e}')
+        
+        try:
+            import requests
+            container_id = os.environ.get('HOSTNAME', '').split('.')[0]
+            
+            if container_id:
+                sock_url = f"http://unix:///var/run/docker.sock:2375/containers/{container_id}/json"
+                response = requests.get(
+                    sock_url,
+                    timeout=5,
+                    headers={'Accept': 'application/json'}
+                )
+                
+                if response.status_code == 200:
+                    container_info = response.json()
+                    
+                    labels = container_info.get('Config', {}).get('Labels', {})
+                    docker_tag = labels.get('DOCKER_TAG') or labels.get('org.opencontainers.image.version')
+                    
+                    if not docker_tag:
+                        image_name = container_info.get('Config', {}).get('Image', '')
+                        if ':' in image_name:
+                            docker_tag = image_name.split(':')[-1]
+                        else:
+                            docker_tag = 'latest'
+                    
+                    logger.info(f'Docker info from socket: tag={docker_tag}')
+                    return jsonify({
+                        'tag': docker_tag or 'latest',
+                        'build_date': labels.get('BUILD_DATE'),
+                        'source': 'docker_socket',
+                        'status': 'success'
+                    }), 200
+                    
+        except Exception as e:
+            logger.debug(f'Docker socket failed: {e}')
+        
+        logger.debug('Docker info fallback: latest')
+        return jsonify({
+            'tag': 'latest',
+            'build_date': None,
+            'source': 'fallback',
+            'status': 'success'
+        }), 200
+        
+    except Exception as e:
+        logger.error(f'get_docker_info error: {e}', exc_info=True)
+        return jsonify({'status': 'error', 'message': 'An internal error occurred'}), 500
+
+
+@config_bp.route('/docker-digest/<tag>', methods=['GET'])
+def get_docker_digest(tag):
+    """
+    Docker Hub API proxy per digest (per nightly/stable checks).
+    """
+    try:
+        import requests
+        
+        url = f'https://registry.hub.docker.com/v2/repositories/ciuse99/suggestarr/tags/{tag}'
+        
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        
+        results = data.get('results', [])
+        if results:
+            digest = results[0].get('digest')
+            if digest:
+                logger.info(f'Digest for {tag}: {digest[:16]}...')
+                return jsonify({
+                    'tag': tag,
+                    'digest': digest,
+                    'status': 'success'
+                }), 200
+        
+        return jsonify({
+            'tag': tag,
+            'message': 'No digest found',
+            'status': 'error'
+        }), 404
+        
+    except requests.exceptions.RequestException as e:
+        logger.error(f'Docker digest API error for {tag}: {e}', exc_info=True)
+        return jsonify({'status': 'error', 'message': 'Failed to retrieve Docker digest'}), 500
+
+
+@config_bp.route('/export', methods=['GET'])
+@require_role('admin')
+def export_config():
+    """
+    Export the full application configuration as a portable JSON snapshot.
+
+    Requires admin role.  Secret values are redacted by default; pass
+    ``include_secrets=true`` for a fully restorable backup.
+
+    Query parameters:
+        include_secrets (str): 'true' to include raw secret values (API keys,
+            tokens, passwords) and Trakt OAuth tokens.  Defaults to 'false'.
+
+    Returns:
+        200 JSON with keys: version, integrations, settings, media_users.
+        500 on unexpected server error.
+    """
+    try:
+        include_secrets = request.args.get('include_secrets', 'false').lower() == 'true'
+        snapshot = ConfigService.export_config(include_secrets=include_secrets)
+        logger.info(
+            "Admin config export requested by user '%s' (include_secrets=%s)",
+            _current_username(),
+            include_secrets,
+        )
+        return jsonify(snapshot), 200
+    except Exception as e:
+        logger.error('Error exporting configuration: %s', e, exc_info=True)
+        return jsonify({'message': 'Error exporting configuration', 'status': 'error'}), 500
+
+
+@config_bp.route('/openai/user', methods=['GET'])
+def get_user_openai_config():
+    """
+    Get the current user's OpenAI configuration (if any).
+    
+    Users with can_manage_ai permission can view their own OpenAI settings.
+    Returns masked API key (first 8 chars + ...) and base URL.
+    
+    Returns:
+        200 JSON with openai_api_key (masked) and openai_base_url
+        403 if user lacks can_manage_ai permission
+        404 if no user config exists (user should use global config)
+    """
+    from flask import g
+    current_user = getattr(g, 'current_user', None)
+    if not current_user:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    if not current_user.get('can_manage_ai'):
+        return jsonify({'error': 'Insufficient permissions to manage AI settings'}), 403
+    
+    try:
+        user_id = int(current_user['id'])
+        db = DatabaseManager()
+        
+        # Get OpenAI config from user_media_profiles
+        token = db.get_user_media_profile_token(user_id, 'openai')
+        
+        if not token:
+            return jsonify({'status': 'not_configured', 'message': 'No user-specific OpenAI config'}), 404
+        
+        # Token is stored as JSON: {"api_key": "...", "base_url": "..."}
+        import json
+        try:
+            config_data = json.loads(token)
+            api_key = config_data.get('api_key', '')
+            base_url = config_data.get('base_url', '')
+            
+            # Mask the API key for security
+            masked_key = api_key[:8] + '...' if len(api_key) > 8 else '***'
+            
+            return jsonify({
+                'status': 'success',
+                'openai_api_key': masked_key,
+                'openai_base_url': base_url
+            }), 200
+        except json.JSONDecodeError:
+            return jsonify({'error': 'Invalid stored configuration'}), 500
+            
+    except Exception as e:
+        logger.error(f'Error retrieving user OpenAI config: {e}', exc_info=True)
+        return jsonify({'error': 'Failed to retrieve OpenAI configuration'}), 500
+
+
+@config_bp.route('/openai/user', methods=['POST'])
+def save_user_openai_config():
+    """
+    Save the current user's OpenAI configuration.
+    
+    Only users with can_manage_ai=1 can save their own OpenAI settings.
+    Stores api_key and base_url in user_media_profiles with provider='openai'.
+    
+    Request JSON:
+      openai_api_key (str, optional) - OpenAI API key
+      openai_base_url (str, optional) - OpenAI base URL (for local providers)
+      
+    At least one field must be provided.
+    
+    Returns:
+        200 on success
+        400 if invalid input
+        403 if user lacks can_manage_ai permission
+    """
+    from flask import g
+    current_user = getattr(g, 'current_user', None)
+    if not current_user:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    if not current_user.get('can_manage_ai'):
+        return jsonify({'error': 'Insufficient permissions to manage AI settings'}), 403
+    
+    try:
+        data = request.get_json(silent=True) or {}
+        api_key = data.get('openai_api_key', '').strip()
+        base_url = data.get('openai_base_url', '').strip()
+        
+        if not api_key and not base_url:
+            return jsonify({'error': 'At least one of openai_api_key or openai_base_url must be provided'}), 400
+        
+        user_id = int(current_user['id'])
+        db = DatabaseManager()
+        
+        # Store as JSON in access_token field
+        import json
+        config_json = json.dumps({
+            'api_key': api_key,
+            'base_url': base_url
+        })
+        
+        # Use external_user_id and external_username as placeholders
+        db.create_user_media_profile(
+            user_id=user_id,
+            provider='openai',
+            external_user_id=str(user_id),
+            external_username=current_user.get('username', 'user'),
+            access_token=config_json
+        )
+        
+        logger.info(f"User {current_user.get('username')} saved personal OpenAI configuration")
+        return jsonify({'status': 'success', 'message': 'OpenAI configuration saved'}), 200
+        
+    except Exception as e:
+        logger.error(f'Error saving user OpenAI config: {e}', exc_info=True)
+        return jsonify({'error': 'Failed to save OpenAI configuration'}), 500
+
+
+@config_bp.route('/openai/user', methods=['DELETE'])
+def delete_user_openai_config():
+    """
+    Delete the current user's OpenAI configuration.
+    
+    This will cause the user to fall back to the global admin OpenAI config.
+    
+    Returns:
+        200 on success
+        403 if user lacks can_manage_ai permission
+    """
+    from flask import g
+    current_user = getattr(g, 'current_user', None)
+    if not current_user:
+        return jsonify({'error': 'Authentication required'}), 401
+    
+    if not current_user.get('can_manage_ai'):
+        return jsonify({'error': 'Insufficient permissions to manage AI settings'}), 403
+    
+    try:
+        user_id = int(current_user['id'])
+        db = DatabaseManager()
+        
+        db.delete_user_media_profile(user_id, 'openai')
+        
+        logger.info(f"User {current_user.get('username')} deleted personal OpenAI configuration")
+        return jsonify({'status': 'success', 'message': 'OpenAI configuration deleted. Using global config.'}), 200
+        
+    except Exception as e:
+        logger.error(f'Error deleting user OpenAI config: {e}', exc_info=True)
+        return jsonify({'error': 'Failed to delete OpenAI configuration'}), 500
+
+
+@config_bp.route('/import', methods=['POST'])
+@require_role('admin')
+def import_config():
+    """
+    Import a configuration snapshot produced by the export endpoint.
+
+    Requires admin role.  Accepts a JSON body matching the export format
+    (version, integrations, settings).  Integrations are upserted into the DB;
+    settings are merged into config.yaml.
+
+    Returns:
+        200 on success.
+        400 if the body is missing, not JSON, or the version is unsupported.
+        500 on unexpected server error.
+    """
+    try:
+        data = request.get_json(silent=True)
+        if not data:
+            return jsonify({'message': 'Request body must be valid JSON', 'status': 'error'}), 400
+
+        ConfigService.import_config(data)
+        logger.info("Admin config import completed by user '%s'", _current_username())
+        return jsonify({'message': 'Configuration imported successfully', 'status': 'success'}), 200
+    except ValueError as e:
+        logger.warning('Config import rejected: %s', e)
+        return jsonify({'message': 'Invalid configuration payload', 'status': 'error'}), 400
+    except Exception as e:
+        logger.error('Error importing configuration: %s', e, exc_info=True)
+        return jsonify({'message': 'Error importing configuration', 'status': 'error'}), 500
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def _current_username() -> str:
+    """Return the username of the authenticated user, or '<unknown>'."""
+    try:
+        from flask import g
+        user = getattr(g, 'current_user', None)
+        return user.get('username', '<unknown>') if user else '<unknown>'
+    except Exception:
+        return '<unknown>'

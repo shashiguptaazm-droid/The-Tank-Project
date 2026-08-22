@@ -1,0 +1,65 @@
+{
+  "timestamp": "2026-08-13T03:05:15.963540",
+  "topic": "database tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "dbeaver/dbeaver",
+      "html_url": "https://github.com/dbeaver/dbeaver",
+      "description": "Free universal database tool and SQL client",
+      "stars": 51428,
+      "language": "Java",
+      "default_branch": "devel"
+    },
+    {
+      "full_name": "metabase/metabase",
+      "html_url": "https://github.com/metabase/metabase",
+      "description": "The easy-to-use open source Business Intelligence and Embedded Analytics tool that lets everyone work with data :bar_chart:",
+      "stars": 48718,
+      "language": "Clojure",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "LeCoupa/awesome-cheatsheets",
+      "html_url": "https://github.com/LeCoupa/awesome-cheatsheets",
+      "description": "\ud83d\udc69\u200d\ud83d\udcbb\ud83d\udc68\u200d\ud83d\udcbb Awesome cheatsheets for popular programming languages, frameworks and development tools. They include everything you should know in one single file.",
+      "stars": 46339,
+      "language": "JavaScript",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 6,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Out of the box supports more than <a href=\"#supported",
+      "description": "databases\">100 database drivers</a>."
+    },
+    {
+      "type": "tool",
+      "name": "Basic frameworks:",
+      "description": "[OSGI](https://en.wikipedia.org/wiki/OSGi) platform for plugins and dependency management. Community version consists of 130+ plugins."
+    },
+    {
+      "type": "tool",
+      "name": "For bug reports and feature requests",
+      "description": "please <a href=\"https://github.com/dbeaver/dbeaver/issues\">create a ticket</a>."
+    },
+    {
+      "type": "tool",
+      "name": "If you have any questions, ideas, etc",
+      "description": "please <a href=\"https://github.com/dbeaver/dbeaver/discussions\">start a discussion</a>."
+    },
+    {
+      "type": "tool",
+      "name": "Visit https://dbeaver.com for more information.",
+      "description": "Follow us on [X](https://x.com/dbeaver_news/) and watch educational video on [YouTube](https://www.youtube.com/@DBeaver_video)"
+    },
+    {
+      "type": "tool",
+      "name": "<a href=\"https://github.com/dbeaver/dbvr\">dbvr</a>",
+      "description": "CLI database management tool. Useful in CI/CD pipelines and all sort of automations."
+    }
+  ],
+  "script_summary": "6 tools"
+}

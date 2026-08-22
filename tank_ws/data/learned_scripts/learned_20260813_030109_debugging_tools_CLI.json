@@ -1,0 +1,238 @@
+{
+  "timestamp": "2026-08-13T03:01:09.414986",
+  "topic": "debugging tools CLI",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "aws/aws-sam-cli",
+      "html_url": "https://github.com/aws/aws-sam-cli",
+      "description": "CLI tool to build, test, debug, and deploy Serverless applications using AWS SAM",
+      "stars": 6728,
+      "language": "Python",
+      "default_branch": "develop"
+    },
+    {
+      "full_name": "geo-tp/ESP32-Bit-Pirate",
+      "html_url": "https://github.com/geo-tp/ESP32-Bit-Pirate",
+      "description": "A Hardware Hacking Tool with Web-Based CLI That Speaks Every Protocol ",
+      "stars": 5456,
+      "language": "C++",
+      "default_branch": "pioarduino"
+    },
+    {
+      "full_name": "patrickfav/uber-apk-signer",
+      "html_url": "https://github.com/patrickfav/uber-apk-signer",
+      "description": "A cli tool that helps signing and zip aligning single or multiple Android application packages (APKs) with either debug or provided release certificates. It supports v1, v2 and v3 Android signing scheme has an embedded debug keystore and auto verifies after signing.",
+      "stars": 2705,
+      "language": "Java",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 48,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Tail CloudWatch logs and X",
+      "description": "Ray traces** with `sam logs` and `sam traces`"
+    },
+    {
+      "type": "tool",
+      "name": "Develop Node projects with SAM CLI using esbuild",
+      "description": "and use SAM Accelerate on Typescript projects. [Read blogpost here](https://s12d.com/5Aa6u0o7)."
+    },
+    {
+      "type": "tool",
+      "name": "Speed up development with SAM Accelerate",
+      "description": "quickly test your changes in the cloud. [Read docs here](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/accelerate.html)."
+    },
+    {
+      "type": "tool",
+      "name": "The Complete SAM Workshop",
+      "description": "[This workshop](https://s12d.com/jKo46elk) is a great way to experience the power of SAM and SAM CLI."
+    },
+    {
+      "type": "tool",
+      "name": "Interactive command",
+      "description": "line interface (CLI) via **USB Serial or WiFi Web**."
+    },
+    {
+      "type": "tool",
+      "name": "Modes for:",
+      "description": "[HiZ](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/01-HiZ) (default)"
+    },
+    {
+      "type": "tool",
+      "name": "Device",
+      "description": "B-Gone command with more than **80 supported INFRARED protocols**."
+    },
+    {
+      "type": "tool",
+      "name": "USB",
+      "description": "Uart dongle, SPI programmer, logic analyzer** and more."
+    },
+    {
+      "type": "tool",
+      "name": "Other ESP32",
+      "description": "S3-based Boards**"
+    },
+    {
+      "type": "feature",
+      "value": "Interactive command-line interface (CLI) via **USB Serial or WiFi Web**."
+    },
+    {
+      "type": "feature",
+      "value": "**Modes for:**"
+    },
+    {
+      "type": "feature",
+      "value": "[HiZ](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/01-HiZ) (default)"
+    },
+    {
+      "type": "feature",
+      "value": "[I2C](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/05-I2C) (scan, glitch, slave mode, dump, eeprom)"
+    },
+    {
+      "type": "feature",
+      "value": "[SPI](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/06-SPI) (eeprom, flash, sdcard, slave mode)"
+    },
+    {
+      "type": "feature",
+      "value": "[UART](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/03-UART) / [Half-Duplex UART](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/04-HDUART) (bridge, read, write)"
+    },
+    {
+      "type": "feature",
+      "value": "[1WIRE](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/02-1WIRE) (ibutton, eeprom)"
+    },
+    {
+      "type": "feature",
+      "value": "[2WIRE](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/07-2WIRE) (sniff, smartcard) / [3WIRE](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/08-3WIRE) (eeprom)"
+    },
+    {
+      "type": "feature",
+      "value": "[DIO](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/09-DIO) (Digital I/O, read, pullup, set, pwm)"
+    },
+    {
+      "type": "feature",
+      "value": "[Infrared](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/11-INFRARED) (send, record, universal remote)"
+    },
+    {
+      "type": "feature",
+      "value": "[USB](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/12-USB) (HID, flashrom, storage, usb-uart)"
+    },
+    {
+      "type": "feature",
+      "value": "[Bluetooth](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/13-BLUETOOTH) (BLE HID, scan, spoofing, sniffing)"
+    },
+    {
+      "type": "feature",
+      "value": "[Wi-Fi](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/14-WIFI) / [Ethernet](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/18-ETHERNET) (sniff, deauth, nmap, netcat)"
+    },
+    {
+      "type": "feature",
+      "value": "[JTAG](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/15-JTAG) (scan, SWD, openOCD)"
+    },
+    {
+      "type": "feature",
+      "value": "[LED](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/10-LED) (animations, set LEDs)"
+    },
+    {
+      "type": "feature",
+      "value": "[I2S](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/16-I2S) (test speakers, mic, play sound)"
+    },
+    {
+      "type": "feature",
+      "value": "[CAN](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/17-CAN) (sniff, send and receive frames)"
+    },
+    {
+      "type": "feature",
+      "value": "[SUBGHZ](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/19-SUBGHZ) (analyze, record, replay)"
+    },
+    {
+      "type": "feature",
+      "value": "[RFID](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/20-RFID) (read, write, clone)"
+    },
+    {
+      "type": "feature",
+      "value": "[RF24](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/21-RF24) (scan, send, receive)"
+    },
+    {
+      "type": "feature",
+      "value": "[FM](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/22-FM) (analyze, broadcast)"
+    },
+    {
+      "type": "feature",
+      "value": "[CELL](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/23-CELL) (dump sim card, sms, call)"
+    },
+    {
+      "type": "feature",
+      "value": "[LORA](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/24-LORA) (sniff, payload, meshtatic)"
+    },
+    {
+      "type": "feature",
+      "value": "**Protocol sniffers** I2C, UART, SPI, 1Wire, 2wire, CAN, Wi-Fi, Bluetooth, SubGhz."
+    },
+    {
+      "type": "feature",
+      "value": "Baudrate **auto-detection**, AT commands and various tools for UART."
+    },
+    {
+      "type": "feature",
+      "value": "Registers manipulation, **EEPROM dump tools**, identify devices for I2C."
+    },
+    {
+      "type": "feature",
+      "value": "Read all sort of **EEPROM, Flash** and various others tools for SPI."
+    },
+    {
+      "type": "feature",
+      "value": "Scripting using **Bus Pirate-style bytecode** instructions or **Python**."
+    },
+    {
+      "type": "feature",
+      "value": "Device-B-Gone command with more than **80 supported INFRARED protocols**."
+    },
+    {
+      "type": "feature",
+      "value": "Direct I/O management, **PWM, servo, GPIOs state**."
+    },
+    {
+      "type": "feature",
+      "value": "Analyze radio signals and frequencies **on every bands**."
+    },
+    {
+      "type": "feature",
+      "value": "Near than **50 addressable LEDs protocols** supported."
+    },
+    {
+      "type": "feature",
+      "value": "**Ethernet and WiFi** are supported to access networks."
+    },
+    {
+      "type": "feature",
+      "value": "Import and export data with the **LittleFS over HTTP.**"
+    },
+    {
+      "type": "feature",
+      "value": "**Pirate assistant** to help you with the firmware."
+    },
+    {
+      "type": "feature",
+      "value": "**USB-Uart dongle, SPI programmer, logic analyzer** and more."
+    },
+    {
+      "type": "feature",
+      "value": "[**Web Serial tools**](https://geo-tp.github.io/ESP32-Bit-Pirate/web-tools/) to use USB Serial over a web browser."
+    },
+    {
+      "type": "tool",
+      "name": "built",
+      "description": "in zipalign & debug keystore for convenient usage"
+    },
+    {
+      "type": "tool",
+      "name": "Keystore location provided with `",
+      "description": "-ksDebug`"
+    }
+  ],
+  "script_summary": "11 tools, 37 features"
+}

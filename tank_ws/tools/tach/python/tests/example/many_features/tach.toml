@@ -1,0 +1,45 @@
+exclude = ["src", "**/tests"]
+exact = true
+forbid_circular_dependencies = true
+
+source_roots = [
+    "real_src",
+    "other_src_root"
+]
+
+layers = [
+    "high",
+    "mid",
+    "low",
+    "lowest",
+    "hightest",
+    { name = "closed", closed = true },
+    "lowest-open"
+]
+
+[[modules]]
+path = "module4"
+depends_on = []
+layer = "hightest"
+
+[[modules]]
+path = "module2"
+depends_on = []
+layer = "high"
+
+[[modules]]
+path = "outer_module"
+unchecked = true
+
+[[modules]]
+path = "globbed.**"
+depends_on = ["module4"]
+layer = "hightest"
+
+[rules]
+unused_ignore_directives = "error"
+require_ignore_directive_reasons = "warn"
+local_imports = "off"
+
+[plugins.django]
+settings_module = "django_settings"

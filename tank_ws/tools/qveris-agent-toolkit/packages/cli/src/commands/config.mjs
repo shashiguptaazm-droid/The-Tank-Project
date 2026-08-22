@@ -1,0 +1,147 @@
+import { getConfigPath, getConfigValue, setConfigValue, writeConfig } from "../config/store.mjs";
+import { resolveAll } from "../config/resolve.mjs";
+import { resolveApiBaseUrl } from "../client/api.mjs";
+import { bold, dim, cyan } from "../output/colors.mjs";
+import { outputJson } from "../output/json.mjs";
+import { revokeOAuthSession } from "../auth/oauth.mjs";
+import {
+  deleteOAuthSession,
+  getOAuthSessionMetadata,
+  hasOAuthSession,
+  loadOAuthSessionSecret,
+  withOAuthRefreshLock,
+} from "../auth/storage.mjs";
+import { CliError } from "../errors/handler.mjs";
+
+const ALLOWED_KEYS = ["api_key", "default_limit", "default_max_size", "color", "output_format"];
+
+export async function runConfig(subcommand, args, flags) {
+  switch (subcommand) {
+    case "set":
+      return configSet(args[0], args[1], flags);
+    case "get":
+      return configGet(args[0], flags);
+    case "list":
+      return configList(flags);
+    case "reset":
+      return configReset(flags);
+    case "path":
+      return configPath(flags);
+    default:
+      console.error(`  Unknown config subcommand: ${subcommand}`);
+      console.error(`  Usage: qveris config <set|get|list|reset|path>`);
+      process.exitCode = 2;
+  }
+}
+
+async function configSet(key, value, flags) {
+  if (!key || value === undefined) {
+    console.error("  Usage: qveris config set <key> <value>");
+    process.exitCode = 2;
+    return;
+  }
+  if (!ALLOWED_KEYS.includes(key)) {
+    console.error(`  Unknown config key: ${key}`);
+    console.error(`  Allowed: ${ALLOWED_KEYS.join(", ")}`);
+    process.exitCode = 2;
+    return;
+  }
+  let parsed = value;
+  if (key.endsWith("limit") || key.endsWith("size")) {
+    parsed = parseInt(value, 10);
+    if (isNaN(parsed)) {
+      console.error(`  Error: ${key} must be a valid integer.`);
+      process.exitCode = 2;
+      return;
+    }
+  }
+  await withOAuthRefreshLock(async () => setConfigValue(key, parsed));
+  if (flags.json) {
+    outputJson({ key, value: parsed });
+  } else {
+    console.log(`  ${key} = ${bold(String(parsed))}`);
+  }
+}
+
+function configGet(key, flags) {
+  if (!key) {
+    console.error("  Usage: qveris config get <key>");
+    process.exitCode = 2;
+    return;
+  }
+  if (!ALLOWED_KEYS.includes(key)) {
+    console.error(`  Unknown config key: ${key}`);
+    console.error(`  Allowed: ${ALLOWED_KEYS.join(", ")}`);
+    process.exitCode = 2;
+    return;
+  }
+  const val = getConfigValue(key);
+  if (flags.json) {
+    outputJson({ key, value: val ?? null });
+  } else {
+    console.log(val !== undefined ? `  ${key} = ${bold(String(val))}` : `  ${key} is not set`);
+  }
+}
+
+function configList(flags) {
+  const all = resolveAll();
+
+  const { baseUrl, source: endpointSource } = resolveApiBaseUrl({
+    baseUrlFlag: flags.baseUrl,
+    preferOAuth: !all.api_key?.value && hasOAuthSession(),
+  });
+
+  if (flags.json) {
+    const obj = {};
+    for (const k of ALLOWED_KEYS) {
+      const v = all[k];
+      if (!v) continue;
+      obj[k] = { value: k === "api_key" && v.value ? mask(v.value) : v.value, source: v.source };
+    }
+    obj._endpoint = { base_url: baseUrl, source: endpointSource };
+    outputJson(obj);
+    return;
+  }
+
+  console.log(`\n  ${bold("Key")}                 ${bold("Value")}                    ${bold("Source")}`);
+  for (const key of ALLOWED_KEYS) {
+    const { value, source } = all[key] || { value: undefined, source: "none" };
+    const display = key === "api_key" && value ? mask(value) : String(value ?? dim("(not set)"));
+    console.log(`  ${cyan(key.padEnd(20))}${display.padEnd(25)}${dim(source)}`);
+  }
+  console.log(`\n  ${bold("Effective endpoint:")} ${dim(baseUrl)} ${dim(`(${endpointSource})`)}`);
+  console.log();
+}
+
+async function configReset() {
+  let cleanupWarning = null;
+  await withOAuthRefreshLock(async () => {
+    const metadata = getOAuthSessionMetadata({ fresh: true });
+    const secret = await loadOAuthSessionSecret(metadata, { fresh: true });
+    if (metadata && secret) {
+      try {
+        await revokeOAuthSession(metadata, secret);
+      } catch (error) {
+        cleanupWarning = error;
+      }
+    } else if (metadata) {
+      cleanupWarning = new CliError(
+        "API_ERROR",
+        "Remote OAuth revocation could not be attempted because the stored credential is unavailable",
+      );
+    }
+    await deleteOAuthSession();
+    writeConfig({});
+  });
+  if (cleanupWarning) throw cleanupWarning;
+  console.log("  Config reset to defaults.");
+}
+
+function configPath() {
+  console.log(getConfigPath());
+}
+
+function mask(key) {
+  if (typeof key !== "string" || key.length < 10) return "***";
+  return key.slice(0, 6) + "..." + key.slice(-4);
+}

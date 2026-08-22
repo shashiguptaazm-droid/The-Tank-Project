@@ -1,0 +1,63 @@
+{
+  "timestamp": "2026-07-31T03:03:37.714154",
+  "topic": "patrol automation tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "levitation-opensource/DiskScan",
+      "html_url": "https://github.com/levitation-opensource/DiskScan",
+      "description": "Disk surface background scan tool. It slowly reads the whole surface of a given physical disk and then repeats indefinitely. When the disk encounters a weak sector during the read operation, its firmware will hopefully relocate the data in this sector into a good spare sector.",
+      "stars": 4,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "raunakranjann/PixelPatrol",
+      "html_url": "https://github.com/raunakranjann/PixelPatrol",
+      "description": "PixelPatrol is a self-hosted, privacy-first automation tool designed to detect \"silent\" UI regressions. It works by capturing screenshots of your Staging and Production environments and comparing them pixel-by-pixel to identify visual bugs (like layout shifts or font changes) that standard code test",
+      "stars": 1,
+      "language": "Java",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "edrc-shawn/lingtai-mcp",
+      "html_url": "https://github.com/edrc-shawn/lingtai-mcp",
+      "description": "Self-evolving knowledge management system: Obsidian vault + a zero-dependency MCP server (86 tools). Refines raw materials into structured knowledge, evolves its own rules, and runs 24/7 patrol automation",
+      "stars": 1,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 6,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone https://github.com/raunakranjann/pixelpatrol.git"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://cnb.cool/edrc.shawn/lingtai-mcp.git"
+    },
+    {
+      "type": "tool",
+      "name": "Python 3.10+",
+      "description": "An MCP-compatible AI client (Claude Desktop, Cursor, VS Code, WorkBuddy)"
+    },
+    {
+      "type": "tool",
+      "name": "All API keys are injected via environment variables",
+      "description": "**never hardcoded**"
+    },
+    {
+      "type": "tool",
+      "name": "File operations are sandboxed within the vault directory",
+      "description": "stdout is reserved for JSON-RPC protocol; all logging goes to stderr"
+    },
+    {
+      "type": "tool",
+      "name": "Write operations use a global mutex with 5s timeout",
+      "description": "See [SECURITY.md](.tool/lingtai-kb/SECURITY.md) for the full policy"
+    }
+  ],
+  "script_summary": "2 commands, 4 tools"
+}

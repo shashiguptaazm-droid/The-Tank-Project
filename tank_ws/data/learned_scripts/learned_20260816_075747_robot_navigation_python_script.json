@@ -1,0 +1,84 @@
+{
+  "timestamp": "2026-08-16T07:57:47.265097",
+  "topic": "robot navigation python scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "JoaoRicardofss/Pepper_grasping_and_navigation",
+      "html_url": "https://github.com/JoaoRicardofss/Pepper_grasping_and_navigation",
+      "description": "A Python script that makes Pepper robot explore a room, define points, and follow the steps for the grasping of an object marked with NAOqi landmarks.",
+      "stars": 13,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "yifanxueseas/mmp_mcbf_control",
+      "html_url": "https://github.com/yifanxueseas/mmp_mcbf_control",
+      "description": "Python scripts for MMP_MCBF control framework proposed in RA-L paper \"Proactive Local-Minima-Free Robot Navigation: Blending Motion Prediction with Safe Control\"",
+      "stars": 3,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "shermanyan/SlamRobotFollower",
+      "html_url": "https://github.com/shermanyan/SlamRobotFollower",
+      "description": "This project uses two Turtlebot3 robots. One maps the environment with SLAM, and the other navigates a maze using an RRT algorithm. Shared data enables autonomous navigation without object detection. Developed using ROS tools, Gazebo, and Python scripts..",
+      "stars": 2,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 12,
+  "findings": [
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements_socialnav.txt"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements_mcbf.txt"
+    },
+    {
+      "type": "command",
+      "value": "python3 src/build_mpc_solver.py"
+    },
+    {
+      "type": "command",
+      "value": "python3 src/main_social_nav.py"
+    },
+    {
+      "type": "command",
+      "value": "python3 src/main_social_nav.py --use_mpc True"
+    },
+    {
+      "type": "command",
+      "value": "python3 src/main_social_nav.py --pred_len 50"
+    },
+    {
+      "type": "command",
+      "value": "python3 src/main.py"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "tool",
+      "name": "Turtlebot3 ```slam_toolbox```",
+      "description": "ROS Navigation ```move_base```"
+    }
+  ],
+  "script_summary": "8 commands, 3 pip_packages, 1 tools"
+}

@@ -1,0 +1,68 @@
+{
+  "timestamp": "2026-08-20T03:00:48.914171",
+  "topic": "creative coding python scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "sadielbartholomew/creative-matplotlib",
+      "html_url": "https://github.com/sadielbartholomew/creative-matplotlib",
+      "description": "Creative coding scripts and outputs using vanilla matplotlib",
+      "stars": 63,
+      "language": "Jupyter Notebook",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "ScriptXeno/ScriptXeno.github.io",
+      "html_url": "https://github.com/ScriptXeno/ScriptXeno.github.io",
+      "description": "A modern tech blog exploring smart code, creative design, and automation. Built for developers, designers, and digital makers pushing boundaries with every script.",
+      "stars": 5,
+      "language": "HTML",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Girijesh-devops/python_richforever",
+      "html_url": "https://github.com/Girijesh-devops/python_richforever",
+      "description": " # Python Developer Roadmap  Folks, Here are 10 important things to deep-dive into Python Developer Role!  Also, the items are listed in no particular order. You don't need to learn everything listed here, however knowing what you don't know is as important as knowing things.  ## **1. Learn the basi",
+      "stars": 3,
+      "language": null,
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 7,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "access the code and raw outputs for each (mini",
+      "description": ")project."
+    },
+    {
+      "type": "command",
+      "value": "bash tools/run.sh          # serve locally with live reload"
+    },
+    {
+      "type": "command",
+      "value": "bash tools/test.sh         # build + htmlproofer, matching CI"
+    },
+    {
+      "type": "tool",
+      "name": "_posts/",
+      "description": "blog posts (`YYYY-MM-DD-slug.md`); published URLs are date-independent (`/posts/:title/`)"
+    },
+    {
+      "type": "tool",
+      "name": "_plugins/",
+      "description": "a few small local Jekyll hooks on top of the theme (git-history-based `last_modified_at`, an upstream `jekyll-seo-tag` schema fix, and a `jekyll-watch` ignore-path patch)"
+    },
+    {
+      "type": "tool",
+      "name": "tools/blog-mcp/",
+      "description": "a local MCP server for the post lifecycle: reading/writing/editing/publishing posts, creating per-post image-hosting repos, PNG\u2192WebP conversion, thumbnail prompt generation, and Gemini image generatio"
+    },
+    {
+      "type": "tool",
+      "name": "CLAUDE.md",
+      "description": "detailed conventions for this repo (permalink structure, tag/category casing rules, image hosting, CI/deploy quirks) for anyone (human or AI agent) working in it"
+    }
+  ],
+  "script_summary": "5 tools, 2 commands"
+}

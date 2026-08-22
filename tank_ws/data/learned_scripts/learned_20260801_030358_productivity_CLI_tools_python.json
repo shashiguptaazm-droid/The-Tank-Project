@@ -1,0 +1,102 @@
+{
+  "timestamp": "2026-08-01T03:03:58.708882",
+  "topic": "productivity CLI tools python",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "ohmyzsh/ohmyzsh",
+      "html_url": "https://github.com/ohmyzsh/ohmyzsh",
+      "description": "\ud83d\ude43   A delightful community-driven (with 2,500+ contributors) framework for managing your zsh configuration. Includes 300+ optional plugins (rails, git, macOS, hub, docker, homebrew, node, php, python, etc), 140+ themes to spice up your morning, and an auto-update tool that makes it easy to keep up w",
+      "stars": 188922,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "TheR1D/shell_gpt",
+      "html_url": "https://github.com/TheR1D/shell_gpt",
+      "description": "A command-line productivity tool powered by AI large language models like GPT-5, will help you accomplish your tasks faster and more efficiently.",
+      "stars": 12213,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "tach-org/tach",
+      "html_url": "https://github.com/tach-org/tach",
+      "description": "A Python tool to visualize + enforce dependencies, using modular architecture \ud83c\udf0e Open source \ud83d\udc0d Installable via pip \ud83d\udd27 Able to be adopted incrementally - \u26a1 Implemented with no runtime impact \u267e\ufe0f Interoperable with your existing systems \ud83e\udd80 Written in rust",
+      "stars": 2778,
+      "language": "Rust",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 16,
+  "findings": [
+    {
+      "type": "command",
+      "value": "wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
+    },
+    {
+      "type": "command",
+      "value": "git"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh"
+    },
+    {
+      "type": "tool",
+      "name": "`curl` or `wget` should be installed",
+      "description": "`git` should be installed (recommended v2.4.11 or higher)"
+    },
+    {
+      "type": "command",
+      "value": "pip install shell-gpt"
+    },
+    {
+      "type": "command",
+      "value": "git diff | sgpt \"Generate git commit message, for my changes\""
+    },
+    {
+      "type": "command",
+      "value": "docker logs -n 20 my_app | sgpt \"check logs, find errors, provide possible solutions\""
+    },
+    {
+      "type": "pip_package",
+      "value": "shell-gpt"
+    },
+    {
+      "type": "command",
+      "value": "pip install tach"
+    },
+    {
+      "type": "command",
+      "value": "python/tach/filesystem/install.py[L6]: Import 'tach.hooks.build_pre_commit_hook_content'"
+    },
+    {
+      "type": "command",
+      "value": "python/tach/filesystem/project.py[L5]: Import 'tach.constants.CONFIG_FILE_NAME'"
+    },
+    {
+      "type": "command",
+      "value": "python/tach/cache/access.py[L8]: Import 'tach.filesystem.find_project_config_root'"
+    },
+    {
+      "type": "command",
+      "value": "python/tach/cache/setup.py[L7]: Import 'tach.filesystem.find_project_config_root'"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83c\udf0e Open source",
+      "description": "\ud83d\udc0d Installable via pip"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\udd27 Able to be adopted incrementally",
+      "description": "\u26a1 Implemented with no runtime impact"
+    },
+    {
+      "type": "pip_package",
+      "value": "tach"
+    }
+  ],
+  "script_summary": "11 commands, 3 tools, 2 pip_packages"
+}

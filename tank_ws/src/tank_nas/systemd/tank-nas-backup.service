@@ -1,0 +1,12 @@
+[Unit]
+Description=The Tank — daily off-site rclone backup of /root/the_tank_data to NAS + cloud
+
+[Service]
+Type=oneshot
+# NOTE: project runs as root; if you add a dedicated `tank` user in
+# scripts/provision_pi5.sh, re-add User=tank / Group=tank here.
+WorkingDirectory=/root/the tank project
+ExecStart=/usr/bin/python3 /root/the tank project/tank_ws/src/tank_nas/scripts/auto_backup.py
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7

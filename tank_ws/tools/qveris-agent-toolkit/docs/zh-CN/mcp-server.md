@@ -1,0 +1,523 @@
+# QVeris MCP 服务器文档
+
+## 简介
+
+`@qverisai/mcp` 是面向 ChatGPT（Codex）、Cursor、Claude Desktop、Cherry Studio、GitHub Copilot、Cline、Roo Code、Kiro、Qoder、CodeBuddy、WorkBuddy 及其他编程智能体等 MCP 兼容客户端的官方 QVeris MCP 服务器。
+
+`@qverisai/mcp` v0.14.0 是最新测试版本，通过六个规范 MCP 工具为智能体提供 QVeris 访问能力：
+
+- `discover` — 用自然语言发现能力
+- `inspect` — 获取工具详情（参数、成功率、示例）
+- `probe` — 不执行能力的参数校验与报价
+- `call` — 执行工具并传入参数
+- `usage_history` — 上下文安全的调用审计摘要 / 精确查询 / 文件导出
+- `credits_ledger` — 上下文安全的最终积分账本摘要 / 精确查询 / 文件导出
+
+换言之，MCP 服务器是本仓库其他文档所描述的 QVeris 核心协议的智能体侧传输层。
+
+---
+
+## MCP 与 REST API 对比
+
+**适合使用 MCP 服务器的场景：**
+
+- 将 QVeris 集成到 ChatGPT（Codex）、Cursor、Claude Desktop、Cherry Studio、GitHub Copilot、Cline、Roo Code、Continue、Kiro、Junie、Augment、Zed、Google Antigravity、Qoder、CodeBuddy、WorkBuddy、OpenCode 或其他 MCP 客户端
+- 希望智能体在对话中直接调用 QVeris 工具
+- 希望客户端自动管理工具调用
+
+**适合使用 REST API 的场景：**
+
+- 编写应用代码或后端服务
+- 需要对请求和响应进行直接的 HTTP 控制
+- 构建 SDK 封装或生产环境集成
+
+两种方式均映射到同一套 QVeris 协议：
+
+| 协议操作 | MCP 工具 | REST API |
+|---------|---------|---------|
+| **发现** | `discover` | `POST /search` |
+| **检查** | `inspect` | `POST /tools/by-ids` |
+| **探测** | `probe` | `POST /tools/probe` |
+| **调用** | `call` | `POST /tools/execute` |
+| **调用审计** | `usage_history` | `GET /auth/usage/history/v2` |
+| **积分账本** | `credits_ledger` | `GET /auth/credits/ledger` |
+
+> **注意：** 旧工具名称（`search_tools`、`get_tools_by_ids`、`execute_tool`）仍作为弃用别名支持。
+
+---
+
+## 环境要求
+
+- 有效的 `QVERIS_API_KEY`
+- MCP 兼容客户端
+- 仅在使用本地 stdio 备用方案时需要 Node.js `18+`
+
+---
+
+## 快速开始
+
+### 托管 MCP（推荐）
+
+只要客户端支持远程 Streamable HTTP，就应优先使用托管 MCP。它使用一个受管端点和 Bearer 认证，无需维护本地软件包、Node.js 进程或服务器生命周期。
+
+```json
+{
+  "mcpServers": {
+    "qveris": {
+      "type": "http",
+      "url": "https://mcp.qveris.ai/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_QVERIS_API_KEY"
+      }
+    }
+  }
+}
+```
+
+可前往[托管 MCP 页面](https://qveris.ai/hosted-mcp)复制端点并查看各客户端的配置说明。只有当客户端不支持远程 Streamable HTTP 时，才使用下方本地 stdio 备用方案。
+
+### 本地 stdio 备用方案
+
+#### 通过 `npx` 安装
+
+```bash
+npx -y @qverisai/mcp
+```
+
+MCP 服务器从以下环境变量读取配置：
+
+```bash
+QVERIS_API_KEY=your-api-key          # 必填
+QVERIS_BASE_URL=https://qveris.ai/api/v1  # 可选：覆盖 API 地址
+```
+
+#### 使用 QVeris CLI 配置
+
+可以用 CLI 生成客户端配置，无需手写 JSON。默认会打印带有 `YOUR_QVERIS_API_KEY` 占位符的安全配置；占位符输出会故意无法通过 API key 校验，直到你替换占位符或使用 `--include-key`。
+
+```bash
+# 打印安全的 Cursor 配置
+qveris mcp configure --target cursor
+
+# 使用 qveris login 或 QVERIS_API_KEY 中的 API key 写入可直接使用的配置
+qveris mcp configure --target cursor --write --include-key
+qveris mcp configure --target claude-desktop --write --include-key
+qveris mcp configure --target opencode --write --include-key
+qveris mcp configure --target openclaw --write --include-key
+
+# Claude Code 使用 shell 命令，而不是 JSON 配置文件
+qveris mcp configure --target claude-code
+```
+
+重启客户端前可以先校验配置：
+
+```bash
+qveris mcp validate --target cursor
+```
+
+对 stdio 客户端，可添加 `--probe` 启动配置中的 MCP server，并通过 `tools/list` 确认 `discover`、`inspect`、`probe`、`call` 可见：
+
+```bash
+qveris mcp validate --target cursor --probe
+```
+
+### Claude Desktop 配置示例
+
+```json
+{
+  "mcpServers": {
+    "qveris": {
+      "command": "npx",
+      "args": ["-y", "@qverisai/mcp"],
+      "env": {
+        "QVERIS_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+### Cursor 配置示例
+
+```json
+{
+  "mcpServers": {
+    "qveris": {
+      "command": "npx",
+      "args": ["-y", "@qverisai/mcp"],
+      "env": {
+        "QVERIS_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+### Cherry Studio 配置示例
+
+在 [Cherry Studio](https://cherry-ai.com/) 中打开**设置 → MCP 服务器**，新增服务器后将以下内容填入对应配置字段：
+
+```json
+{
+  "name": "QVeris",
+  "command": "npx",
+  "args": ["-y", "@qverisai/mcp"],
+  "env": {
+    "QVERIS_API_KEY": "your-api-key-here",
+    "QVERIS_BASE_URL": "https://qveris.ai/api/v1"
+  },
+  "disabledTools": []
+}
+```
+
+保存服务器，在对话中启用它，并确认可见 `discover`、`inspect`、`probe` 和 `call`。
+
+### 桌面端智能体客户端
+
+除上文客户端外，以下桌面端智能体在支持远程 Streamable HTTP 时应优先使用托管 MCP，本地 stdio 仅作为备用方案：**ChatGPT（Codex）**、**GitHub Copilot**、**Cline**、**Roo Code**、**Continue**、**Kiro**、**Junie**、**Augment**、**Zed**、**Google Antigravity**、**Qoder**、**CodeBuddy** 和 **WorkBuddy**。
+
+ChatGPT（Codex）可运行：
+
+```bash
+codex mcp add qveris --env QVERIS_API_KEY=your-api-key-here --env QVERIS_BASE_URL=https://qveris.ai/api/v1 -- npx -y @qverisai/mcp
+```
+
+对于 GitHub Copilot 以外的仅支持本地 stdio 的客户端，请在 MCP 设置中导入以下备用配置。Zed 在 Agent 面板中填写相同的名称、命令、参数和环境变量。
+
+```json
+{
+  "mcpServers": {
+    "qveris": {
+      "command": "npx",
+      "args": ["-y", "@qverisai/mcp"],
+      "env": {
+        "QVERIS_API_KEY": "your-api-key-here",
+        "QVERIS_BASE_URL": "https://qveris.ai/api/v1"
+      }
+    }
+  }
+}
+```
+
+#### VS Code 中的 GitHub Copilot
+
+GitHub Copilot 的 `mcp.json` 使用顶层 `servers` 对象，而不是 `mcpServers`。
+
+##### 托管 MCP 配置
+
+```json
+{
+  "servers": {
+    "qveris": {
+      "type": "http",
+      "url": "https://mcp.qveris.ai/mcp",
+      "headers": {
+        "Authorization": "Bearer your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+##### 本地 stdio 备用方案
+
+如果客户端环境不能使用远程 HTTP，请保留同一 `servers` 外层键，改用以下本地 stdio 条目：
+
+```json
+{
+  "servers": {
+    "qveris": {
+      "command": "npx",
+      "args": ["-y", "@qverisai/mcp"],
+      "env": {
+        "QVERIS_API_KEY": "your-api-key-here",
+        "QVERIS_BASE_URL": "https://qveris.ai/api/v1"
+      }
+    }
+  }
+}
+```
+
+各环境的详细配置指南，请参考：
+
+- [智能体安装指南](../../agent/SETUP.md)
+- [Codex 与 ChatGPT 桌面端配置](codex-setup.md)
+- [Claude Code 配置](claude-code-setup.md)
+- [OpenCode 配置](opencode-setup.md)
+- [IDE / CLI 配置](ide-cli-setup.md)
+
+---
+
+## 托管 MCP 详细说明
+
+QVeris 提供远程 Streamable HTTP MCP 托管服务。对于支持它的客户端，这是首选 MCP 连接方式：无需安装本地软件包或运行后台进程。
+
+```text
+https://mcp.qveris.ai/mcp
+```
+
+在支持远程 MCP 的客户端中添加服务地址，并在每次请求中发送 QVeris API 密钥：
+
+```json
+{
+  "mcpServers": {
+    "qveris": {
+      "type": "http",
+      "url": "https://mcp.qveris.ai/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_QVERIS_API_KEY"
+      }
+    }
+  }
+}
+```
+
+Claude Code 可直接通过命令行添加：
+
+```bash
+claude mcp add --transport http qveris https://mcp.qveris.ai/mcp --scope user --header "Authorization: Bearer YOUR_QVERIS_API_KEY"
+```
+
+接入步骤：
+
+1. 在[控制台/API 密钥](/account?page=api-keys)创建密钥。
+2. 将服务地址和 Bearer 请求头添加到客户端。客户端支持时，请用密钥管理或环境变量保存 API 密钥，切勿提交到源代码仓库。
+3. 重新连接客户端，确认 `discover`、`inspect`、`probe`、`call` 可见。
+
+服务会在会话启动时验证并绑定密钥。`401` 表示密钥缺失或无效；`503` 表示验证服务暂时不可用。更换密钥后请新建 MCP 会话。可前往[托管 MCP 页面](/hosted-mcp)复制配置。
+
+不支持远程 Streamable HTTP MCP 的客户端仍可使用本地 stdio 软件包。
+
+---
+
+## 可用 MCP 工具
+
+### 1. `discover`
+
+使用自然语言发现能力。
+
+这是**发现（Discover）**操作，**免费**使用。
+
+| 参数 | 类型 | 必填 | 说明 |
+|-----|------|------|------|
+| `query` | string | 是 | 用自然语言描述所需能力 |
+| `limit` | number | 否 | 最大返回数量（`1-100`，默认 `20`） |
+| `session_id` | string | 否 | 用于追踪的会话标识符 |
+| `view` | string | 否 | `routing` 返回精简 routing card；`full` 或省略返回完整结果 |
+| `lang` | string | 否 | 响应语言：`zh` 或 `en`；省略时由服务端协商 |
+
+示例：
+
+```json
+{
+  "query": "天气预报 API",
+  "limit": 10,
+  "view": "routing",
+  "lang": "zh"
+}
+```
+
+典型响应字段：
+
+- `search_id`
+- `total`
+- `results[]`
+- `results[].tool_id`
+- `results[].params`
+- `results[].examples`
+- `results[].stats`
+
+---
+
+### 2. `inspect`
+
+在复用或调用之前，检查一个或多个已知 `tool_id` 的详情。
+
+这是**检查（Inspect）**操作。
+
+| 参数 | 类型 | 必填 | 说明 |
+|-----|------|------|------|
+| `tool_ids` | array | 是 | 要查询的工具 ID 数组 |
+| `search_id` | string | 否 | 返回该工具的发现操作的搜索 ID |
+| `session_id` | string | 否 | 用于追踪的会话标识符 |
+
+示例：
+
+```json
+{
+  "tool_ids": ["openweathermap.weather.execute.v1"],
+  "search_id": "YOUR_SEARCH_ID"
+}
+```
+
+以下情况建议使用 `inspect`：
+
+- 多个候选能力看起来类似
+- 调用前想重新确认参数
+- 想检查成功率或延迟数据
+- 复用上一轮对话中发现的工具
+
+响应结构与 `/search` 一致，包含所请求工具的参数、示例和统计数据。
+
+---
+
+### 3. `probe`
+
+用于在不执行能力的情况下校验候选参数并获取零成本报价。输入包括 `tool_id`、可选 `parameters`、可选 `checks`（`schema`、`quote`、`coverage`、`sample`）以及可选 `live_budget`（`none`、`metadata`、`sampled`）。当前已实现 schema 与 quote；coverage 和 sample 可能返回 `unknown`。Probe 不执行能力，也不消耗积分。
+
+---
+
+### 4. `call`
+
+调用已发现的 QVeris 能力。
+
+调用响应可能包含紧凑的 `billing` 预结算账单。最终是否扣费请通过 `usage_history` 或 `credits_ledger` 查询。
+
+| 参数 | 类型 | 必填 | 说明 |
+|-----|------|------|------|
+| `tool_id` | string | 是 | 来自发现结果的工具 ID |
+| `search_id` | string | 是 | 发现该工具的搜索 ID |
+| `params_to_tool` | object | 是 | 传递给工具的参数字典 |
+| `session_id` | string | 否 | 用于追踪的会话标识符 |
+| `model` | string | 否 | 选择能力并生成参数的模型（最多 128 个字符） |
+| `max_response_size` | number | 否 | 最大响应字节数（默认 `20480`） |
+| `respond_with` | string | 否 | `full`、`summary` 或 `fields:<JSONPath,...>`；省略时为 full |
+
+示例：
+
+```json
+{
+  "tool_id": "openweathermap.weather.execute.v1",
+  "search_id": "YOUR_SEARCH_ID",
+  "params_to_tool": {"city": "北京", "units": "metric"},
+  "model": "router-model-v1",
+  "respond_with": "summary"
+}
+```
+
+投影参数仅在显式指定时发送。付费 `call` / `execute_tool` 请求严格 single-submit：MCP server 不会重试 `429`/`503`，不会跟随 HTTP 重定向，也不会删除被拒绝的投影字段后再次提交。投影错误仍按错误返回；`QVERIS_MAX_RETRIES` 仅用于读和审计工具。
+
+典型成功响应字段：
+
+- `execution_id`
+- `tool_id`（所选投影返回时）
+- `success`
+- `result.data`，或显式请求的精简摘要字段
+- `elapsed_time_ms` 或 `execution_time`
+- `billing` / `pre_settlement_bill`（如可用）
+
+---
+
+### 5. `usage_history`
+
+当用户询问某次调用是否成功、失败或扣费时使用。默认 `summary` 模式，不会把全量历史塞进上下文。
+
+常用参数：
+
+- `mode`: `summary`、`search` 或 `export_file`
+- `execution_id` / `search_id`
+- `charge_outcome`: `charged`、`included`、`failed_not_charged`、`failed_charged_review`
+- `min_credits` / `max_credits`
+- `start_date` / `end_date`
+
+`summary` 模式会优先请求服务端 `summary=true` 聚合摘要；若旧部署暂不支持，则回退到有上限的客户端聚合。
+
+示例：
+
+```json
+{ "mode": "search", "execution_id": "EXECUTION_ID" }
+```
+
+### 6. `credits_ledger`
+
+当用户询问余额为何变化时使用。默认 `summary` 模式。
+
+常用参数：
+
+- `mode`: `summary`、`search` 或 `export_file`
+- `direction`: `consume`、`grant` 或 `any`
+- `entry_type`
+- `min_credits` / `max_credits`
+- `start_date` / `end_date`
+
+`summary` 模式会优先请求服务端 `summary=true` 聚合摘要；若旧部署暂不支持，则回退到有上限的客户端聚合。
+
+示例：
+
+```json
+{ "mode": "search", "direction": "consume", "min_credits": 50 }
+```
+
+大量记录应使用 `mode: "export_file"`，MCP 服务器会写入 `.qveris/exports/*.jsonl` 并返回文件路径，而不是直接输出全量记录。
+
+对于超大的工具调用输出，QVeris 可能返回：
+
+- `truncated_content`
+- `full_content_file_url`
+- `message`
+
+---
+
+## 推荐使用模式
+
+对于大多数智能体任务，建议使用以下流程：
+
+1. `discover` — 发现相关能力
+2. `inspect` — 在需要时检查最佳候选
+3. `call` — 调用所选能力
+
+实践中：
+
+- 任务简单且最佳候选明确时，可直接从发现跳到调用
+- 任务风险较高或参数不清晰时，在调用前插入检查步骤
+- 复用上一轮找到的 `tool_id` 时，建议先重新检查再复用
+
+---
+
+## 会话管理
+
+在单次用户会话中提供一致的 `session_id` 有助于：
+
+- 保持用户会话连续性
+- 随时间推移优化工具选择
+- 更连贯的分析和追踪
+
+若省略 `session_id`，MCP 服务器可能会在进程存活期间自动生成一个。
+
+---
+
+## 故障排查
+
+### MCP 服务器未出现在客户端
+
+- 确认已安装 Node.js：`node --version`
+- 确认客户端 MCP 配置为有效 JSON
+- 确认 `QVERIS_API_KEY` 设置正确
+- 修改配置后重启 MCP 客户端
+
+### 工具可见但调用失败
+
+- 验证 API 密钥是否有效
+- 验证所选 `tool_id` 来自此前的发现结果
+- 重新运行 `inspect` 检查工具后再调用
+- 检查 `params_to_tool` 是否为有效对象
+
+### Windows 特定问题
+
+如果在某些客户端中直接执行 `npx` 失败，用 `cmd /c` 包裹：
+
+```json
+{
+  "command": "cmd",
+  "args": ["/c", "npx", "-y", "@qverisai/mcp"]
+}
+```
+
+---
+
+## 相关文档
+
+- [快速开始](getting-started.md)
+- [REST API 文档](rest-api.md)
+- [智能体安装指南](../../agent/SETUP.md)
+- [IDE / CLI 配置指南](ide-cli-setup.md)

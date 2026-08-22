@@ -1,0 +1,65 @@
+{
+  "timestamp": "2026-08-12T03:02:24.787377",
+  "topic": "game server management scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "C0nw0nk/Nginx-Lua-Anti-DDoS",
+      "html_url": "https://github.com/C0nw0nk/Nginx-Lua-Anti-DDoS",
+      "description": "A Anti-DDoS script to protect Nginx web servers using Lua with a HTML Javascript based authentication puzzle inspired by Cloudflare I am under attack mode an Anti-DDoS authentication page protect yourself from every attack type All Layer 7 Attacks Mitigating Historic Attacks DoS DoS Implications DDo",
+      "stars": 1622,
+      "language": "Lua",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "chrisneagu/FTC-Skystone-Dark-Angels-Romania-2020",
+      "html_url": "https://github.com/chrisneagu/FTC-Skystone-Dark-Angels-Romania-2020",
+      "description": "NOTICE This repository contains the public FTC SDK for the SKYSTONE (2019-2020) competition season. If you are looking for the current season's FTC SDK software, please visit the new and permanent home of the public FTC SDK:  FtcRobotController repository  Welcome! This GitHub repository contains th",
+      "stars": 300,
+      "language": "Java",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "swati1024/torrents",
+      "html_url": "https://github.com/swati1024/torrents",
+      "description": "Skip to content   Search\u2026 All gists Back to GitHub Sign in Sign up Instantly share code, notes, and snippets.  @giansalex giansalex/torrent-courses-download-list.md forked from M-Younus/torrent courses download-list Last active 2 days ago 15188  Code Revisions 15 Stars 151 Forks 88 <script src=\"http",
+      "stars": 103,
+      "language": null,
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 6,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Fixes extra",
+      "description": "wide margins on settings activities, and placement of the new configuration button"
+    },
+    {
+      "type": "tool",
+      "name": "Removes older (season",
+      "description": "specific) sample op modes."
+    },
+    {
+      "type": "tool",
+      "name": "Includes 64",
+      "description": "bit support (to comply with [Google Play requirements](https://android-developers.googleblog.com/2019/01/get-your-apps-ready-for-64-bit.html))."
+    },
+    {
+      "type": "tool",
+      "name": "Fixes [SkyStone issue #9](https://github.com/FIRST",
+      "description": "Tech-Challenge/SkyStone/issues/9)"
+    },
+    {
+      "type": "tool",
+      "name": "Adds a manual",
+      "description": "refresh DS Camera Stream for remotely viewing RC camera frames."
+    },
+    {
+      "type": "tool",
+      "name": "Blocks Programming Development Tool:",
+      "description": "Changed \"LynxI2cColorRangeSensor\" block to \"REV Color/range sensor\" block."
+    }
+  ],
+  "script_summary": "6 tools"
+}

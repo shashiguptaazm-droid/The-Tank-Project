@@ -1,0 +1,56 @@
+# ROS2 colcon install / build / log artifacts
+tank_ws/build/
+tank_ws/install/
+tank_ws/log/
+tank_ws/.colcon_workspace/
+*.egg-info/
+*.egg
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+.fuse_hidden*
+
+# ROS bag files (recordings)
+*.bag
+*.bag.active
+*.mcap
+
+# Generated URDF
+tank_ws/src/tank_bringup/urdf/tank.urdf
+
+# Calibration output (regenerated)
+*.calib.yaml
+
+# Secrets — never commit
+.env
+config/secrets.yaml
+config/*.local.yaml
+
+# 3D-print profiles / per-printer state (Bambu)
+.creality_print/
+printables/
+
+# Diagnostic dumps
+diagnostics/*.txt
+diagnostics/*.json

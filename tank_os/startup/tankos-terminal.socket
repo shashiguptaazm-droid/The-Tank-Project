@@ -1,0 +1,14 @@
+[Unit]
+Description=TankOS TCP Terminal Socket
+After=network.target
+
+[Socket]
+ListenStream=[::]:2223
+Accept=yes
+MaxConnectionsPerSource=8
+MaxConnections=32
+NoDelay=true
+KeepAlive=true
+
+[Install]
+WantedBy=sockets.target

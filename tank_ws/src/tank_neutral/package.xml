@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>tank_assistant</name>
+  <version>0.1.0</version>
+  <description>The Tank Project — local LLM (llama.cpp), RAG bridge and emotion engine</description>
+  <maintainer email="you@example.com">The Tank Project</maintainer>
+  <license>TODO</license>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>tank_memory</exec_depend>
+  <exec_depend>llama-cpp-python</exec_depend>
+  <exec_depend>sentence-transformers</exec_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>

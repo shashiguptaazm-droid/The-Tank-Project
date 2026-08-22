@@ -1,0 +1,399 @@
+{
+  "timestamp": "2026-08-12T03:00:11.181178",
+  "topic": "LLM wrapper tools CLI",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "Gabrieliam42/AI-Agent-Qubitz",
+      "html_url": "https://github.com/Gabrieliam42/AI-Agent-Qubitz",
+      "description": "Powerful standalone AI Agent for local LLM workflows, with context and code retrieval, specialized wrappers and harness, GUI/CLI, works with (MCP) Tools-capable LLMs. No cloud, No subscriptions needed.",
+      "stars": 4,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "unmodeled-tyler/aider-ollama",
+      "html_url": "https://github.com/unmodeled-tyler/aider-ollama",
+      "description": "wrapper for Aider CLI that allows for easy ollama model selection",
+      "stars": 3,
+      "language": "Shell",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "vahidkowsari/mcp-cli",
+      "html_url": "https://github.com/vahidkowsari/mcp-cli",
+      "description": "AI MCP Host which is wrapper around LLMS and tools. Allows the user to send agent messages and have the AI and tools execute them",
+      "stars": 2,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 79,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Local `llama.cpp` GGUF generation",
+      "description": "Task-routed workspace retrieval with local embedding models"
+    },
+    {
+      "type": "tool",
+      "name": "Tk GUI, CLI, and stdio MCP server modes",
+      "description": "Direct existing-entrypoint execution for explicit `.py`, `.ps1`, `.sh`, `.bat`, `.cmd`, `uv run`, `npm run`, `pnpm run`, and `make` tasks"
+    },
+    {
+      "type": "tool",
+      "name": "Local background jobs, local plugin guidance, and wrapper",
+      "description": "local sandbox/tool orchestration"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_Qwen3.5_9B_Q5_12G.py",
+      "description": "for 12GB VRAM GPU `Qwen Team's` Qwen-3.5-9B Q5 Dense"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_AgenticQwen-8B.i1-Q5_12G.py",
+      "description": "for 12GB VRAM GPU `Qwen Team's` AgenticQwen-8B Q5 Dense"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_Granite-4.1-8B_Q5_12G.py",
+      "description": "for 12GB VRAM GPU `IBM's` Granite-4.1-8B Q5 Dense"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_GLM_4.7_Flash-30B-A3B-Q4.py",
+      "description": "24 GB VRAM GPU `Z.AI's` GLM-4.7-Flash 30B A3B MoE Q4"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_North-Mini-Code-1.0-30B-A3B-Q4.py",
+      "description": "24 GB VRAM GPU `Cohere's` North-Mini-Code-1.0 30B A3B MoE Q4"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_Nemotron-Cascade-2-30B-A3B-IQ4.py",
+      "description": "24 GB VRAM GPU `NVIDIA's` Nemotron-Cascade-2 30B A3B MoE IQ4"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_Nemotron-3-Nano-30B-A3B-IQ4.py",
+      "description": "24 GB VRAM GPU `NVIDIA's` Nemotron-3-Nano 30B A3B MoE IQ4"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_GPT-OSS-20B_F16.py",
+      "description": "24 GB VRAM GPU `OpenAI's` GPT-OSS-20B F16 A3B MoE F16"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_Ornith-1.0-35B-A3B-Q4.py",
+      "description": "24 GB VRAM GPU `DeepReinforce AI's` Ornith-1.0-35B A3B MoE Q4"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_AgenticQwen-30B-A3B.i1-Q4.py",
+      "description": "24 GB VRAM GPU `Qwen Team's` AgenticQwen-30B A3B MoE Q4"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_Qwen3.6-35B-A3B_Q4.py",
+      "description": "24 GB VRAM GPU `Qwen Team's` Qwen-3.6-35B A3B MoE Q4"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_Gemma-4-31B-IT_QAT-Q4.py",
+      "description": "24 GB VRAM GPU `Google's` Gemma-4-31B-IT-QAT Q4 Dense"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_Qwen3.6-27B_Q4.py",
+      "description": "24 GB VRAM GPU `Qwen Team's` Qwen-3.6-27B Q4 Dense"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_Granite-4.1-8B_Q8.py",
+      "description": "24 GB VRAM GPU `IBM's` Granite-4.1-8B Q8"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_Devstral-Small-2-24B-Q4.py",
+      "description": "24 GB VRAM GPU `Mistral AI's` Devstral-Small-2 24B Q4 Dense"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_Qwen3.5_9B_Q8.py",
+      "description": "24 GB VRAM GPU `Qwen Team's` Qwen-3.5-9B Q8 Dense"
+    },
+    {
+      "type": "tool",
+      "name": "AI_Agent_Qubitz_AgenticQwen-8B-F16.py",
+      "description": "24 GB VRAM GPU `Qwen Team's` AgenticQwen-8B F16 Dense"
+    },
+    {
+      "type": "tool",
+      "name": "MoE = Mixture of Experts",
+      "description": "A3B = Approximately 3 billion parameters are activated per token from the model's total parameters through its Mixture-of-Experts routing."
+    },
+    {
+      "type": "tool",
+      "name": "QAT = Quantization",
+      "description": "Aware Training (trained to better preserve quality after quantization)"
+    },
+    {
+      "type": "tool",
+      "name": "IT = Instruction",
+      "description": "Tuned"
+    },
+    {
+      "type": "tool",
+      "name": "Q4/Q5/Q6/Q8 = Approximate quantization bit",
+      "description": "width"
+    },
+    {
+      "type": "tool",
+      "name": "F16/FP16 = 16",
+      "description": "bit floating-point precision"
+    },
+    {
+      "type": "tool",
+      "name": "IQ4 = Importance",
+      "description": "aware 4-bit quantization"
+    },
+    {
+      "type": "tool",
+      "name": "i1 = Importance",
+      "description": "matrix-weighted quantization"
+    },
+    {
+      "type": "tool",
+      "name": "It uses `HARNESS.enc` that exists in the workspace root",
+      "description": "`HARNESS.enc` is excluded from normal retrieval context paths so the encrypted duplicate is not injected."
+    },
+    {
+      "type": "tool",
+      "name": "HARNESS.enc",
+      "description": "AI Agent Harness"
+    },
+    {
+      "type": "tool",
+      "name": "QUBITZ_HARNESS_KEY.local.txt",
+      "description": "local harness-key helper file"
+    },
+    {
+      "type": "tool",
+      "name": "requirements.txt",
+      "description": "runtime dependencies"
+    },
+    {
+      "type": "tool",
+      "name": "requirements-ci.txt",
+      "description": "CI, lint, and test dependencies"
+    },
+    {
+      "type": "tool",
+      "name": "--num-ctx",
+      "description": "`--num-predict`"
+    },
+    {
+      "type": "tool",
+      "name": "--max-steps",
+      "description": "`--thinking-effort` with `default`, `low`, `medium`, `high`, or `xhigh`"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "feature",
+      "value": "Local `llama.cpp` GGUF generation"
+    },
+    {
+      "type": "feature",
+      "value": "Task-routed workspace retrieval with local embedding models"
+    },
+    {
+      "type": "feature",
+      "value": "Tk GUI, CLI, and stdio MCP server modes"
+    },
+    {
+      "type": "feature",
+      "value": "Direct existing-entrypoint execution for explicit `.py`, `.ps1`, `.sh`, `.bat`, `.cmd`, `uv run`, `npm run`, `pnpm run`, and `make` tasks"
+    },
+    {
+      "type": "feature",
+      "value": "Local background jobs, local plugin guidance, and wrapper-local sandbox/tool orchestration"
+    },
+    {
+      "type": "command",
+      "value": "pip install aider-chat"
+    },
+    {
+      "type": "command",
+      "value": "pip install aider-chat"
+    },
+    {
+      "type": "command",
+      "value": "pip install aider-chat"
+    },
+    {
+      "type": "command",
+      "value": "curl -o ~/.local/bin/aider-ollama https://raw.githubusercontent.com/unmodeled-tyler/aider-ollama/main/aider-ollama"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/unmodeled-tyler/aider-ollama.git"
+    },
+    {
+      "type": "command",
+      "value": "./install.sh"
+    },
+    {
+      "type": "command",
+      "value": "pip install aider-chat"
+    },
+    {
+      "type": "pip_package",
+      "value": "aider-chat`)"
+    },
+    {
+      "type": "pip_package",
+      "value": "aider-chat"
+    },
+    {
+      "type": "pip_package",
+      "value": "aider-chat"
+    },
+    {
+      "type": "pip_package",
+      "value": "aider-chat"
+    },
+    {
+      "type": "pip_package",
+      "value": "aider-chat"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83c\udfaf **Interactive Selection** - Use arrow keys to browse, type to fuzzy-search"
+    },
+    {
+      "type": "feature",
+      "value": "\u26a1 **Fast** - Fetches models directly from Ollama API"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83d\udd27 **Configurable** - Works with custom Ollama endpoints and virtual environments"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83d\udce6 **Zero Config** - Works out of the box with sensible defaults"
+    },
+    {
+      "type": "command",
+      "value": "git clone <repository-url>"
+    },
+    {
+      "type": "tool",
+      "name": "help",
+      "description": "Show available commands"
+    },
+    {
+      "type": "tool",
+      "name": "clear",
+      "description": "Clear conversation history"
+    },
+    {
+      "type": "tool",
+      "name": "tools",
+      "description": "List available MCP tools"
+    },
+    {
+      "type": "tool",
+      "name": "status",
+      "description": "Show MCP connection status"
+    },
+    {
+      "type": "tool",
+      "name": "quit",
+      "description": "Exit application"
+    },
+    {
+      "type": "tool",
+      "name": "CLI: Prints to console with colors/emojis",
+      "description": "API: Collects output for JSON responses"
+    },
+    {
+      "type": "tool",
+      "name": "GUI: Updates chat windows/notifications",
+      "description": "Custom: Whatever you need"
+    },
+    {
+      "type": "tool",
+      "name": "ChatService can be tested independently",
+      "description": "Mock output handlers for testing"
+    },
+    {
+      "type": "tool",
+      "name": "mcp-use-cli.py",
+      "description": "Application entry point using mcp-use library"
+    },
+    {
+      "type": "tool",
+      "name": "chat_service.py",
+      "description": "**Core chat library (NEW)** - reusable chat functionality"
+    },
+    {
+      "type": "tool",
+      "name": "ai_client.py",
+      "description": "AI provider abstraction (OpenAI/Claude)"
+    },
+    {
+      "type": "tool",
+      "name": "mcp_manager.py",
+      "description": "MCP connection and tool management"
+    },
+    {
+      "type": "tool",
+      "name": "cli_interface.py",
+      "description": "Interactive command-line interface (now uses ChatService)"
+    },
+    {
+      "type": "tool",
+      "name": "mcp_config.json",
+      "description": "Configuration file"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83e\udd16 **Multi-AI Support**: Works with both OpenAI GPT and Claude"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83d\udd27 **MCP Integration**: Connect to various MCP servers for extended functionality"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83c\udfaf **Tool Calling**: AI can automatically use available MCP tools"
+    },
+    {
+      "type": "feature",
+      "value": "\u2699\ufe0f **Configurable**: Easy JSON-based configuration"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83d\udcac **Interactive CLI**: Chat interface with command support"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83d\udd0c **Extensible**: Add new MCP servers easily"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83d\udcda **Library-like**: Core chat functionality can be used programmatically in other applications"
+    }
+  ],
+  "script_summary": "48 tools, 7 pip_packages, 16 features, 8 commands"
+}

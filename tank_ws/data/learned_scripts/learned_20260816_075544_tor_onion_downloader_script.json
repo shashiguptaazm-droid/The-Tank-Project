@@ -1,0 +1,66 @@
+{
+  "timestamp": "2026-08-16T07:55:44.954167",
+  "topic": "tor onion downloader script",
+  "repos_scanned": 1,
+  "repos": [
+    {
+      "full_name": "D4T4HUN73R/Onion-Downloader",
+      "html_url": "https://github.com/D4T4HUN73R/Onion-Downloader",
+      "description": "A simple script that uses an onion base url to recursively download all files and folders over the Tor network.",
+      "stars": 1,
+      "language": null,
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 11,
+  "findings": [
+    {
+      "type": "command",
+      "value": "pip3 install tor stem beautifulsoup4"
+    },
+    {
+      "type": "tool",
+      "name": "just one base onion url needed",
+      "description": "recursiv download"
+    },
+    {
+      "type": "tool",
+      "name": "automated tor connection switching",
+      "description": "automated useragent switcher"
+    },
+    {
+      "type": "tool",
+      "name": "automated time delays between the downloads",
+      "description": "also usable for clear-web url's"
+    },
+    {
+      "type": "pip_package",
+      "value": "tor"
+    },
+    {
+      "type": "feature",
+      "value": "just one base onion url needed"
+    },
+    {
+      "type": "feature",
+      "value": "recursiv download"
+    },
+    {
+      "type": "feature",
+      "value": "automated tor connection switching"
+    },
+    {
+      "type": "feature",
+      "value": "automated useragent switcher"
+    },
+    {
+      "type": "feature",
+      "value": "automated time delays between the downloads"
+    },
+    {
+      "type": "feature",
+      "value": "also usable for clear-web url's"
+    }
+  ],
+  "script_summary": "1 commands, 3 tools, 1 pip_packages, 6 features"
+}

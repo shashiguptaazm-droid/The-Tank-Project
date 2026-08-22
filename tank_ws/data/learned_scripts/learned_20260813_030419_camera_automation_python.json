@@ -1,0 +1,80 @@
+{
+  "timestamp": "2026-08-13T03:04:19.774317",
+  "topic": "camera automation python",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "jeffreydwalter/arlo",
+      "html_url": "https://github.com/jeffreydwalter/arlo",
+      "description": "Python module for interacting with Netgear's Arlo camera system.",
+      "stars": 532,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "Y0oshi/Project-Eyes-On",
+      "html_url": "https://github.com/Y0oshi/Project-Eyes-On",
+      "description": "Project Eyes On is a high-speed, multi-threaded surveillance tool by Y0oshi (@rde0) for locating open IP cameras worldwide. Unifies Google Dorking and Directory Scraping into a single OSINT engine.",
+      "stars": 128,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "supreeth101/Abnormal-human-Activity-detection",
+      "html_url": "https://github.com/supreeth101/Abnormal-human-Activity-detection",
+      "description": " A smart surveillance system using CCTV Surveillance camera in order to detect hammers, weapons involved in a break in. This Surveillance system focuses on automation of Video Surveillance in ATM machines and detect any type of potential criminal activities. Technologies used open CV, Computer Visio",
+      "stars": 35,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 11,
+  "findings": [
+    {
+      "type": "pip_package",
+      "value": "arlo"
+    },
+    {
+      "type": "pip_package",
+      "value": "git+https://github.com/jeffreydwalter/arlo"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/Y0oshi/Project-Eyes-On.git"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/Y0oshi/Project-Eyes-On.git"
+    },
+    {
+      "type": "tool",
+      "name": "Python 3.x",
+      "description": "Pip"
+    },
+    {
+      "type": "feature",
+      "value": "**Parallel Engine**: Queries **Yahoo** and **Startpage** simultaneously for maximum speed and results."
+    },
+    {
+      "type": "feature",
+      "value": "**GeoIP Enrichment**: Automatically resolves camera IP locations to **City, Country** (e.g., \"New York, United States\")."
+    },
+    {
+      "type": "feature",
+      "value": "**Smart Deduplication**: Merges results from multiple engines to ensure unique feeds."
+    },
+    {
+      "type": "feature",
+      "value": "**Direct Connection**: Optimized for speed without unreliable proxies."
+    },
+    {
+      "type": "feature",
+      "value": "**Country Targeting**: Target specific regions (e.g., `/country US`, `/country RU`)."
+    },
+    {
+      "type": "feature",
+      "value": "**Live Verification**: Automatically detects stream types (MJPEG, JPEG, Video)."
+    }
+  ],
+  "script_summary": "2 pip_packages, 2 commands, 1 tools, 6 features"
+}

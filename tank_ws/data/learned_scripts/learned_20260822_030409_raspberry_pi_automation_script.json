@@ -1,0 +1,196 @@
+{
+  "timestamp": "2026-08-22T03:04:09.689011",
+  "topic": "raspberry pi automation scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "MiczFlor/RPi-Jukebox-RFID",
+      "html_url": "https://github.com/MiczFlor/RPi-Jukebox-RFID",
+      "description": "A Raspberry Pi jukebox, playing local music, podcasts, web radio and streams triggered by RFID cards, web app or home automation. All plug and play via USB. GPIO scripts available.",
+      "stars": 1772,
+      "language": "PHP",
+      "default_branch": "develop"
+    },
+    {
+      "full_name": "teja156/wifi-hacking-raspberrypi",
+      "html_url": "https://github.com/teja156/wifi-hacking-raspberrypi",
+      "description": "An automation script written in Python to convert a Raspberry Pi into a WiFi hacking device",
+      "stars": 74,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "mvkro1/Smart-Home-Automation",
+      "html_url": "https://github.com/mvkro1/Smart-Home-Automation",
+      "description": "A Raspberry Pi-based system for smart home automation, including sensors, automation scripts, and a web dashboard.",
+      "stars": 36,
+      "language": null,
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 38,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "\ud83d\udc1b [Report a bug](https://github.com/MiczFlor/RPi",
+      "description": "Jukebox-RFID/issues/new?assignees=&labels=bug%2Cfuture3%2Cneeds+triage&projects=&template=bug_v3.yaml&title=%F0%9F%90%9B+%7C+)"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\ude80 [Propose a feature](https://github.com/MiczFlor/RPi",
+      "description": "Jukebox-RFID/issues/new?assignees=&labels=enhancement%2Cfuture3&projects=&template=feature_v3.yaml&title=%F0%9F%9A%80+%7C+)"
+    },
+    {
+      "type": "tool",
+      "name": "\u2611\ufe0f [Feature Status](https://github.com/MiczFlor/RPi",
+      "description": "Jukebox-RFID/blob/future3/main/documentation/developers/status.md)"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\udcd6 [Documentation](https://github.com/MiczFlor/RPi",
+      "description": "Jukebox-RFID/blob/future3/main/documentation/README.md)"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\udc69\u200d\ud83d\udcbb [Development](https://github.com/MiczFlor/RPi",
+      "description": "Jukebox-RFID/blob/future3/main/documentation/developers/README.md)"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83e\udd84 Code: [Release Branch](https://github.com/MiczFlor/RPi",
+      "description": "Jukebox-RFID/tree/future3/main), [Development Branch](https://github.com/MiczFlor/RPi-Jukebox-RFID/tree/future3/develop)"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\udc1b [Report a bug](https://github.com/MiczFlor/RPi",
+      "description": "Jukebox-RFID/issues/new?assignees=&labels=bug%2Clegacy_v2%2Cneeds+triage&projects=&template=bug_v2.yaml&title=%F0%9F%90%9B+%7C+)"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83e\udd84 Code: [Release Branch](https://github.com/MiczFlor/RPi",
+      "description": "Jukebox-RFID/tree/master), [Development Branch](https://github.com/MiczFlor/RPi-Jukebox-RFID/tree/develop)"
+    },
+    {
+      "type": "tool",
+      "name": "RFID cards or tags can be reused",
+      "description": "no need to buy new plastic elements** for changing the music or story linked to a card"
+    },
+    {
+      "type": "feature",
+      "value": "The **one-line install script** handles both **Classic** and **+Spotify** when [setting up your Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID/wiki/INSTALL#one-line-install-command)"
+    },
+    {
+      "type": "feature",
+      "value": "integrated selection of RFID readers"
+    },
+    {
+      "type": "feature",
+      "value": "features *non-interactive* installs based on a config file"
+    },
+    {
+      "type": "feature",
+      "value": "[**RFID** control](https://github.com/MiczFlor/RPi-Jukebox-RFID/wiki/MANUAL#cardcontrol) for playout and controlling your Phoniebox (e.g. set [maximum volume with RFID](https://github.com/MiczFlor/RPi"
+    },
+    {
+      "type": "feature",
+      "value": "Support for various RFID readers, e.g."
+    },
+    {
+      "type": "feature",
+      "value": "USB"
+    },
+    {
+      "type": "feature",
+      "value": "[RC522](components/rfid-reader/RC522/README.md)"
+    },
+    {
+      "type": "feature",
+      "value": "[PN532](components/rfid-reader/PN532/README.md)"
+    },
+    {
+      "type": "feature",
+      "value": "PC/SC"
+    },
+    {
+      "type": "feature",
+      "value": "also [multiple readers](https://github.com/MiczFlor/RPi-Jukebox-RFID/pull/1012#issue-434052529) simultaneously"
+    },
+    {
+      "type": "feature",
+      "value": "[**GPIO** control](components/gpio_control/README.md) for [buttons](https://github.com/MiczFlor/RPi-Jukebox-RFID/wiki/Using-GPIO-hardware-buttons) and much more to control your Phoniebox via GPIO."
+    },
+    {
+      "type": "feature",
+      "value": "Control via smooth [**Web App**](https://github.com/MiczFlor/RPi-Jukebox-RFID/wiki/MANUAL#webapp) running on ajax from your phone, tablet or PC. You can play, upload, move files, assign new RFID cards"
+    },
+    {
+      "type": "feature",
+      "value": "Support for files with embedded chapters metadata (like m4a)"
+    },
+    {
+      "type": "feature",
+      "value": "Customizable poweroff command"
+    },
+    {
+      "type": "feature",
+      "value": "**[WiFi management](https://github.com/MiczFlor/RPi-Jukebox-RFID/wiki/MANUAL#wifi-settings)**"
+    },
+    {
+      "type": "feature",
+      "value": "RFID cards to toggle WiFi (or switch it on/off)"
+    },
+    {
+      "type": "feature",
+      "value": "Read out the WiFi IP address (if you are connecting to a new network and don't know where to point your browser)"
+    },
+    {
+      "type": "feature",
+      "value": "**Hotspot** Phoniebox: [ad-hoc hotspot](https://github.com/MiczFlor/RPi-Jukebox-RFID/pull/967) if no known network found (IP: 10.0.0.5 SSID: phoniebox Password: PlayItLoud)"
+    },
+    {
+      "type": "feature",
+      "value": "**Touchscreen** LCD display Player (file: `index-lcd.php` in web app)"
+    },
+    {
+      "type": "feature",
+      "value": "Integrate your [Phoniebox in your Smart Home with MQTT](components/smart-home-automation/MQTT-protocol/README.md)."
+    },
+    {
+      "type": "feature",
+      "value": "Player control"
+    },
+    {
+      "type": "feature",
+      "value": "[Playout **Resume**](https://github.com/MiczFlor/RPi-Jukebox-RFID/wiki/MANUAL#manage-playout-behaviour) switch for audio books, allowing you to jump straight back to where you were (unless you fell as"
+    },
+    {
+      "type": "feature",
+      "value": "Playout **Shuffle** switch to mix up your playlists."
+    },
+    {
+      "type": "feature",
+      "value": "Audio sources"
+    },
+    {
+      "type": "feature",
+      "value": "Local audio files"
+    },
+    {
+      "type": "feature",
+      "value": "Download from **YouTube** directly to your Phoniebox."
+    },
+    {
+      "type": "feature",
+      "value": "Support for **[Spotify](https://github.com/MiczFlor/RPi-Jukebox-RFID/wiki/Spotify-FAQ)** integration."
+    },
+    {
+      "type": "feature",
+      "value": "[**Podcast feature** for Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID/wiki/MANUAL#podcasts)"
+    },
+    {
+      "type": "npm_package",
+      "value": "&&"
+    }
+  ],
+  "script_summary": "9 tools, 28 features, 1 npm_packages"
+}

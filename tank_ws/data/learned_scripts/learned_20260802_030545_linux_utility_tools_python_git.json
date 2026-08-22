@@ -1,0 +1,134 @@
+{
+  "timestamp": "2026-08-02T03:05:45.726752",
+  "topic": "linux utility tools python github",
+  "repos_scanned": 4,
+  "repos": [
+    {
+      "full_name": "donnemartin/gitsome",
+      "html_url": "https://github.com/donnemartin/gitsome",
+      "description": "A supercharged Git/GitHub command line interface (CLI).  An official integration for GitHub and GitHub Enterprise: https://github.com/works-with/category/desktop-tools",
+      "stars": 7678,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "zszszszsz/.config",
+      "html_url": "https://github.com/zszszszsz/.config",
+      "description": "# # Automatically generated file; DO NOT EDIT. # OpenWrt Configuration # CONFIG_MODULES=y CONFIG_HAVE_DOT_CONFIG=y # CONFIG_TARGET_sunxi is not set # CONFIG_TARGET_apm821xx is not set # CONFIG_TARGET_ath25 is not set CONFIG_TARGET_ar71xx=y # CONFIG_TARGET_ath79 is not set # CONFIG_TARGET_bcm27xx is ",
+      "stars": 351,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "Don-No7/Hack-SQL",
+      "html_url": "https://github.com/Don-No7/Hack-SQL",
+      "description": "-- -- File generated with SQLiteStudio v3.2.1 on Sun Feb 7 14:58:28 2021 -- -- Text encoding used: System -- PRAGMA foreign_keys = off; BEGIN TRANSACTION;  -- Table: Commands CREATE TABLE Commands (Command_No INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Name TEXT REFERENCES Programs (Name) NOT NULL, ",
+      "stars": 142,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "gilas-byte/TPPK-The_Personal_Pocket_Knife",
+      "html_url": "https://github.com/gilas-byte/TPPK-The_Personal_Pocket_Knife",
+      "description": "\ud83d\udd2a A digital Swiss Army knife in Python + CustomTkinter: OS maintenance tools (Windows & Arch), a study-notes reader, and GitHub-powered auto-updates.",
+      "stars": 0,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 22,
+  "findings": [
+    {
+      "type": "command",
+      "value": "gitignore-template   Output the gitignore template for the given language."
+    },
+    {
+      "type": "command",
+      "value": "gitignore-templates  Output all supported gitignore templates."
+    },
+    {
+      "type": "tool",
+      "name": "Countless command",
+      "description": "specific options"
+    },
+    {
+      "type": "tool",
+      "name": "Improving ease",
+      "description": "of-use**"
+    },
+    {
+      "type": "pip_package",
+      "value": "gitsome"
+    },
+    {
+      "type": "pip_package",
+      "value": "git+https://github.com/donnemartin/gitsome.git"
+    },
+    {
+      "type": "pip_package",
+      "value": "gitsome"
+    },
+    {
+      "type": "pip_package",
+      "value": "gitsome"
+    },
+    {
+      "type": "pip_package",
+      "value": "virtualenv"
+    },
+    {
+      "type": "pip_package",
+      "value": "virtualenvwrapper"
+    },
+    {
+      "type": "pip_package",
+      "value": "gitsome"
+    },
+    {
+      "type": "pip_package",
+      "value": "gitsome"
+    },
+    {
+      "type": "pip_package",
+      "value": "Pillow"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/gilas-byte/TPPK-The_Personal_Pocket_Knife.git"
+    },
+    {
+      "type": "command",
+      "value": "python -m venv .venv"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "python main_windows.py   # Windows"
+    },
+    {
+      "type": "command",
+      "value": "python main_arch.py      # Arch Linux"
+    },
+    {
+      "type": "tool",
+      "name": "Um sistema de auto",
+      "description": "atualiza\u00e7\u00e3o** que busca novas vers\u00f5es direto do GitHub."
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    }
+  ],
+  "script_summary": "7 commands, 3 tools, 12 pip_packages"
+}

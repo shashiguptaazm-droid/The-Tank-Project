@@ -1,0 +1,81 @@
+{
+  "timestamp": "2026-08-12T03:01:53.819942",
+  "topic": "magnet link downloader",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "iw4p/torrentp",
+      "html_url": "https://github.com/iw4p/torrentp",
+      "description": "Python torrent downloader - Download from torrent with .torrent file or magnet link, with just 3 lines of python code.",
+      "stars": 271,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "tnychn/torrodle",
+      "html_url": "https://github.com/tnychn/torrodle",
+      "description": "\u26a1\ufe0f A magnet link scraper for streaming videos (movies, tv shows, anime, porn) along with subtitles.",
+      "stars": 269,
+      "language": "Go",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "harryeffinpotter/ALL-LEGIT",
+      "html_url": "https://github.com/harryeffinpotter/ALL-LEGIT",
+      "description": "Feature-rich All Debrid Helper - Automatically Convert Magnets/DLC (Download Link Containers)! w/ Global hotkey, Auto-Download, Extract, Extract nested, Delete zips, Exclude URLs + MORE",
+      "stars": 24,
+      "language": "C#",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 11,
+  "findings": [
+    {
+      "type": "command",
+      "value": "python3 scripts/test_download_ubuntu.py"
+    },
+    {
+      "type": "pip_package",
+      "value": "torrentp"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\udeb8 User",
+      "description": "friendly"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83e\udd16 Built",
+      "description": "in torrent streaming client via HTTP (refined from [`go-peerflix`](https://github.com/Sioro-Neoku/go-peerflix))"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83d\udd25 Blazing fast"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83d\udeb8 User-friendly"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83e\udd16 Built-in torrent streaming client via HTTP (refined from [`go-peerflix`](https://github.com/Sioro-Neoku/go-peerflix))"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83d\udd30 Watch the video while it is being downloaded"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83d\udd0e Query multiple providers in a single search"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83d\ude80 Sorted results from 7 different providers at once"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83d\udcc4 Along with subtitles fetching for the video (using [`osdb`](https://github.com/Sioro-Neoku/go-peerflix))"
+    }
+  ],
+  "script_summary": "1 commands, 1 pip_packages, 2 tools, 7 features"
+}

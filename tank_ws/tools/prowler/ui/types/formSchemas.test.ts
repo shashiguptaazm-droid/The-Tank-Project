@@ -1,0 +1,290 @@
+import { describe, expect, it } from "vitest";
+
+import { ProviderCredentialFields } from "@/lib/provider-credentials/provider-credential-fields";
+
+import {
+  addCredentialsFormSchema,
+  addCredentialsRoleFormSchema,
+  addProviderFormSchema,
+  KUBECONFIG_UNSUPPORTED_COMMAND_AUTHENTICATION_ERROR,
+} from "./formSchemas";
+
+const BASE_AWS_ROLE_VALUES = {
+  [ProviderCredentialFields.PROVIDER_ID]: "provider-123",
+  [ProviderCredentialFields.PROVIDER_TYPE]: "aws",
+  [ProviderCredentialFields.ROLE_ARN]:
+    "arn:aws:iam::123456789012:role/ProwlerRole",
+  [ProviderCredentialFields.EXTERNAL_ID]: "tenant-123",
+  [ProviderCredentialFields.CREDENTIALS_TYPE]: "access-secret-key",
+} as const;
+
+describe("addCredentialsRoleFormSchema", () => {
+  it("accepts AWS role credentials when access and secret keys are present", () => {
+    const schema = addCredentialsRoleFormSchema("aws");
+
+    const result = schema.safeParse({
+      ...BASE_AWS_ROLE_VALUES,
+      [ProviderCredentialFields.AWS_ACCESS_KEY_ID]: "AKIA1234567890EXAMPLE",
+      [ProviderCredentialFields.AWS_SECRET_ACCESS_KEY]:
+        "test/secret+access=key1234567890",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("reports missing AWS secret access key on aws_secret_access_key field", () => {
+    const schema = addCredentialsRoleFormSchema("aws");
+
+    const result = schema.safeParse({
+      ...BASE_AWS_ROLE_VALUES,
+      [ProviderCredentialFields.AWS_ACCESS_KEY_ID]: "AKIA1234567890EXAMPLE",
+      [ProviderCredentialFields.AWS_SECRET_ACCESS_KEY]: "",
+    });
+
+    expect(result.success).toBe(false);
+    if (result.success) return;
+
+    expect(result.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: [ProviderCredentialFields.AWS_SECRET_ACCESS_KEY],
+      }),
+    );
+  });
+});
+
+describe("addProviderFormSchema - okta", () => {
+  const validUidFixtures = [
+    "acme.okta.com",
+    "acme.oktapreview.com",
+    "acme.okta-emea.com",
+    "agency.okta-gov.com",
+    "agency.okta.mil",
+    "agency.okta-miltest.com",
+    "agency.trex-govcloud.com",
+    "Acme.okta.com",
+    "  ACME.OKTA.COM  ",
+    "Agency.Okta-Gov.com",
+  ];
+
+  it.each(validUidFixtures)("accepts okta-managed org domain %s", (uid) => {
+    const result = addProviderFormSchema.safeParse({
+      providerType: "okta",
+      providerUid: uid,
+      providerAlias: "okta-test",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it.each([
+    ["Acme.okta.com", "acme.okta.com"],
+    ["  ACME.OKTA.COM  ", "acme.okta.com"],
+    ["Agency.Okta-Gov.com", "agency.okta-gov.com"],
+  ])("normalizes okta org domain %s to %s", (input, expected) => {
+    const result = addProviderFormSchema.safeParse({
+      providerType: "okta",
+      providerUid: input,
+      providerAlias: "okta-test",
+    });
+
+    expect(result.success).toBe(true);
+    expect(
+      result.success && "providerUid" in result.data
+        ? result.data.providerUid
+        : undefined,
+    ).toBe(expected);
+  });
+
+  const invalidUidFixtures = [
+    "https://acme.okta.com",
+    "acme.example.com",
+    "acme.okta.com/path",
+    "",
+  ];
+
+  it.each(invalidUidFixtures)("rejects invalid okta org domain %s", (uid) => {
+    const result = addProviderFormSchema.safeParse({
+      providerType: "okta",
+      providerUid: uid,
+      providerAlias: "okta-test",
+    });
+
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("addCredentialsFormSchema - okta", () => {
+  const BASE_OKTA_VALUES = {
+    [ProviderCredentialFields.PROVIDER_ID]: "provider-okta-1",
+    [ProviderCredentialFields.PROVIDER_TYPE]: "okta",
+  } as const;
+
+  it("accepts okta credentials when client id and private key are present", () => {
+    const schema = addCredentialsFormSchema("okta");
+
+    const result = schema.safeParse({
+      ...BASE_OKTA_VALUES,
+      [ProviderCredentialFields.OKTA_CLIENT_ID]: "0oa123456789abcdef",
+      [ProviderCredentialFields.OKTA_PRIVATE_KEY]:
+        "-----BEGIN PRIVATE KEY-----\nMIIEvQ...\n-----END PRIVATE KEY-----",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("reports missing okta private key on okta_private_key field", () => {
+    const schema = addCredentialsFormSchema("okta");
+
+    const result = schema.safeParse({
+      ...BASE_OKTA_VALUES,
+      [ProviderCredentialFields.OKTA_CLIENT_ID]: "0oa123456789abcdef",
+      [ProviderCredentialFields.OKTA_PRIVATE_KEY]: "",
+    });
+
+    expect(result.success).toBe(false);
+    if (result.success) return;
+
+    expect(result.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: [ProviderCredentialFields.OKTA_PRIVATE_KEY],
+      }),
+    );
+  });
+});
+
+describe("addCredentialsFormSchema - kubernetes", () => {
+  const BASE_KUBERNETES_VALUES = {
+    [ProviderCredentialFields.PROVIDER_ID]: "provider-kubernetes-1",
+    [ProviderCredentialFields.PROVIDER_TYPE]: "kubernetes",
+  } as const;
+
+  it("accepts kubeconfig content without exec authentication", () => {
+    const schema = addCredentialsFormSchema("kubernetes");
+
+    const result = schema.safeParse({
+      ...BASE_KUBERNETES_VALUES,
+      [ProviderCredentialFields.KUBECONFIG_CONTENT]: `apiVersion: v1
+kind: Config
+users:
+  - name: test-user
+    user:
+      token: test-token`,
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("reports kubeconfig exec authentication on kubeconfig_content field", () => {
+    const schema = addCredentialsFormSchema("kubernetes");
+
+    const result = schema.safeParse({
+      ...BASE_KUBERNETES_VALUES,
+      [ProviderCredentialFields.KUBECONFIG_CONTENT]: `apiVersion: v1
+kind: Config
+users:
+  - name: test-user
+    user:
+      exec:
+        apiVersion: client.authentication.k8s.io/v1
+        command: kubectl`,
+    });
+
+    expect(result.success).toBe(false);
+    if (result.success) return;
+
+    expect(result.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: [ProviderCredentialFields.KUBECONFIG_CONTENT],
+        message: KUBECONFIG_UNSUPPORTED_COMMAND_AUTHENTICATION_ERROR,
+      }),
+    );
+  });
+
+  it("reports kubeconfig auth-provider cmd-path on kubeconfig_content field", () => {
+    const schema = addCredentialsFormSchema("kubernetes");
+
+    const result = schema.safeParse({
+      ...BASE_KUBERNETES_VALUES,
+      [ProviderCredentialFields.KUBECONFIG_CONTENT]: `apiVersion: v1
+kind: Config
+users:
+  - name: test-user
+    user:
+      auth-provider:
+        name: gcp
+        config:
+          cmd-path: /bin/sh`,
+    });
+
+    expect(result.success).toBe(false);
+    if (result.success) return;
+
+    expect(result.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: [ProviderCredentialFields.KUBECONFIG_CONTENT],
+        message: KUBECONFIG_UNSUPPORTED_COMMAND_AUTHENTICATION_ERROR,
+      }),
+    );
+  });
+
+  it("accepts kubeconfig auth-provider without cmd-path", () => {
+    const schema = addCredentialsFormSchema("kubernetes");
+
+    const result = schema.safeParse({
+      ...BASE_KUBERNETES_VALUES,
+      [ProviderCredentialFields.KUBECONFIG_CONTENT]: `apiVersion: v1
+kind: Config
+users:
+  - name: test-user
+    user:
+      auth-provider:
+        name: oidc
+        config:
+          client-id: prowler`,
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts malformed kubeconfig content for backend validation", () => {
+    const schema = addCredentialsFormSchema("kubernetes");
+
+    const result = schema.safeParse({
+      ...BASE_KUBERNETES_VALUES,
+      [ProviderCredentialFields.KUBECONFIG_CONTENT]: "apiVersion: [",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts non-mapping kubeconfig content for backend validation", () => {
+    const schema = addCredentialsFormSchema("kubernetes");
+
+    const result = schema.safeParse({
+      ...BASE_KUBERNETES_VALUES,
+      [ProviderCredentialFields.KUBECONFIG_CONTENT]: "[]",
+    });
+
+    expect(result.success).toBe(true);
+  });
+});
+
+describe("addCredentialsFormSchema - oraclecloud", () => {
+  const BASE_OCI_VALUES = {
+    [ProviderCredentialFields.PROVIDER_ID]: "provider-oci-1",
+    [ProviderCredentialFields.PROVIDER_TYPE]: "oraclecloud",
+    [ProviderCredentialFields.OCI_USER]: "ocid1.user.oc1..example",
+    [ProviderCredentialFields.OCI_FINGERPRINT]: "aa:bb:cc:dd",
+    [ProviderCredentialFields.OCI_KEY_CONTENT]:
+      "-----BEGIN PRIVATE KEY-----\nMIIEvQ...\n-----END PRIVATE KEY-----",
+    [ProviderCredentialFields.OCI_TENANCY]: "ocid1.tenancy.oc1..example",
+  } as const;
+
+  it("accepts OCI API key credentials without region", () => {
+    const schema = addCredentialsFormSchema("oraclecloud");
+
+    const result = schema.safeParse(BASE_OCI_VALUES);
+
+    expect(result.success).toBe(true);
+  });
+});

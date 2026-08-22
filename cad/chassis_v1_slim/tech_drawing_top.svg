@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360" font-family="Inter, Arial, sans-serif" font-size="11">
+  <defs>
+    <pattern id="hatch" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#cbd5e1" stroke-width="0.5"/>
+    </pattern>
+    <pattern id="dotg" patternUnits="userSpaceOnUse" width="3" height="3">
+      <circle cx="1" cy="1" r="0.5" fill="#64748b"/>
+    </pattern>
+    <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 z" fill="#0f172a"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect width="600" height="360" fill="#fafaf9"/>
+  <rect x="40" y="40" width="520" height="280" fill="#ffffff" stroke="#475569" stroke-width="0.8"/>
+
+  <!-- title -->
+  <text x="300" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f172a">CHASSIS v1 SLIM — TOP VIEW (185 × 100 mm)</text>
+
+  <!-- chassis outline -->
+  <g transform="translate(300 180)">
+    <rect x="-262.5" y="-100" width="525" height="200" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.4" rx="6"/>
+    <!-- corners label -->
+    <text x="-262.5" y="-110" font-size="9" fill="#475569">185 mm</text>
+    <line x1="-262.5" y1="-108" x2="262.5" y2="-108" stroke="#475569" stroke-width="0.4"/>
+
+    <!-- Pi recess -->
+    <g fill="#fef3c7" stroke="#b45309" stroke-width="0.8">
+      <rect x="-100" y="-55" width="200" height="110" rx="4"/>
+    </g>
+    <text x="0" y="-44" font-size="9" fill="#b45309">Pi 5 recess · 85 × 56 mm · M2.5 @ 58 × 49 mm</text>
+    <!-- Pi mounting holes -->
+    <g fill="none" stroke="#b45309" stroke-width="0.9">
+      <circle cx="-29" cy="-24.5" r="2.8"/>
+      <circle cx="29" cy="-24.5" r="2.8"/>
+      <circle cx="-29" cy="24.5" r="2.8"/>
+      <circle cx="29" cy="24.5" r="2.8"/>
+    </g>
+
+    <!-- VESA bosses -->
+    <g fill="#bfdbfe" stroke="#1d4ed8" stroke-width="0.8">
+      <circle cx="-37.5" cy="-37.5" r="3.5"/>
+      <circle cx="37.5" cy="-37.5" r="3.5"/>
+      <circle cx="-37.5" cy="37.5" r="3.5"/>
+      <circle cx="37.5" cy="37.5" r="3.5"/>
+    </g>
+    <text x="80" y="-37" font-size="8" fill="#1d4ed8">VESA 75×75 / M3</text>
+
+    <!-- Motor bays (left + right) -->
+    <g>
+      <rect x="-262" y="-32" width="32" height="64" fill="#bbf7d0" stroke="#15803d" stroke-width="0.9" rx="2"/>
+      <rect x="230" y="-32" width="32" height="64" fill="#bbf7d0" stroke="#15803d" stroke-width="0.9" rx="2"/>
+    </g>
+    <text x="-250" y="50" font-size="9" fill="#15803d">M1</text>
+    <text x="246" y="50" font-size="9" fill="#15803d">M2</text>
+    <text x="-260" y="-38" font-size="8" fill="#15803d">TT · 24 mm</text>
+    <text x="230" y="-38" font-size="8" fill="#15803d">TT · 24 mm</text>
+
+    <!-- Battery bay (2x 18650) -->
+    <g fill="url(#hatch)" stroke="#7c2d12" stroke-width="0.7">
+      <rect x="-46" y="-30" width="20" height="60" rx="9"/>
+      <rect x="26" y="-30" width="20" height="60" rx="9"/>
+    </g>
+    <text x="0" y="44" font-size="9" fill="#7c2d12">18650 × 2</text>
+
+    <!-- Shock pivots (4 pairs at corners) -->
+    <g fill="#fde68a" stroke="#a16207" stroke-width="0.7">
+      <circle cx="-237.5" cy="-78" r="4.5"/>
+      <circle cx="-215" cy="-78" r="4.5"/>
+      <circle cx="215" cy="78" r="4.5"/>
+      <circle cx="237.5" cy="78" r="4.5"/>
+      <circle cx="237.5" cy="-78" r="4.5"/>
+      <circle cx="215" cy="-78" r="4.5"/>
+      <circle cx="-237.5" cy="78" r="4.5"/>
+      <circle cx="-215" cy="78" r="4.5"/>
+    </g>
+    <text x="-237" y="-92" font-size="8" fill="#a16207">shock M3</text>
+
+    <!-- Magnet corners -->
+    <g fill="url(#dotg)" stroke="#0f172a" stroke-width="0.6">
+      <circle cx="-262.5" cy="-100" r="3.5"/>
+      <circle cx="262.5" cy="-100" r="3.5"/>
+      <circle cx="-262.5" cy="100" r="3.5"/>
+      <circle cx="262.5" cy="100" r="3.5"/>
+    </g>
+    <text x="232" y="-72" font-size="8" fill="#334155">⌬ M 6×2</text>
+
+    <!-- Ventilation slots -->
+    <g fill="#f1f5f9" stroke="#475569" stroke-width="0.5">
+      <rect x="-220" y="-1" width="22" height="2"/>
+      <rect x="-185" y="-1" width="22" height="2"/>
+      <rect x="-150" y="-1" width="22" height="2"/>
+      <rect x="-115" y="-1" width="22" height="2"/>
+      <rect x="-80" y="-1" width="22" height="2"/>
+      <rect x="80" y="-1" width="22" height="2"/>
+      <rect x="115" y="-1" width="22" height="2"/>
+      <rect x="150" y="-1" width="22" height="2"/>
+      <rect x="185" y="-1" width="22" height="2"/>
+    </g>
+    <text x="0" y="14" text-anchor="middle" font-size="7" fill="#475569">VENTS × 9 (22×1.6 mm)</text>
+
+    <!-- dimension lines -->
+    <g stroke="#0f172a" stroke-width="0.7" fill="none">
+      <line x1="-262.5" y1="115" x2="262.5" y2="115" marker-start="url(#arr)" marker-end="url(#arr)"/>
+      <line x1="285" y1="-100" x2="285" y2="100" marker-start="url(#arr)" marker-end="url(#arr)"/>
+    </g>
+    <text x="0" y="128" text-anchor="middle" font-size="10" fill="#0f172a">185 mm</text>
+    <text x="295" y="0" dominant-baseline="middle" font-size="10" fill="#0f172a">100 mm</text>
+
+    <!-- legend -->
+    <g font-size="9" transform="translate(-260 -150)">
+      <text x="0" y="0" font-weight="bold" fill="#0f172a">LEGEND</text>
+      <rect x="0" y="6" width="10" height="6" fill="#fef3c7" stroke="#b45309"/>
+      <text x="14" y="11" fill="#0f172a">Pi 5 mounting pocket</text>
+      <rect x="0" y="16" width="10" height="6" fill="#bbf7d0" stroke="#15803d"/>
+      <text x="14" y="21" fill="#0f172a">TT motor bay (drop-in)</text>
+      <rect x="0" y="26" width="10" height="6" fill="url(#hatch)" stroke="#7c2d12"/>
+      <text x="14" y="31" fill="#0f172a">18650 × 2 battery bay</text>
+      <circle cx="5" cy="38" r="3" fill="#bfdbfe" stroke="#1d4ed8"/>
+      <text x="14" y="41" fill="#0f172a">VESA M3 boss (4×)</text>
+      <circle cx="5" cy="48" r="3" fill="#fde68a" stroke="#a16207"/>
+      <text x="14" y="51" fill="#0f172a">Probots shock-absorber pivot M3 (8×)</text>
+      <circle cx="5" cy="58" r="3" fill="url(#dotg)" stroke="#0f172a"/>
+      <text x="14" y="61" fill="#0f172a">N52 magnet pocket (4×)</text>
+    </g>
+  </g>
+</svg>

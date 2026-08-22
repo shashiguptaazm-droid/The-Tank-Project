@@ -1,0 +1,373 @@
+{
+  "timestamp": "2026-08-06T03:01:06.896565",
+  "topic": "developer tools python CLI",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "donnemartin/dev-setup",
+      "html_url": "https://github.com/donnemartin/dev-setup",
+      "description": "macOS development environment setup:  Easy-to-understand instructions with automated setup scripts for developer tools like Vim, Sublime Text, Bash, iTerm, Python data analysis, Spark, Hadoop MapReduce, AWS, Heroku, JavaScript web development, Android development, common data stores, and dev-based O",
+      "stars": 6266,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "harshkedia177/axon",
+      "html_url": "https://github.com/harshkedia177/axon",
+      "description": "Graph-powered code intelligence engine \u2014 indexes codebases into a knowledge graph, exposed via MCP tools for AI agents and a CLI for developers.",
+      "stars": 728,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Masudbro94/python-hacked-mobile-phone-",
+      "html_url": "https://github.com/Masudbro94/python-hacked-mobile-phone-",
+      "description": "Open in app Get started   ITNEXT Published in ITNEXT  You have 2 free member-only stories left this month. Sign up for Medium and get an extra one  Kush Kush Follow Apr 15, 2021  \u00b7 7 min read \u00b7  Listen   Save      How you can Control your Android Device with Python Photo by Caspar Camille Rubin on U",
+      "stars": 154,
+      "language": null,
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 80,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git config --global user.name \"$GIT_AUTHOR_NAME\""
+    },
+    {
+      "type": "command",
+      "value": "git config --global user.email \"$GIT_AUTHOR_EMAIL\""
+    },
+    {
+      "type": "tool",
+      "name": "`.dots` might ask you to re",
+      "description": "enter your password at certain stages of the installation."
+    },
+    {
+      "type": "tool",
+      "name": "Open your User Settings Preferences file `Sublime Text 2",
+      "description": "> Preferences -> Settings - User`"
+    },
+    {
+      "type": "tool",
+      "name": "Open your User Settings Preferences file `Sublime Text",
+      "description": "> Preferences -> Settings - User`"
+    },
+    {
+      "type": "tool",
+      "name": "50+ top",
+      "description": "level commands"
+    },
+    {
+      "type": "tool",
+      "name": "Countless command",
+      "description": "specific options"
+    },
+    {
+      "type": "tool",
+      "name": "Improving ease",
+      "description": "of-use**"
+    },
+    {
+      "type": "tool",
+      "name": "Auto",
+      "description": "completion of:"
+    },
+    {
+      "type": "tool",
+      "name": "Auto",
+      "description": "completion of resources:"
+    },
+    {
+      "type": "pip_package",
+      "value": "\u2013upgrade"
+    },
+    {
+      "type": "pip_package",
+      "value": "<package>"
+    },
+    {
+      "type": "pip_package",
+      "value": "--upgrade"
+    },
+    {
+      "type": "pip_package",
+      "value": "<package>"
+    },
+    {
+      "type": "pip_package",
+      "value": "\"ipython[notebook]\""
+    },
+    {
+      "type": "pip_package",
+      "value": "\"ipython[all]\""
+    },
+    {
+      "type": "pip_package",
+      "value": "numpy"
+    },
+    {
+      "type": "pip_package",
+      "value": "pandas"
+    },
+    {
+      "type": "pip_package",
+      "value": "matplotlib"
+    },
+    {
+      "type": "pip_package",
+      "value": "seaborn"
+    },
+    {
+      "type": "pip_package",
+      "value": "scikit-learn"
+    },
+    {
+      "type": "pip_package",
+      "value": "scipy"
+    },
+    {
+      "type": "pip_package",
+      "value": "Flask"
+    },
+    {
+      "type": "pip_package",
+      "value": "bokeh"
+    },
+    {
+      "type": "pip_package",
+      "value": "mrjob"
+    },
+    {
+      "type": "pip_package",
+      "value": "awscli"
+    },
+    {
+      "type": "pip_package",
+      "value": "boto"
+    },
+    {
+      "type": "pip_package",
+      "value": "s3cmd"
+    },
+    {
+      "type": "npm_package",
+      "value": "coffee-script"
+    },
+    {
+      "type": "npm_package",
+      "value": "grunt-cli"
+    },
+    {
+      "type": "npm_package",
+      "value": "<package>"
+    },
+    {
+      "type": "npm_package",
+      "value": "<package>"
+    },
+    {
+      "type": "npm_package",
+      "value": "<package>"
+    },
+    {
+      "type": "npm_package",
+      "value": "jshint"
+    },
+    {
+      "type": "npm_package",
+      "value": "less"
+    },
+    {
+      "type": "feature",
+      "value": "[.dots](https://github.com/donnemartin/dev-setup/blob/master/.dots)"
+    },
+    {
+      "type": "feature",
+      "value": "Runs specified scripts"
+    },
+    {
+      "type": "feature",
+      "value": "[bootstrap.sh](https://github.com/donnemartin/dev-setup/blob/master/bootstrap.sh)"
+    },
+    {
+      "type": "feature",
+      "value": "Syncs dev-setup to your local home directory `~`"
+    },
+    {
+      "type": "feature",
+      "value": "[osxprep.sh](https://github.com/donnemartin/dev-setup/blob/master/osxprep.sh)"
+    },
+    {
+      "type": "feature",
+      "value": "Updates OS X and installs Xcode command line tools"
+    },
+    {
+      "type": "feature",
+      "value": "[brew.sh](https://github.com/donnemartin/dev-setup/blob/master/brew.sh)"
+    },
+    {
+      "type": "feature",
+      "value": "Installs common Homebrew formulae and apps"
+    },
+    {
+      "type": "feature",
+      "value": "[osx.sh](https://github.com/donnemartin/dev-setup/blob/master/osx.sh)"
+    },
+    {
+      "type": "feature",
+      "value": "Sets up OS X defaults geared towards developers"
+    },
+    {
+      "type": "feature",
+      "value": "[pydata.sh](https://github.com/donnemartin/dev-setup/blob/master/pydata.sh)"
+    },
+    {
+      "type": "feature",
+      "value": "Sets up python for data analysis"
+    },
+    {
+      "type": "feature",
+      "value": "[aws.sh](https://github.com/donnemartin/dev-setup/blob/master/aws.sh)"
+    },
+    {
+      "type": "feature",
+      "value": "Sets up Spark, Hadoop MapReduce, and Amazon Web Services"
+    },
+    {
+      "type": "feature",
+      "value": "[datastores.sh](https://github.com/donnemartin/dev-setup/blob/master/datastores.sh)"
+    },
+    {
+      "type": "feature",
+      "value": "Sets up common data stores"
+    },
+    {
+      "type": "feature",
+      "value": "[web.sh](https://github.com/donnemartin/dev-setup/blob/master/web.sh)"
+    },
+    {
+      "type": "feature",
+      "value": "Sets up JavaScript web development"
+    },
+    {
+      "type": "feature",
+      "value": "[android.sh](https://github.com/donnemartin/dev-setup/blob/master/android.sh)"
+    },
+    {
+      "type": "feature",
+      "value": "Sets up Android development"
+    },
+    {
+      "type": "feature",
+      "value": "`.dots` will initially prompt you to enter your password."
+    },
+    {
+      "type": "feature",
+      "value": "`.dots` might ask you to re-enter your password at certain stages of the installation."
+    },
+    {
+      "type": "feature",
+      "value": "If OS X updates require a restart, simply run `.dots` again to resume where you left off."
+    },
+    {
+      "type": "feature",
+      "value": "When installing the Xcode command line tools, a dialog box will confirm installation."
+    },
+    {
+      "type": "feature",
+      "value": "Once Xcode is installed, follow the instructions on the terminal to continue."
+    },
+    {
+      "type": "feature",
+      "value": "`.dots` runs `brew.sh`, which takes awhile to complete as some formulae need to be installed from source."
+    },
+    {
+      "type": "feature",
+      "value": "**When `.dots` completes, be sure to restart your computer for all updates to take effect.**"
+    },
+    {
+      "type": "command",
+      "value": "pip install axoniq            # 1. Install"
+    },
+    {
+      "type": "tool",
+      "name": "Explorer",
+      "description": "Interactive force-directed graph (Sigma.js + WebGL). Click any node to see its code, callers, callees, impact radius, and community. Community hull overlays show architectural clusters at a glance."
+    },
+    {
+      "type": "tool",
+      "name": "Analysis",
+      "description": "Health score, coupling heatmap, dead code report, inheritance tree, branch diff \u2014 your codebase health in one dashboard."
+    },
+    {
+      "type": "tool",
+      "name": "Cypher Console",
+      "description": "Write and run Cypher queries against the graph with syntax highlighting, presets, and history."
+    },
+    {
+      "type": "tool",
+      "name": "`axon_query(\"auth handler\")` returns hybrid",
+      "description": "ranked results grouped by execution flow, not a flat list of name matches"
+    },
+    {
+      "type": "tool",
+      "name": "BM25 full",
+      "description": "text search** \u2014 fast exact name and keyword matching via KuzuDB FTS"
+    },
+    {
+      "type": "tool",
+      "name": "Semantic vector search",
+      "description": "conceptual queries via 384-dim embeddings (BAAI/bge-small-en-v1.5)"
+    },
+    {
+      "type": "tool",
+      "name": "Fuzzy name search",
+      "description": "Levenshtein fallback for typos and partial matches"
+    },
+    {
+      "type": "tool",
+      "name": "Depth 1",
+      "description": "Direct callers (will break)"
+    },
+    {
+      "type": "tool",
+      "name": "Depth 2",
+      "description": "Indirect callers (may break)"
+    },
+    {
+      "type": "tool",
+      "name": "Depth 3+",
+      "description": "Transitive (review)"
+    },
+    {
+      "type": "pip_package",
+      "value": "axoniq"
+    },
+    {
+      "type": "pip_package",
+      "value": "axoniq"
+    },
+    {
+      "type": "pip_package",
+      "value": "axoniq[neo4j]"
+    },
+    {
+      "type": "pip_package",
+      "value": "axoniq[neo4j]`."
+    },
+    {
+      "type": "npm_package",
+      "value": "&&"
+    },
+    {
+      "type": "npm_package",
+      "value": "npm"
+    },
+    {
+      "type": "pip_package",
+      "value": "pure-python-adb."
+    }
+  ],
+  "script_summary": "3 commands, 18 tools, 23 pip_packages, 9 npm_packages, 27 features"
+}

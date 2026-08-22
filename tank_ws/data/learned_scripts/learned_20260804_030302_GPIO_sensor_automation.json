@@ -1,0 +1,90 @@
+{
+  "timestamp": "2026-08-04T03:03:02.237208",
+  "topic": "GPIO sensor automation",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "CodeChix-OpenSource/PiDoorbell",
+      "html_url": "https://github.com/CodeChix-OpenSource/PiDoorbell",
+      "description": "PiDoorbell - home automation using RaspberryPi, Proximity sensor, GPIO",
+      "stars": 7,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "iver56/auto-light",
+      "html_url": "https://github.com/iver56/auto-light",
+      "description": "Home automation: Light that turns on when somebody is standing still in front of the mirror",
+      "stars": 3,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "justin-marian/casamonitor",
+      "html_url": "https://github.com/justin-marian/casamonitor",
+      "description": "CasaMonitor: Home condition monitoring & control with: sensors, LEDs, fan, automation, real-time data, and customizable settings.",
+      "stars": 2,
+      "language": "C++",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 11,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Node",
+      "description": "RED API Dashboard:** [SW](https://drive.google.com/file/d/1zLRS86_t2jiu0NKJF-CHeEPyh4NjXHAV/view?usp=sharing)"
+    },
+    {
+      "type": "tool",
+      "name": "USB 2.0 A",
+      "description": "B Cable**: Connects the Arduino to a laptop for data transfer and power."
+    },
+    {
+      "type": "tool",
+      "name": "DHT22 Temperature",
+      "description": "Humidity Sensor**: Connected to digital pin 12 on the Arduino, it measures environmental temperature and humidity. A pull-up resistor ensures stable data communication."
+    },
+    {
+      "type": "tool",
+      "name": "INA219 Current",
+      "description": "Voltage Sensor**: Uses I2C protocol for communication, measuring current up to \u00b13.2A with 10\u00b5A resolution, and bus voltage up to 26V."
+    },
+    {
+      "type": "tool",
+      "name": "For IR light or ON",
+      "description": "OFF button."
+    },
+    {
+      "type": "tool",
+      "name": "Adjusts light intensity and ON",
+      "description": "OFF value."
+    },
+    {
+      "type": "tool",
+      "name": "Used if motion or ON button is active.",
+      "description": "Defaults to Min Light if inactive."
+    },
+    {
+      "type": "tool",
+      "name": "Sets minimum light intensity without IR or ON",
+      "description": "OFF."
+    },
+    {
+      "type": "tool",
+      "name": "Temperature, Humidity, Current, Voltage, Power:",
+      "description": "Shows real-time values."
+    },
+    {
+      "type": "tool",
+      "name": "Sets light intensity and temperature preferences.",
+      "description": "Buttons for lights and fan."
+    },
+    {
+      "type": "tool",
+      "name": "Sets desired temperature.",
+      "description": "Fan activates if real temperature is higher."
+    }
+  ],
+  "script_summary": "11 tools"
+}

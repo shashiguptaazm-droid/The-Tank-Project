@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-07-30T13:48:25.018963",
+  "query": "machine learning",
+  "duration_ms": 13923.0,
+  "total_results": 6,
+  "results_by_source": {
+    "torrent": {
+      "count": 0,
+      "items": []
+    },
+    "youtube": {
+      "count": 3,
+      "items": [
+        {
+          "source": "youtube",
+          "title": "Advice for machine learning beginners | Andrej Karpathy and Lex Fridman",
+          "url": "https://youtube.com/watch?v=I2ZK3ngNvvI",
+          "duration": 348,
+          "uploader": "Lex Clips",
+          "views": 1173978
+        },
+        {
+          "source": "youtube",
+          "title": "AI Doesn't Know Anything. It Just Passes Tests.",
+          "url": "https://youtube.com/watch?v=R9OHn5ZF4Uo",
+          "duration": 535,
+          "uploader": "CGP Grey",
+          "views": 12395720
+        },
+        {
+          "source": "youtube",
+          "title": "11. Introduction to Machine Learning",
+          "url": "https://youtube.com/watch?v=h0e2HAPTGF4",
+          "duration": 3091,
+          "uploader": "MIT OpenCourseWare",
+          "views": 1817667
+        }
+      ]
+    },
+    "web": {
+      "count": 0,
+      "items": []
+    },
+    "github": {
+      "count": 3,
+      "items": [
+        {
+          "source": "github",
+          "title": "tensorflow/tensorflow",
+          "url": "https://github.com/tensorflow/tensorflow",
+          "description": "An Open Source Machine Learning Framework for Everyone",
+          "stars": 196604,
+          "language": "C++",
+          "updated": "2026-07-30T11:45:32Z"
+        },
+        {
+          "source": "github",
+          "title": "huggingface/transformers",
+          "url": "https://github.com/huggingface/transformers",
+          "description": "\ud83e\udd17 Transformers: the model-definition framework for state-of-the-art machine learning models in text, vision, audio, and multimodal models, for both inference and training. ",
+          "stars": 163162,
+          "language": "Python",
+          "updated": "2026-07-30T11:34:21Z"
+        },
+        {
+          "source": "github",
+          "title": "microsoft/ML-For-Beginners",
+          "url": "https://github.com/microsoft/ML-For-Beginners",
+          "description": "12 weeks, 26 lessons, 52 quizzes, classic Machine Learning for all",
+          "stars": 88750,
+          "language": "Jupyter Notebook",
+          "updated": "2026-07-30T10:38:36Z"
+        }
+      ]
+    }
+  }
+}

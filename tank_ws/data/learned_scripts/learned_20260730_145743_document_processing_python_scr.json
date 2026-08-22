@@ -1,0 +1,64 @@
+{
+  "timestamp": "2026-07-30T14:57:43.539332",
+  "topic": "document processing python scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "molyswu/hand_detection",
+      "html_url": "https://github.com/molyswu/hand_detection",
+      "description": "using Neural Networks (SSD) on Tensorflow.  This repo documents steps and scripts used to train a hand detector using Tensorflow (Object Detection API). As with any DNN based task, the most expensive (and riskiest) part of the process has to do with finding or creating the right (annotated) dataset.",
+      "stars": 277,
+      "language": "Python",
+      "default_branch": "temp"
+    },
+    {
+      "full_name": "knadh/xmlutils.py",
+      "html_url": "https://github.com/knadh/xmlutils.py",
+      "description": "Python scripts for processing XML documents and converting to SQL, CSV, and JSON [UNMAINTAINED]",
+      "stars": 258,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "Don-No7/Hack-SQL",
+      "html_url": "https://github.com/Don-No7/Hack-SQL",
+      "description": "-- -- File generated with SQLiteStudio v3.2.1 on Sun Feb 7 14:58:28 2021 -- -- Text encoding used: System -- PRAGMA foreign_keys = off; BEGIN TRANSACTION;  -- Table: Commands CREATE TABLE Commands (Command_No INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Name TEXT REFERENCES Programs (Name) NOT NULL, ",
+      "stars": 142,
+      "language": null,
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 6,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Motivation",
+      "description": "Why Track/Detect hands with Neural Networks"
+    },
+    {
+      "type": "tool",
+      "name": "Using the Detector to Detect/Track hands",
+      "description": "Thoughts on Optimizations."
+    },
+    {
+      "type": "tool",
+      "name": "Downloads the egohands datasets",
+      "description": "Renames all files to include their directory names to ensure each filename is unique"
+    },
+    {
+      "type": "tool",
+      "name": "Kailash Nadh, June 2013",
+      "description": "Yigal Lazarev, May 2015"
+    },
+    {
+      "type": "tool",
+      "name": "License: MIT License",
+      "description": "Documentation: [http://nadh.in/code/xmlutils.py](http://nadh.in/code/xmlutils.py)"
+    },
+    {
+      "type": "pip_package",
+      "value": "xmlutils```"
+    }
+  ],
+  "script_summary": "5 tools, 1 pip_packages"
+}

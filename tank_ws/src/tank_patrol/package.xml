@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<?xml-model
+  href="http://download.ros.org/schema/package_format3.xsd"
+  schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>tank_patrol</name>
+  <version>0.1.0</version>
+  <description>
+    Autonomous AI patrolling + AI-driven surveillance for The Tank
+    Project. Provides:
+      * Pure-Python patrol modes (waypoint + random walk)
+      * ROS 2 patrol_node state machine with reactive /cmd_vel control
+      * ROS 2 surveillance_node fusion of motion events + patrol phase
+      * AlertJournal + CLI review tool
+    Integrates with /security/events/motion (tank_security),
+    /cmd_vel + /odom (tank_motion), /battery/state (tank_health),
+    /estop (operator UI), /security/events/intruder (handoff
+    back into tank_security for unified logging + MQTT).
+  </description>
+  <maintainer email="tank@example.invalid">Tank Maintainer</maintainer>
+  <license>MIT</license>
+
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>sensor_msgs</depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

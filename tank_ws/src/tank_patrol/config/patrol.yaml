@@ -1,0 +1,17 @@
+/patrol_node:
+  ros__parameters:
+    waypoints_file: "/root/the tank project/tank_ws/src/tank_patrol/config/waypoints_demo.json"
+    random_bounds_xmin: -5.0
+    random_bounds_ymin: -5.0
+    random_bounds_xmax:  5.0
+    random_bounds_ymax:  5.0
+    random_seed: 42
+    battery_return_threshold: 0.20
+    battery_critical_threshold: 0.10
+    collision_min_range_m: 0.45
+
+/patrol_node_motors:
+  ros__parameters: {}
+
+/surveillance_node:
+  ros__parameters: {}

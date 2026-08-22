@@ -1,0 +1,79 @@
+{
+  "timestamp": "2026-07-30T14:44:33.821544",
+  "topic": "generative art tools CLI",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "youclaude-cmyk/QQL-GAN",
+      "html_url": "https://github.com/youclaude-cmyk/QQL-GAN",
+      "description": "CalliGAN is a high-performance Rust implementation of the QQL (Qualia) generative art algorithm, offering both CLI tools and a modern web interface for creating stunning generative artwork.",
+      "stars": 1,
+      "language": "HTML",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "genart-dev/cli",
+      "html_url": "https://github.com/genart-dev/cli",
+      "description": "Command-line interface for genart.dev \u2014 render, batch, montage, video, and agent tools for generative art",
+      "stars": 0,
+      "language": "TypeScript",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "maxwellmattryan/sketchbook",
+      "html_url": "https://github.com/maxwellmattryan/sketchbook",
+      "description": "CLI tool for managing generative art sketches, written in Rust \ud83e\udd80",
+      "stars": 0,
+      "language": "Rust",
+      "default_branch": "develop"
+    }
+  ],
+  "total_findings": 11,
+  "findings": [
+    {
+      "type": "command",
+      "value": "./target/release/qql-cli \\"
+    },
+    {
+      "type": "feature",
+      "value": "[Viewport restriction, `--viewport`](#viewport-restriction)"
+    },
+    {
+      "type": "feature",
+      "value": "[Multicore rendering, `--chunks`](#multicore-rendering)"
+    },
+    {
+      "type": "feature",
+      "value": "[Incremental animations, `--animate`](#incremental-animations)"
+    },
+    {
+      "type": "feature",
+      "value": "[Higher quality circles, `--min-circle-steps`](#higher-quality-circles)"
+    },
+    {
+      "type": "feature",
+      "value": "[Fast collision checking, `--fast-collisions`](#fast-collision-checking)"
+    },
+    {
+      "type": "feature",
+      "value": "[Radius inflation at paint time, `--inflate-draw-radius`](#radius-inflation-at-paint-time)"
+    },
+    {
+      "type": "command",
+      "value": "npm install -g @genart-dev/cli"
+    },
+    {
+      "type": "npm_package",
+      "value": "@genart-dev/cli"
+    },
+    {
+      "type": "npm_package",
+      "value": "sharp`."
+    },
+    {
+      "type": "npm_package",
+      "value": "sharp`"
+    }
+  ],
+  "script_summary": "2 commands, 6 features, 3 npm_packages"
+}

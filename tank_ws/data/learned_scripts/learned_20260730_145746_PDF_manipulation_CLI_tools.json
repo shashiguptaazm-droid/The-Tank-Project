@@ -1,0 +1,340 @@
+{
+  "timestamp": "2026-07-30T14:57:46.107565",
+  "topic": "PDF manipulation CLI tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "file-conversor/file_conversor",
+      "html_url": "https://github.com/file-conversor/file_conversor",
+      "description": "File Conversor is a Python-based CLI tool to convert, compress, and manipulate files - covering audio, video, images, text/docs, and PDFs - integrated with Windows context menu. It offers an all-in-one, scriptable solution for format conversion, resizing, rotation, compression, metadata and file man",
+      "stars": 9,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "kurtbuilds/imcon",
+      "html_url": "https://github.com/kurtbuilds/imcon",
+      "description": "A modern CLI tool for image manipulation",
+      "stars": 1,
+      "language": "Rust",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "Chibs5/pdf-merger-pro",
+      "html_url": "https://github.com/Chibs5/pdf-merger-pro",
+      "description": "Professional PDF manipulation tool with GUI and CLI - merge, split, rotate, watermark, and compress PDFs",
+      "stars": 1,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 67,
+  "findings": [
+    {
+      "type": "command",
+      "value": "pip install file_conversor"
+    },
+    {
+      "type": "command",
+      "value": "docker run --rm -it -v $(pwd):/app andreromano/file_conversor:latest"
+    },
+    {
+      "type": "command",
+      "value": "pip install file_conversor"
+    },
+    {
+      "type": "tool",
+      "name": "Automate repetitive file conversion or compression tasks",
+      "description": "Manipulate various media formats with a single tool"
+    },
+    {
+      "type": "tool",
+      "name": "Integrate seamlessly with scripting workflows",
+      "description": "Configure advanced file processing pipelines"
+    },
+    {
+      "type": "tool",
+      "name": "Format Conversion",
+      "description": "**Documents**: `docx \u21c4 odt`, `docx \u2192 pdf`, etc"
+    },
+    {
+      "type": "tool",
+      "name": "Compression",
+      "description": "Optimizes size for formats like MP4, MP3, PDF, JPG, and others."
+    },
+    {
+      "type": "tool",
+      "name": "Metadata Inspection",
+      "description": "Retrieves EXIF data from images, stream details from audio/video."
+    },
+    {
+      "type": "tool",
+      "name": "File Manipulation",
+      "description": "**PDFs**: split, rotate, encrypt, etc"
+    },
+    {
+      "type": "tool",
+      "name": "Batch Processing",
+      "description": "Use pipelines and config files for automation and advanced tasks."
+    },
+    {
+      "type": "tool",
+      "name": "Multiple Interfaces",
+      "description": "**Windows Explorer integration**: right-click files for quick actions"
+    },
+    {
+      "type": "tool",
+      "name": "Acknowledgements",
+      "description": "We're grateful to the icon designers whose work is featured in the app: [Freepik](https://www.flaticon.com/authors/freepik), [atomicicon](https://www.flaticon.com/authors/atomicicon), [swifticons](htt"
+    },
+    {
+      "type": "pip_package",
+      "value": "file_conversor"
+    },
+    {
+      "type": "pip_package",
+      "value": "file_conversor"
+    },
+    {
+      "type": "feature",
+      "value": "**Format Conversion**"
+    },
+    {
+      "type": "feature",
+      "value": "**Documents**: `docx \u21c4 odt`, `docx \u2192 pdf`, etc"
+    },
+    {
+      "type": "feature",
+      "value": "**Spreadsheets**: `xlsx \u21c4 ods`, `xlsx \u2192 pdf`, etc"
+    },
+    {
+      "type": "feature",
+      "value": "**Video**: `mkv \u21c4 mp4`, `avi \u21c4 mp4`, etc."
+    },
+    {
+      "type": "feature",
+      "value": "**Images**: `jpg \u21c4 png`, `gif \u21c4 webp`, `bmp \u21c4 tiff`, etc."
+    },
+    {
+      "type": "feature",
+      "value": "**Audio**: `mp3 \u21c4 m4a`, etc."
+    },
+    {
+      "type": "feature",
+      "value": "**Text**: `json \u21c4 yaml`, `xml \u21c4 json`, etc"
+    },
+    {
+      "type": "feature",
+      "value": "And more ..."
+    },
+    {
+      "type": "feature",
+      "value": "**Compression**"
+    },
+    {
+      "type": "feature",
+      "value": "Optimizes size for formats like MP4, MP3, PDF, JPG, and others."
+    },
+    {
+      "type": "feature",
+      "value": "**Metadata Inspection**"
+    },
+    {
+      "type": "feature",
+      "value": "Retrieves EXIF data from images, stream details from audio/video."
+    },
+    {
+      "type": "feature",
+      "value": "**File Manipulation**"
+    },
+    {
+      "type": "feature",
+      "value": "**PDFs**: split, rotate, encrypt, etc"
+    },
+    {
+      "type": "feature",
+      "value": "**Images**: rotate, enhance, and apply other transformations"
+    },
+    {
+      "type": "feature",
+      "value": "**Batch Processing**"
+    },
+    {
+      "type": "feature",
+      "value": "Use pipelines and config files for automation and advanced tasks."
+    },
+    {
+      "type": "feature",
+      "value": "**Multiple Interfaces**"
+    },
+    {
+      "type": "feature",
+      "value": "**Windows Explorer integration**: right-click files for quick actions"
+    },
+    {
+      "type": "feature",
+      "value": "**KDE Linux integration**: right-click files in Dolphin for quick actions"
+    },
+    {
+      "type": "feature",
+      "value": "CLI for scripting and automation"
+    },
+    {
+      "type": "tool",
+      "name": "What are operations you want on scaling images?",
+      "description": "Resize the image to a max side length.  (-W $size -H $size)"
+    },
+    {
+      "type": "tool",
+      "name": "You might also want to just print metadata.",
+      "description": "width"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/yourusername/pdf-merger-pro.git"
+    },
+    {
+      "type": "command",
+      "value": "python -m venv venv"
+    },
+    {
+      "type": "tool",
+      "name": "Professional tabbed interface (Merge, Split, Modify, About)",
+      "description": "Drag-and-drop file support"
+    },
+    {
+      "type": "tool",
+      "name": "Visual file list with reordering",
+      "description": "Real-time progress tracking"
+    },
+    {
+      "type": "tool",
+      "name": "Page range specification for each file",
+      "description": "Standalone Windows executable (no Python needed!)"
+    },
+    {
+      "type": "tool",
+      "name": "Complete command",
+      "description": "line interface for automation"
+    },
+    {
+      "type": "tool",
+      "name": "Batch processing support",
+      "description": "Scriptable operations"
+    },
+    {
+      "type": "tool",
+      "name": "Progress indicators",
+      "description": "Standard exit codes for scripting"
+    },
+    {
+      "type": "tool",
+      "name": "all",
+      "description": "All pages"
+    },
+    {
+      "type": "tool",
+      "name": "1-10",
+      "description": "Range of pages (pages 1 through 10)"
+    },
+    {
+      "type": "tool",
+      "name": "1,5,10",
+      "description": "Specific pages (pages 1, 5, and 10)"
+    },
+    {
+      "type": "tool",
+      "name": "1-5,10,15-20",
+      "description": "Mixed ranges and specific pages"
+    },
+    {
+      "type": "tool",
+      "name": "Windows 64",
+      "description": "bit (for standalone executable)"
+    },
+    {
+      "type": "tool",
+      "name": "Python 3.7 or higher",
+      "description": "Dependencies (automatically installed via `requirements.txt`):"
+    },
+    {
+      "type": "tool",
+      "name": "Built",
+      "description": "in Help** - Use `python cli.py --help` or `python cli.py <command> --help`"
+    },
+    {
+      "type": "tool",
+      "name": "Make sure you have Python 3.7+ installed: `python",
+      "description": "-version`"
+    },
+    {
+      "type": "tool",
+      "name": "This is normal if `tkinterdnd2` isn't installed",
+      "description": "Use the \"Add Files\" button instead"
+    },
+    {
+      "type": "tool",
+      "name": "Built with [pypdf](https://github.com/py",
+      "description": "pdf/pypdf) for PDF manipulation"
+    },
+    {
+      "type": "tool",
+      "name": "GUI powered by Python's built",
+      "description": "in tkinter"
+    },
+    {
+      "type": "tool",
+      "name": "Drag",
+      "description": "and-drop support via [tkinterdnd2](https://github.com/pmgagne/tkinterdnd2)"
+    },
+    {
+      "type": "tool",
+      "name": "\u2728 Added CLI interface for automation",
+      "description": "\u2728 Added page selection for merging"
+    },
+    {
+      "type": "tool",
+      "name": "\u2728 Added PDF splitting functionality",
+      "description": "\u2728 Added page extraction"
+    },
+    {
+      "type": "tool",
+      "name": "\u2728 Added page rotation",
+      "description": "\u2728 Added watermarking"
+    },
+    {
+      "type": "tool",
+      "name": "\u2728 Added PDF compression",
+      "description": "\u2728 Added drag-and-drop support"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83c\udfa8 Redesigned GUI with tabbed interface",
+      "description": "\ud83d\udcda Comprehensive documentation"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 Basic PDF merging",
+      "description": "\u2705 GUI interface"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 File reordering",
+      "description": "\u2705 Progress tracking"
+    },
+    {
+      "type": "tool",
+      "name": "Open an [issue](../../issues)",
+      "description": "Check the [CLI_GUIDE.md](CLI_GUIDE.md) for detailed CLI help"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "tkinterdnd2`"
+    }
+  ],
+  "script_summary": "5 commands, 37 tools, 4 pip_packages, 21 features"
+}

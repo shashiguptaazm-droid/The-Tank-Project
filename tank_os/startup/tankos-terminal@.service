@@ -1,0 +1,19 @@
+[Unit]
+Description=TankOS TCP Terminal (connection %i)
+After=network.target
+
+[Service]
+Type=exec
+StandardInput=socket
+StandardOutput=socket
+StandardError=journal
+ExecStart=/usr/local/bin/tankos-terminal
+WorkingDirectory=/root/the tank project
+Environment=PYTHONPATH=/root/the tank project
+Environment=TERM=vt100
+User=root
+Restart=no
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target

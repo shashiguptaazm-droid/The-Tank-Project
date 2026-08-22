@@ -1,0 +1,52 @@
+{
+  "timestamp": "2026-08-22T03:05:29.525578",
+  "topic": "dev tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "x1xhlol/system-prompts-and-models-of-ai-tools",
+      "html_url": "https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools",
+      "description": "FULL Augment Code, Claude Code, Cluely, CodeBuddy, Comet, Cursor, Devin AI, Junie, Kiro, Leap.new, Lovable, Manus, NotionAI, Orchids.app, Perplexity, Poke, Qoder, Replit, Same.dev, Trae, Traycer AI, VSCode Agent, Warp.dev, Windsurf, Xcode, Z.ai Code, Dia & v0. (And other Open Sourced) System Prompts",
+      "stars": 142988,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "bradtraversy/design-resources-for-developers",
+      "html_url": "https://github.com/bradtraversy/design-resources-for-developers",
+      "description": "Curated list of design and UI resources from stock photos, web templates, CSS frameworks, UI libraries, tools and much more",
+      "stars": 66723,
+      "language": null,
+      "default_branch": "master"
+    },
+    {
+      "full_name": "jdx/mise",
+      "html_url": "https://github.com/jdx/mise",
+      "description": "dev tools, env vars, task runner",
+      "stars": 32802,
+      "language": "Rust",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 4,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Cryptocurrency:",
+      "description": "**BTC:** `bc1q7zldmzjwspnaa48udvelwe6k3fef7xrrhg5625`"
+    },
+    {
+      "type": "feature",
+      "value": "Install and switch between [dev tools](https://mise.jdx.dev/dev-tools/) like node, python, cmake, terraform, and [hundreds more](https://mise.jdx.dev/registry.html)."
+    },
+    {
+      "type": "feature",
+      "value": "Load [environment variables](https://mise.jdx.dev/environments/) per project directory, including values from `.env` files and other sources."
+    },
+    {
+      "type": "feature",
+      "value": "Define and run [tasks](https://mise.jdx.dev/tasks/) for building, testing, linting, and deploying projects."
+    }
+  ],
+  "script_summary": "1 tools, 3 features"
+}

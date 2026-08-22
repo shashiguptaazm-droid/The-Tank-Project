@@ -1,0 +1,904 @@
+/**
+ * Copyright 2017-present, The Visdom Authors
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
+
+import { polygonContains } from 'd3-polygon';
+import { pointer, select } from 'd3-selection';
+import { zoom as d3zoom, zoomIdentity } from 'd3-zoom';
+import debounce from 'debounce';
+import React from 'react';
+import * as THREE from 'three';
+
+import ApiContext from '../api/ApiContext';
+import EventSystem from '../EventSystem';
+import lasso from '../lasso';
+import { showToast } from '../toasts/toastEvents';
+import Pane from './Pane';
+import {
+  downloadJpegWithDpi,
+  downloadPngWithDpi,
+} from './utils/Embeddpimetadata';
+import { copyLatexToClipboard } from './utils/LatexExport';
+import { downloadImageAsPdf } from './utils/pdfExport';
+
+const SCALE_RADIUS = 2000;
+const MIN_SELECTION = 22;
+
+const EXPORT_FORMATS = ['png', 'jpg', 'pdf'];
+
+class EmbeddingsPane extends React.Component {
+  state = { exportError: null };
+  sceneRef = React.createRef();
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.contentID !== nextProps.contentID) return true;
+    if (
+      Math.round(this.props.height) !== Math.round(nextProps.height) ||
+      Math.round(this.props.width) !== Math.round(nextProps.width)
+    )
+      return true;
+    if (this.props.isFocused !== nextProps.isFocused) return true;
+    if (this.state.exportError !== nextState.exportError) return true;
+    return false;
+  }
+
+  onEvent = (e) => {
+    if (!this.props.isFocused) {
+      return;
+    }
+
+    switch (e.type) {
+      case 'keydown':
+      case 'keypress': {
+        const tag = e.target.tagName;
+        if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
+          e.preventDefault();
+        }
+        break;
+      }
+      case 'keyup':
+        if (this.props.isFocused)
+          this.context.sendPaneMessage(
+            {
+              event_type: 'KeyPress',
+              key: e.key,
+              key_code: e.keyCode,
+              pane_data: false, // No need to send the full data for this
+            },
+            this.props.id,
+            this.props.envID
+          );
+        break;
+    }
+  };
+
+  onEntitySelection = (e) => {
+    if (this.props.isFocused)
+      this.context.sendPaneMessage(
+        {
+          event_type: 'EntitySelected',
+          entityId: e.name,
+          idx: e.idx,
+          pane_data: false, // No need to send the full data for this
+        },
+        this.props.id,
+        this.props.envID
+      );
+  };
+
+  onRegionSelection = (pointIdxs) => {
+    this.props.onFocus(this.props.id);
+    this.context.sendPaneMessage(
+      {
+        event_type: 'RegionSelected',
+        selectedIdxs: pointIdxs,
+        pane_data: false, // No need to send the full data for this
+      },
+      this.props.id,
+      this.props.envID
+    );
+  };
+
+  // Used to pop an embeddings drilldown off of the stack
+  onGoBack = () => {
+    this.context.sendEmbeddingPop(
+      {
+        pane_data: false, // No need to send the full data for this
+      },
+      this.props.id,
+      this.props.envID
+    );
+  };
+
+  componentDidMount() {
+    EventSystem.subscribe('global.event', this.onEvent);
+  }
+  componentWillUnmount() {
+    EventSystem.unsubscribe('global.event', this.onEvent);
+  }
+
+  handleMetadataExport = () => {
+    var blob = new Blob([JSON.stringify(this.props.content.data)], {
+      type: 'text/plain',
+    });
+    var url = window.URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.download = this.props.contentID
+      ? `${this.props.contentID}_tsne_data.txt`
+      : 'plot_tsne_data.txt';
+    link.href = url;
+    link.click();
+  };
+
+  handleLatexExport = (style) => {
+    copyLatexToClipboard(style, {
+      contentID: this.props.contentID,
+      id: this.props.id,
+      caption: this.props.title,
+    })
+      .then(() =>
+        showToast('Copied!', 'success', {
+          position: 'bottom-center',
+          shape: 'pill',
+          duration: 1500,
+        })
+      )
+      .catch((err) => {
+        console.error('EmbeddingsPane LaTeX export failed:', err);
+        showToast('Failed to Copy', 'error', {
+          position: 'bottom-center',
+          shape: 'pill',
+          duration: 1500,
+        });
+      });
+  };
+
+  handleExport = (format, dpi) => {
+    this.setState({ exportError: null });
+
+    const sceneInstance = this.sceneRef.current;
+    if (!sceneInstance) {
+      this.setState({
+        exportError: 'Visualization is not ready yet. Please try again.',
+      });
+      return;
+    }
+
+    const { renderer, scene, camera } = sceneInstance;
+    if (!renderer || !scene || !camera) {
+      this.setState({
+        exportError: 'Visualization is not ready yet. Please try again.',
+      });
+      return;
+    }
+
+    const width = Math.max(1, this.props.width);
+    const height = Math.max(1, this.props.height);
+    const PDF_CAPTURE_DPI = 300;
+    const scale = format === 'pdf' ? PDF_CAPTURE_DPI / 96 : dpi ? dpi / 96 : 1;
+    const originalPixelRatio = renderer.getPixelRatio();
+    const effectiveDpi = Math.round(scale * 96 * originalPixelRatio);
+
+    try {
+      // `updateStyle=false` keeps the on-screen CSS size unchanged while
+      // only the internal render resolution increases
+      renderer.setPixelRatio(originalPixelRatio * scale);
+      renderer.setSize(width, height, false);
+      renderer.render(scene, camera);
+
+      const mime =
+        format === 'jpg' || format === 'pdf' ? 'image/jpeg' : 'image/png';
+      const dataUrl = renderer.domElement.toDataURL(
+        mime,
+        format === 'jpg' || format === 'pdf' ? 0.95 : undefined
+      );
+
+      if (format === 'pdf') {
+        downloadImageAsPdf(
+          dataUrl,
+          `${this.props.contentID || 'plot'}.pdf`,
+          effectiveDpi
+        );
+      } else {
+        const filename = `${this.props.contentID || 'plot'}.${format}`;
+        if (format === 'jpg') {
+          downloadJpegWithDpi(dataUrl, filename, effectiveDpi);
+        } else {
+          downloadPngWithDpi(dataUrl, filename, effectiveDpi);
+        }
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('EmbeddingsPane export failed:', err);
+      this.setState({
+        exportError: 'Export failed: ' + (err.message || 'unknown error'),
+      });
+    } finally {
+      // restore the on-screen resolution and schedule a normal repaint,
+      // regardless of whether the export above succeeded
+      renderer.setPixelRatio(originalPixelRatio);
+      renderer.setSize(width, height, false);
+      sceneInstance.scheduleRender();
+    }
+  };
+
+  render() {
+    return (
+      <Pane
+        {...this.props}
+        handleExport={this.handleExport}
+        handleMetadataExport={this.handleMetadataExport}
+        handleLatexExport={this.handleLatexExport}
+        exportFormats={EXPORT_FORMATS}
+      >
+        {this.state.exportError ? (
+          <div
+            style={{
+              position: 'absolute',
+              top: 16,
+              left: 0,
+              right: 0,
+              textAlign: 'center',
+              zIndex: 5,
+            }}
+          >
+            <span
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                color: '#c00',
+                padding: 2,
+                userSelect: 'none',
+              }}
+            >
+              {this.state.exportError}
+            </span>
+          </div>
+        ) : null}
+        {this.props.content.isLoading ? (
+          <div
+            style={{
+              width: this.props.width + 'px',
+              height: this.props.height + 'px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              textAlign: 'center',
+              padding: '5px 10px',
+            }}
+          >
+            Generating embeddings visualization...
+          </div>
+        ) : (
+          <Scene
+            ref={this.sceneRef}
+            key={
+              this.props.height +
+              '===' +
+              this.props.width +
+              '===' +
+              this.props.content.data.length
+            }
+            content={this.props.content}
+            height={this.props.height}
+            width={this.props.width}
+            onSelect={this.onEntitySelection}
+            onRegionSelection={this.onRegionSelection}
+            onGoBack={this.onGoBack}
+            interactive={this.props.isFocused}
+          />
+        )}
+      </Pane>
+    );
+  }
+}
+
+class Scene extends React.Component {
+  state = { detailsLoading: false };
+
+  constructor(props) {
+    super(props);
+
+    this.scheduleRender = this.scheduleRender.bind(this);
+    this.renderFrame = this.renderFrame.bind(this);
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return (
+      nextProps.content.data !== this.props.content.data ||
+      nextProps.content.data.length !== this.props.content.data.length ||
+      Math.round(nextProps.height) !== Math.round(this.props.height) ||
+      Math.round(nextProps.width) !== Math.round(this.props.width) ||
+      nextProps.interactive !== this.props.interactive ||
+      nextState.detailsLoading !== this.state.detailsLoading ||
+      nextState.selectMode !== this.state.selectMode ||
+      nextState.selectionError !== this.state.selectionError
+    );
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.state.detailsLoading !== false) {
+      this.setState({ detailsLoading: false });
+    }
+
+    if (this.props.interactive !== prevProps.interactive) {
+      if (this.props.interactive) {
+        // set up handlers
+        this.setUpMouseInteractions();
+      } else {
+        // remove handlers
+        this.removeMouseInteractions();
+      }
+    }
+
+    if (this.props.content.data.length !== prevProps.content.data.length) {
+      this.stop();
+      this.setUpScene();
+    }
+  }
+
+  removeMouseInteractions() {
+    const { renderer, zoom } = this;
+    let view = select(renderer.domElement);
+
+    view.on('mousemove', null);
+    view.on('mouseleave', null);
+    zoom.on('zoom', null);
+  }
+
+  setUpMouseInteractions() {
+    /* ----------------------------------------------------------- */
+    // setup hover
+
+    const { renderer, scene, points, camera, circle_sprite, near, far } = this;
+
+    let view = select(renderer.domElement);
+
+    let raycaster = new THREE.Raycaster();
+    raycaster.params.Points.threshold = 30;
+    let hoverContainer = new THREE.Object3D();
+    scene.add(hoverContainer);
+
+    view.on('mousemove', (event) => {
+      if (!this.props.interactive) return;
+      let [mouseX, mouseY] = pointer(event, view.node());
+      let mouse_position = [mouseX, mouseY];
+      this.checkIntersects(
+        mouse_position,
+        points,
+        hoverContainer,
+        circle_sprite
+      );
+    });
+
+    view.on('mouseleave', () => {
+      this.removeHighlights(hoverContainer);
+      this.scheduleRender();
+    });
+
+    this.raycaster = raycaster;
+
+    /* ----------------------------------------------------------- */
+
+    let zoom = d3zoom().scaleExtent([
+      this.getScaleFromZ(far),
+      this.getScaleFromZ(near) - 1,
+    ]);
+    zoom.on('zoom', (event) => {
+      if (!this.props.interactive) return;
+      let d3_transform = event.transform;
+      this.lastTransform = event.transform;
+      this.zoomHandler(d3_transform);
+      this.scheduleRender();
+    });
+    this.zoom = zoom;
+
+    let setUpZoom = () => {
+      view.call(zoom);
+      let initial_transform;
+
+      if (!this.lastTransform) {
+        let initial_scale = this.getScaleFromZ(far);
+        initial_transform = zoomIdentity
+          .translate(this.props.width / 2, this.props.height / 2)
+          .scale(initial_scale);
+
+        camera.position.set(0, 0, far);
+      } else {
+        initial_transform = this.lastTransform;
+
+        this.zoomHandler(this.lastTransform);
+      }
+
+      zoom.transform(view, initial_transform);
+    };
+    setUpZoom();
+    this.zoom = zoom;
+
+    /* ----------------------------------------------------------- */
+  }
+
+  componentDidMount() {
+    this.setUpScene();
+  }
+
+  setUpScene() {
+    // References:
+    // https://blog.fastforwardlabs.com/2017/10/04/using-three-js-for-2d-data-visualization.html
+    // https://codepen.io/WebSeed/pen/MEBoRq
+
+    const width = Math.max(1, this.props.width);
+    const height = Math.max(1, this.props.height);
+    let radius = SCALE_RADIUS;
+    let color_array = [
+      '#1f78b4',
+      '#b2df8a',
+      '#33a02c',
+      '#fb9a99',
+      '#e31a1c',
+      '#fdbf6f',
+      '#ff7f00',
+      '#6a3d9a',
+      '#cab2d6',
+      '#cccc00',
+    ];
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.setCrossOrigin('anonymous');
+    let circle_sprite = textureLoader.load(
+      'https://fastforwardlabs.github.io/visualization_assets/circle-sprite.png',
+      () => this.scheduleRender()
+    );
+
+    let fov = 40;
+    let near = 10;
+    let far = 7000;
+
+    // Set up camera and scene
+    let camera = new THREE.PerspectiveCamera(fov, width / height, near, far);
+    camera.position.set(0, 0, far);
+
+    let generated_points = this.props.content.data.map((p) =>
+      Object.assign({}, p, {
+        position: [p.position[0] * radius, p.position[1] * radius],
+      })
+    );
+
+    let pointsGeometry = new THREE.BufferGeometry();
+
+    const count = generated_points.length;
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    generated_points.forEach((datum, i) => {
+      positions[i * 3] = datum.position[0];
+      positions[i * 3 + 1] = datum.position[1];
+      positions[i * 3 + 2] = 0;
+      const c = new THREE.Color(color_array[datum.group]);
+      colors[i * 3] = c.r;
+      colors[i * 3 + 1] = c.g;
+      colors[i * 3 + 2] = c.b;
+    });
+    pointsGeometry.setAttribute(
+      'position',
+      new THREE.BufferAttribute(positions, 3)
+    );
+    pointsGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    let pointsMaterial = new THREE.PointsMaterial({
+      size: 6,
+      sizeAttenuation: false,
+      vertexColors: true,
+      map: circle_sprite,
+      transparent: true,
+    });
+
+    let points = new THREE.Points(pointsGeometry, pointsMaterial);
+    let renderer = new THREE.WebGLRenderer({ preserveDrawingBuffer: true });
+
+    let scene = new THREE.Scene();
+    scene.add(points);
+    scene.background = new THREE.Color(0xffffff);
+
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    this.scene = scene;
+    this.camera = camera;
+    this.renderer = renderer;
+
+    this.fov = fov;
+    this.near = near;
+    this.far = far;
+
+    this.color_array = color_array;
+    this.points = points;
+    this.circle_sprite = circle_sprite;
+    this.generated_points = generated_points;
+    this.debouncedFn = debounce((fn) => fn(), 300);
+
+    this.setUpMouseInteractions();
+
+    this.mount.appendChild(this.renderer.domElement);
+    this.scheduleRender();
+  }
+
+  componentWillUnmount() {
+    this.stop();
+    clearTimeout(this._errTimer);
+    let view = select(this.renderer.domElement);
+    view.on('mousemove', null);
+    view.on('mouseleave', null);
+    this.mount.removeChild(this.renderer.domElement);
+    this.renderer.forceContextLoss();
+    this.renderer.dispose();
+  }
+
+  /* utility methods */
+  zoomHandler = (d3_transform) => {
+    let scale = d3_transform.k;
+    let x = -(d3_transform.x - this.props.width / 2) / scale;
+    let y = (d3_transform.y - this.props.height / 2) / scale;
+    let z = this.getZFromScale(scale);
+    this.raycaster.params.Points.threshold = 30 / (scale * 0.5);
+    this.camera.position.set(x, y, z);
+  };
+
+  getScaleFromZ(camera_z_position) {
+    let half_fov = this.fov / 2;
+    let half_fov_radians = this.toRadians(half_fov);
+    let half_fov_height = Math.tan(half_fov_radians) * camera_z_position;
+    let fov_height = half_fov_height * 2;
+
+    // Divide visualization height by height derived from field of view
+    let scale = this.props.height / fov_height;
+    return scale;
+  }
+
+  getZFromScale(scale) {
+    let half_fov = this.fov / 2;
+    let half_fov_radians = this.toRadians(half_fov);
+    let scale_height = this.props.height / scale;
+    let camera_z_position = scale_height / (2 * Math.tan(half_fov_radians));
+    return camera_z_position;
+  }
+
+  toRadians(angle) {
+    return angle * (Math.PI / 180);
+  }
+
+  mouseToThree(mouseX, mouseY) {
+    return new THREE.Vector3(
+      (mouseX / this.props.width) * 2 - 1,
+      -(mouseY / this.props.height) * 2 + 1,
+      1
+    );
+  }
+
+  checkIntersects(mouse_position, points, hoverContainer, circle_sprite) {
+    let mouse_vector = this.mouseToThree(...mouse_position);
+    this.raycaster.setFromCamera(mouse_vector, this.camera);
+    let intersects = this.raycaster.intersectObject(points);
+    if (intersects[0]) {
+      let sorted_intersects = this.sortIntersectsByDistanceToRay(intersects);
+      let intersect = sorted_intersects[0];
+      let index = intersect.index;
+      let datum = this.generated_points[index];
+      this.highlightPoint(datum, hoverContainer, circle_sprite);
+      this.showTooltip(mouse_position, datum);
+      this.scheduleRender();
+    } else if (hoverContainer.children.length > 0) {
+      this.removeHighlights(hoverContainer);
+      this.hideTooltip();
+      this.scheduleRender();
+    }
+  }
+
+  showTooltip(mouse_position, datum) {
+    if (!this.state.hovered || this.state.hovered !== datum) {
+      this.setState({ detailsLoading: true });
+      this.debouncedFn(() => {
+        this.props.onSelect(datum);
+      });
+    }
+    this.setState({ hovered: datum });
+  }
+
+  hideTooltip() {
+    this.setState({ hovered: null });
+  }
+
+  handleTooFew = (count) => {
+    this.setState({
+      selectionError: `Only ${count} point${
+        count === 1 ? '' : 's'
+      } selected; at least ${MIN_SELECTION} are needed to drill down.`,
+    });
+    clearTimeout(this._errTimer);
+    this._errTimer = setTimeout(
+      () => this.setState({ selectionError: null }),
+      3000
+    );
+  };
+
+  sortIntersectsByDistanceToRay(intersects) {
+    return [...intersects].sort((a, b) => a.distanceToRay - b.distanceToRay);
+  }
+
+  highlightPoint(datum, hoverContainer, circle_sprite) {
+    this.removeHighlights(hoverContainer);
+
+    let geometry = new THREE.BufferGeometry();
+    const pos = new Float32Array([datum.position[0], datum.position[1], 0]);
+    const c = new THREE.Color(this.color_array[datum.group]);
+    const col = new Float32Array([c.r, c.g, c.b]);
+    geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(col, 3));
+
+    let material = new THREE.PointsMaterial({
+      size: 16,
+      sizeAttenuation: false,
+      vertexColors: true,
+      map: circle_sprite,
+      transparent: true,
+    });
+
+    let point = new THREE.Points(geometry, material);
+    hoverContainer.add(point);
+  }
+
+  removeHighlights(hoverContainer) {
+    hoverContainer.remove(...hoverContainer.children);
+  }
+
+  scheduleRender() {
+    if (this.frameId) {
+      return;
+    }
+    this.frameId = requestAnimationFrame(this.renderFrame);
+  }
+
+  renderFrame() {
+    this.frameId = null;
+    if (this.renderer && this.scene && this.camera) {
+      this.renderer.render(this.scene, this.camera);
+    }
+  }
+
+  stop() {
+    if (this.frameId) {
+      cancelAnimationFrame(this.frameId);
+      this.frameId = null;
+    }
+  }
+
+  render() {
+    const selectedStyles = {
+      backgroundColor: '#ccc',
+      border: '1px solid #888',
+      boxShadow: '0px 1px 2px rgba(0,0,0,0.1) inset',
+    };
+    const unselectedStyles = {
+      backgroundColor: '#eee',
+      border: '1px solid #bbb',
+      boxShadow: '0px 1px 2px rgba(0,0,0,0.1)',
+    };
+
+    const buttonStyles = this.state.selectMode
+      ? selectedStyles
+      : unselectedStyles;
+
+    return (
+      <div style={{ position: 'relative' }}>
+        <span
+          style={{
+            position: 'absolute',
+            left: 5,
+            top: 5,
+            zIndex: 1,
+            cursor: 'pointer',
+            display: 'flex',
+          }}
+        >
+          {this.props.content.has_previous ? (
+            <div
+              tabIndex={0}
+              role="button"
+              style={Object.assign(
+                {
+                  width: 24,
+                  height: 24,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginRight: 7,
+                },
+                unselectedStyles
+              )}
+              title="Selection mode"
+              onClick={(e) => {
+                e.preventDefault();
+                this.props.onGoBack();
+              }}
+              onKeyDown={(e) => {
+                e.preventDefault();
+                if (e.keyCode === 13) this.props.onGoBack();
+              }}
+            >
+              {'\u2190'}
+            </div>
+          ) : null}
+          <div
+            tabIndex={0}
+            role="button"
+            style={Object.assign(
+              {
+                width: 24,
+                height: 24,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 7,
+              },
+              buttonStyles
+            )}
+            title="Selection mode"
+            onClick={(e) => {
+              e.preventDefault();
+              this.setState({ selectMode: !this.state.selectMode });
+            }}
+            onKeyDown={(e) => {
+              e.preventDefault();
+              if (e.keyCode === 13)
+                this.setState({ selectMode: !this.state.selectMode });
+            }}
+          >
+            <span
+              style={{
+                border: '1px dashed black',
+                width: 16,
+                height: 16,
+                display: 'inline-block',
+                borderRadius: 10,
+              }}
+            />
+          </div>
+
+          {this.state.selectMode ? (
+            <span
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                padding: 2,
+                userSelect: 'none',
+              }}
+            >
+              Selection mode: Drag a selection around points to re-run
+              embeddings on
+            </span>
+          ) : null}
+          {this.state.selectionError ? (
+            <span
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                color: '#c00',
+                padding: 2,
+                marginLeft: 6,
+                userSelect: 'none',
+              }}
+            >
+              {this.state.selectionError}
+            </span>
+          ) : null}
+        </span>
+        {this.state.hovered && (
+          <div
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              backgroundColor: 'rgba(0,0,0,0.77)',
+              padding: 5,
+              width: 150,
+              color: 'white',
+            }}
+          >
+            <strong>{this.state.hovered.name}</strong>
+            <br />
+            <strong>Label: {this.state.hovered.label}</strong>
+            <br />
+            {this.props.content.selected && (
+              <div
+                style={{ opacity: this.state.detailsLoading ? 0.2 : 1 }}
+                dangerouslySetInnerHTML={{
+                  __html: this.props.content.selected.html,
+                }}
+              />
+            )}
+          </div>
+        )}
+        {this.state.selectMode && (
+          <LassoSelection
+            width={this.props.width}
+            height={this.props.height}
+            points={this.props.content.data}
+            camera={this.camera}
+            onRegionSelection={this.props.onRegionSelection}
+            onTooFew={this.handleTooFew}
+          />
+        )}
+        <div
+          style={{
+            opacity: this.props.interactive ? 1 : 0.2,
+            width: this.props.width + 'px',
+            height: this.props.height + 'px',
+          }}
+          ref={(mount) => {
+            this.mount = mount;
+          }}
+        />
+      </div>
+    );
+  }
+}
+
+class LassoSelection extends React.Component {
+  componentDidMount() {
+    var lassoInstance = lasso();
+    lassoInstance
+      .on('end', (polygon) => {
+        this.props.camera.updateMatrixWorld();
+
+        const points = this.props.points.map((point) => {
+          var p = new THREE.Vector3(
+            point.position[0] * SCALE_RADIUS,
+            point.position[1] * SCALE_RADIUS,
+            0
+          );
+          var vector = p.project(this.props.camera);
+
+          vector.x = ((vector.x + 1) / 2) * this.props.width;
+          vector.y = (-(vector.y - 1) / 2) * this.props.height;
+
+          const [x, y] = point.position;
+          return {
+            ref: point,
+            old: point.position,
+            test: [vector.x, vector.y],
+            coords: [x * this.props.width, y * this.props.height],
+          };
+        });
+        const selected = points.filter((point) =>
+          polygonContains(polygon, point.test)
+        );
+        if (selected.length < MIN_SELECTION) {
+          this.props.onTooFew(selected.length);
+          lassoInstance.reset();
+          return;
+        }
+        this.props.onRegionSelection(selected.map((pt) => pt.ref.idx));
+      })
+      .on('start', null);
+
+    select(this.interactionSvg).call(lassoInstance);
+  }
+  render() {
+    return (
+      <svg
+        ref={(mount) => (this.interactionSvg = mount)}
+        style={{
+          width: this.props.width,
+          height: this.props.height,
+          position: 'absolute',
+          top: 0,
+          left: 0,
+        }}
+      />
+    );
+  }
+}
+
+EmbeddingsPane.contextType = ApiContext;
+
+export default EmbeddingsPane;

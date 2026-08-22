@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-07-30T13:41:57.393460",
+  "query": "llama.cpp",
+  "duration_ms": 384.8,
+  "total_results": 3,
+  "results_by_source": {
+    "github": {
+      "count": 3,
+      "items": [
+        {
+          "source": "github",
+          "title": "ggml-org/llama.cpp",
+          "url": "https://github.com/ggml-org/llama.cpp",
+          "description": "LLM inference in C/C++",
+          "stars": 122085,
+          "language": "C++",
+          "updated": "2026-07-30T11:26:53Z"
+        },
+        {
+          "source": "github",
+          "title": "h2oai/h2ogpt",
+          "url": "https://github.com/h2oai/h2ogpt",
+          "description": "Private chat with local GPT with document, images, video, etc. 100% private, Apache 2.0. Supports oLLaMa, Mixtral, llama.cpp, and more. Demo: https://gpt.h2o.ai/ https://gpt-docs.h2o.ai/",
+          "stars": 11977,
+          "language": "Python",
+          "updated": "2026-07-29T17:42:43Z"
+        },
+        {
+          "source": "github",
+          "title": "abetlen/llama-cpp-python",
+          "url": "https://github.com/abetlen/llama-cpp-python",
+          "description": "Python bindings for llama.cpp",
+          "stars": 10520,
+          "language": "Python",
+          "updated": "2026-07-29T22:58:21Z"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-07-30T13:42:36.489030",
+  "query": "neural networks",
+  "duration_ms": 10018.2,
+  "total_results": 2,
+  "results_by_source": {
+    "torrent": {
+      "count": 0,
+      "items": []
+    },
+    "youtube": {
+      "count": 0,
+      "items": []
+    },
+    "web": {
+      "count": 0,
+      "items": []
+    },
+    "github": {
+      "count": 2,
+      "items": [
+        {
+          "source": "github",
+          "title": "pytorch/pytorch",
+          "url": "https://github.com/pytorch/pytorch",
+          "description": "Tensors and Dynamic neural networks in Python with strong GPU acceleration",
+          "stars": 102074,
+          "language": "Python",
+          "updated": "2026-07-30T11:18:47Z"
+        },
+        {
+          "source": "github",
+          "title": "lutzroeder/netron",
+          "url": "https://github.com/lutzroeder/netron",
+          "description": "Visualizer for neural network, deep learning and machine learning models",
+          "stars": 33279,
+          "language": "JavaScript",
+          "updated": "2026-07-30T08:06:30Z"
+        }
+      ]
+    }
+  }
+}

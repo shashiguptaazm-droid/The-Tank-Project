@@ -1,0 +1,156 @@
+{
+  "timestamp": "2026-07-30T14:32:08.203985",
+  "topic": "network tools python CLI",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "sherlock-project/sherlock",
+      "html_url": "https://github.com/sherlock-project/sherlock",
+      "description": "Hunt down social media accounts by username across social networks",
+      "stars": 87340,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "zszszszsz/.config",
+      "html_url": "https://github.com/zszszszsz/.config",
+      "description": "# # Automatically generated file; DO NOT EDIT. # OpenWrt Configuration # CONFIG_MODULES=y CONFIG_HAVE_DOT_CONFIG=y # CONFIG_TARGET_sunxi is not set # CONFIG_TARGET_apm821xx is not set # CONFIG_TARGET_ath25 is not set CONFIG_TARGET_ar71xx=y # CONFIG_TARGET_ath79 is not set # CONFIG_TARGET_bcm27xx is ",
+      "stars": 351,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "QVerisAI/qveris-agent-toolkit",
+      "html_url": "https://github.com/QVerisAI/qveris-agent-toolkit",
+      "description": "Open-source toolkit for the QVeris capability routing network: CLI, MCP server, Python SDK, skills, and REST API docs for agents to discover, inspect, call, and audit real-world tools.",
+      "stars": 249,
+      "language": "JavaScript",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 25,
+  "findings": [
+    {
+      "type": "command",
+      "value": "curl -fsSL https://qveris.ai/cli/install | bash"
+    },
+    {
+      "type": "command",
+      "value": "npm install -g @qverisai/cli"
+    },
+    {
+      "type": "tool",
+      "name": "`10,000+` capabilities across `15+` categories",
+      "description": "`Discover / Inspect / Call / Audit` \u2014 one protocol for finding, evaluating, invoking, and tracking capabilities"
+    },
+    {
+      "type": "tool",
+      "name": "`Discover` is free. `Call` returns structured pre",
+      "description": "settlement billing, with final charge outcomes available through usage audit and credits ledger views."
+    },
+    {
+      "type": "tool",
+      "name": "Discover",
+      "description": "find the right capability with natural language (free)"
+    },
+    {
+      "type": "tool",
+      "name": "Inspect",
+      "description": "check parameters, success rate, latency, and billing rule before calling"
+    },
+    {
+      "type": "tool",
+      "name": "Call",
+      "description": "invoke any capability, get structured results and pre-settlement billing back"
+    },
+    {
+      "type": "tool",
+      "name": "`Usage audit` / `Credits ledger`",
+      "description": "check whether calls were charged and how balance changed without dumping full history into Agent context"
+    },
+    {
+      "type": "tool",
+      "name": "QVeris CLI",
+      "description": "call tools via `qveris discover/inspect/call` subprocess, zero prompt tokens"
+    },
+    {
+      "type": "tool",
+      "name": "See [SETUP.md](agent/SETUP.md)",
+      "description": "supports OpenClaw / Claude Code / Cursor / OpenCode / Trae"
+    },
+    {
+      "type": "tool",
+      "name": "Final charge status: check `qveris usage` / `usage_history`",
+      "description": "Final balance movement: check `qveris ledger` / `credits_ledger`"
+    },
+    {
+      "type": "tool",
+      "name": "Free tier: 1,000 credits on signup",
+      "description": "$19 = 10,000 credits (pay-as-you-go, credits never expire)"
+    },
+    {
+      "type": "tool",
+      "name": "Details: [qveris.ai/pricing](https://qveris.ai/pricing)",
+      "description": "--"
+    },
+    {
+      "type": "tool",
+      "name": "You can review call logs and credit usage anytime",
+      "description": "--"
+    },
+    {
+      "type": "tool",
+      "name": "10,000+ capabilities, 15+ categories",
+      "description": "Each capability includes parameter schema, examples, success rate, avg latency"
+    },
+    {
+      "type": "tool",
+      "name": "Supports `private` / `org` / `public` visibility levels",
+      "description": "Browse all: [qveris.ai/providers](https://qveris.ai/providers)"
+    },
+    {
+      "type": "tool",
+      "name": "Discover is free",
+      "description": "Agents can explore all capabilities at zero cost"
+    },
+    {
+      "type": "tool",
+      "name": "No monthly fees, no auto",
+      "description": "renewal"
+    },
+    {
+      "type": "tool",
+      "name": "Details: [qveris.ai/pricing](https://qveris.ai/pricing)",
+      "description": "--"
+    },
+    {
+      "type": "tool",
+      "name": "All capability calls execute in sandbox",
+      "description": "Session-scoped config, no system file modifications by default"
+    },
+    {
+      "type": "tool",
+      "name": "Full audit trail with execution IDs",
+      "description": "RBAC and per-capability access control"
+    },
+    {
+      "type": "tool",
+      "name": "Rate limiting and quota enforcement",
+      "description": "Enterprise options (VPC / private cloud) planned"
+    },
+    {
+      "type": "tool",
+      "name": "One",
+      "description": "liner install**: `curl -fsSL https://qveris.ai/cli/install | bash`"
+    },
+    {
+      "type": "npm_package",
+      "value": "@qverisai/cli`"
+    },
+    {
+      "type": "npm_package",
+      "value": "@qverisai/cli"
+    }
+  ],
+  "script_summary": "2 commands, 21 tools, 2 npm_packages"
+}

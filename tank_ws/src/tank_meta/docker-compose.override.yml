@@ -1,0 +1,24 @@
+version: "3.9"
+
+# Drop this next to your existing docker-compose.yml on the Pi 5 and
+# run `docker compose up -d` to spin up the tank_meta API alongside
+# Home Assistant + Prometheus + Grafana. Only overrides — never replaces
+# the upstream compose.
+
+services:
+  tank-meta-api:
+    image: python:3.11-slim
+    container_name: tank-meta-api
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - /root/the tank project/tank_ws/src/tank_meta:/app:ro
+      - /root/the tank project/tank_ws/data:/app/data:rw
+    command: >
+      bash -lc "pip install --quiet fastapi 'uvicorn[standard]' &&
+                exec uvicorn scripts.serve_meta_api:app
+                --host 0.0.0.0 --port 8083"
+    ports:
+      - "8083:8083"
+    environment:
+      - PYTHONUNBUFFERED=1

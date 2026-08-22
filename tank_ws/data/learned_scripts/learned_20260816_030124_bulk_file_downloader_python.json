@@ -1,0 +1,256 @@
+{
+  "timestamp": "2026-08-16T03:01:24.637930",
+  "topic": "bulk file downloader python",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "LeyckerS/moondownloader",
+      "html_url": "https://github.com/LeyckerS/moondownloader",
+      "description": "Bulk file downloader for datanodes.to and fuckingfast.co \u2014 real-Chrome extraction over CDP, pure-HTTP extraction with a Chrome TLS fingerprint, aiohttp streaming, WebView2 GUI and a headless CLI. Windows, Python 3.10+, MIT.",
+      "stars": 1583,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "nikhilkumarsingh/content-downloader",
+      "html_url": "https://github.com/nikhilkumarsingh/content-downloader",
+      "description": "Python package to download files on any topic in bulk.",
+      "stars": 108,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "Lysagxra/GoFileDownloader",
+      "html_url": "https://github.com/Lysagxra/GoFileDownloader",
+      "description": "Efficient downloader for GoFile",
+      "stars": 98,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 51,
+  "findings": [
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "python moon_bridge.py            # GUI"
+    },
+    {
+      "type": "command",
+      "value": "python moon_bridge.py --serve    # server only, prints the URL"
+    },
+    {
+      "type": "command",
+      "value": "python moon_cli.py --urls links.txt --output ./downloads   # headless CLI"
+    },
+    {
+      "type": "command",
+      "value": "python integration_http.py     # browser \u2192 loopback HTTP \u2192 engine (the path start.bat takes)"
+    },
+    {
+      "type": "command",
+      "value": "python integration_web.py      # pywebview path"
+    },
+    {
+      "type": "command",
+      "value": "python render_gui.py out/           # renders at 2554x1400 and 1440x900 + overflow audit"
+    },
+    {
+      "type": "command",
+      "value": "python moon_engine.py          # headless engine: prints a snapshot and exits"
+    },
+    {
+      "type": "tool",
+      "name": "The defaults are deliberately conservative",
+      "description": "8 download streams, one shared browser, one identity."
+    },
+    {
+      "type": "tool",
+      "name": "Provided as",
+      "description": "is under the MIT licence**, without warranty of any kind. See [LICENSE](LICENSE)."
+    },
+    {
+      "type": "tool",
+      "name": "Links",
+      "description": "per-host colouring while you paste, live count, `datanodes / fuckingfast / others` split"
+    },
+    {
+      "type": "tool",
+      "name": "Per",
+      "description": "method panels** \u2014 common knobs in one card, datanodes in its own, fuckingfast declaring it has nothing to tune"
+    },
+    {
+      "type": "tool",
+      "name": "Live transfers",
+      "description": "one row per file: progress ring, state, percentage, instantaneous speed. Active transfers sort above the finished tail"
+    },
+    {
+      "type": "tool",
+      "name": "Stats",
+      "description": "speed (3 s rolling window + sparkline), completed, downloaded, byte-based ETA"
+    },
+    {
+      "type": "tool",
+      "name": "Pipeline",
+      "description": "extraction and download tracked separately, because they run at the same time"
+    },
+    {
+      "type": "tool",
+      "name": "Log",
+      "description": "the engine's own lines, tagged and coloured, capped at 2000"
+    },
+    {
+      "type": "tool",
+      "name": "English / Italian",
+      "description": "switchable at runtime, English by default"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "tool",
+      "name": "Files can be downloaded parallely using multithreading.",
+      "description": "ctdl is Python 2 as well as Python 3 compatible."
+    },
+    {
+      "type": "tool",
+      "name": "To install content",
+      "description": "downloader, simply,"
+    },
+    {
+      "type": "tool",
+      "name": "-p : for parallel downloading.",
+      "description": "-minfs MIN_FILE_SIZE : specify minimum file size to download in Kilobytes (KB)."
+    },
+    {
+      "type": "pip_package",
+      "value": "ctdl"
+    },
+    {
+      "type": "pip_package",
+      "value": "-U"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "git+https://github.com/nikhilkumarsingh/tqdm"
+    },
+    {
+      "type": "feature",
+      "value": "ctdl can be used as a command line utility as well as a desktop GUI."
+    },
+    {
+      "type": "feature",
+      "value": "ctdl fetches file links related to a search query from **Google Search**."
+    },
+    {
+      "type": "feature",
+      "value": "Files can be downloaded parallely using multithreading."
+    },
+    {
+      "type": "feature",
+      "value": "ctdl is Python 2 as well as Python 3 compatible."
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/Lysagxra/GoFileDownloader.git"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "python3 downloader.py <gofile_url>"
+    },
+    {
+      "type": "command",
+      "value": "python3 downloader.py https://gofile.io/d/clgeTz"
+    },
+    {
+      "type": "command",
+      "value": "python3 downloader.py <gofile_url> <password>"
+    },
+    {
+      "type": "command",
+      "value": "python3 downloader.py https://gofile.io/d/hXHGR1 TestPassword"
+    },
+    {
+      "type": "command",
+      "value": "python3 main.py"
+    },
+    {
+      "type": "command",
+      "value": "python3 main.py --custom-path <custom_path>"
+    },
+    {
+      "type": "command",
+      "value": "python3 main.py --custom-path /path/to/external/drive"
+    },
+    {
+      "type": "tool",
+      "name": "Downloads multiple files from an album concurrently.",
+      "description": "Supports [batch downloading](https://github.com/Lysagxra/GoFileDownloader?tab=readme-ov-file#batch-download) via a list of URLs."
+    },
+    {
+      "type": "tool",
+      "name": "Supports [downloading password",
+      "description": "protected albums](https://github.com/Lysagxra/GoFileDownloader?tab=readme-ov-file#password-protected-album-download) by providing a password."
+    },
+    {
+      "type": "tool",
+      "name": "Progress indication during downloads.",
+      "description": "Automatically creates a directory structure for organized storage."
+    },
+    {
+      "type": "tool",
+      "name": "Python 3",
+      "description": "`requests` - for HTTP requests"
+    },
+    {
+      "type": "tool",
+      "name": "rich",
+      "description": "for progress display in the terminal."
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "feature",
+      "value": "Downloads multiple files from an album concurrently."
+    },
+    {
+      "type": "feature",
+      "value": "Supports [batch downloading](https://github.com/Lysagxra/GoFileDownloader?tab=readme-ov-file#batch-download) via a list of URLs."
+    },
+    {
+      "type": "feature",
+      "value": "Supports [downloading password-protected albums](https://github.com/Lysagxra/GoFileDownloader?tab=readme-ov-file#password-protected-album-download) by providing a password."
+    },
+    {
+      "type": "feature",
+      "value": "Supports [custom download location](https://github.com/Lysagxra/GoFileDownloader?tab=readme-ov-file#file-download-location)."
+    },
+    {
+      "type": "feature",
+      "value": "Progress indication during downloads."
+    },
+    {
+      "type": "feature",
+      "value": "Automatically creates a directory structure for organized storage."
+    },
+    {
+      "type": "feature",
+      "value": "Logs URLs that encounter errors for troubleshooting."
+    }
+  ],
+  "script_summary": "17 commands, 17 tools, 6 pip_packages, 11 features"
+}

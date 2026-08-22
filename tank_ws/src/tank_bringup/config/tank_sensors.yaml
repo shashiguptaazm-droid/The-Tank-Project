@@ -1,0 +1,10 @@
+/**:
+  ros__parameters:
+    imu_publisher:
+      i2c_address: 40           # 0x28 — BNO055 default
+      rate_hz: 50.0
+      frame_id: imu_link
+    lidar_publisher:
+      port: /dev/ttyUSB0        # USB-to-UART adapter (cyrillic udev alias: rplidar)
+      baudrate: 115200
+      frame_id: lidar_link

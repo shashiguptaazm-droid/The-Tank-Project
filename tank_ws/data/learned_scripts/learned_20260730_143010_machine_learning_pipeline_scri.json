@@ -1,0 +1,73 @@
+{
+  "timestamp": "2026-07-30T14:30:10.982039",
+  "topic": "machine learning pipeline scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "marcgarnica13/ml-interpretability-european-football",
+      "html_url": "https://github.com/marcgarnica13/ml-interpretability-european-football",
+      "description": "Understanding gender differences in professional European football through Machine Learning interpretability and match actions data. This repository contains the full data pipeline implemented for the study *Understanding gender differences in professional European football through Machine Learning ",
+      "stars": 12,
+      "language": "Jupyter Notebook",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "pinar-oner/feature_engineering",
+      "html_url": "https://github.com/pinar-oner/feature_engineering",
+      "description": "A data preprocessing and feature engineering script for a machine learning pipeline is prepared.",
+      "stars": 7,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "MariamGado0/Starbucks-Capstone-Project-ML-Udacity-aws",
+      "html_url": "https://github.com/MariamGado0/Starbucks-Capstone-Project-ML-Udacity-aws",
+      "description": "# Starbucks Promotions Project ### This project is the Capstone Project of Udacity's Machine Learning Engineering Nanodegree program.  ![intro](/images0/x.png)  ![intro](/images0/v.png) ![intro](/images0/s.png)   ## Problem Statement This data set contains simulated data that mimics customer behavio",
+      "stars": 7,
+      "language": "HTML",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 8,
+  "findings": [
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "tool",
+      "name": "__Amazon S3__:",
+      "description": "saving our data and model artifacts;"
+    },
+    {
+      "type": "tool",
+      "name": "This project is structured as follows:",
+      "description": "#### 01. Proposal  Project"
+    },
+    {
+      "type": "tool",
+      "name": "#### 02. Data_Cleaning_[Dataset]",
+      "description": "Folder to perform data preparation and Dataset Cleaning and Prepare the Final Data for Further using in model algorithms."
+    },
+    {
+      "type": "tool",
+      "name": "#### 03. Pre",
+      "description": "processing Dataset Visualization"
+    },
+    {
+      "type": "tool",
+      "name": "#### 04. Dataset_Visualization",
+      "description": "Folder to perform Visualizations for the Pre-processed Dataset."
+    },
+    {
+      "type": "tool",
+      "name": "#### 06. ORG_Starbucks_Capstone_Project.ipynb",
+      "description": "Jupyter notebook file that deploy final model and create an endpoint and orchestrates the end-to-end process in AWS SageMaker and also interacts with other services."
+    }
+  ],
+  "script_summary": "1 commands, 1 pip_packages, 6 tools"
+}

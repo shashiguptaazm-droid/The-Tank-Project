@@ -1,0 +1,11 @@
+exclude: ["domain_three"]
+constraints:
+  one:
+    depends_on:
+    - path: "two"
+  two:
+    depends_on: [ path: "one"]
+  shared:
+    depends_on: []
+unknown: 88
+forbid_circular_dependencies: true

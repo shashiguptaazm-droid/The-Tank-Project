@@ -1,0 +1,82 @@
+{
+  "timestamp": "2026-08-01T03:02:42.719626",
+  "topic": "gaming tools python scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "C0nw0nk/Nginx-Lua-Anti-DDoS",
+      "html_url": "https://github.com/C0nw0nk/Nginx-Lua-Anti-DDoS",
+      "description": "A Anti-DDoS script to protect Nginx web servers using Lua with a HTML Javascript based authentication puzzle inspired by Cloudflare I am under attack mode an Anti-DDoS authentication page protect yourself from every attack type All Layer 7 Attacks Mitigating Historic Attacks DoS DoS Implications DDo",
+      "stars": 1616,
+      "language": "Lua",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "landy22granatt/Kumpulan-Script-Termux",
+      "html_url": "https://github.com/landy22granatt/Kumpulan-Script-Termux",
+      "description": "Ok, Langsung Saja Ke Materi. Sesuai Judul, Disini Saya Akan Memberikan Kumpulan Script Termux Yang Masih Work. Karena, Jarang Sekali Saat Ini Mendapatkan Script Yang Benar-Benar Work.  \u2713BOT KOMEN DAN LIKE INSTAGRAM $ pkg update $ pkg upgrade $ pkg install python2 $ pkg install ruby $ gem install lol",
+      "stars": 733,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "KnifeXRage/Godot-Secure",
+      "html_url": "https://github.com/KnifeXRage/Godot-Secure",
+      "description": "Godot Secure is a Simple Python Script That modify the Godot Source Code Automatically, to integrate Camellia-256 / AES-256 encryption with a unique security token system. This solution creates a cryptographically unique engine build that prevents generic decryption tools from accessing your game as",
+      "stars": 558,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 10,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone https://github.com/godotengine/godot.git"
+    },
+    {
+      "type": "command",
+      "value": "python godot_secure.py /path/to/godot_source/"
+    },
+    {
+      "type": "command",
+      "value": "python godot_secure.py godot/"
+    },
+    {
+      "type": "tool",
+      "name": "Ensure Python 3.10+ installed",
+      "description": "Verify correct Godot source path"
+    },
+    {
+      "type": "tool",
+      "name": "Clean build: `scons",
+      "description": "-clean`"
+    },
+    {
+      "type": "tool",
+      "name": "Ensure all submodules: `git submodule update",
+      "description": "-init`"
+    },
+    {
+      "type": "tool",
+      "name": "Use `Godot",
+      "description": "Secure` Script only once on _Godot Source Code_. Using script multiple times on same source code can cause **Compilation Errors!**. So, always refresh Your Godot source code before running the script "
+    },
+    {
+      "type": "tool",
+      "name": "Back up your source code before running",
+      "description": "Test builds thoroughly before deployment"
+    },
+    {
+      "type": "tool",
+      "name": "Maintain secure copies of security tokens",
+      "description": "Understand that enhanced security increases complexity"
+    },
+    {
+      "type": "tool",
+      "name": "MIT License",
+      "description": "Free for Personal and Commercial use with attribution:"
+    }
+  ],
+  "script_summary": "3 commands, 7 tools"
+}

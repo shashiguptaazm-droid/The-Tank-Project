@@ -1,0 +1,794 @@
+"""
+Tests for LLM service pure functions and async wrappers.
+
+Covers (pure/sync):
+- _deduplicate_history(): removes duplicates, preserves order, handles empty/None titles
+- _normalize_title(): strips episode notation, year suffix, plain titles, both decorations
+- _is_duplicate_of_history(): exact match, substring (long), short title no match, no match
+- _strip_markdown_fences(): fenced with ```json, plain ```, none
+- _repair_title_qualifiers(): common LLM title quirk
+
+Covers (_call_with_validation — async):
+- Valid structured response passes on first attempt
+- Invalid schema triggers retry with corrective system message
+- Retries exhausted → raises LLMValidationError
+- JSON decode error triggers retry → raises LLMValidationError
+
+Covers (get_recommendations_from_history — async):
+- No LLM client → []
+- No history → []
+- Valid wrapped response ("recommendations" key) → parsed list
+- Duplicate recommendation filtered against watch history
+- LLMValidationError caught internally → [] returned (automation resilience)
+- Markdown code fences stripped before validation
+
+Covers (interpret_search_query — async):
+- No LLM client → {}
+- Valid response → parsed dict
+- LLMValidationError propagates to caller (interactive path)
+"""
+
+import json
+import asyncio
+import unittest
+from unittest.mock import AsyncMock, MagicMock, call, patch
+
+from api_service.exceptions.api_exceptions import LLMValidationError
+from api_service.services.llm.llm_service import (
+    _call_with_validation,
+    _close_llm_client,
+    _deduplicate_history,
+    _extract_json_object,
+    _is_duplicate_of_history,
+    _normalize_title,
+    _repair_title_qualifiers,
+    _resolve_generation_settings,
+    _strip_markdown_fences,
+    generate_search_result_rationales,
+    get_recommendations_from_history,
+    interpret_search_query,
+)
+from api_service.services.llm.schemas import RecommendationList, SearchQueryInterpretation
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+_DEFAULT_CONFIG = {"LLM_MODEL": "gpt-4o-mini", "LLM_MAX_RETRIES": 2}
+_GPT5_UNSET_TEMPERATURE_CONFIG = {
+    **_DEFAULT_CONFIG,
+    "LLM_MODEL": "gpt-5.6",
+    "LLM_TEMPERATURE": "unset",
+    "LLM_REASONING_EFFORT": "high",
+}
+
+
+def _mock_openai_response(content: str):
+    """Build a mock OpenAI chat completion response."""
+    choice = MagicMock()
+    choice.message.content = content
+    response = MagicMock()
+    response.choices = [choice]
+    return response
+
+
+def _wrap_recs(recs: list) -> str:
+    """Wrap a list of recommendation dicts in the expected {"recommendations": [...]} envelope."""
+    return json.dumps({"recommendations": recs})
+
+
+# ---------------------------------------------------------------------------
+# _strip_markdown_fences
+# ---------------------------------------------------------------------------
+
+class TestStripMarkdownFences(unittest.TestCase):
+
+    def test_strips_json_fence(self):
+        text = "```json\n{}\n```"
+        self.assertEqual(_strip_markdown_fences(text), "{}")
+
+    def test_strips_plain_fence(self):
+        text = "```\n{}\n```"
+        self.assertEqual(_strip_markdown_fences(text), "{}")
+
+    def test_no_fence_unchanged(self):
+        text = '{"key": "value"}'
+        self.assertEqual(_strip_markdown_fences(text), text)
+
+    def test_strips_whitespace(self):
+        text = "  {}  "
+        self.assertEqual(_strip_markdown_fences(text), "{}")
+
+
+# ---------------------------------------------------------------------------
+# _repair_title_qualifiers
+# ---------------------------------------------------------------------------
+
+class TestRepairTitleQualifiers(unittest.TestCase):
+
+    def test_merges_trailing_parenthetical(self):
+        text = '"True Detective" (Season 1)'
+        result = _repair_title_qualifiers(text)
+        self.assertIn("True Detective (Season 1)", result)
+
+    def test_leaves_normal_json_unchanged(self):
+        text = '{"title": "Se7en", "year": 1995}'
+        self.assertEqual(_repair_title_qualifiers(text), text)
+
+
+# ---------------------------------------------------------------------------
+# _extract_json_object
+# ---------------------------------------------------------------------------
+
+class TestExtractJsonObject(unittest.TestCase):
+
+    def test_extracts_object_with_preface_and_trailing_text(self):
+        text = 'Here is the result:\n{"recommendations": []}\nThis should help.'
+        self.assertEqual(_extract_json_object(text), '{"recommendations": []}')
+
+    def test_returns_trimmed_text_when_braces_missing(self):
+        text = '  not json  '
+        self.assertEqual(_extract_json_object(text), 'not json')
+
+
+# ---------------------------------------------------------------------------
+# _deduplicate_history
+# ---------------------------------------------------------------------------
+
+class TestDeduplicateHistory(unittest.TestCase):
+
+    def test_removes_exact_duplicates(self):
+        history = [{"title": "Inception"}, {"title": "Inception"}, {"title": "Interstellar"}]
+        result = _deduplicate_history(history)
+        self.assertEqual(len(result), 2)
+
+    def test_preserves_insertion_order(self):
+        history = [{"title": "C"}, {"title": "A"}, {"title": "B"}]
+        result = _deduplicate_history(history)
+        self.assertEqual([r["title"] for r in result], ["C", "A", "B"])
+
+    def test_case_insensitive_dedup(self):
+        history = [{"title": "inception"}, {"title": "Inception"}]
+        self.assertEqual(len(_deduplicate_history(history)), 1)
+
+    def test_uses_name_key_as_fallback(self):
+        history = [{"name": "Breaking Bad"}, {"name": "Breaking Bad"}]
+        self.assertEqual(len(_deduplicate_history(history)), 1)
+
+    def test_handles_empty_list(self):
+        self.assertEqual(_deduplicate_history([]), [])
+
+    def test_skips_items_with_empty_title(self):
+        history = [{"title": ""}, {"title": None}]
+        self.assertEqual(len(_deduplicate_history(history)), 0)
+
+
+# ---------------------------------------------------------------------------
+# _normalize_title
+# ---------------------------------------------------------------------------
+
+class TestNormalizeTitle(unittest.TestCase):
+
+    def test_strips_episode_notation(self):
+        self.assertEqual(_normalize_title("Show - S02E12 Title"), "show")
+
+    def test_strips_trailing_year_suffix(self):
+        self.assertEqual(_normalize_title("Manchester by the Sea (2016)"), "manchester by the sea")
+
+    def test_strips_both_decorations(self):
+        self.assertEqual(_normalize_title("Show - S01E01 (2020)"), "show")
+
+    def test_plain_title_is_lowercased(self):
+        self.assertEqual(_normalize_title("Breaking Bad"), "breaking bad")
+
+    def test_strips_whitespace(self):
+        self.assertEqual(_normalize_title("  Dune  "), "dune")
+
+
+# ---------------------------------------------------------------------------
+# _is_duplicate_of_history
+# ---------------------------------------------------------------------------
+
+class TestIsDuplicateOfHistory(unittest.TestCase):
+
+    def test_returns_true_on_exact_match(self):
+        self.assertTrue(_is_duplicate_of_history("inception", {"inception", "interstellar"}))
+
+    def test_returns_true_on_substring_match_long_title(self):
+        self.assertTrue(_is_duplicate_of_history("breaking bad season 1", {"breaking bad"}))
+
+    def test_returns_false_for_short_watched_title_substring(self):
+        # 'dark' has len 4 < 5 → substring logic NOT applied
+        self.assertFalse(_is_duplicate_of_history("darkest hour", {"dark"}))
+
+    def test_returns_false_when_no_match(self):
+        self.assertFalse(_is_duplicate_of_history("dune", {"inception", "interstellar"}))
+
+    def test_skips_empty_watched_titles(self):
+        self.assertFalse(_is_duplicate_of_history("dune", {"", "inception"}))
+
+
+# ---------------------------------------------------------------------------
+# _call_with_validation
+# ---------------------------------------------------------------------------
+
+class TestGenerationSettings(unittest.TestCase):
+
+    def test_legacy_temperature_preserves_per_flow_default(self):
+        settings = _resolve_generation_settings({}, "gpt-4o-mini", legacy_temperature=0.7)
+
+        self.assertEqual(settings["temperature"], 0.7)
+        self.assertIsNone(settings["reasoning_effort"])
+
+    def test_unset_temperature_is_omitted_and_gpt5_gets_reasoning_effort(self):
+        settings = _resolve_generation_settings(
+            _GPT5_UNSET_TEMPERATURE_CONFIG,
+            "gpt-5.6",
+            legacy_temperature=0.8,
+        )
+
+        self.assertIsNone(settings["temperature"])
+        self.assertEqual(settings["reasoning_effort"], "high")
+
+    def test_reasoning_effort_is_omitted_for_compatible_gateway(self):
+        settings = _resolve_generation_settings(
+            {**_GPT5_UNSET_TEMPERATURE_CONFIG, "OPENAI_BASE_URL": "http://localhost:4000/v1"},
+            "gpt-5.6",
+            legacy_temperature=0.8,
+        )
+
+        self.assertIsNone(settings["reasoning_effort"])
+
+class TestCallWithValidation(unittest.IsolatedAsyncioTestCase):
+
+    def _make_client(self, *responses):
+        """Return a mock client whose create coroutine returns *responses* in order."""
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(side_effect=list(responses))
+        return mock_client
+
+    def _response_format_rejection(self, response_format_type: str):
+        exc = Exception(f"{response_format_type} response_format unsupported")
+        exc.status_code = 400
+        exc.body = {"error": f"{response_format_type} response_format unsupported"}
+        return exc
+
+    async def test_valid_response_passes_first_attempt(self):
+        payload = json.dumps({"recommendations": [
+            {"title": "Dune", "year": 2021, "rationale": "Epic sci-fi", "source_title": None}
+        ]})
+        client = self._make_client(_mock_openai_response(payload))
+
+        result = await _call_with_validation(
+            client=client,
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": "recommend"}],
+            schema_cls=RecommendationList,
+            max_retries=2,
+        )
+
+        self.assertIsInstance(result, RecommendationList)
+        self.assertEqual(len(result.recommendations), 1)
+        self.assertEqual(result.recommendations[0].title, "Dune")
+        # Only one API call should have been made
+        self.assertEqual(client.chat.completions.create.call_count, 1)
+        response_format = client.chat.completions.create.call_args[1]["response_format"]
+        self.assertEqual(response_format["type"], "json_schema")
+
+    async def test_omits_unset_generation_parameters(self):
+        payload = json.dumps({"recommendations": [
+            {"title": "Dune", "year": 2021, "rationale": "Epic sci-fi", "source_title": None}
+        ]})
+        client = self._make_client(_mock_openai_response(payload))
+
+        await _call_with_validation(
+            client=client,
+            model="gpt-5.6",
+            messages=[{"role": "user", "content": "recommend"}],
+            schema_cls=RecommendationList,
+            temperature=None,
+            reasoning_effort=None,
+            max_retries=0,
+        )
+
+        request_kwargs = client.chat.completions.create.call_args.kwargs
+        self.assertNotIn("temperature", request_kwargs)
+        self.assertNotIn("reasoning_effort", request_kwargs)
+
+    async def test_response_format_rejection_falls_back_without_burning_retry(self):
+        payload = json.dumps({"recommendations": [
+            {"title": "Dune", "year": 2021, "rationale": "Epic sci-fi", "source_title": None}
+        ]})
+        client = self._make_client(
+            self._response_format_rejection("json_schema"),
+            _mock_openai_response(payload),
+        )
+
+        result = await _call_with_validation(
+            client=client,
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": "recommend"}],
+            schema_cls=RecommendationList,
+            max_retries=0,
+        )
+
+        self.assertEqual(result.recommendations[0].title, "Dune")
+        self.assertEqual(client.chat.completions.create.call_count, 2)
+        second_response_format = client.chat.completions.create.call_args_list[1][1]["response_format"]
+        self.assertEqual(second_response_format["type"], "json_object")
+
+    async def test_invalid_schema_triggers_retry_and_succeeds(self):
+        bad_payload = json.dumps({"wrong_key": []})  # missing "recommendations"
+        good_payload = json.dumps({"recommendations": [
+            {"title": "Se7en", "year": 1995, "rationale": "Dark.", "source_title": None}
+        ]})
+        client = self._make_client(
+            _mock_openai_response(bad_payload),
+            _mock_openai_response(good_payload),
+        )
+
+        result = await _call_with_validation(
+            client=client,
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": "recommend"}],
+            schema_cls=RecommendationList,
+            max_retries=2,
+        )
+
+        self.assertEqual(result.recommendations[0].title, "Se7en")
+        # Two calls: first failure + one retry
+        self.assertEqual(client.chat.completions.create.call_count, 2)
+
+    async def test_retry_injects_corrective_system_message(self):
+        bad_payload = json.dumps({"wrong_key": []})
+        good_payload = json.dumps({"recommendations": [
+            {"title": "Tenet", "year": 2020, "rationale": "Great.", "source_title": None}
+        ]})
+        client = self._make_client(
+            _mock_openai_response(bad_payload),
+            _mock_openai_response(good_payload),
+        )
+        original_messages = [{"role": "user", "content": "recommend"}]
+
+        await _call_with_validation(
+            client=client,
+            model="gpt-4o-mini",
+            messages=original_messages,
+            schema_cls=RecommendationList,
+            max_retries=2,
+        )
+
+        # Second call's messages should include the corrective system message at the front
+        second_call_messages = client.chat.completions.create.call_args_list[1][1]["messages"]
+        self.assertEqual(second_call_messages[0]["role"], "system")
+        self.assertIn("schema", second_call_messages[0]["content"].lower())
+
+    async def test_recommendation_retry_includes_required_top_level_shape(self):
+        bad_payload = json.dumps({})
+        good_payload = json.dumps({"recommendations": [
+            {"title": "Tenet", "year": 2020, "rationale": "Great.", "source_title": None}
+        ]})
+        client = self._make_client(
+            _mock_openai_response(bad_payload),
+            _mock_openai_response(good_payload),
+        )
+
+        await _call_with_validation(
+            client=client,
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": "recommend"}],
+            schema_cls=RecommendationList,
+            max_retries=1,
+        )
+
+        second_call_messages = client.chat.completions.create.call_args_list[1][1]["messages"]
+        self.assertIn('"recommendations"', second_call_messages[0]["content"])
+        self.assertIn("Do not return {}", second_call_messages[0]["content"])
+
+    async def test_close_llm_client_drains_transport_close_callbacks(self):
+        state = {"callback_ran": False}
+
+        class FakeClient:
+            async def aclose(self):
+                loop = asyncio.get_running_loop()
+                loop.call_soon(lambda: state.__setitem__("callback_ran", True))
+
+        await _close_llm_client(FakeClient())
+
+        self.assertTrue(state["callback_ran"])
+
+    async def test_bare_recommendation_array_is_wrapped(self):
+        payload = json.dumps([
+            {"title": "Dune", "year": 2021, "rationale": "Epic.", "source_title": None}
+        ])
+        client = self._make_client(_mock_openai_response(payload))
+
+        result = await _call_with_validation(
+            client=client,
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": "recommend"}],
+            schema_cls=RecommendationList,
+            max_retries=0,
+        )
+
+        self.assertEqual(result.recommendations[0].title, "Dune")
+
+    async def test_common_recommendation_keys_are_normalized(self):
+        payload = json.dumps({"movies": [
+            {"title": "Dune", "year": 2021, "rationale": "Epic.", "source_title": None}
+        ]})
+        client = self._make_client(_mock_openai_response(payload))
+
+        result = await _call_with_validation(
+            client=client,
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": "recommend"}],
+            schema_cls=RecommendationList,
+            max_retries=0,
+        )
+
+        self.assertEqual(result.recommendations[0].title, "Dune")
+
+    async def test_retries_exhausted_raises_llm_validation_error(self):
+        bad_payload = json.dumps({"wrong_key": []})
+        client = self._make_client(
+            _mock_openai_response(bad_payload),
+            _mock_openai_response(bad_payload),
+            _mock_openai_response(bad_payload),
+        )
+
+        with self.assertRaises(LLMValidationError):
+            await _call_with_validation(
+                client=client,
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": "recommend"}],
+                schema_cls=RecommendationList,
+                max_retries=2,
+            )
+
+        # 1 original + 2 retries = 3 total attempts
+        self.assertEqual(client.chat.completions.create.call_count, 3)
+
+    async def test_json_decode_error_triggers_retry_then_raises(self):
+        client = self._make_client(
+            _mock_openai_response("not valid json {{{{"),
+            _mock_openai_response("still not json"),
+            _mock_openai_response("```"),
+        )
+
+        with self.assertRaises(LLMValidationError):
+            await _call_with_validation(
+                client=client,
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": "recommend"}],
+                schema_cls=RecommendationList,
+                max_retries=2,
+            )
+
+    async def test_strips_markdown_fences_before_validation(self):
+        payload = json.dumps({"recommendations": [
+            {"title": "Dune", "year": 2021, "rationale": "Epic.", "source_title": None}
+        ]})
+        fenced = f"```json\n{payload}\n```"
+        client = self._make_client(_mock_openai_response(fenced))
+
+        result = await _call_with_validation(
+            client=client,
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": "recommend"}],
+            schema_cls=RecommendationList,
+            max_retries=0,
+        )
+        self.assertEqual(result.recommendations[0].title, "Dune")
+
+    async def test_ignores_trailing_text_after_valid_json(self):
+        payload = json.dumps({"recommendations": [
+            {"title": "Dune", "year": 2021, "rationale": "Epic.", "source_title": None}
+        ]})
+        noisy_output = f"{payload}\n\nI picked this based on your history."
+        client = self._make_client(_mock_openai_response(noisy_output))
+
+        result = await _call_with_validation(
+            client=client,
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": "recommend"}],
+            schema_cls=RecommendationList,
+            max_retries=0,
+        )
+        self.assertEqual(result.recommendations[0].title, "Dune")
+
+
+# ---------------------------------------------------------------------------
+# get_recommendations_from_history (async)
+# ---------------------------------------------------------------------------
+
+class TestGetRecommendationsFromHistory(unittest.IsolatedAsyncioTestCase):
+
+    async def test_returns_empty_list_when_no_llm_client(self):
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=None):
+            result = await get_recommendations_from_history([{"title": "Film A"}], max_results=3)
+        self.assertEqual(result, [])
+
+    async def test_returns_empty_list_when_no_history(self):
+        mock_client = AsyncMock()
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value=_DEFAULT_CONFIG):
+            result = await get_recommendations_from_history([], max_results=3)
+        self.assertEqual(result, [])
+
+    async def test_returns_parsed_recommendations_on_success(self):
+        recs = [
+            {"title": "Interstellar", "year": 2014, "source_title": "Inception", "rationale": "similar themes"},
+            {"title": "Tenet",        "year": 2020, "source_title": "Inception", "rationale": "same director"},
+        ]
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            return_value=_mock_openai_response(_wrap_recs(recs))
+        )
+        history = [{"title": "Inception", "year": 2010}]
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value=_DEFAULT_CONFIG):
+            result = await get_recommendations_from_history(history, max_results=5)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]["title"], "Interstellar")
+
+    async def test_applies_generation_settings_to_recommendations(self):
+        recs = [{"title": "Interstellar", "year": 2014, "source_title": "Inception", "rationale": "similar themes"}]
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            return_value=_mock_openai_response(_wrap_recs(recs))
+        )
+
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value=_GPT5_UNSET_TEMPERATURE_CONFIG):
+            await get_recommendations_from_history([{"title": "Inception", "year": 2010}], max_results=1)
+
+        request_kwargs = mock_client.chat.completions.create.call_args.kwargs
+        self.assertNotIn("temperature", request_kwargs)
+        self.assertEqual(request_kwargs["reasoning_effort"], "high")
+
+    async def test_filters_out_recs_that_are_in_watch_history(self):
+        recs = [
+            {"title": "Inception", "year": 2010, "source_title": "Inception", "rationale": "dupe"},
+            {"title": "Tenet",     "year": 2020, "source_title": "Inception", "rationale": "good pick"},
+        ]
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            return_value=_mock_openai_response(_wrap_recs(recs))
+        )
+        history = [{"title": "Inception", "year": 2010}]
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value=_DEFAULT_CONFIG):
+            result = await get_recommendations_from_history(history, max_results=5)
+        titles = [r["title"] for r in result]
+        self.assertNotIn("Inception", titles)
+        self.assertIn("Tenet", titles)
+
+    async def test_llm_validation_error_caught_returns_empty_list(self):
+        """Persistent validation failure should be logged and return [] for automation resilience."""
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            return_value=_mock_openai_response("not valid json")
+        )
+        history = [{"title": "Inception", "year": 2010}]
+        # max_retries=0 → single attempt, then LLMValidationError caught internally
+        config = {**_DEFAULT_CONFIG, "LLM_MAX_RETRIES": 0}
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value=config):
+            result = await get_recommendations_from_history(history, max_results=5)
+        self.assertEqual(result, [])
+
+    async def test_strips_markdown_code_fences(self):
+        recs = [{"title": "Tenet", "year": 2020, "source_title": "Inception", "rationale": "ok"}]
+        fenced = "```json\n" + _wrap_recs(recs) + "\n```"
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            return_value=_mock_openai_response(fenced)
+        )
+        history = [{"title": "Inception", "year": 2010}]
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value=_DEFAULT_CONFIG):
+            result = await get_recommendations_from_history(history, max_results=5)
+        self.assertEqual(len(result), 1)
+
+    async def test_includes_filter_constraints_in_prompt(self):
+        recs = [{"title": "Dogman", "year": 2018, "source_title": "Gomorra", "rationale": "ok"}]
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            return_value=_mock_openai_response(_wrap_recs(recs))
+        )
+        history = [{"title": "Gomorra", "year": 2008}]
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value=_DEFAULT_CONFIG):
+            await get_recommendations_from_history(
+                history,
+                max_results=3,
+                item_type="movie",
+                filters={
+                    "with_original_language": "it",
+                    "release_year_gte": 1990,
+                    "release_year_lte": 1999,
+                },
+            )
+
+        messages = mock_client.chat.completions.create.call_args.kwargs["messages"]
+        user_prompt = messages[1]["content"]
+        self.assertIn("ORIGINAL language code is 'it'", user_prompt)
+        self.assertIn("released from year 1990 onward", user_prompt)
+        self.assertIn("released up to year 1999", user_prompt)
+
+    async def test_marks_recent_watches_as_neutral_and_includes_genres(self):
+        recs = [{"title": "Tenet", "year": 2020, "source_title": "Inception", "rationale": "ok"}]
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            return_value=_mock_openai_response(_wrap_recs(recs))
+        )
+        history = [{
+            "title": "Inception",
+            "year": 2010,
+            "media_type": "movie",
+            "genres": ["Science Fiction", "Thriller"],
+            "preference_signal": "recent_watch",
+        }]
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value=_DEFAULT_CONFIG):
+            await get_recommendations_from_history(history, max_results=1)
+
+        prompt = mock_client.chat.completions.create.call_args.kwargs["messages"][1]["content"]
+        self.assertIn("recent/neutral watch", prompt)
+        self.assertIn("NOT evidence that they enjoyed it", prompt)
+        self.assertIn("genres: Science Fiction, Thriller", prompt)
+
+    async def test_includes_configured_web_context(self):
+        recs = [{"title": "Tenet", "year": 2020, "source_title": "Inception", "rationale": "ok"}]
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(return_value=_mock_openai_response(_wrap_recs(recs)))
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value={**_DEFAULT_CONFIG, "SEARXNG_BASE_URL": "http://searxng:8080"}), \
+             patch("api_service.services.llm.llm_service._get_web_search_context", new=AsyncMock(return_value="\\nCurrent web-search context: result\\n")):
+            await get_recommendations_from_history([{"title": "Inception", "year": 2010}], max_results=1)
+        prompt = mock_client.chat.completions.create.call_args.kwargs["messages"][1]["content"]
+        self.assertIn("Current web-search context: result", prompt)
+
+
+# ---------------------------------------------------------------------------
+# interpret_search_query (async)
+# ---------------------------------------------------------------------------
+
+class TestInterpretSearchQuery(unittest.IsolatedAsyncioTestCase):
+
+    def _valid_interpretation_payload(self, n_titles: int = 1) -> str:
+        titles = [
+            {"title": f"Film {i}", "year": 2000 + i, "rationale": "Good film."}
+            for i in range(n_titles)
+        ]
+        return json.dumps({
+            "discover_params": {"genres": ["Thriller"], "year_from": 1990, "sort_by": "vote_average.desc"},
+            "suggested_titles": titles,
+        })
+
+    async def test_returns_empty_dict_when_no_llm_client(self):
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=None):
+            result = await interpret_search_query("psychological thriller", [])
+        self.assertEqual(result, {})
+
+    async def test_returns_parsed_result_on_success(self):
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            return_value=_mock_openai_response(self._valid_interpretation_payload())
+        )
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value=_DEFAULT_CONFIG):
+            result = await interpret_search_query("dark psychological thriller from 90s", [])
+
+        self.assertIn("discover_params", result)
+        self.assertIn("suggested_titles", result)
+        self.assertEqual(result["suggested_titles"][0]["title"], "Film 0")
+
+    async def test_applies_generation_settings_to_ai_search(self):
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            return_value=_mock_openai_response(self._valid_interpretation_payload())
+        )
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value=_GPT5_UNSET_TEMPERATURE_CONFIG):
+            await interpret_search_query("thriller", [])
+
+        request_kwargs = mock_client.chat.completions.create.call_args.kwargs
+        self.assertNotIn("temperature", request_kwargs)
+        self.assertEqual(request_kwargs["reasoning_effort"], "high")
+
+    async def test_title_similarity_query_anchors_the_prompt_to_its_reference(self):
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            return_value=_mock_openai_response(self._valid_interpretation_payload())
+        )
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value=_DEFAULT_CONFIG):
+            await interpret_search_query("movies like 2012", [])
+
+        prompt = mock_client.chat.completions.create.call_args.kwargs["messages"][1]["content"]
+        self.assertIn("primary anchor", prompt)
+        self.assertIn("name the reference title", prompt)
+
+    async def test_includes_configured_web_context(self):
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            return_value=_mock_openai_response(self._valid_interpretation_payload())
+        )
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value={**_DEFAULT_CONFIG, "SEARXNG_BASE_URL": "http://searxng:8080"}), \
+             patch("api_service.services.llm.llm_service._get_web_search_context", new=AsyncMock(return_value="\\nCurrent web-search context: result\\n")):
+            await interpret_search_query("new sci-fi films", [])
+        prompt = mock_client.chat.completions.create.call_args.kwargs["messages"][1]["content"]
+        self.assertIn("Current web-search context: result", prompt)
+
+    async def test_applies_generation_settings_to_ai_search_rationales(self):
+        payload = json.dumps({"rationales": [
+            {"title": "Dune", "year": 2021, "rationale": "Its epic science-fiction scope fits your query."}
+        ]})
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(return_value=_mock_openai_response(payload))
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value=_GPT5_UNSET_TEMPERATURE_CONFIG):
+            result = await generate_search_result_rationales(
+                "epic science fiction",
+                "movie",
+                {},
+                [{"title": "Dune", "year": 2021}],
+            )
+
+        self.assertEqual(len(result), 1)
+        request_kwargs = mock_client.chat.completions.create.call_args.kwargs
+        self.assertNotIn("temperature", request_kwargs)
+        self.assertEqual(request_kwargs["reasoning_effort"], "high")
+        prompt = request_kwargs["messages"][1]["content"]
+        self.assertIn("never merely list genres, year, or rating filters", prompt)
+
+    async def test_llm_validation_error_propagates_to_caller(self):
+        """On persistent failure, LLMValidationError should propagate (interactive path)."""
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            return_value=_mock_openai_response("not json")
+        )
+        config = {**_DEFAULT_CONFIG, "LLM_MAX_RETRIES": 0}
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value=config):
+            with self.assertRaises(LLMValidationError):
+                await interpret_search_query("thriller", [])
+
+    async def test_retry_succeeds_on_second_attempt(self):
+        bad_payload = json.dumps({"wrong_key": []})
+        good_payload = self._valid_interpretation_payload(2)
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            side_effect=[
+                _mock_openai_response(bad_payload),
+                _mock_openai_response(good_payload),
+            ]
+        )
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value=_DEFAULT_CONFIG):
+            result = await interpret_search_query("thriller", [])
+
+        self.assertEqual(len(result["suggested_titles"]), 2)
+        self.assertEqual(mock_client.chat.completions.create.call_count, 2)
+
+    async def test_result_is_serialisable_dict(self):
+        """model_dump() output must be JSON-serialisable (no Pydantic models inside)."""
+        mock_client = MagicMock()
+        mock_client.chat.completions.create = AsyncMock(
+            return_value=_mock_openai_response(self._valid_interpretation_payload())
+        )
+        with patch("api_service.services.llm.llm_service.get_llm_client", return_value=mock_client), \
+             patch("api_service.services.llm.llm_service.ConfigService.get_runtime_config", return_value=_DEFAULT_CONFIG):
+            result = await interpret_search_query("thriller", [])
+
+        # Should not raise
+        serialised = json.dumps(result)
+        self.assertIsInstance(serialised, str)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,208 @@
+{
+  "timestamp": "2026-08-01T03:04:26.329139",
+  "topic": "server management scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "hwdsl2/setup-ipsec-vpn",
+      "html_url": "https://github.com/hwdsl2/setup-ipsec-vpn",
+      "description": "Set up your own IPsec VPN server in just a few minutes, with IPsec/L2TP, Cisco IPsec and IKEv2. Supports Ubuntu, Debian, CentOS/RHEL, Alpine Linux and Raspberry Pi OS. Includes client config and management scripts.",
+      "stars": 28272,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "bugy/script-server",
+      "html_url": "https://github.com/bugy/script-server",
+      "description": "Web UI for your scripts with execution management",
+      "stars": 1870,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "C0nw0nk/Nginx-Lua-Anti-DDoS",
+      "html_url": "https://github.com/C0nw0nk/Nginx-Lua-Anti-DDoS",
+      "description": "A Anti-DDoS script to protect Nginx web servers using Lua with a HTML Javascript based authentication puzzle inspired by Cloudflare I am under attack mode an Anti-DDoS authentication page protect yourself from every attack type All Layer 7 Attacks Mitigating Historic Attacks DoS DoS Implications DDo",
+      "stars": 1616,
+      "language": "Lua",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 39,
+  "findings": [
+    {
+      "type": "command",
+      "value": "wget https://get.vpnsetup.net -O vpn.sh && sudo sh vpn.sh"
+    },
+    {
+      "type": "command",
+      "value": "curl -fsSL https://get.vpnsetup.net -o vpn.sh && sudo sh vpn.sh"
+    },
+    {
+      "type": "command",
+      "value": "wget https://get.vpnsetup.net -O vpn.sh && sudo sh vpn.sh"
+    },
+    {
+      "type": "command",
+      "value": "wget https://get.vpnsetup.net -O vpn.sh"
+    },
+    {
+      "type": "command",
+      "value": "wget https://get.vpnsetup.net -O vpn.sh"
+    },
+    {
+      "type": "command",
+      "value": "curl -fL https://get.vpnsetup.net -o vpn.sh"
+    },
+    {
+      "type": "command",
+      "value": "wget https://get.vpnsetup.net -O vpn.sh"
+    },
+    {
+      "type": "command",
+      "value": "wget https://get.vpnsetup.net/upg -O vpnup.sh && sudo sh vpnup.sh"
+    },
+    {
+      "type": "command",
+      "value": "curl -fsSL https://get.vpnsetup.net/upg -o vpnup.sh && sudo sh vpnup.sh"
+    },
+    {
+      "type": "command",
+      "value": "wget https://get.vpnsetup.net/unst -O unst.sh && sudo bash unst.sh"
+    },
+    {
+      "type": "command",
+      "value": "curl -fsSL https://get.vpnsetup.net/unst -o unst.sh && sudo bash unst.sh"
+    },
+    {
+      "type": "tool",
+      "name": "Generates VPN profiles to auto",
+      "description": "configure iOS, macOS and Android devices"
+    },
+    {
+      "type": "tool",
+      "name": "Docker VPN: [IPsec VPN](https://github.com/hwdsl2/docker",
+      "description": "ipsec-vpn-server), [WireGuard](https://github.com/hwdsl2/docker-wireguard), [OpenVPN](https://github.com/hwdsl2/docker-openvpn), [Headscale](https://github.com/hwdsl2/docker-headscale)"
+    },
+    {
+      "type": "tool",
+      "name": "AI: [Self",
+      "description": "Hosted AI Stack](https://github.com/hwdsl2/self-hosted-ai-stack) for local LLMs, chat, RAG, voice and AI tools"
+    },
+    {
+      "type": "tool",
+      "name": "Books: [Privacy Tools in the Age of AI](docs/vpn",
+      "description": "book.md#new-privacy-tools-in-the-age-of-ai), [Build Your Own VPN Server](docs/vpn-book.md#build-your-own-vpn-server-a-step-by-step-guide)"
+    },
+    {
+      "type": "tool",
+      "name": "Ubuntu 26.04, 24.04 or 22.04",
+      "description": "Debian 13, 12 or 11"
+    },
+    {
+      "type": "tool",
+      "name": "CentOS Stream 10 or 9",
+      "description": "Rocky Linux or AlmaLinux"
+    },
+    {
+      "type": "tool",
+      "name": "Raspberry Pi OS (Raspbian)",
+      "description": "Kali Linux"
+    },
+    {
+      "type": "tool",
+      "name": "Alpine Linux",
+      "description": "Red Hat Enterprise Linux (RHEL)"
+    },
+    {
+      "type": "tool",
+      "name": "Users can send input during script execution",
+      "description": "Auth (optional): LDAP, Google OAuth, htpasswd file"
+    },
+    {
+      "type": "tool",
+      "name": "Access control",
+      "description": "Alerts"
+    },
+    {
+      "type": "tool",
+      "name": "Logging and auditing",
+      "description": "Formatted output support (colors, styles, cursor positioning, clearing)"
+    },
+    {
+      "type": "tool",
+      "name": "Download of script output files",
+      "description": "Execution history"
+    },
+    {
+      "type": "tool",
+      "name": "Linux (main). Tested and working on Debian 10,11",
+      "description": "Windows (additional). Light testing"
+    },
+    {
+      "type": "tool",
+      "name": "Help with improving the documentation",
+      "description": "Set up a demo server"
+    },
+    {
+      "type": "tool",
+      "name": "Ask in gitter: https://gitter.im/script",
+      "description": "server/community"
+    },
+    {
+      "type": "tool",
+      "name": "or [create a ticket](https://github.com/bugy/script",
+      "description": "server/issues/new)"
+    },
+    {
+      "type": "tool",
+      "name": "or contact me via email: buggygm@gmail.com (for some non",
+      "description": "shareable questions)"
+    },
+    {
+      "type": "feature",
+      "value": "Different types of script parameters (text, flag, dropdown, file upload, etc.)"
+    },
+    {
+      "type": "feature",
+      "value": "Real-time script output"
+    },
+    {
+      "type": "feature",
+      "value": "Users can send input during script execution"
+    },
+    {
+      "type": "feature",
+      "value": "Auth (optional): LDAP, Google OAuth, htpasswd file"
+    },
+    {
+      "type": "feature",
+      "value": "Access control"
+    },
+    {
+      "type": "feature",
+      "value": "Alerts"
+    },
+    {
+      "type": "feature",
+      "value": "Logging and auditing"
+    },
+    {
+      "type": "feature",
+      "value": "Formatted output support (colors, styles, cursor positioning, clearing)"
+    },
+    {
+      "type": "feature",
+      "value": "Download of script output files"
+    },
+    {
+      "type": "feature",
+      "value": "Execution history"
+    },
+    {
+      "type": "feature",
+      "value": "Admin page for script configuration"
+    }
+  ],
+  "script_summary": "11 commands, 17 tools, 11 features"
+}

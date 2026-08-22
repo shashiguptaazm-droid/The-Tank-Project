@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-08-03T03:03:08.865259",
+  "topic": "awesome command line tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "shadawck/awesome-cli-frameworks",
+      "html_url": "https://github.com/shadawck/awesome-cli-frameworks",
+      "description": "Collection of tools to build beautiful command line interface in different languages",
+      "stars": 1199,
+      "language": "HTML",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "umutphp/awesome-cli",
+      "html_url": "https://github.com/umutphp/awesome-cli",
+      "description": "A simple command line tool to give you a fancy command line interface to dive into Awesome lists.",
+      "stars": 789,
+      "language": "Go",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "beucismis/awesome-fetch",
+      "html_url": "https://github.com/beucismis/awesome-fetch",
+      "description": "Command-line fetch tools for system/other information",
+      "stars": 594,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 1,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "https://reddit.com/r/sysfetch/",
+      "description": "https://reddit.com/r/unixporn/"
+    }
+  ],
+  "script_summary": "1 tools"
+}

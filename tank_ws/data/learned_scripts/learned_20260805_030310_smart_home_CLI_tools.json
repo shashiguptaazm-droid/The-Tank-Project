@@ -1,0 +1,83 @@
+{
+  "timestamp": "2026-08-05T03:03:10.676137",
+  "topic": "smart home CLI tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "tuya/tuya-smart-control-cli",
+      "html_url": "https://github.com/tuya/tuya-smart-control-cli",
+      "description": "The official command-line tool for Tuya Smart Control -- manage your smart home devices directly from the terminal.",
+      "stars": 124,
+      "language": "JavaScript",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "klonnet23/helloy-word",
+      "html_url": "https://github.com/klonnet23/helloy-word",
+      "description": "    {   \"releases\": {     \"2.0.4\": [       \"[Fixed] Refresh for Enterprise repositories did not handle API error querying branches - #7713\",       \"[Fixed] Missing \\\"Discard all changes\\\" context menu in Changes header - #7696\",       \"[Fixed] \\\"Select all\\\" keyboard shortcut not firing on Windows -",
+      "stars": 89,
+      "language": null,
+      "default_branch": "master"
+    },
+    {
+      "full_name": "ericellb/Broadlink-CLI-SmartIR",
+      "html_url": "https://github.com/ericellb/Broadlink-CLI-SmartIR",
+      "description": "A CLI tool to help you learn codes for Climate, Fan and Media devices for SmartIR and Home Assistant",
+      "stars": 40,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 11,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone https://github.com/tuya/tuya-smart-control-cli.git"
+    },
+    {
+      "type": "command",
+      "value": "npm install"
+    },
+    {
+      "type": "command",
+      "value": "npm link"
+    },
+    {
+      "type": "tool",
+      "name": "GitHub Issues: [tuya/tuya",
+      "description": "openclaw-skills](https://github.com/tuya/tuya-openclaw-skills)"
+    },
+    {
+      "type": "npm_package",
+      "value": "npm"
+    },
+    {
+      "type": "command",
+      "value": "pip3 install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "python src/main.py"
+    },
+    {
+      "type": "tool",
+      "name": "https://github.com/mjg59/python",
+      "description": "broadlink"
+    },
+    {
+      "type": "tool",
+      "name": "https://github.com/smartHomeHub/SmartIR",
+      "description": "https://github.com/keitetran/BroadlinkIRTools"
+    },
+    {
+      "type": "tool",
+      "name": "https://github.com/t0mer/broadlinkmanager",
+      "description": "docker"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    }
+  ],
+  "script_summary": "5 commands, 4 tools, 1 npm_packages, 1 pip_packages"
+}

@@ -1,0 +1,76 @@
+{
+  "timestamp": "2026-08-05T03:01:39.103042",
+  "topic": "dataset downloader script",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "GalAvineri/ISIC-Archive-Downloader",
+      "html_url": "https://github.com/GalAvineri/ISIC-Archive-Downloader",
+      "description": "A script to download the ISIC Archive of lesion images",
+      "stars": 204,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "cashiwamochi/RealEstate10K_Downloader",
+      "html_url": "https://github.com/cashiwamochi/RealEstate10K_Downloader",
+      "description": "These scripts are used to download RealEstate10K dataset. ",
+      "stars": 103,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "naba89/AVSpeechDownloader",
+      "html_url": "https://github.com/naba89/AVSpeechDownloader",
+      "description": "Simple python script for downloading AVSpeech Dataset",
+      "stars": 47,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 10,
+  "findings": [
+    {
+      "type": "pip_package",
+      "value": "requests`"
+    },
+    {
+      "type": "pip_package",
+      "value": "Pillow`"
+    },
+    {
+      "type": "pip_package",
+      "value": "tqdm`"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "command",
+      "value": "python3 generate_dataset.py [test or train]"
+    },
+    {
+      "type": "command",
+      "value": "python3 vizualizer.py [/path/to/pose_data.txt]"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "python downloader.py --csv ./example.csv"
+    },
+    {
+      "type": "tool",
+      "name": "This script for downloading AVSpeech Dataset.",
+      "description": "It downloads only the relevant part of the video and audio."
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    }
+  ],
+  "script_summary": "5 pip_packages, 4 commands, 1 tools"
+}

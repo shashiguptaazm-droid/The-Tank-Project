@@ -1,0 +1,186 @@
+{
+  "timestamp": "2026-07-31T03:00:17.832640",
+  "topic": "openai api wrapper python",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "terry3041/pyChatGPT",
+      "html_url": "https://github.com/terry3041/pyChatGPT",
+      "description": "An unofficial Python wrapper for OpenAI's ChatGPT API",
+      "stars": 1335,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "snowby666/poe-api-wrapper",
+      "html_url": "https://github.com/snowby666/poe-api-wrapper",
+      "description": "\ud83d\udc7e A Python API wrapper for Poe.com. With this, you will have free access to GPT-4, Claude, Llama, Gemini, Mistral and more! \ud83d\ude80",
+      "stars": 1100,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "juzeon/poe-openai-proxy",
+      "html_url": "https://github.com/juzeon/poe-openai-proxy",
+      "description": "A wrapper that lets you use the reverse-engineered Python library poe-api library as if it was the OpenAI API for ChatGPT. You can connect your favorite OpenAI API based apps to this proxy and enjoy the ChatGPT API for free!",
+      "stars": 457,
+      "language": "Go",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 34,
+  "findings": [
+    {
+      "type": "command",
+      "value": "pip install -U pyChatGPT"
+    },
+    {
+      "type": "command",
+      "value": "python3 -m pyChatGPT"
+    },
+    {
+      "type": "command",
+      "value": "python3 your_script.py"
+    },
+    {
+      "type": "pip_package",
+      "value": "-U"
+    },
+    {
+      "type": "pip_package",
+      "value": "-U"
+    },
+    {
+      "type": "feature",
+      "value": "[x] Cloudflare's anti-bot protection bypass using `undetected_chromedriver`"
+    },
+    {
+      "type": "feature",
+      "value": "[x] OpenAI / Google / Microsoft login support (experimental)"
+    },
+    {
+      "type": "feature",
+      "value": "[x] Captcha solvers support (2Captcha, PyPasser)"
+    },
+    {
+      "type": "feature",
+      "value": "[x] [Headless machines support](#how-do-i-get-it-to-work-on-headless-linux-server)"
+    },
+    {
+      "type": "feature",
+      "value": "[x] Proxy support (only without basic auth)"
+    },
+    {
+      "type": "tool",
+      "name": "This library also supports command",
+      "description": "line interface:"
+    },
+    {
+      "type": "tool",
+      "name": "Chromium: Devtools > Application > Cookies > poe.com",
+      "description": "Firefox: Devtools > Storage > Cookies"
+    },
+    {
+      "type": "tool",
+      "name": "/models",
+      "description": "/chat/completions"
+    },
+    {
+      "type": "tool",
+      "name": "/images/generations",
+      "description": "/images/edits"
+    },
+    {
+      "type": "tool",
+      "name": "/v1/models",
+      "description": "/v1/chat/completions"
+    },
+    {
+      "type": "tool",
+      "name": "/v1/images/generations",
+      "description": "/v1/images/edits"
+    },
+    {
+      "type": "tool",
+      "name": "Modify secrets.json with your own tokens",
+      "description": "Run the FastAPI server:"
+    },
+    {
+      "type": "tool",
+      "name": "Non",
+      "description": "streamed example:"
+    },
+    {
+      "type": "tool",
+      "name": "What are the file types that poe",
+      "description": "api-wrapper support?"
+    },
+    {
+      "type": "tool",
+      "name": "Try poe",
+      "description": "api-wrapper and give feedback"
+    },
+    {
+      "type": "tool",
+      "name": "Help with open [issues](https://github.com/snowby666/poe",
+      "description": "api-wrapper/issues) or [create your own](https://github.com/snowby666/poe-api-wrapper/issues/new/choose)"
+    },
+    {
+      "type": "tool",
+      "name": "Share your thoughts and suggestions with us",
+      "description": "Request a feature by submitting a proposal"
+    },
+    {
+      "type": "tool",
+      "name": "Report a bug",
+      "description": "**Improve documentation:** fix incomplete or missing docs, bad wording, examples or explanations."
+    },
+    {
+      "type": "pip_package",
+      "value": "-U"
+    },
+    {
+      "type": "pip_package",
+      "value": "-U"
+    },
+    {
+      "type": "pip_package",
+      "value": "-U"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/juzeon/poe-openai-proxy.git"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r external/requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "python external/api.py # Running on port 5100"
+    },
+    {
+      "type": "command",
+      "value": "./poe-openai-proxy"
+    },
+    {
+      "type": "tool",
+      "name": "/models",
+      "description": "/chat/completions"
+    },
+    {
+      "type": "tool",
+      "name": "/v1/models",
+      "description": "/v1/chat/completions"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    }
+  ],
+  "script_summary": "7 commands, 7 pip_packages, 5 features, 15 tools"
+}

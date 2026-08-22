@@ -1,0 +1,8 @@
+# Developer & testing tools.
+# Install: pip install -r requirements-dev.txt
+pytest
+pytest-asyncio
+black
+flake8
+mypy
+pre-commit

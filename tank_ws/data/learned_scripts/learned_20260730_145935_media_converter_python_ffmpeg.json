@@ -1,0 +1,113 @@
+{
+  "timestamp": "2026-07-30T14:59:35.652543",
+  "topic": "media converter python ffmpeg",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "hariharen9/ffmpeg-this",
+      "html_url": "https://github.com/hariharen9/ffmpeg-this",
+      "description": " A powerful, interactive Python CLI for converting, manipulating, and inspecting media files using FFmpeg \ud83c\udfac",
+      "stars": 20,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "cnajm/flask-ffmpeg-mediaconverter",
+      "html_url": "https://github.com/cnajm/flask-ffmpeg-mediaconverter",
+      "description": "A python media converter than uses ffmpeg through the flask framework.",
+      "stars": 7,
+      "language": "HTML",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "lucasrennok/ConvertMedia",
+      "html_url": "https://github.com/lucasrennok/ConvertMedia",
+      "description": "Convert images and videos to another file extension.",
+      "stars": 6,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 19,
+  "findings": [
+    {
+      "type": "command",
+      "value": "pip install peg_this"
+    },
+    {
+      "type": "command",
+      "value": "pip install peg_this[download]     # yt-dlp download engine"
+    },
+    {
+      "type": "command",
+      "value": "pip install peg_this[demucs]       # AI music stem separation (~1.5GB)"
+    },
+    {
+      "type": "command",
+      "value": "pip install peg_this[upscale]      # AI video upscaling (~1.5GB)"
+    },
+    {
+      "type": "command",
+      "value": "pip install peg_this[all-ai,download]  # Everything"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/hariharen9/ffmpeg-this.git && cd ffmpeg-this"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "python -m src.peg_this.peg_this"
+    },
+    {
+      "type": "pip_package",
+      "value": "peg_this"
+    },
+    {
+      "type": "pip_package",
+      "value": "peg_this[download]"
+    },
+    {
+      "type": "pip_package",
+      "value": "peg_this[demucs]"
+    },
+    {
+      "type": "pip_package",
+      "value": "peg_this[upscale]"
+    },
+    {
+      "type": "pip_package",
+      "value": "peg_this[all-ai,download]"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "flask`),"
+    },
+    {
+      "type": "tool",
+      "name": "Make a fork",
+      "description": "Send me suggestions"
+    },
+    {
+      "type": "tool",
+      "name": "If you found an error, contact me",
+      "description": "Give a star to this project"
+    },
+    {
+      "type": "pip_package",
+      "value": "Pillow"
+    },
+    {
+      "type": "pip_package",
+      "value": "pysimplegui"
+    }
+  ],
+  "script_summary": "8 commands, 9 pip_packages, 2 tools"
+}

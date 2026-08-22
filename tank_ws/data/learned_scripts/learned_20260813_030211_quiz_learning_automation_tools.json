@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-08-13T03:02:11.665035",
+  "topic": "quiz learning automation tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "SakuraPuare/ChaoXing",
+      "html_url": "https://github.com/SakuraPuare/ChaoXing",
+      "description": "\u8d85\u661f\u5b66\u4e60\u901a\u81ea\u52a8\u5316\u5de5\u5177 | Automation tool for Chaoxing (Xuexitong) online learning platform",
+      "stars": 4,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "tuliocunha/ThermoQuiz",
+      "html_url": "https://github.com/tuliocunha/ThermoQuiz",
+      "description": "ThermoQuiz: Your HVAC & Refrigeration Learning Tool. Interactive quizzes on Thermodynamics, Refrigeration Cycles, Air Conditioning, System Components, Refrigerants, Installation, Maintenance, Safety, Fault Diagnosis, Energy Efficiency, Automation, Indoor Air Quality. Master theory & practice.",
+      "stars": 0,
+      "language": "HTML",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "DanielHallbro/ai-flashcards",
+      "html_url": "https://github.com/DanielHallbro/ai-flashcards",
+      "description": "Flashcard & quiz study tool for an AI, automation & machine learning course exam - flip cards, self-rate, and track what to review.",
+      "stars": 0,
+      "language": "HTML",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 0,
+  "findings": [],
+  "script_summary": "no findings"
+}

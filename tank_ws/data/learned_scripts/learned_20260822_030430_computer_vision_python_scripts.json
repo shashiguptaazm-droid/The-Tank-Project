@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-08-22T03:04:30.756037",
+  "topic": "computer vision python scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "molyswu/hand_detection",
+      "html_url": "https://github.com/molyswu/hand_detection",
+      "description": "using Neural Networks (SSD) on Tensorflow.  This repo documents steps and scripts used to train a hand detector using Tensorflow (Object Detection API). As with any DNN based task, the most expensive (and riskiest) part of the process has to do with finding or creating the right (annotated) dataset.",
+      "stars": 278,
+      "language": "Python",
+      "default_branch": "temp"
+    },
+    {
+      "full_name": "JayabharathP/The-Python-Mega-Course-Build-10-Real-World-Applications-",
+      "html_url": "https://github.com/JayabharathP/The-Python-Mega-Course-Build-10-Real-World-Applications-",
+      "description": "The Python Mega Course is one of the top online Python courses with over 100,000 enrolled students and is targeted toward people with little or no previous programming experience. The course follows a modern-teaching approach where students learn by doing. You will start Python from scratch by first",
+      "stars": 183,
+      "language": "Jupyter Notebook",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "mailrocketsystems/AIComputerVision",
+      "html_url": "https://github.com/mailrocketsystems/AIComputerVision",
+      "description": "This project contains various computer vision and AI related python scripts",
+      "stars": 157,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 3,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Motivation",
+      "description": "Why Track/Detect hands with Neural Networks"
+    },
+    {
+      "type": "tool",
+      "name": "Using the Detector to Detect/Track hands",
+      "description": "Thoughts on Optimizations."
+    },
+    {
+      "type": "tool",
+      "name": "Downloads the egohands datasets",
+      "description": "Renames all files to include their directory names to ensure each filename is unique"
+    }
+  ],
+  "script_summary": "3 tools"
+}

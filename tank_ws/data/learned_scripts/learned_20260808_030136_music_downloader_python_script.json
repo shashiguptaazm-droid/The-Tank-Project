@@ -1,0 +1,112 @@
+{
+  "timestamp": "2026-08-08T03:01:36.268933",
+  "topic": "music downloader python script",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "everdrone/nts",
+      "html_url": "https://github.com/everdrone/nts",
+      "description": "NTS Radio downloader and metadata parser",
+      "stars": 188,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "bunnykek/Fetcher",
+      "html_url": "https://github.com/bunnykek/Fetcher",
+      "description": "A python script for downloading enhanced animated artworks from Apple-Music.",
+      "stars": 184,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "CuteTenshii/spotify-downloader",
+      "html_url": "https://github.com/CuteTenshii/spotify-downloader",
+      "description": "A Python script to download music straight from Spotify servers lol",
+      "stars": 147,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 19,
+  "findings": [
+    {
+      "type": "command",
+      "value": "pip3 install nts-everdrone"
+    },
+    {
+      "type": "pip_package",
+      "value": "nts-everdrone"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/bunnykek/Apple-Music-Animated-Artwork-Fetcher"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "python fetcher.py -h"
+    },
+    {
+      "type": "command",
+      "value": "python fetcher.py -T tall -L 2 -A https://music.apple.com/us/album/planet-her-deluxe/1574004234"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "feature",
+      "value": "Downloads the animated artwork from Apple Music in Highest available HEVC quality."
+    },
+    {
+      "type": "feature",
+      "value": "Can also multiplex the animated artwork with the track of your choice from that album."
+    },
+    {
+      "type": "feature",
+      "value": "Will also tag the artwork with all the metadata of the album."
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/JustYuuto/spotify-downloader.git"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "python main.py <id of the track you want to download>"
+    },
+    {
+      "type": "tool",
+      "name": "Of course, it decrypts the DRM encryption with pywidevine",
+      "description": "**Soon:** downloading playlists and albums"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "feature",
+      "value": "Supports downloading music from Spotify (that's the point of this program)"
+    },
+    {
+      "type": "feature",
+      "value": "As it downloads music directly from Spotify servers, the quality is the same as you can hear it on Spotify"
+    },
+    {
+      "type": "feature",
+      "value": "Of course, it decrypts the DRM encryption with pywidevine"
+    },
+    {
+      "type": "feature",
+      "value": "**Soon:** downloading playlists and albums"
+    }
+  ],
+  "script_summary": "8 commands, 3 pip_packages, 7 features, 1 tools"
+}

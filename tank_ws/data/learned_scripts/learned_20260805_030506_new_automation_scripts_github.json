@@ -1,0 +1,83 @@
+{
+  "timestamp": "2026-08-05T03:05:06.720643",
+  "topic": "new automation scripts github",
+  "repos_scanned": 5,
+  "repos": [
+    {
+      "full_name": "Sfedfcv/redesigned-pancake",
+      "html_url": "https://github.com/Sfedfcv/redesigned-pancake",
+      "description": "Skip to content github / docs Code Issues 80 Pull requests 35 Discussions Actions Projects 2 Security Insights Merge branch 'main' into 1862-Add-Travis-CI-migration-table  1862-Add-Travis-CI-migration-table (#1869, Iixixi/ZachryTylerWood#102, THEBOLCK79/docs#1, sbnbhk/docs#1) @martin389 martin389 co",
+      "stars": 254,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "nyaundid/EC2-AWS-AND-SHELL",
+      "html_url": "https://github.com/nyaundid/EC2-AWS-AND-SHELL",
+      "description": "SEIS 665 Assignment 2: Linux & Git Overview This week we will focus on becoming familiar with launching a Linux server and working with some basic Linux and Git commands. We will use AWS to launch and host the Linux server. AWS might seem a little confusing at this point. Don\u2019t worry, we will gain m",
+      "stars": 55,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "jarodburchill/project-automation",
+      "html_url": "https://github.com/jarodburchill/project-automation",
+      "description": "Python script for creating new projects (React, Express.js, Vue, Laravel, etc.) in the desired local directory, with a GitHub origin.",
+      "stars": 43,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "ultranet1/APACHE_AIRFLOW_DATA_PIPELINES",
+      "html_url": "https://github.com/ultranet1/APACHE_AIRFLOW_DATA_PIPELINES",
+      "description": "Project Description: A music streaming company wants to introduce more automation and monitoring to their data warehouse ETL pipelines and they have come to the conclusion that the best tool to achieve this is Apache Airflow. As their Data Engineer, I was tasked to create a reusable production-grade",
+      "stars": 20,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Den4200/python-project-starter",
+      "html_url": "https://github.com/Den4200/python-project-starter",
+      "description": "A script to help create new Python projects.",
+      "stars": 14,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 7,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone https://github.com/jarodburchill/project-automation"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/jarodburchill/project-automation"
+    },
+    {
+      "type": "tool",
+      "name": "DWN_ENDPOINT ::  dwhcluster.c4m4dhrmsdov.us",
+      "description": "west-2.redshift.amazonaws.com"
+    },
+    {
+      "type": "tool",
+      "name": "You will need to install [Git](https://git",
+      "description": "scm.com/downloads) seperately"
+    },
+    {
+      "type": "tool",
+      "name": "Use `pip install",
+      "description": "r requirements.txt` to install the required packages"
+    },
+    {
+      "type": "tool",
+      "name": "Add in your license to `templates\\LICENSE",
+      "description": "template`"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    }
+  ],
+  "script_summary": "2 commands, 4 tools, 1 pip_packages"
+}

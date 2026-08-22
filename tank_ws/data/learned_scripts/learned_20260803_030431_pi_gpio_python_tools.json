@@ -1,0 +1,63 @@
+{
+  "timestamp": "2026-08-03T03:04:31.213753",
+  "topic": "pi gpio python tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "timofurrer/w1thermsensor",
+      "html_url": "https://github.com/timofurrer/w1thermsensor",
+      "description": "A Python package and CLI tool to work with w1 temperature sensors like DS1822, DS18S20 & DS18B20 on the Raspberry Pi, Beagle Bone and other devices.",
+      "stars": 510,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "aCallum/SafePi",
+      "html_url": "https://github.com/aCallum/SafePi",
+      "description": "SafePi is a Python based tracking tool for Safemoon, aimed to be run on a Raspberry Pi with GPIO displays.",
+      "stars": 25,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "vindolin/Python-Ebyte-E32",
+      "html_url": "https://github.com/vindolin/Python-Ebyte-E32",
+      "description": "Python 3 command line tool/library for controlling Ebyte LoRa modules like the E32 with GPIOs (Raspberry Pi).",
+      "stars": 7,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 7,
+  "findings": [
+    {
+      "type": "pip_package",
+      "value": "w1thermsensor"
+    },
+    {
+      "type": "pip_package",
+      "value": "w1thermsensor[async]"
+    },
+    {
+      "type": "pip_package",
+      "value": "RPi.GPIO"
+    },
+    {
+      "type": "pip_package",
+      "value": "spidev"
+    },
+    {
+      "type": "pip_package",
+      "value": "ccxt"
+    },
+    {
+      "type": "pip_package",
+      "value": "schedule"
+    },
+    {
+      "type": "command",
+      "value": "python ebyte.py read /dev/serial0 27 17 22"
+    }
+  ],
+  "script_summary": "6 pip_packages, 1 commands"
+}

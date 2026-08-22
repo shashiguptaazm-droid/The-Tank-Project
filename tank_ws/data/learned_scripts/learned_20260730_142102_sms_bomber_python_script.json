@@ -1,0 +1,85 @@
+{
+  "timestamp": "2026-07-30T14:21:02.362302",
+  "topic": "sms bomber python script",
+  "repos_scanned": 5,
+  "repos": [
+    {
+      "full_name": "MGz-Staze/tools-Termux",
+      "html_url": "https://github.com/MGz-Staze/tools-Termux",
+      "description": "Cara Update dan Upgrade Termux  pkg update && pkg upgrade  Tools Pendukung untuk Termux  Tools pendukung yang di perlukan agar tools yang lain work. <\u2014-| PENTING  pkg install git php curl -y pkg install python2 pkg install apache2  Trik Termux  Untuk mematikan atau memberhentikan tools tekan tombol\u00a0",
+      "stars": 140,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "bombcrack/bombcrack",
+      "html_url": "https://github.com/bombcrack/bombcrack",
+      "description": "A TheSpeedX/TBomb bomber script decoder, oh yeah.",
+      "stars": 27,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "Devn913/prank_sms_bomber",
+      "html_url": "https://github.com/Devn913/prank_sms_bomber",
+      "description": "This is a small python script to bomb some message  to your friend , use it for prank only not for revenge. This script will work only with Indian mobile numbers . Make sure to install python requests libraries before using this. This script containing about 10 API , i will add more in the future. D",
+      "stars": 7,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "Trickyabhi/Tricky_abhi",
+      "html_url": "https://github.com/Trickyabhi/Tricky_abhi",
+      "description": "Due misusing of TBomb, several API's died. Don't be afraid if you don't see all send messages.  The script requires working network connection to work. No balance will be deducted for using this script to send SMS/calls. While doing infinite bombing use 2-3 seconds delay and 10 to 20 threads for max",
+      "stars": 7,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Anonymous69-hub/Dragon-Virus-2.0",
+      "html_url": "https://github.com/Anonymous69-hub/Dragon-Virus-2.0",
+      "description": "1eh6mqlqs5@xdsedr.tech#!/usr/bin/python # -*- coding: UTF-8 -*-  import os import shutil import sys import subprocess import string import random import json import re import time import argparse import zipfile from io import BytesIO  from concurrent.futures import ThreadPoolExecutor, as_completed  ",
+      "stars": 7,
+      "language": null,
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 8,
+  "findings": [
+    {
+      "type": "pip_package",
+      "value": "wordlist"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "tool",
+      "name": "@scpketer",
+      "description": "the person who gave me an inspiration."
+    },
+    {
+      "type": "tool",
+      "name": "@KnightSec",
+      "description": "Official - the person who supported me in development process."
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "requests"
+    },
+    {
+      "type": "pip_package",
+      "value": "--upgrade"
+    }
+  ],
+  "script_summary": "6 pip_packages, 2 tools"
+}

@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-07-30T13:52:45.332160",
+  "query": "climate change solutions",
+  "duration_ms": 2698.6,
+  "total_results": 3,
+  "results_by_source": {
+    "web": {
+      "count": 3,
+      "items": [
+        {
+          "source": "web",
+          "title": "Manage Climate Risk - Climate Risk Experts",
+          "url": "https://www.bing.com/aclick?ld=e8XpJ7U-FWk38eFEsDtjKeljVUCUwcuiZLRQdD2752E23WbRDvOJXq-OaA4TjPX3a4cQ_CilLpQDKYtfDwvC04ZEx8kPmpTOtt0ngX6LTorWMmCnJh3TPXi1fMUGryFKOs2iw9ZdUz78VRq_DPZLMeSBtQ1z9S0ghxE35bLd3R11lvS3xBrODUtDq4qLhZxeEu2XzZXiEZ3A_1kBG24pOIWkzhVlc&u=aHR0cHMlM2ElMmYlMmZuYXZpZ2F0b3IuY29uc3RlbGxhdGlvbi5jb20lMmZzb2x1dGlvbnMlMmZzdXN0YWluYWJpbGl0eS1hZHZpc29yeSUzZnV0bV90ZXJtJTNkY2xpbWF0ZSUyNTIwcmlzayUyNTIwYXNzZXNzbWVudCUyNnV0bV9jYW1wYWlnbiUzZE0lMmItJTJiU3VzdGFpbmFiaWxpdHklMmJDb25zdWx0aW5nJTI2dXRtX3NvdXJjZSUzZGJpbmclMjZ1dG1fbWVkaXVtJTNkcHBjJTI2dXRtX2lkJTNkNTcxMzcxMzAyJTI2aHNhX2FjYyUzZDc3MzE1NjQ2ODIlMjZoc2FfY2FtJTNkMjM5OTQyMzg0NTAlMjZoc2FfZ3JwJTNkMTE3NDI4MDcwNTEzOTIzNCUyNmhzYV9hZCUzZCUyNmhzYV9zcmMlM2RvJTI2aHNhX3RndCUzZGt3ZC03MzM5MzIxNzYyMTUxNiUzYWxvYy02NiUyNmhzYV9rdyUzZGNsaW1hdGUlMjUyMHJpc2slMjUyMGFzc2Vzc21lbnQlMjZoc2FfbXQlM2RiJTI2aHNhX25ldCUzZGFkd29yZHMlMjZoc2FfdmVyJTNkMyUyNm1zY2xraWQlM2Q3NDlhMmM4Mzg5MzMxYTFhZTU4MzQ2ZThiMjNmYTgzZg&rlid=749a2c8389331a1ae58346e8b23fa83f",
+          "body": "Turn climate and ESG risk into a clear, defensible compliance strategy. Talk to a Constellation consultant about your compliance and risk needs. Standardized Reporting \u00b7 ESG & Compliance Support \u00b7 Dec"
+        },
+        {
+          "source": "web",
+          "title": "What are the solutions to climate change? - Greenpeace UK",
+          "url": "https://www.greenpeace.org.uk/challenges/climate-change/solutions-climate-change/",
+          "body": "Climate change is already an urgent threat to millions of lives \u2013 but there are solutions. From changing how we get our energy to limiting deforestation, here are some of the key solutions to climate "
+        },
+        {
+          "source": "web",
+          "title": "Climate change solutions \u00bb Yale Climate Connections",
+          "url": "https://yaleclimateconnections.org/solutions/",
+          "body": "Discover how people across the country are reacting to the reality of climate change."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,8 @@
+/**:
+  ros__parameters:
+    camera_publisher:
+      device: 0                 # /dev/video0 — set to 2 for Pi Camera Module 3 V4L2
+      width: 1280
+      height: 720
+      fps: 30
+      frame_id: camera_optical_frame

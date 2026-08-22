@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-08-13T03:03:26.225969",
+  "topic": "SLAM ROS automation tools",
+  "repos_scanned": 2,
+  "repos": [
+    {
+      "full_name": "jessee07/AGV-Fleet-Management-System-",
+      "html_url": "https://github.com/jessee07/AGV-Fleet-Management-System-",
+      "description": "README.md AGV-Fleet-Management-System Project Description:  The current industrial revolution mainly focuses on automation, artificial intelligence, and interconnectivity to optimize and manage the production processes and supply chain. As a result of it, AGVs are used in a range of industries to ha",
+      "stars": 14,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "jlbucklew/ros2-build-tool",
+      "html_url": "https://github.com/jlbucklew/ros2-build-tool",
+      "description": "A comprehensive, novice-friendly ROS2 workspace automation tool that generates fully-configured SLAM + Nav2 navigation stacks from minimal user input: just a URDF file and GitHub hardware driver URLs.",
+      "stars": 0,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 5,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone https://github.com/your-org/ros2-build-tool.git"
+    },
+    {
+      "type": "command",
+      "value": "./scripts/setup-dev.sh"
+    },
+    {
+      "type": "tool",
+      "name": "Minimum 80% test coverage (enforced)",
+      "description": "All tests must pass before merge"
+    },
+    {
+      "type": "tool",
+      "name": "Cross",
+      "description": "platform CI validation"
+    },
+    {
+      "type": "tool",
+      "name": "Security scanning on every commit",
+      "description": "Performance benchmarks required"
+    }
+  ],
+  "script_summary": "2 commands, 3 tools"
+}

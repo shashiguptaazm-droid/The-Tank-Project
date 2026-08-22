@@ -1,0 +1,462 @@
+/**
+ * Copyright 2017-present, The Visdom Authors
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
+
+import React, { useContext, useEffect, useRef, useState } from 'react';
+
+import ApiContext from '../api/ApiContext';
+import EventSystem from '../EventSystem';
+import { showToast } from '../toasts/toastEvents';
+import Pane from './Pane';
+import {
+  downloadJpegWithDpi,
+  downloadPngWithDpi,
+} from './utils/Embeddpimetadata';
+import { copyLatexToClipboard } from './utils/LatexExport';
+import { typesetMathJax } from './utils/mathjaxHelpers';
+import { downloadImageAsPdf } from './utils/pdfExport';
+
+const DEFAULT_HEIGHT = 400;
+const DEFAULT_WIDTH = 300;
+const IMAGE_EXPORT_FORMATS = ['png', 'jpg', 'pdf'];
+
+function ImagePane(props) {
+  const { sendPaneMessage } = useContext(ApiContext);
+  const { envID, id, contentID, title, type, selected, width, height } = props;
+  var { isFocused, content } = props;
+
+  // state variables
+  // --------------
+  const paneRef = useRef();
+  const imgRef = useRef();
+  const captionRef = useRef();
+  const mouseLocationRef = useRef({ x: null, y: null });
+  const [view, setView] = useState({ scale: 1, tx: 0, ty: 0 });
+  const [imgDim, setImgDim] = useState({ width: null, height: 0 });
+  const [actualSelected, setActualSelected] = useState(props.selected);
+  const [mouseLocation, setMouseLocation] = useState({
+    x: 0,
+    y: 0,
+    visibility: 'hidden',
+  });
+  const [dragStart, setDragStart] = useState({
+    x: 0,
+    y: 0,
+  });
+  const [exportError, setExportError] = useState(null);
+  const exportErrorTimeoutRef = useRef(null);
+
+  // private events
+  // -------------
+  const handleExport = (format, dpi) => {
+    try {
+      const filename = `${title || 'visdom_image'}.${format}`;
+      const dpiToEmbed = dpi || 96;
+      const isSourceJpeg = /^data:image\/jpe?g/i.test(content.src || '');
+
+      if (isSourceJpeg && format === 'jpg') {
+        downloadJpegWithDpi(content.src, filename, dpiToEmbed);
+        return;
+      }
+      if (isSourceJpeg && format === 'pdf') {
+        downloadImageAsPdf(content.src, filename, dpiToEmbed);
+        return;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = imgRef.current.naturalWidth;
+      canvas.height = imgRef.current.naturalHeight;
+      const ctx = canvas.getContext('2d');
+
+      if (format === 'jpg' || format === 'pdf') {
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      ctx.drawImage(imgRef.current, 0, 0);
+
+      if (format === 'pdf') {
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+        downloadImageAsPdf(dataUrl, filename, dpiToEmbed);
+      } else if (format === 'jpg') {
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+        downloadJpegWithDpi(dataUrl, filename, dpiToEmbed);
+      } else {
+        const dataUrl = canvas.toDataURL('image/png');
+        downloadPngWithDpi(dataUrl, filename, dpiToEmbed);
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('ImagePane export failed:', err);
+      setExportError('Export failed. Please try again.');
+      if (exportErrorTimeoutRef.current) {
+        clearTimeout(exportErrorTimeoutRef.current);
+      }
+      exportErrorTimeoutRef.current = setTimeout(() => {
+        setExportError(null);
+      }, 3000);
+    }
+  };
+
+  const handleLatexExport = (style) => {
+    copyLatexToClipboard(style, {
+      contentID,
+      id,
+      caption: content.caption || title,
+    })
+      .then(() =>
+        showToast('Copied!', 'success', {
+          position: 'bottom-center',
+          shape: 'pill',
+          duration: 1500,
+        })
+      )
+      .catch((err) => {
+        console.error('ImagePane LaTeX export failed:', err);
+        showToast('Failed to Copy', 'error', {
+          position: 'bottom-center',
+          shape: 'pill',
+          duration: 1500,
+        });
+      });
+  };
+
+  const handleZoom = (ev) => {
+    if (ev.altKey) {
+      //var direction = natural.checked ? -1 : 1;
+      let direction = -1;
+      // Get browser independent scaling factor
+      let scrollDirectionX = Math.sign(ev.deltaX);
+      let scrollDirectionY = Math.sign(ev.deltaY);
+      // If shift is pressed only scroll sidewise (to allow scrolling
+      // to the side by keep shift pressed and using normal scrolling
+      // on the image pane)
+      if (ev.shiftKey)
+        setView({
+          ...view,
+          tx: view['tx'] + scrollDirectionY * direction * 50,
+        });
+      else
+        setView({
+          ...view,
+          tx: view['tx'] + scrollDirectionX * direction * 50,
+          ty: view['ty'] + scrollDirectionY * direction * 50,
+        });
+      ev.stopPropagation();
+      ev.preventDefault();
+    } else if (ev.ctrlKey) {
+      // get the x and y offset of the pane
+      let rect = paneRef.current.children[1].getBoundingClientRect();
+      // Get browser independent scaling factor
+      let scrollDirectionY = Math.sign(ev.deltaY);
+      // Compute the coords of the mouse relative to the top left of the pane
+      let xscreen = ev.clientX - rect.x;
+      let yscreen = ev.clientY - rect.y;
+      // Compute the coords of the pixel under the mouse wrt the image top left
+      let ximage = (xscreen - view['tx']) / view['scale'];
+      let yimage = (yscreen - view['ty']) / view['scale'];
+      let new_scale = view['scale'] * Math.exp(-scrollDirectionY / 10);
+      // Update the state.
+      // The offset is modifed such that the pixel under the mouse
+      // is the same after zooming
+      setView({
+        scale: new_scale,
+        tx: xscreen - new_scale * ximage,
+        ty: yscreen - new_scale * yimage,
+      });
+      ev.stopPropagation();
+      ev.preventDefault();
+    }
+  };
+
+  const handleDragStart = (ev) => {
+    setDragStart({ x: ev.screenX, y: ev.screenY });
+    ev.dataTransfer.setDragImage(new Image(), 0, 0); // disables ghost image
+  };
+
+  const handleDragOver = (ev) => {
+    setView({
+      scale: view['scale'],
+      tx: view['tx'] + ev.screenX - dragStart.x,
+      ty: view['ty'] + ev.screenY - dragStart.y,
+    });
+    setDragStart({ x: ev.screenX, y: ev.screenY });
+  };
+
+  const handleMouseOver = (ev) => {
+    var rect = paneRef.current.children[1].getBoundingClientRect();
+    var xscreen = ev.clientX - rect.x;
+    var yscreen = ev.clientY - rect.y;
+    var ximage = Math.round((xscreen - view['tx']) / view['scale']);
+    var yimage = Math.round((yscreen - view['ty']) / view['scale']);
+    mouseLocationRef.current = { x: ximage, y: yimage };
+    if (!ev.altKey) {
+      if (mouseLocation.visibility !== 'hidden') {
+        setMouseLocation({ x: 0, y: 0, visibility: 'hidden' });
+      }
+      return;
+    }
+    setMouseLocation((prev) =>
+      prev.x === ximage && prev.y === yimage
+        ? prev
+        : { x: ximage, y: yimage, visibility: 'visible' }
+    );
+  };
+
+  const handleReset = () => {
+    setView({
+      scale: 1,
+      tx: 0,
+      ty: 0,
+    });
+  };
+
+  const updateSlider = (evt) => {
+    const idx = parseInt(evt.target.value, 10);
+    if (Number.isNaN(idx)) return;
+    setActualSelected(idx);
+  };
+
+  const commitSliderSelection = (value) => {
+    const idx = parseInt(value, 10);
+    if (Number.isNaN(idx)) return;
+    sendPaneMessage(
+      { event_type: 'SliderMoved', index: idx, pane_data: false },
+      id,
+      envID
+    );
+  };
+
+  const finalizeSlider = (evt) => {
+    if (!evt || !evt.target) return;
+    commitSliderSelection(evt.target.value);
+  };
+
+  // effects
+  // -------
+
+  // reset image selection upon property change
+  useEffect(() => {
+    setActualSelected(selected);
+  }, [selected]);
+
+  useEffect(() => {
+    return () => {
+      if (exportErrorTimeoutRef.current) {
+        clearTimeout(exportErrorTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Reset the image settings when the user resizes the window. Avoid
+  // constantly resetting the zoom level when user has not zoomed.
+  useEffect(() => {
+    if (Math.abs(view['scale'] - 1) > Number.EPSILON) handleReset();
+  }, [width, height]);
+
+  // initialize mouse events
+  useEffect(() => {
+    const onEvent = (event) => {
+      switch (event.type) {
+        case 'keydown':
+        case 'keypress': {
+          if (!isFocused) {
+            break;
+          }
+          const tag = event.target.tagName;
+          if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
+            event.preventDefault();
+          }
+          break;
+        }
+        case 'keyup':
+          if (isFocused)
+            sendPaneMessage(
+              {
+                event_type: 'KeyPress',
+                key: event.key,
+                key_code: event.keyCode,
+              },
+              id,
+              envID
+            );
+          break;
+        case 'click':
+          if (isFocused)
+            sendPaneMessage(
+              {
+                event_type: 'Click',
+                image_coord: mouseLocationRef.current,
+              },
+              id,
+              envID
+            );
+          break;
+      }
+    };
+
+    EventSystem.subscribe('global.event', onEvent);
+    return function cleanup() {
+      EventSystem.unsubscribe('global.event', onEvent);
+    };
+  }, [isFocused]);
+
+  // image size/pos computation
+  // --------------------------
+
+  // Find the width/height that preserves the aspect ratio 'scaledWidth/height'
+  const computeHFromW = (scaledWidth) => {
+    if (!imgDim.width) return 0;
+    return Math.ceil((imgDim.height / imgDim.width) * scaledWidth);
+  };
+  const computeWFromH = (scaledHeight) => {
+    if (!imgDim.height) return 0;
+    return Math.ceil((imgDim.width / imgDim.height) * scaledHeight);
+  };
+
+  // compute image size & position
+  let candidateWidth = Math.ceil(1 + width * view['scale']);
+  let candidateHeight = Math.ceil(1 + height * view['scale']);
+  let imageContainerStyle = {
+    display: 'flex',
+    height: isNaN(candidateHeight) ? DEFAULT_HEIGHT : candidateHeight,
+    justifyContent: 'center',
+    width: isNaN(candidateWidth) ? DEFAULT_WIDTH : candidateWidth,
+  };
+
+  if (imgDim.height === null || imgDim.width === null) {
+    // Do nothing, don't change the width/height
+  } else if (candidateWidth >= candidateHeight) {
+    // If the width exceeds the height, then we use the height as the limiting
+    // factor
+    let newWidth = computeWFromH(candidateHeight);
+    // If the new width would exceed the window boundaries, we need to
+    // instead use the window width as the limiting factor
+    if (newWidth > candidateWidth) {
+      candidateHeight = computeHFromW(candidateWidth);
+    } else {
+      candidateWidth = newWidth;
+    }
+  } else if (candidateWidth < candidateHeight) {
+    // If the height exceeds the width, then we use the width as the limiting
+    // factor
+    let newHeight = computeHFromW(candidateWidth);
+    // If the new height would exceed the window boundaries, we need to
+    // instead use the window height as the limiting factor
+    if (newHeight > candidateHeight) {
+      candidateWidth = computeWFromH(candidateHeight);
+    } else {
+      candidateHeight = newHeight;
+    }
+  }
+
+  // During initial render cycle,
+  // Math.ceil(1 + height/width * view["scale"]) may be NaN.
+  // Set a default value here to avoid warnings, which will be updated on the
+  // next render
+
+  if (isNaN(candidateHeight)) {
+    candidateHeight = DEFAULT_HEIGHT;
+  }
+
+  if (isNaN(candidateWidth)) {
+    candidateWidth = DEFAULT_WIDTH;
+  }
+
+  // rendering
+  // ---------
+  let widgets = [];
+  const divstyle = { left: view['tx'], top: view['ty'], position: 'absolute' };
+
+  // add image slider as widget
+  if (type === 'image_history') {
+    if (props.show_slider) {
+      widgets.push(
+        <div className="widget" key="image_slider">
+          <div style={{ display: 'flex' }}>
+            <span>Selected:&nbsp;&nbsp;</span>
+            <input
+              type="range"
+              min="0"
+              max={content.length - 1}
+              value={actualSelected}
+              onChange={updateSlider}
+              onPointerUp={finalizeSlider}
+              onKeyUp={finalizeSlider}
+            />
+            <span>&nbsp;&nbsp;{actualSelected}&nbsp;&nbsp;</span>
+          </div>
+        </div>
+      );
+    }
+    content = content[actualSelected];
+  }
+
+  useEffect(() => {
+    let cancelled = false;
+    typesetMathJax(captionRef.current, () => cancelled);
+    return () => {
+      cancelled = true;
+    };
+  }, [content.caption]);
+
+  // add caption as widget
+  if (content.caption) {
+    widgets.splice(
+      0,
+      0,
+      <span className="widget" key="img_caption" ref={captionRef}>
+        {content.caption}
+      </span>
+    );
+  }
+
+  return (
+    <Pane
+      {...props}
+      handleExport={handleExport}
+      exportFormats={IMAGE_EXPORT_FORMATS}
+      handleReset={handleReset}
+      handleZoom={handleZoom}
+      handleMouseMove={handleMouseOver}
+      handleLatexExport={handleLatexExport}
+      ref={paneRef}
+      widgets={widgets}
+    >
+      {exportError && <div className="error-message">{exportError}</div>}
+      <div style={divstyle}>
+        <div style={imageContainerStyle}>
+          <img
+            className="content-image cssTransforms"
+            alt={content.caption}
+            src={content.src}
+            ref={imgRef}
+            onLoad={() => {
+              setImgDim({
+                height: imgRef.current.naturalHeight,
+                width: imgRef.current.naturalWidth,
+              });
+            }}
+            width={candidateWidth + 'px'}
+            height={candidateHeight + 'px'}
+            onDoubleClick={handleReset}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+          />
+        </div>
+      </div>
+      <span
+        className="mouse_image_location"
+        style={{ visibility: mouseLocation.visibility }}
+      >
+        {mouseLocation.x + ' / ' + mouseLocation.y}
+      </span>
+    </Pane>
+  );
+}
+
+export default ImagePane;

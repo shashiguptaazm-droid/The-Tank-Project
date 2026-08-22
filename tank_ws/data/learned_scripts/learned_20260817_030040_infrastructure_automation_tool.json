@@ -1,0 +1,78 @@
+{
+  "timestamp": "2026-08-17T03:00:40.059883",
+  "topic": "infrastructure automation tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "vividus-framework/vividus",
+      "html_url": "https://github.com/vividus-framework/vividus",
+      "description": "VIVIDUS is all in one test automation tool",
+      "stars": 415,
+      "language": "Java",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "NotHarshhaa/devops-cheatsheet",
+      "html_url": "https://github.com/NotHarshhaa/devops-cheatsheet",
+      "description": "A comprehensive collection of quick-reference cheatsheets for DevOps tools, covering CI/CD, containerization, monitoring, security, cloud infrastructure, and networking. Perfect for DevOps engineers, sysadmins, developers, and newcomers looking for essential commands and best practices. Contribution",
+      "stars": 338,
+      "language": "TypeScript",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "saurabhsharma2u/search-console-mcp",
+      "html_url": "https://github.com/saurabhsharma2u/search-console-mcp",
+      "description": "Search & analytics data as infrastructure \u2014 MCP server for Google Search Console, Bing Webmaster Tools, and GA4, designed for AI agents and automation.",
+      "stars": 270,
+      "language": "TypeScript",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 9,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone --recursive https://github.com/vividus-framework/vividus.git"
+    },
+    {
+      "type": "command",
+      "value": "./gradlew build"
+    },
+    {
+      "type": "tool",
+      "name": "Next.js",
+      "description": "React framework for production"
+    },
+    {
+      "type": "tool",
+      "name": "TypeScript",
+      "description": "Type-safe JavaScript"
+    },
+    {
+      "type": "tool",
+      "name": "Tailwind CSS",
+      "description": "Utility-first CSS framework"
+    },
+    {
+      "type": "tool",
+      "name": "OS keychain first",
+      "description": "tokens stored in macOS Keychain, Windows Credential Manager, or Linux Secret Service"
+    },
+    {
+      "type": "tool",
+      "name": "AES",
+      "description": "256-GCM fallback** \u2014 encrypted with a key derived from your machine's hardware ID; a stolen file is useless on another device"
+    },
+    {
+      "type": "tool",
+      "name": "Minimal storage",
+      "description": "only `refresh_token` and `expiry_date` are persisted, at `mode 600`"
+    },
+    {
+      "type": "tool",
+      "name": "Silent refresh",
+      "description": "tokens renew automatically in the background"
+    }
+  ],
+  "script_summary": "2 commands, 7 tools"
+}

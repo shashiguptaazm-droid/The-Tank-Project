@@ -1,0 +1,15 @@
+[Unit]
+Description=The Tank — hourly offload sweep (calls /api/offload/trigger)
+Documentation=https://=
+
+[Timer]
+# Run once at boot (catch-up after long downtime via Persistent=true) and
+# then on the top of every hour.
+OnBootSec=5min
+OnCalendar=hourly
+Persistent=true
+# Add a small jitter so multiple Pi reboots don't stampede the VPS.
+RandomizedDelaySec=900
+
+[Install]
+WantedBy=timers.target

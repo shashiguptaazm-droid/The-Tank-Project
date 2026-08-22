@@ -1,0 +1,44 @@
+{
+  "timestamp": "2026-08-06T03:02:23.310447",
+  "topic": "learning platform scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "Sfedfcv/redesigned-pancake",
+      "html_url": "https://github.com/Sfedfcv/redesigned-pancake",
+      "description": "Skip to content github / docs Code Issues 80 Pull requests 35 Discussions Actions Projects 2 Security Insights Merge branch 'main' into 1862-Add-Travis-CI-migration-table  1862-Add-Travis-CI-migration-table (#1869, Iixixi/ZachryTylerWood#102, THEBOLCK79/docs#1, sbnbhk/docs#1) @martin389 martin389 co",
+      "stars": 256,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "swati1024/torrents",
+      "html_url": "https://github.com/swati1024/torrents",
+      "description": "Skip to content   Search\u2026 All gists Back to GitHub Sign in Sign up Instantly share code, notes, and snippets.  @giansalex giansalex/torrent-courses-download-list.md forked from M-Younus/torrent courses download-list Last active 2 days ago 15188  Code Revisions 15 Stars 151 Forks 88 <script src=\"http",
+      "stars": 103,
+      "language": null,
+      "default_branch": "master"
+    },
+    {
+      "full_name": "abuhuraira-73/Cursor-Ai-Free",
+      "html_url": "https://github.com/abuhuraira-73/Cursor-Ai-Free",
+      "description": "Unlock unlimited Cursor AI trials on any platform. Scripts and helper tools to reset Cursor AI\u2019s config, spin up fresh 150-trial sessions, and keep the editor running free on Windows, macOS, and Linux\u2014perfect for learning, testing, and boosting dev productivity.",
+      "stars": 63,
+      "language": null,
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 2,
+  "findings": [
+    {
+      "type": "command",
+      "value": "curl -fsSL https://raw.githubusercontent.com/yeongpin/cursor-free-vip/main/scripts/install.sh -o install.sh && chmod +x install.sh && ./install.sh"
+    },
+    {
+      "type": "tool",
+      "name": "\u26a1 Multi",
+      "description": "language support (English, \u7b80\u4f53\u4e2d\u6587, \u7e41\u9ad4\u4e2d\u6587, Vietnamese)"
+    }
+  ],
+  "script_summary": "1 commands, 1 tools"
+}

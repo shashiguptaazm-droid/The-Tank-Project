@@ -1,0 +1,110 @@
+{
+  "timestamp": "2026-08-18T03:03:15.757884",
+  "topic": "arduino raspberry pi projects",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "itead/Segnix",
+      "html_url": "https://github.com/itead/Segnix",
+      "description": "An Arduino-like Project Based on Linux/Raspberry Pi",
+      "stars": 117,
+      "language": "C++",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "vjaunet/QUADCOPTER_V2",
+      "html_url": "https://github.com/vjaunet/QUADCOPTER_V2",
+      "description": "A quadcopter project based on Raspberry Pi and Arduino",
+      "stars": 117,
+      "language": "C++",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "majdsassi/Pico-WIFI-Duck",
+      "html_url": "https://github.com/majdsassi/Pico-WIFI-Duck",
+      "description": "Pico WiFi Duck is a project that enables the emulation of a USB Rubber Ducky over Wi-Fi using the Raspberry Pi Pico W. This functionality allows for remote control and automation of target systems, making it a versatile tool for penetration testing and security assessments.",
+      "stars": 87,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 16,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "PID controller",
+      "description": "Web interface to access the Camera (work in progress)"
+    },
+    {
+      "type": "tool",
+      "name": "Communication with the MPU6050 through I2C.",
+      "description": "Communication to Arduino Micro through SPI"
+    },
+    {
+      "type": "tool",
+      "name": "4 brushless motors (TURNIGY 2204",
+      "description": "14T 19g Outrunner)"
+    },
+    {
+      "type": "tool",
+      "name": "4 Electronic Speed Controllers (Turnigy Multistar 20 Amp)",
+      "description": "1 LiPo 3s 3700 mAh battery"
+    },
+    {
+      "type": "tool",
+      "name": "1 sparkfun MPU6050 breakout board",
+      "description": "1 QuadCopter frame"
+    },
+    {
+      "type": "tool",
+      "name": "1 4 channels RC Remote + Receiver",
+      "description": "1 arduino micro"
+    },
+    {
+      "type": "tool",
+      "name": "Emulates USB Rubber Ducky functionality over Wi",
+      "description": "Fi."
+    },
+    {
+      "type": "tool",
+      "name": "Remote scripting and automation capabilities.",
+      "description": "Requires only one Microcontroller."
+    },
+    {
+      "type": "tool",
+      "name": "Based on the [pico",
+      "description": "ducky](https://github.com/dbisu/pico-ducky) project."
+    },
+    {
+      "type": "tool",
+      "name": "Cost",
+      "description": "effective, approximately $6 (40dt)."
+    },
+    {
+      "type": "tool",
+      "name": "Raspberry Pi Pico W.",
+      "description": "Micro-USB Cable."
+    },
+    {
+      "type": "feature",
+      "value": "Emulates USB Rubber Ducky functionality over Wi-Fi."
+    },
+    {
+      "type": "feature",
+      "value": "Remote scripting and automation capabilities."
+    },
+    {
+      "type": "feature",
+      "value": "Requires only one Microcontroller."
+    },
+    {
+      "type": "feature",
+      "value": "Based on the [pico-ducky](https://github.com/dbisu/pico-ducky) project."
+    },
+    {
+      "type": "feature",
+      "value": "Cost-effective, approximately $6 (40dt)."
+    }
+  ],
+  "script_summary": "11 tools, 5 features"
+}

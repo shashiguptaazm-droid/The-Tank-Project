@@ -1,0 +1,111 @@
+{
+  "timestamp": "2026-08-16T07:54:16.775046",
+  "topic": "AI automation scripts python",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "rushindrasinha/youtube-shorts-pipeline",
+      "html_url": "https://github.com/rushindrasinha/youtube-shorts-pipeline",
+      "description": "Automated YouTube Shorts pipeline: news \u2192 script \u2192 AI visuals \u2192 voiceover \u2192 captions \u2192 upload",
+      "stars": 2185,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "awekrx/AutoDoc-ChatGPT",
+      "html_url": "https://github.com/awekrx/AutoDoc-ChatGPT",
+      "description": "AutoDoc-ChatGPT is a Python script that leverages the power of ChatGPT model to automatically generate documentation for any programming language. With AutoDoc-ChatGPT, you can easily generate comprehensive documentation for your codebase.",
+      "stars": 393,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "ok-oldking/ok-script-app",
+      "html_url": "https://github.com/ok-oldking/ok-script-app",
+      "description": "Python\u7248\u6309\u952e\u7cbe\u7075\u57fa\u4e8eok-script\u5f00\u53d1",
+      "stars": 185,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 17,
+  "findings": [
+    {
+      "type": "command",
+      "value": "python -m verticals run --topic \"Sam Altman just mass-fired 200 safety researchers\" --niche tech"
+    },
+    {
+      "type": "tool",
+      "name": "research with DuckDuckGo plus optional source scraping",
+      "description": "script and metadata generation through Claude, Gemini, GPT, Ollama, MiniMax, LiteLLM, or Claude CLI"
+    },
+    {
+      "type": "tool",
+      "name": "Whisper captions with ASS burn",
+      "description": "in plus SRT export, niche-configurable fonts"
+    },
+    {
+      "type": "tool",
+      "name": "news explainers",
+      "description": "niche trend breakdowns"
+    },
+    {
+      "type": "tool",
+      "name": "list",
+      "description": "style educational Shorts"
+    },
+    {
+      "type": "tool",
+      "name": "cinematic storytelling",
+      "description": "creator personality pieces"
+    },
+    {
+      "type": "tool",
+      "name": "Pick a niche with existing short",
+      "description": "form demand."
+    },
+    {
+      "type": "tool",
+      "name": "Generate and review a small batch of Shorts.",
+      "description": "Publish consistently on the platforms where that niche already moves."
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/awekrx/AutoDoc-ChatGPT.git"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "tool",
+      "name": "\u7528\u6237\u7fa4\uff1a`1097603920`",
+      "description": "\u5f00\u53d1\u8005\u7fa4\uff1a`938132715`"
+    },
+    {
+      "type": "pip_package",
+      "value": "--index-url"
+    },
+    {
+      "type": "pip_package",
+      "value": "--index-url"
+    },
+    {
+      "type": "pip_package",
+      "value": "--index-url"
+    }
+  ],
+  "script_summary": "3 commands, 8 tools, 6 pip_packages"
+}

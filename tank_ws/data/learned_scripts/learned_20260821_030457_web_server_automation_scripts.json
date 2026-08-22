@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-08-21T03:04:57.130580",
+  "topic": "web server automation scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "Sfedfcv/redesigned-pancake",
+      "html_url": "https://github.com/Sfedfcv/redesigned-pancake",
+      "description": "Skip to content github / docs Code Issues 80 Pull requests 35 Discussions Actions Projects 2 Security Insights Merge branch 'main' into 1862-Add-Travis-CI-migration-table  1862-Add-Travis-CI-migration-table (#1869, Iixixi/ZachryTylerWood#102, THEBOLCK79/docs#1, sbnbhk/docs#1) @martin389 martin389 co",
+      "stars": 258,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "nyaundid/EC2-AWS-AND-SHELL",
+      "html_url": "https://github.com/nyaundid/EC2-AWS-AND-SHELL",
+      "description": "SEIS 665 Assignment 2: Linux & Git Overview This week we will focus on becoming familiar with launching a Linux server and working with some basic Linux and Git commands. We will use AWS to launch and host the Linux server. AWS might seem a little confusing at this point. Don\u2019t worry, we will gain m",
+      "stars": 55,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "RoseSecurity/APOLOGEE",
+      "html_url": "https://github.com/RoseSecurity/APOLOGEE",
+      "description": "APOLOGEE is a Python script and Metasploit module that enumerates a hidden directory on Siemens APOGEE PXC BACnet Automation Controllers (all versions prior to V3.5) and TALON TC BACnet Automation Controllers (all versions prior to V3.5). With a 7.5 CVSS, this exploit allows for an attacker to perfo",
+      "stars": 50,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 0,
+  "findings": [],
+  "script_summary": "no findings"
+}

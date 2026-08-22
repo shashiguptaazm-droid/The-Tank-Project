@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-08-10T03:03:59.274559",
+  "topic": "system administration python scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "zszszszsz/.config",
+      "html_url": "https://github.com/zszszszsz/.config",
+      "description": "# # Automatically generated file; DO NOT EDIT. # OpenWrt Configuration # CONFIG_MODULES=y CONFIG_HAVE_DOT_CONFIG=y # CONFIG_TARGET_sunxi is not set # CONFIG_TARGET_apm821xx is not set # CONFIG_TARGET_ath25 is not set CONFIG_TARGET_ar71xx=y # CONFIG_TARGET_ath79 is not set # CONFIG_TARGET_bcm27xx is ",
+      "stars": 351,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "swati1024/torrents",
+      "html_url": "https://github.com/swati1024/torrents",
+      "description": "Skip to content   Search\u2026 All gists Back to GitHub Sign in Sign up Instantly share code, notes, and snippets.  @giansalex giansalex/torrent-courses-download-list.md forked from M-Younus/torrent courses download-list Last active 2 days ago 15188  Code Revisions 15 Stars 151 Forks 88 <script src=\"http",
+      "stars": 103,
+      "language": null,
+      "default_branch": "master"
+    },
+    {
+      "full_name": "Oneiroi/sysadmin",
+      "html_url": "https://github.com/Oneiroi/sysadmin",
+      "description": "Originally an all encompassing helper script, more now a library of scripts in bash and python to aid in Systems Administration tasks and extend functionality.",
+      "stars": 41,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 0,
+  "findings": [],
+  "script_summary": "no findings"
+}

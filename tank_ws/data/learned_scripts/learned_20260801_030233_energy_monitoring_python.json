@@ -1,0 +1,120 @@
+{
+  "timestamp": "2026-08-01T03:02:33.142468",
+  "topic": "energy monitoring python",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "nilmtk/nilmtk",
+      "html_url": "https://github.com/nilmtk/nilmtk",
+      "description": "Non-Intrusive Load Monitoring Toolkit (nilmtk)",
+      "stars": 942,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "magico13/ha-emporia-vue",
+      "html_url": "https://github.com/magico13/ha-emporia-vue",
+      "description": "Home Assistant Integration for Emporia Vue Energy Monitor",
+      "stars": 736,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "magico13/PyEmVue",
+      "html_url": "https://github.com/magico13/PyEmVue",
+      "description": "Python Library for the Emporia Vue Energy Monitor",
+      "stars": 240,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 19,
+  "findings": [
+    {
+      "type": "command",
+      "value": "python -c \"import nilmtk; print(nilmtk.__version__)\""
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/nilmtk/nilmtk.git"
+    },
+    {
+      "type": "tool",
+      "name": "use the single [nilmtk",
+      "description": "contrib Dockerfile](https://github.com/nilmtk/nilmtk-contrib)"
+    },
+    {
+      "type": "tool",
+      "name": "converters for public energy datasets;",
+      "description": "lazy access to buildings, meters, appliances, and time frames;"
+    },
+    {
+      "type": "tool",
+      "name": "resampling, alignment, preprocessing, and data",
+      "description": "quality statistics;"
+    },
+    {
+      "type": "tool",
+      "name": "standard NILM accuracy and energy metrics;",
+      "description": "the rapid experimentation API used by nilmtk-contrib;"
+    },
+    {
+      "type": "pip_package",
+      "value": "\"nilmtk"
+    },
+    {
+      "type": "pip_package",
+      "value": "\"nilmtk[deddiag]"
+    },
+    {
+      "type": "feature",
+      "value": "converters for public energy datasets;"
+    },
+    {
+      "type": "feature",
+      "value": "lazy access to buildings, meters, appliances, and time frames;"
+    },
+    {
+      "type": "feature",
+      "value": "resampling, alignment, preprocessing, and data-quality statistics;"
+    },
+    {
+      "type": "feature",
+      "value": "standard NILM accuracy and energy metrics;"
+    },
+    {
+      "type": "feature",
+      "value": "the rapid experimentation API used by nilmtk-contrib;"
+    },
+    {
+      "type": "feature",
+      "value": "classical reference disaggregators and baseline utilities."
+    },
+    {
+      "type": "tool",
+      "name": "2345 1,2,3 Furnace 0.0 kwh",
+      "description": "2346 1,2,3 EV 0.0 kwh"
+    },
+    {
+      "type": "tool",
+      "name": "3456 1,2,3 Washer 2.0127220576742082e",
+      "description": "06 kwh"
+    },
+    {
+      "type": "tool",
+      "name": "123456 1,2,3 myplug None kwh",
+      "description": "123457 1,2,3 Tree None kwh"
+    },
+    {
+      "type": "tool",
+      "name": "123458 1,2,3 Kitchen Counter 5.368702827258442e",
+      "description": "05 kwh"
+    },
+    {
+      "type": "tool",
+      "name": "123451 1,2,3 Network 0.001209796911216301 kwh",
+      "description": "123452 1,2,3 Bedroom Fan None kwh"
+    }
+  ],
+  "script_summary": "2 commands, 9 tools, 2 pip_packages, 6 features"
+}

@@ -1,0 +1,395 @@
+{
+  "timestamp": "2026-07-30T14:58:26.146407",
+  "topic": "video downloader CLI tool",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "iawia002/lux",
+      "html_url": "https://github.com/iawia002/lux",
+      "description": "\ud83d\udc7e Fast and simple video download library and CLI tool written in Go",
+      "stars": 31571,
+      "language": "Go",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "akiomik/vimeo-dl",
+      "html_url": "https://github.com/akiomik/vimeo-dl",
+      "description": "A cli tool to download private videos on vimeo. Written in golang.",
+      "stars": 369,
+      "language": "Go",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "ArchiveBox/abx-dl",
+      "html_url": "https://github.com/ArchiveBox/abx-dl",
+      "description": "\u2b07\ufe0f A simple all-in-one CLI tool to download EVERYTHING from a URL (like youtube-dl/yt-dlp, forum-dl, gallery-dl, simpler ArchiveBox). \ud83c\udfad Uses headless Chrome to get HTML, JS, CSS, images/video/audio/subtitles, PDFs, screenshots, article text, git repos, and more...",
+      "stars": 135,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 73,
+  "findings": [
+    {
+      "type": "command",
+      "value": "curl -s $URL | jq '[.video[] | {id, height, width, codecs}] | sort_by(.height)'"
+    },
+    {
+      "type": "command",
+      "value": "docker build -t vimeo-dl ."
+    },
+    {
+      "type": "command",
+      "value": "docker build -t vimeo-dl:no-ffmpeg --target=no-ffmpeg ."
+    },
+    {
+      "type": "command",
+      "value": "docker run -v \"$(pwd)/downloads:/downloads\" vimeo-dl ..."
+    },
+    {
+      "type": "command",
+      "value": "docker run --rm \\"
+    },
+    {
+      "type": "tool",
+      "name": "audio, video, subtitles, playlists, comments",
+      "description": "snapshot of the page as a PDF, screenshot, and [Singlefile](https://github.com/gildas-lormeau/single-file-cli) HTML"
+    },
+    {
+      "type": "tool",
+      "name": "article text, `git` source code",
+      "description": "[and much more](https://archivebox.github.io/abx-plugins/)..."
+    },
+    {
+      "type": "tool",
+      "name": "TIMEOUT=60",
+      "description": "default timeout for hooks"
+    },
+    {
+      "type": "tool",
+      "name": "USER_AGENT",
+      "description": "default user agent string"
+    },
+    {
+      "type": "tool",
+      "name": "{PLUGIN}_BINARY",
+      "description": "path or name of the binary to use (e.g. `WGET_BINARY=wget` or `CHROME_BINARY=/usr/bin/chromium`)"
+    },
+    {
+      "type": "tool",
+      "name": "{PLUGIN}_ENABLED=True/False",
+      "description": "enable/disable specific plugins"
+    },
+    {
+      "type": "tool",
+      "name": "{PLUGIN}_TIMEOUT=120",
+      "description": "per-plugin timeout overrides"
+    },
+    {
+      "type": "tool",
+      "name": "`CrawlEvent` (internal lifecycle root)",
+      "description": "`CrawlSetupEvent` \u2192 plugin `on_CrawlSetup__*` hooks"
+    },
+    {
+      "type": "tool",
+      "name": "`CrawlStartEvent` \u2192 `SnapshotEvent`",
+      "description": "`SnapshotEvent` \u2192 plugin `on_Snapshot__*` hooks"
+    },
+    {
+      "type": "tool",
+      "name": "index.jsonl",
+      "description": "snapshot metadata and plugin results (JSONL format, ArchiveBox-compatible)"
+    },
+    {
+      "type": "tool",
+      "name": "title/title.txt",
+      "description": "page title"
+    },
+    {
+      "type": "tool",
+      "name": "favicon/favicon.ico",
+      "description": "site favicon"
+    },
+    {
+      "type": "tool",
+      "name": "screenshot/screenshot.png",
+      "description": "full page screenshot (Chrome)"
+    },
+    {
+      "type": "tool",
+      "name": "pdf/output.pdf",
+      "description": "page as PDF (Chrome)"
+    },
+    {
+      "type": "tool",
+      "name": "dom/output.html",
+      "description": "rendered DOM (Chrome)"
+    },
+    {
+      "type": "tool",
+      "name": "wget/example.com/...",
+      "description": "mirrored site files"
+    },
+    {
+      "type": "tool",
+      "name": "singlefile/output.html",
+      "description": "single-file HTML snapshot"
+    },
+    {
+      "type": "tool",
+      "name": "... and more via plugin library ...",
+      "description": "--"
+    },
+    {
+      "type": "tool",
+      "name": "ytdlp",
+      "description": "downloads media plus sidecars: audio, video, images/thumbnails, subtitles (`.srt`, `.vtt`), JSON metadata, and text descriptions."
+    },
+    {
+      "type": "tool",
+      "name": "gallerydl",
+      "description": "downloads gallery/media sets as images, videos, JSON sidecars, text sidecars, and ZIP archives."
+    },
+    {
+      "type": "tool",
+      "name": "forumdl",
+      "description": "exports forum/thread archives as JSONL, WARC, and mailbox-style message archives."
+    },
+    {
+      "type": "tool",
+      "name": "git",
+      "description": "clones repository contents including text, binaries, images, audio, video, fonts, and other tracked files."
+    },
+    {
+      "type": "tool",
+      "name": "wget",
+      "description": "mirrors pages and requisites as HTML, WARC, images, CSS, JavaScript, fonts, audio, and video."
+    },
+    {
+      "type": "tool",
+      "name": "archivedotorg",
+      "description": "saves a Wayback Machine archive link as plain text."
+    },
+    {
+      "type": "tool",
+      "name": "favicon",
+      "description": "saves site favicons and touch icons as image files."
+    },
+    {
+      "type": "tool",
+      "name": "modalcloser",
+      "description": "setup helper only; no direct archive files."
+    },
+    {
+      "type": "tool",
+      "name": "consolelog",
+      "description": "saves browser console events as JSONL."
+    },
+    {
+      "type": "tool",
+      "name": "dns",
+      "description": "saves observed DNS activity as JSONL."
+    },
+    {
+      "type": "tool",
+      "name": "ssl",
+      "description": "saves TLS certificate/connection metadata as JSONL."
+    },
+    {
+      "type": "tool",
+      "name": "responses",
+      "description": "saves HTTP response metadata as JSONL and can record referenced text, images, audio, video, apps, and fonts."
+    },
+    {
+      "type": "tool",
+      "name": "redirects",
+      "description": "saves redirect chains as JSONL."
+    },
+    {
+      "type": "tool",
+      "name": "staticfile",
+      "description": "saves non-HTML direct file responses such as PDF, EPUB, images, audio, video, JSON, XML, CSV, ZIP, and generic binary files."
+    },
+    {
+      "type": "tool",
+      "name": "headers",
+      "description": "saves main-document HTTP headers as JSON."
+    },
+    {
+      "type": "tool",
+      "name": "chrome",
+      "description": "manages shared browser state and emits plain-text and JSON runtime metadata."
+    },
+    {
+      "type": "tool",
+      "name": "seo",
+      "description": "saves SEO metadata such as meta tags and Open Graph fields as JSON."
+    },
+    {
+      "type": "tool",
+      "name": "accessibility",
+      "description": "saves the browser accessibility tree as JSON."
+    },
+    {
+      "type": "tool",
+      "name": "infiniscroll",
+      "description": "page-expansion helper only; no direct archive files."
+    },
+    {
+      "type": "tool",
+      "name": "claudechrome",
+      "description": "saves Claude-computer-use interaction results as JSON plus PNG screenshots."
+    },
+    {
+      "type": "tool",
+      "name": "singlefile",
+      "description": "saves a full self-contained page snapshot as HTML."
+    },
+    {
+      "type": "tool",
+      "name": "screenshot",
+      "description": "saves rendered page screenshots as PNG."
+    },
+    {
+      "type": "tool",
+      "name": "pdf",
+      "description": "saves rendered pages as PDF."
+    },
+    {
+      "type": "tool",
+      "name": "dom",
+      "description": "saves fully rendered DOM output as HTML."
+    },
+    {
+      "type": "tool",
+      "name": "title",
+      "description": "saves the final page title as plain text."
+    },
+    {
+      "type": "tool",
+      "name": "readability",
+      "description": "extracts article HTML, plain text, and JSON metadata."
+    },
+    {
+      "type": "tool",
+      "name": "defuddle",
+      "description": "extracts cleaned article HTML, plain text, and JSON metadata."
+    },
+    {
+      "type": "tool",
+      "name": "mercury",
+      "description": "extracts article HTML, plain text, and JSON metadata."
+    },
+    {
+      "type": "tool",
+      "name": "claudecodeextract",
+      "description": "generates cleaned Markdown from other extractor outputs."
+    },
+    {
+      "type": "tool",
+      "name": "htmltotext",
+      "description": "converts archived HTML into plain text."
+    },
+    {
+      "type": "tool",
+      "name": "trafilatura",
+      "description": "extracts article content as plain text, Markdown, HTML, CSV, JSON, and XML/TEI."
+    },
+    {
+      "type": "tool",
+      "name": "papersdl",
+      "description": "downloads academic papers as PDF."
+    },
+    {
+      "type": "tool",
+      "name": "parse_html_urls",
+      "description": "emits discovered links from HTML as JSONL records."
+    },
+    {
+      "type": "tool",
+      "name": "parse_txt_urls",
+      "description": "emits discovered links from text files as JSONL records."
+    },
+    {
+      "type": "tool",
+      "name": "parse_rss_urls",
+      "description": "emits discovered feed entry URLs from RSS/Atom as JSONL records."
+    },
+    {
+      "type": "tool",
+      "name": "parse_netscape_urls",
+      "description": "emits discovered bookmark URLs from Netscape bookmark exports as JSONL records."
+    },
+    {
+      "type": "tool",
+      "name": "parse_jsonl_urls",
+      "description": "emits discovered bookmark URLs from JSONL exports as JSONL records."
+    },
+    {
+      "type": "tool",
+      "name": "parse_dom_outlinks",
+      "description": "emits crawlable rendered-DOM outlinks as JSONL records."
+    },
+    {
+      "type": "tool",
+      "name": "search_backend_sqlite",
+      "description": "writes a searchable SQLite FTS index database."
+    },
+    {
+      "type": "tool",
+      "name": "search_backend_sonic",
+      "description": "pushes content into Sonic search; no local archive files declared."
+    },
+    {
+      "type": "tool",
+      "name": "claudecodecleanup",
+      "description": "writes cleanup/deduplication results as plain text."
+    },
+    {
+      "type": "tool",
+      "name": "hashes",
+      "description": "writes file hash manifests as JSON."
+    },
+    {
+      "type": "tool",
+      "name": "and more via the [`abx",
+      "description": "plugins` marketplace](https://github.com/ArchiveBox/abx-plugins)..."
+    },
+    {
+      "type": "tool",
+      "name": "Skill source: [`skills/abx",
+      "description": "dl/SKILL.md`](./skills/abx-dl/SKILL.md)"
+    },
+    {
+      "type": "tool",
+      "name": "skills.sh page: https://skills.sh/archivebox/abx",
+      "description": "dl/abx-dl"
+    },
+    {
+      "type": "tool",
+      "name": "`abx_dl/plugins.py`",
+      "description": "Plugin discovery from `abx-plugins` or `ABX_PLUGINS_DIR`"
+    },
+    {
+      "type": "tool",
+      "name": "`abx_dl/executor.py`",
+      "description": "Hook execution engine with config propagation"
+    },
+    {
+      "type": "tool",
+      "name": "`abx_dl/config.py`",
+      "description": "Environment variable configuration"
+    },
+    {
+      "type": "tool",
+      "name": "`abx_dl/cli.py`",
+      "description": "Rich CLI with live progress display"
+    },
+    {
+      "type": "tool",
+      "name": "`abx",
+      "description": "plugins` https://abx-plugins.archivebox.io https://github.com/ArchiveBox/abx-plugins"
+    }
+  ],
+  "script_summary": "5 commands, 68 tools"
+}

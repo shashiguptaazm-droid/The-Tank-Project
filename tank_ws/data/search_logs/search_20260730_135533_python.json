@@ -1,0 +1,136 @@
+{
+  "timestamp": "2026-07-30T13:55:33.003223",
+  "query": "python",
+  "duration_ms": 12849.0,
+  "total_results": 12,
+  "results_by_source": {
+    "torrent": {
+      "count": 3,
+      "items": [
+        {
+          "title": "Python Programming And Maching Learning Understanding How To Code Within 24 Hour..",
+          "link": "http://itorrents.net/torrent/0D4AF725CC7CDF3CE933E5BFF8C0B3A6ED6E0D93.torrent?title=Python-Programming-And-Maching-Learning-Understanding-How-To-Code-Within-24-Hours-2-In-1",
+          "seeds": 575,
+          "peers": 21,
+          "time": "1 Year+",
+          "size": "6.33 MB",
+          "desc": "https://www.limetorrents.info/Python-Programming-And-Maching-Learning-Understanding-How-To-Code-Within-24-Hours-2-In-1-torrent-16752637.html",
+          "provider": "Limetorrents",
+          "_provider": "Limetorrents",
+          "magnet": "",
+          "source": "torrent"
+        },
+        {
+          "title": "Monty Python and the Holy Grail (1975)",
+          "link": "http://itorrents.net/torrent/8BD946C76EED6259767A848FAFC23028301015A7.torrent?title=Monty-Python-and-the-Holy-Grail-(1975)",
+          "seeds": 352,
+          "peers": 22,
+          "time": "1 Year+",
+          "size": "1.46 GB",
+          "desc": "https://www.limetorrents.info/Monty-Python-and-the-Holy-Grail-(1975)-torrent-10861218.html",
+          "provider": "Limetorrents",
+          "_provider": "Limetorrents",
+          "magnet": "",
+          "source": "torrent"
+        },
+        {
+          "title": "Monty Python and the Holy Grail (1975) (1080p BluRay x265 HEVC 10bit AAC 5 1 afm..",
+          "link": "http://itorrents.net/torrent/E1BF3BFD042CCCC2EC184FCE576228A2C8048EA7.torrent?title=Monty-Python-and-the-Holy-Grail-(1975)-(1080p-BluRay-x265-HEVC-10bit-AAC-5-1-afm72)",
+          "seeds": 329,
+          "peers": 22,
+          "time": "1 Year+",
+          "size": "4.56 GB",
+          "desc": "https://www.limetorrents.info/Monty-Python-and-the-Holy-Grail-(1975)-(1080p-BluRay-x265-HEVC-10bit-AAC-5-1-afm72)-torrent-13917861.html",
+          "provider": "Limetorrents",
+          "_provider": "Limetorrents",
+          "magnet": "",
+          "source": "torrent"
+        }
+      ]
+    },
+    "youtube": {
+      "count": 3,
+      "items": [
+        {
+          "source": "youtube",
+          "title": "Python Tutorial Deutsch | Komplettkurs f\u00fcr Anf\u00e4nger",
+          "url": "https://youtube.com/watch?v=e6vPt_e9sRw",
+          "duration": 22556,
+          "uploader": "Fabian Rappert | Data Science Institute",
+          "views": 865134
+        },
+        {
+          "source": "youtube",
+          "title": "Python Full Course for free \ud83d\udc0d",
+          "url": "https://youtube.com/watch?v=ix9cRaBkVe0",
+          "duration": 43200,
+          "uploader": "Bro Code",
+          "views": 11158568
+        },
+        {
+          "source": "youtube",
+          "title": "Harvard CS50\u2019s Introduction to Programming with Python \u2013 Full University Course",
+          "url": "https://youtube.com/watch?v=nLRL_NcnK-4",
+          "duration": 57468,
+          "uploader": "freeCodeCamp.org and CS50",
+          "views": 8686303
+        }
+      ]
+    },
+    "web": {
+      "count": 3,
+      "items": [
+        {
+          "source": "web",
+          "title": "Python",
+          "url": "https://en.wikipedia.org/wiki/Python",
+          "body": ""
+        },
+        {
+          "source": "web",
+          "title": "Python Release Python 3.15.0b4 | Python.org",
+          "url": "https://www.python.org/downloads/release/python-3150b4/",
+          "body": "Call to action. We strongly encourage maintainers of third-party Python projects to test with 3.15 during the beta phase and report issues found to the Python bug tracker as soon as possible."
+        },
+        {
+          "source": "web",
+          "title": "Python Playground - Python Compiler Online, Kostenlos",
+          "url": "https://coddy.tech/playground/de/python",
+          "body": "Ein kostenloser Python-Playground und -Compiler im Browser.Der Online-Python-Compiler f\u00fchrt deinen Code serverseitig aus und liefert die Ausgabe in Sekunden."
+        }
+      ]
+    },
+    "github": {
+      "count": 3,
+      "items": [
+        {
+          "source": "github",
+          "title": "donnemartin/system-design-primer",
+          "url": "https://github.com/donnemartin/system-design-primer",
+          "description": "Learn how to design large-scale systems. Prep for the system design interview.  Includes Anki flashcards.",
+          "stars": 359733,
+          "language": "Python",
+          "updated": "2026-07-30T11:53:29Z"
+        },
+        {
+          "source": "github",
+          "title": "vinta/awesome-python",
+          "url": "https://github.com/vinta/awesome-python",
+          "description": "An opinionated list of Python frameworks, libraries, tools, and resources",
+          "stars": 311160,
+          "language": "Python",
+          "updated": "2026-07-30T11:38:25Z"
+        },
+        {
+          "source": "github",
+          "title": "practical-tutorials/project-based-learning",
+          "url": "https://github.com/practical-tutorials/project-based-learning",
+          "description": "Curated list of project-based tutorials",
+          "stars": 275823,
+          "language": "Python",
+          "updated": "2026-07-30T11:16:14Z"
+        }
+      ]
+    }
+  }
+}

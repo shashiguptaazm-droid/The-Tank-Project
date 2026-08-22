@@ -1,0 +1,261 @@
+{
+  "timestamp": "2026-08-07T03:00:44.714794",
+  "topic": "data pipeline scripts CLI",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "onlozanoo/databroom",
+      "html_url": "https://github.com/onlozanoo/databroom",
+      "description": "Databroom is a cross-language data cleaning tool with CLI, GUI, and API. Clean CSV, Excel, or JSON files and generate reproducible scripts in Python (pandas) or R (tidyverse). Now supports saving and loading cleaning pipelines as JSON for fully automated, shareable workflows.",
+      "stars": 10,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "jitendra20661/minimal-local-RAG",
+      "html_url": "https://github.com/jitendra20661/minimal-local-RAG",
+      "description": "A simple local RAG pipeline designed to extract questions from PDF\u2019s, store them in a vector database, and provides functionality to search and chat, with the stored data. The script comes with a easy-to-use CLI interface developed using python.",
+      "stars": 4,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "swanframe/food-calorie-estimation",
+      "html_url": "https://github.com/swanframe/food-calorie-estimation",
+      "description": "Built a computer vision regression pipeline with PyTorch, ResNet-50, and ViT to estimate total meal calories from single overhead images. Includes Colab training notebooks, clean data loaders, evaluation metrics/plots, and a reusable CLI inference script for reproducible experiments.",
+      "stars": 4,
+      "language": "Jupyter Notebook",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 49,
+  "findings": [
+    {
+      "type": "command",
+      "value": "pip install databroom"
+    },
+    {
+      "type": "command",
+      "value": "pip install databroom[cli]"
+    },
+    {
+      "type": "command",
+      "value": "pip install databroom[gui]"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/onlozanoo/databroom.git"
+    },
+    {
+      "type": "command",
+      "value": "python -m venv venv"
+    },
+    {
+      "type": "command",
+      "value": "pip install -e \".[dev,cli,all]\""
+    },
+    {
+      "type": "command",
+      "value": "python -m databroom.cli.main --help"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83e\udd16 Full automation",
+      "description": "Transform your entire data cleaning pipeline into a single command"
+    },
+    {
+      "type": "tool",
+      "name": "Quick data exploration and cleaning",
+      "description": "Batch processing multiple files"
+    },
+    {
+      "type": "tool",
+      "name": "Learning data cleaning best practices",
+      "description": "Generating reproducible cleaning scripts"
+    },
+    {
+      "type": "tool",
+      "name": "Teams needing consistent data preprocessing",
+      "description": "Converting workflows between Python and R"
+    },
+    {
+      "type": "tool",
+      "name": "Real",
+      "description": "time code generation** with syntax highlighting"
+    },
+    {
+      "type": "tool",
+      "name": "One",
+      "description": "click download** of cleaned data and generated scripts"
+    },
+    {
+      "type": "tool",
+      "name": "Template",
+      "description": "based code generation** with Jinja2"
+    },
+    {
+      "type": "tool",
+      "name": "Cross",
+      "description": "language support** (Python/pandas \u2194 R/tidyverse)"
+    },
+    {
+      "type": "tool",
+      "name": "Create a cleaning workflow visually in the GUI",
+      "description": "Export it as a JSON pipeline"
+    },
+    {
+      "type": "tool",
+      "name": "Complete CLI with simplified and legacy operations",
+      "description": "Interactive Streamlit GUI with live preview and organized operations"
+    },
+    {
+      "type": "tool",
+      "name": "Programmatic API with method chaining",
+      "description": "Python and R code generation with parameter filtering"
+    },
+    {
+      "type": "tool",
+      "name": "Comprehensive test suite",
+      "description": "Save/load cleaning pipelines as JSON"
+    },
+    {
+      "type": "tool",
+      "name": "Dynamic new operations loading system",
+      "description": "Extensible component-based GUI structure"
+    },
+    {
+      "type": "tool",
+      "name": "Extended cleaning operations library",
+      "description": "Advanced parameter validation"
+    },
+    {
+      "type": "tool",
+      "name": "Performance optimizations",
+      "description": "Enhanced error handling"
+    },
+    {
+      "type": "tool",
+      "name": "Preview in CLI",
+      "description": "Configuration presets and templates"
+    },
+    {
+      "type": "tool",
+      "name": "Enhanced batch processing workflows",
+      "description": "Custom cleaning operation plugins system"
+    },
+    {
+      "type": "tool",
+      "name": "Integration with pandas",
+      "description": "profiling and data validation tools"
+    },
+    {
+      "type": "tool",
+      "name": "Advanced data quality reporting and metrics",
+      "description": "--"
+    },
+    {
+      "type": "pip_package",
+      "value": "databroom"
+    },
+    {
+      "type": "pip_package",
+      "value": "databroom[cli]"
+    },
+    {
+      "type": "pip_package",
+      "value": "databroom[gui]"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "pip_package",
+      "value": "databroom`"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/jeetsahoo/minimal-local-RAG.git"
+    },
+    {
+      "type": "command",
+      "value": "python -m venv venv"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "python main.py"
+    },
+    {
+      "type": "command",
+      "value": "python main.py"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83c\udf10 Web",
+      "description": "based interface using Streamlit"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\uddc2\ufe0f Multi",
+      "description": "user support"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\udce6 Deploy using Docker",
+      "description": "--"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "tool",
+      "name": "Notebook 01",
+      "description": "Debug subset**"
+    },
+    {
+      "type": "tool",
+      "name": "Notebook 02",
+      "description": "Scaled subset (`N_TRAIN_LIMIT = 3000`)**"
+    },
+    {
+      "type": "tool",
+      "name": "mae",
+      "description": "Mean Absolute Error (kCal)"
+    },
+    {
+      "type": "tool",
+      "name": "mse",
+      "description": "Mean Squared Error"
+    },
+    {
+      "type": "tool",
+      "name": "rmse",
+      "description": "Root Mean Squared Error (kCal)"
+    },
+    {
+      "type": "tool",
+      "name": "mape",
+      "description": "Mean Absolute Percentage Error (%)"
+    },
+    {
+      "type": "tool",
+      "name": "MAPE is not robust due to near",
+      "description": "zero-calorie dishes."
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "task regression**"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    }
+  ],
+  "script_summary": "12 commands, 30 tools, 7 pip_packages"
+}

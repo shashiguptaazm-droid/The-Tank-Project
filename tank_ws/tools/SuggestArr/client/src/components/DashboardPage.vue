@@ -1,0 +1,1088 @@
+<template>
+  <div class="settings-container" :class="{ 'static-bg-active': config.ENABLE_STATIC_BACKGROUND }">
+    <div class="background-container">
+      <template v-if="!config.ENABLE_STATIC_BACKGROUND">
+          <div
+            class="background-layer"
+            :class="activeBg === 'bg1' ? 'bg-visible' : 'bg-hidden'"
+            :style="{ backgroundImage: 'url(' + bg1Url + ')' }"
+          ></div>
+          <div
+            class="background-layer"
+            :class="activeBg === 'bg2' ? 'bg-visible' : 'bg-hidden'"
+            :style="{ backgroundImage: 'url(' + bg2Url + ')' }"
+          ></div>
+      </template>
+      <div
+        v-if="config.ENABLE_STATIC_BACKGROUND"
+        class="background-layer static-bg"
+        :style="{ backgroundColor: config.STATIC_BACKGROUND_COLOR }"
+      ></div>
+    </div>
+    <div v-if="currentUser" class="settings-content">
+      <!-- Header -->
+      <div class="settings-header">
+
+        <div class="header-content">
+          <a href="https://github.com/giuseppe99barchetta/SuggestArr" target="_blank" rel="noopener noreferrer">
+            <img src="@/assets/logo.png" alt="SuggestArr Logo" class="logo">
+          </a>
+          <button
+            v-if="authSetupComplete && !authBypass"
+            @click="handleLogout"
+            class="logout-btn"
+            title="Log out"
+          >
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="logout-label">Log out</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <!-- Desktop Navigation -->
+      <div class="tabs-navigation desktop-nav" data-tour-id="nav-tabs">
+        <button
+          v-for="tab in visibleTabs"
+          :key="tab.id"
+          :data-tour-id="tab.tourId || null"
+          @click="setActiveTab(tab.id)"
+          :class="['tab-button', { active: activeTab === tab.id }]"
+        >
+          <i :class="tab.icon"></i>
+          <span>{{ tab.name }}</span>
+          <span v-if="tab.isBeta" class="beta-badge">
+            BETA
+          </span>
+          <!-- Badge per Requests -->
+          <span v-if="tab.id === 'requests' && requestCount > 0" class="tab-badge">
+            {{ requestCount }}
+          </span>
+        </button>
+      </div>
+
+      <!-- Mobile Navigation -->
+      <div class="mobile-nav">
+        <div class="mobile-tab-selector">
+          <button 
+            @click="showMobileDropdown = !showMobileDropdown"
+            class="mobile-dropdown-button"
+            :class="{ active: showMobileDropdown }"
+          >
+            <i :class="getCurrentTabIcon()"></i>
+            <span class="current-tab-name">{{ getCurrentTabName() }}</span>
+            <!-- Badge per Requests -->
+            <span v-if="currentTabId === 'requests' && requestCount > 0" class="tab-badge">
+              {{ requestCount }}
+            </span>
+            <i class="fas fa-chevron-down dropdown-arrow" :class="{ rotated: showMobileDropdown }"></i>
+          </button>
+          
+          <transition name="dropdown-slide">
+            <div v-if="showMobileDropdown" class="mobile-dropdown">
+              <button
+                v-for="tab in visibleTabs"
+                :key="tab.id"
+                @click="selectMobileTab(tab.id)"
+                :class="['mobile-dropdown-item', { active: activeTab === tab.id }]"
+              >
+                <i :class="tab.icon"></i>
+                <span>{{ tab.name }}</span>
+                <!-- Badge per Requests -->
+                <span v-if="tab.id === 'requests' && requestCount > 0" class="tab-badge">
+                  {{ requestCount }}
+                </span>
+              </button>
+            </div>
+          </transition>
+        </div>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <transition name="fade-slide" mode="out-in">
+          <component
+            v-if="activeTabComponent"
+            :key="activeTab"
+            :is="activeTabComponent"
+            :config="config"
+            :isLoading="isLoading"
+            :testingConnections="testingConnections"
+            :getServiceStatus="getServiceStatus"
+            :getServiceIcon="getServiceIcon"
+            @save-section="saveSection"
+            @test-connection="testConnection"
+            @export-config="showExportModal = true"
+            @import-config="importConfig"
+            @reset-config="showResetModal = true"
+          />
+        </transition>
+      </div>
+
+      <!-- Footer -->
+      <div class="settings-footer">
+        <div class="footer-info">
+          <button
+            @click="restartTour"
+            class="changelog-btn"
+            title="Replay the onboarding tour"
+          >
+            <i class="fas fa-question-circle"></i>
+          </button>
+          <div class="version-info">
+            <button
+              type="button"
+              class="version-text-container"
+              title="View changelog for current version"
+              @click="showChangelog"
+            >
+              <span>SuggestArr {{ currentVersion }}</span>
+              <span 
+                v-if="currentImageTag === 'nightly'" 
+                class="nightly-badge"
+              >
+                ({{ currentImageTag }})
+              </span>
+            </button>
+            <button 
+              @click="checkForUpdates" 
+              :disabled="updateAvailable === null"
+              class="version-check-btn"
+              :class="{ 'update-available': updateAvailable }"
+              :title="updateAvailable ? `Update available!` : 'Check for updates'"
+            >
+              <i :class="updateAvailable === null ? 'fas fa-spinner fa-spin' : updateAvailable ? 'fas fa-arrow-up' : 'fas fa-sync'"></i>
+              <span v-if="updateAvailable" class="update-indicator">Update</span>
+            </button>
+          </div>
+        </div>
+
+        <Footer />
+      </div>
+
+      <!-- Loading Overlay -->
+      <transition name="fade">
+        <div v-if="isLoading" class="loading-overlay">
+          <div class="loading-content">
+            <div class="spinner"></div>
+            <p>{{ loadingMessage }}</p>
+          </div>
+        </div>
+      </transition>
+
+      <!-- Changelog Modal -->
+      <transition name="fade">
+        <div v-if="showChangelogModal" class="modal-overlay" @click.self="showChangelogModal = false">
+          <div class="modal-content changelog-modal">
+            <div class="modal-header">
+              <i class="fab fa-github changelog-icon"></i>
+              <h3>Changelog - {{ currentVersion }}</h3>
+            </div>
+            
+            <div class="modal-body changelog-body">
+              <div v-if="isLoadingChangelog" class="changelog-loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>Loading changelog...</span>
+              </div>
+              
+              <div v-else-if="changelogError" class="changelog-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>{{ changelogError }}</span>
+                <button @click="showChangelog" class="btn btn-secondary btn-sm">Retry</button>
+              </div>
+              
+              <div v-else class="changelog-content">
+                <div v-if="changelogData" v-html="changelogData"></div>
+                <div v-else class="no-changelog">
+                  <i class="fas fa-info-circle"></i>
+                  <span>No changelog available for this version</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="modal-actions">
+              <a 
+                :href="`https://github.com/giuseppe99barchetta/SuggestArr/releases/tag/${currentVersion}`" 
+                target="_blank" 
+                class="btn btn-outline"
+                v-if="changelogData"
+              >
+                <i class="fas fa-external-link-alt"></i>
+                View on GitHub
+              </a>
+              <button @click="showChangelogModal = false" class="btn btn-primary">
+                <i class="fas fa-times"></i>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+      <!-- Hidden file input for import -->
+      <input
+        type="file"
+        ref="fileInput"
+        @change="handleFileImport"
+        accept=".json"
+        style="display: none"
+      />
+
+      <!-- Export Configuration Modal -->
+      <transition name="fade">
+        <div v-if="showExportModal" class="modal-overlay" @click.self="showExportModal = false">
+          <div class="modal modal--sm" role="dialog" aria-modal="true" aria-labelledby="export-modal-title">
+            <div class="modal-header">
+              <div class="modal-title-wrap">
+                <h3 class="modal-title" id="export-modal-title">
+                  <i class="fas fa-download"></i> Export Configuration
+                </h3>
+                <p class="modal-subtitle">Download a JSON snapshot of your settings.</p>
+              </div>
+              <button type="button" class="modal-close" aria-label="Close export modal" @click="showExportModal = false">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            <div class="modal-body">
+              <p>Non-secret settings, media user identities, and Trakt account metadata are included by default. Live credentials are redacted unless you opt in below.</p>
+              <label class="export-sensitive-option">
+                <input v-model="exportIncludeSecrets" type="checkbox">
+                Include all secrets (full backup)
+              </label>
+              <p v-if="exportIncludeSecrets" class="export-sensitive-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                This export will contain API keys, tokens, and passwords. Do not share it for troubleshooting or attach it to public issues.
+              </p>
+            </div>
+
+            <div class="modal-footer">
+              <button @click="showExportModal = false" class="btn btn-outline">
+                <i class="fas fa-times"></i>
+                Cancel
+              </button>
+              <button @click="confirmExportConfig" class="btn btn-primary">
+                <i class="fas fa-download"></i>
+                Export
+              </button>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+      <!-- Reset Confirmation Modal -->
+      <transition name="fade">
+        <div v-if="showResetModal" class="modal-overlay" @click.self="showResetModal = false">
+          <div class="modal modal--sm" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
+            <div class="modal-header modal-header--danger">
+              <div class="modal-title-wrap">
+                <h3 class="modal-title" id="reset-modal-title">
+                  <i class="fas fa-exclamation-triangle"></i> Confirm Reset
+                </h3>
+                <p class="modal-subtitle">This action is permanent and cannot be undone.</p>
+              </div>
+              <button type="button" class="modal-close" aria-label="Close reset modal" @click="showResetModal = false">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            <div class="modal-body">
+              <p>Are you sure you want to reset all settings to default? This will:</p>
+              <ul class="reset-warning-list">
+                <li><i class="fas fa-times-circle"></i> Clear all service connections</li>
+                <li><i class="fas fa-times-circle"></i> Remove all custom filters</li>
+                <li><i class="fas fa-times-circle"></i> Reset scheduling preferences</li>
+                <li><i class="fas fa-times-circle"></i> Clear database configuration</li>
+              </ul>
+            </div>
+
+            <div class="modal-footer">
+              <button @click="showResetModal = false" class="btn btn-outline">
+                <i class="fas fa-times"></i>
+                Cancel
+              </button>
+              <button @click="confirmReset" class="btn btn-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                Yes, Reset Everything
+              </button>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+    </div>
+
+    <div v-else class="settings-content">
+      <div class="loading-overlay">
+        <div class="loading-content">
+          <div class="spinner"></div>
+          <p>Loading dashboard...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onboarding Tour -->
+    <OnboardingTour
+      :active="showTour"
+      :steps="tourSteps"
+      @done="showTour = false"
+    />
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+import Footer from './AppFooter.vue';
+import OnboardingTour from './OnboardingTour.vue';
+import { useBackgroundImage } from '@/composables/useBackgroundImage';
+import { useVersionCheck } from '@/composables/useVersionCheck';
+import { useAuth } from '@/composables/useAuth';
+import '@/assets/styles/dashboardPage.css';
+
+// Import tab components
+import SettingsServices from './settings/SettingsServices.vue';
+import SettingsDatabase from './settings/SettingsDatabase.vue';
+import SettingsAdvanced from './settings/SettingsAdvanced.vue';
+import SettingsRequests from './settings/SettingsRequests.vue';
+import SettingsJobs from './settings/SettingsJobs.vue';
+import AiSearchPage from './settings/AiSearchPage.vue';
+import LogsComponent from './LogsComponent.vue';
+import UserManagement from './settings/UserManagement.vue';
+import UserProfile from './settings/UserProfile.vue';
+import { exportConfig, importConfig } from '@/api/api';
+import { getReleaseByTag } from '@/api/githubReleasesApi';
+
+const TOUR_STORAGE_KEY = 'suggestarr_tour_done';
+
+export default {
+  name: 'SettingsPage',
+  components: {
+    Footer,
+    OnboardingTour,
+    SettingsServices,
+    SettingsDatabase,
+    SettingsAdvanced,
+    SettingsRequests,
+    SettingsJobs,
+    AiSearchPage,
+    LogsComponent,
+    UserManagement,
+    UserProfile,
+  },
+  setup() {
+    const { bg1Url, bg2Url, activeBg, isTransitioning, startDefaultImageRotation, startBackgroundImageRotation, stopBackgroundImageRotation } = useBackgroundImage();
+    const { currentVersion, currentImageTag, currentBuildDate, updateAvailable, checkForUpdates } = useVersionCheck();
+    const { authSetupComplete, authBypass, logout } = useAuth();
+
+    return {
+      bg1Url,
+      bg2Url,
+      activeBg,
+      isTransitioning,
+      startDefaultImageRotation,
+      startBackgroundImageRotation,
+      stopBackgroundImageRotation,
+      currentVersion,
+      currentImageTag,
+      currentBuildDate,
+      updateAvailable,
+      checkForUpdates,
+      authSetupComplete,
+      authBypass,
+      logout,
+    };
+  },
+    data() {
+    return {
+      currentUser: null,
+      config: {},
+      isLoading: false,
+      loadingMessage: 'Processing...',
+      activeTab: 'requests',
+      showResetModal: false,
+      showExportModal: false,
+      exportIncludeSecrets: false,
+      showChangelogModal: false,
+      changelogData: null,
+      isLoadingChangelog: false,
+      changelogError: null,
+      requestCount: 0,
+      showMobileDropdown: false,
+      showTour: false,
+      // Cache per migliorare performance
+      testingConnections: {
+        tmdb: false,
+        plex: false,
+        jellyfin: false,
+        seer: false,
+        database: false,
+      },
+      tabs: [
+        { id: 'requests',  name: 'Requests',  icon: 'fas fa-paper-plane', tourId: 'tab-requests' },
+        { id: 'ai_search', name: 'AI Search', icon: 'fas fa-magic',       isBeta: true,           tourId: 'tab-ai-search' },
+        { id: 'services',  name: 'Services',  icon: 'fas fa-plug',         tourId: 'tab-services', adminOnly: true },
+        { id: 'jobs',      name: 'Jobs',       icon: 'fas fa-briefcase',   tourId: 'tab-jobs' },
+        { id: 'database',  name: 'Database',  icon: 'fas fa-database',     tourId: 'tab-database', adminOnly: true },
+        { id: 'advanced',  name: 'Advanced',  icon: 'fas fa-sliders-h',   tourId: 'tab-advanced', adminOnly: true },
+        { id: 'users',     name: 'Users',      icon: 'fas fa-users',       adminOnly: true },
+        { id: 'profile',   name: 'Profile',    icon: 'fas fa-user-circle', nonAdminOnly: true },
+        { id: 'logs',      name: 'Logs',       icon: 'fas fa-file-alt',    tourId: 'tab-logs', adminOnly: true },
+      ],
+      tourSteps: [
+        {
+          targetId: 'nav-tabs',
+          title: 'Welcome to SuggestArr!',
+          description: 'These tabs give you access to all features. Let\'s take a quick look at each one.',
+          position: 'bottom',
+        },
+        {
+          targetId: 'tab-requests',
+          title: 'Requests',
+          description: 'Every time SuggestArr runs, it submits content requests to Seer. You can track them all here — what was requested, when, and for which user.',
+          position: 'bottom',
+        },
+        {
+          targetId: 'tab-jobs',
+          title: 'Jobs',
+          description: 'Jobs control when and how SuggestArr runs. You can create multiple jobs with different schedules, filters, media types, and user selections.',
+          position: 'bottom',
+        },
+        {
+          targetId: 'tab-services',
+          title: 'Services',
+          description: 'Update your API keys and connection settings for TMDB, your media server (Jellyfin, Plex…), and Seer here.',
+          position: 'bottom',
+        },
+        {
+          targetId: 'tab-ai-search',
+          title: 'AI Search',
+          description: 'Describe what you\'re in the mood for in plain language — "a tense thriller set in space" — and SuggestArr uses an LLM to find and request matching titles for you.',
+          position: 'bottom',
+        },
+        {
+          targetId: 'tab-database',
+          title: 'Database',
+          description: 'By default SuggestArr uses SQLite (zero setup). Switch here to PostgreSQL, MySQL, or MariaDB if you need a shared or more scalable database.',
+          position: 'bottom',
+        },
+        {
+          targetId: 'tab-advanced',
+          title: 'Advanced',
+          description: 'Fine-tune behaviour: configure an LLM for AI-enhanced recommendations, adjust the recommendation algorithm, set a custom base path, and more.',
+          position: 'bottom',
+        },
+        {
+          targetId: 'tab-logs',
+          title: 'Logs',
+          description: 'View real-time application logs to debug issues, monitor job execution, or check why a specific request was skipped.',
+          position: 'bottom',
+        },
+      ],
+    };
+  },
+  computed: {
+    visibleTabs() {
+      if (!this.currentUser) {
+        return [];
+      }
+
+      const isAdmin = this.currentUser.role === 'admin';
+      const allowedTabs = new Set(
+        String(this.currentUser.visible_tabs || '')
+          .split(',')
+          .map(tab => this.normalizeTabId(tab.trim()))
+          .filter(Boolean)
+      );
+
+      return this.tabs.filter(tab => {
+        if (tab.adminOnly && !isAdmin) return false;
+        if (tab.nonAdminOnly && isAdmin) return false;
+        if (!isAdmin && allowedTabs.size > 0 && !allowedTabs.has(tab.id)) return false;
+        return true;
+      });
+    },
+    activeTabComponent() {
+      // Never resolve a component for a tab the current user cannot access.
+      if (!this.visibleTabs.some(tab => tab.id === this.activeTab)) {
+        return null;
+      }
+      const componentMap = {
+        requests: 'SettingsRequests',
+        services: 'SettingsServices',
+        jobs: 'SettingsJobs',
+        database: 'SettingsDatabase',
+        advanced: 'SettingsAdvanced',
+        logs: 'LogsComponent',
+        ai_search: 'AiSearchPage',
+        users: 'UserManagement',
+        profile: 'UserProfile',
+      };
+      return componentMap[this.activeTab] ?? null;
+    },
+    currentTabId() {
+      return this.activeTab;
+    },
+  },
+  watch: {
+    isTransitioning(newValue) {
+      if (newValue) {
+        // Handle background transition state if needed
+      }
+    },
+    currentUser: {
+      // immediate: true ensures the guard runs at mount time even if
+      // currentUser is already populated before the watcher is registered.
+      immediate: true,
+      handler() {
+        this.ensureValidActiveTab();
+      },
+    },
+    activeTab(newTab) {
+      if (!this.visibleTabs.some(tab => tab.id === newTab)) {
+        this.ensureValidActiveTab();
+      }
+    },
+    'config.ENABLE_STATIC_BACKGROUND': {
+      handler(newValue) {
+        if (newValue) {
+          this.stopBackgroundImageRotation();
+        } else {
+          this.startBackgroundImageRotation();
+        }
+      }
+    },
+    'config.ENABLE_VISUAL_EFFECTS': {
+      immediate: true,
+      handler(newValue) {
+        if (newValue === false) {
+          document.body.classList.add('no-blur');
+        } else {
+          document.body.classList.remove('no-blur');
+        }
+      }
+    }
+  },
+  async mounted() {
+    try {
+      // Ensure auth is fully initialized before making protected API calls
+      const { waitForAuthReady } = await import("@/composables/useAuth");
+      await waitForAuthReady();
+
+      await this.fetchMe();
+
+      if (!this.currentUser) {
+        return;
+      }
+
+      if (this.currentUser?.role === 'admin') {
+        await this.loadConfig();
+      }
+
+      // Re-validate after config+auth are settled, in case currentUser
+      // was populated after the initial watcher run.
+      this.ensureValidActiveTab();
+
+      this.loadRequestCount();
+
+      if (!this.config.ENABLE_STATIC_BACKGROUND) {
+        this.startBackgroundImageRotation();
+      }
+
+      // Auto-start tour on first visit or when ?tour=1 is in the URL
+      const tourDone = localStorage.getItem(TOUR_STORAGE_KEY);
+      const tourForced = window.location.search.includes('tour=1');
+      if (!tourDone || tourForced) {
+        setTimeout(() => { this.showTour = true; }, 900);
+      }
+    } catch (error) {
+      if (error?.response?.status !== 403) {
+        console.error('Error during component mount:', error);
+      }
+      this.isLoading = false;
+    }
+  },
+  methods: {
+    normalizeTabId(tabId) {
+      if (tabId === 'suggestions') return 'requests';
+      if (tabId === 'ai-search') {
+        return 'ai_search';
+      }
+      return tabId;
+    },
+
+    async fetchMe() {
+      try {
+        const response = await axios.get('/api/auth/me', {
+          withCredentials: true,
+          timeout: 10000,
+        });
+        this.currentUser = response.data;
+        return this.currentUser;
+      } catch (error) {
+        this.currentUser = null;
+
+        // In local bypass mode there may be no JWT token; rely on public
+        // auth status to avoid an incorrect redirect loop to /login.
+        try {
+          const statusRes = await axios.get('/api/auth/status', {
+            _skipAuth: true,
+            timeout: 5000,
+          });
+
+          if (statusRes?.data?.authenticated) {
+            const retryRes = await axios.get('/api/auth/me', {
+              withCredentials: true,
+              timeout: 10000,
+            });
+            this.currentUser = retryRes.data;
+            return this.currentUser;
+          }
+        } catch {
+          // Fall through to login redirect below when status/me cannot be resolved.
+        }
+
+        this.$router.push('/login');
+        return null;
+      }
+    },
+    async handleLogout() {
+      await this.logout();
+      this.$router.push('/login');
+    },
+    restartTour() {
+      localStorage.removeItem(TOUR_STORAGE_KEY);
+      this.showTour = true;
+    },
+    setActiveTab(id) {
+      if (this.visibleTabs.some(tab => tab.id === id)) {
+        this.activeTab = id;
+      }
+    },
+    ensureValidActiveTab() {
+      if (!this.visibleTabs.some(tab => tab.id === this.activeTab)) {
+        this.activeTab = this.visibleTabs[0]?.id ?? 'requests';
+      }
+    },
+    selectMobileTab(tabId) {
+      this.setActiveTab(tabId);
+      this.showMobileDropdown = false;
+    },
+    getCurrentTabName() {
+      const currentTab = this.visibleTabs.find(tab => tab.id === this.activeTab);
+      return currentTab ? currentTab.name : '';
+    },
+    getCurrentTabIcon() {
+      const currentTab = this.visibleTabs.find(tab => tab.id === this.activeTab);
+      return currentTab ? currentTab.icon : 'fas fa-question';
+    },
+    async loadConfig() {
+      this.loadingMessage = 'Loading configuration...';
+      this.isLoading = true;
+      try {
+        const response = await axios.get('/api/config/fetch', {
+          timeout: 10000 // 10 second timeout
+        });
+        this.config = response.data;
+      } catch (error) {
+        if (error?.response?.status === 403) {
+          return;
+        }
+        this.$toast.open({
+          message: 'Failed to load configuration',
+          type: 'error',
+          duration: 5000,
+          position: 'top-right'
+        });
+        console.error('Error loading config:', error);
+        if (error.code === 'ECONNABORTED') {
+          this.$toast.open({
+            message: 'Configuration loading timed out. Please check your connection.',
+            type: 'warning',
+            duration: 5000,
+            position: 'top-right'
+          });
+        }
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    async loadRequestCount() {
+      try {
+        const jobs = await axios.get('/api/jobs', { timeout: 5000 });
+        if (!(jobs.data.jobs || []).some(job => job.delivery_mode === 'manual')) {
+          this.requestCount = 0;
+          return;
+        }
+        const response = await axios.get('/api/automation/requests/workflow', {
+          params: { status: 'awaiting_approval', page: 1, per_page: 1 },
+          timeout: 5000 // 5 second timeout
+        });
+        this.requestCount = response.data.total || 0;
+      } catch (error) {
+        console.error('Error loading request count:', error);
+      }
+    },
+
+    async showChangelog() {
+      this.showChangelogModal = true;
+      this.changelogError = null;
+      
+      if (!this.changelogData) {
+        this.isLoadingChangelog = true;
+        try {
+          // Get release info from GitHub API
+          const response = await getReleaseByTag(this.currentVersion);
+          
+          if (response.data && response.data.body) {
+            // Convert markdown to basic HTML
+            this.changelogData = this.parseMarkdown(response.data.body);
+          } else {
+            this.changelogData = null;
+          }
+        } catch (error) {
+          console.error('Error fetching changelog:', error);
+          this.changelogError = 'Failed to load changelog from GitHub. Please check your internet connection.';
+        } finally {
+          this.isLoadingChangelog = false;
+        }
+      }
+    },
+
+    parseMarkdown(markdown) {
+      if (!markdown) return '';
+
+      // Escape HTML entities first to prevent XSS
+      const escaped = markdown
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
+      // Basic markdown to HTML conversion (on escaped input)
+      return escaped
+        // Headers
+        .replace(/^### (.*$)/gim, '<h4>$1</h4>')
+        .replace(/^## (.*$)/gim, '<h3>$1</h3>')
+        .replace(/^# (.*$)/gim, '<h2>$1</h2>')
+        // Bold
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        // Italic
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        // Links (href is already entity-encoded from the escape step)
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+        // Line breaks
+        .replace(/\n/g, '<br>')
+        // Lists (basic)
+        .replace(/^- (.+)$/gim, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+    },
+
+    async saveSection({ section, data }) {
+      this.loadingMessage = `Saving ${section} settings...`;
+      this.isLoading = true;
+      const oldSubpath = (this.config.SUBPATH || '').replace(/\/$/, '');
+      try {
+        await axios.post(`/api/config/section/${section}`, data);
+        Object.assign(this.config, data);
+
+        // After saving advanced settings, sync use_llm flag on all recommendation jobs
+        if (section === 'advanced' && 'ENABLE_ADVANCED_ALGORITHM' in data) {
+          axios.post('/api/jobs/sync-ai-setting').catch(() => {});
+        }
+
+        // If SUBPATH changed, redirect the browser to the new base URL so the
+        // router re-initialises with the correct history base.
+        if (section === 'advanced' && 'SUBPATH' in data) {
+          const newSubpath = (data.SUBPATH || '').replace(/\/$/, '');
+          if (newSubpath !== oldSubpath) {
+            this.$toast.open({
+              message: 'Settings saved! Redirecting to new base URL…',
+              type: 'success',
+              duration: 2000,
+              position: 'top-right'
+            });
+            setTimeout(() => {
+              window.location.href = (newSubpath || '') + '/';
+            }, 1500);
+            return;
+          }
+        }
+
+        this.$toast.open({
+          message: `Settings saved successfully!`,
+          type: 'success',
+          duration: 3000,
+          position: 'top-right'
+        });
+      } catch (error) {
+        this.$toast.open({
+          message: `Failed to save settings, see logs for details.`,
+          type: 'error',
+          duration: 5000,
+          position: 'top-right'
+        });
+        console.error('Error saving section:', error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async testConnection(service, config) {
+      this.testingConnections[service] = true;
+    
+      try {
+        let endpoint = '';
+        let payload = {};
+      
+        switch (service) {
+          case 'tmdb':
+            endpoint = '/api/tmdb/test';
+            payload = { api_key: config.api_key };
+            break;
+          case 'plex':
+            endpoint = '/api/plex/test';
+            payload = { token: config.token, api_url: config.api_url };
+            break;
+          case 'jellyfin':
+            endpoint = '/api/jellyfin/test';
+            payload = { 
+              api_url: config.api_url,
+              token: config.token 
+            };
+            break;
+          case 'emby':
+            endpoint = '/api/jellyfin/test';
+            payload = { 
+              api_url: config.api_url,
+              token: config.token 
+            };
+            break;
+          case 'seer':
+            endpoint = '/api/seer/test';
+            payload = { 
+              api_url: config.api_url, 
+              token: config.token 
+            };
+            break;
+          case 'database':
+            endpoint = '/api/config/test-db-connection';
+            payload = {
+              DB_TYPE: config.DB_TYPE,
+              DB_HOST: config.DB_HOST,
+              DB_PORT: config.DB_PORT,
+              DB_NAME: config.DB_NAME,
+              DB_USER: config.DB_USER,
+              DB_PASSWORD: config.DB_PASSWORD,
+            };
+            break;
+          default:
+            throw new Error('Unknown service');
+        }
+      
+        const response = await axios.post(endpoint, payload);
+      
+        if (this.$toast) {
+          this.$toast.success(
+            response.data.message || `${service.toUpperCase()} connection successful!`,
+            {
+              position: 'top-right',
+              duration: 3000
+            }
+          );
+        } else {
+          alert(response.data.message || `${service.toUpperCase()} connection successful!`);
+        }
+      
+        return response.data;
+      
+      } catch (error) {
+        console.error(`${service} connection test failed:`, error);
+      
+        let errorMessage = 'Connection test failed';
+      
+        if (error.response) {
+          const status = error.response.status;
+          const data = error.response.data;
+        
+          if (status === 400) {
+            errorMessage = data?.message || 'Invalid credentials or server unreachable. Please check your URL and token.';
+          } else if (status === 401) {
+            errorMessage = 'Invalid authentication token. Please check your API token.';
+          } else if (status === 404) {
+            errorMessage = 'Server not found. Please check your URL.';
+          } else if (status === 500) {
+            errorMessage = 'Server error. Please check server logs.';
+          } else if (status === 503) {
+            errorMessage = 'Service unavailable. The server might be down.';
+          } else {
+            errorMessage = data?.message || `Error ${status}: Connection failed`;
+          }
+        } else if (error.request) {
+          errorMessage = 'No response from server. Check your network connection and server URL.';
+        } else {
+          errorMessage = error.message || 'Request configuration error';
+        }
+      
+        if (this.$toast) {
+          this.$toast.error(errorMessage, {
+            position: 'top-right',
+            duration: 5000
+          });
+        } else {
+          alert(`Error: ${errorMessage}`);
+        }
+      
+        return {
+          status: 'error',
+          message: errorMessage
+        };
+      
+      } finally {
+        this.testingConnections[service] = false;
+      }
+    },
+    getServiceStatus() {
+      const service = this.config.SELECTED_SERVICE;
+      if (!service) return 'status-disconnected';
+      
+      if (service === 'plex' && this.config.PLEX_TOKEN) return 'status-connected';
+      if ((service === 'jellyfin' || service === 'emby') && this.config.JELLYFIN_TOKEN) return 'status-connected';
+      
+      return 'status-warning';
+    },
+
+    getServiceIcon() {
+      const icons = {
+        plex: 'fas fa-play-circle',
+        jellyfin: 'fas fa-server',
+        emby: 'fas fa-server',
+      };
+      return icons[this.config.SELECTED_SERVICE] || 'fas fa-question-circle';
+    },
+
+    goToDashboard() {
+      this.$router.push({ name: 'Home' });
+    },
+
+    async confirmExportConfig() {
+      const includeSecrets = this.exportIncludeSecrets;
+      this.showExportModal = false;
+      this.exportIncludeSecrets = false;
+      await this.exportConfig(includeSecrets);
+    },
+
+    async exportConfig(includeSecrets = false) {
+      this.loadingMessage = 'Exporting configuration...';
+      this.isLoading = true;
+    
+      try {
+        const response = await exportConfig(includeSecrets);
+        const configData = response.data;
+      
+        const blob = new Blob(
+          [JSON.stringify(configData, null, 2)],
+          { type: 'application/json' }
+        );
+      
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `suggestarr-config-${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+      
+        const warnings = configData.warnings || [];
+        this.$toast.open({
+          message: warnings.length
+            ? warnings[0]
+            : 'Configuration exported successfully!',
+          type: warnings.length ? 'warning' : 'success',
+          duration: warnings.length ? 8000 : 3000,
+          position: 'top-right'
+        });
+      
+      } catch (error) {
+        this.$toast.open({
+          message: 'Failed to export configuration',
+          type: 'error',
+          duration: 5000,
+          position: 'top-right'
+        });
+      
+        console.error('Error exporting config:', error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    importConfig() {
+      this.$refs.fileInput.click();
+    },
+
+    async handleFileImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      this.loadingMessage = 'Importing configuration...';
+      this.isLoading = true;
+
+      try {
+        const text = await file.text();
+        const configData = JSON.parse(text);
+
+        await importConfig(configData);
+
+        await this.loadConfig();
+
+        this.$toast.open({
+          message: 'Configuration imported successfully!',
+          type: 'success',
+          duration: 3000,
+          position: 'top-right',
+        });
+      } catch (error) {
+        this.$toast.open({
+          message: 'Failed to import configuration',
+          type: 'error',
+          duration: 5000,
+          position: 'top-right',
+        });
+        console.error('Error importing config:', error);
+      } finally {
+        this.isLoading = false;
+        event.target.value = '';
+      }
+    },
+
+    async confirmReset() {
+      this.showResetModal = false;
+      this.loadingMessage = 'Resetting configuration...';
+      this.isLoading = true;
+
+      try {
+        await axios.post('/api/config/reset');
+        this.$toast.open({
+          message: 'Configuration reset successfully!',
+          type: 'success',
+          duration: 3000,
+          position: 'top-right'
+        });
+
+        setTimeout(() => {
+          this.$router.push({ name: 'Setup' });
+        }, 1000);
+      } catch (error) {
+        this.$toast.open({
+          message: 'Failed to reset configuration',
+          type: 'error',
+          duration: 5000,
+          position: 'top-right'
+        });
+        console.error('Error resetting config:', error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+  },
+};
+</script>

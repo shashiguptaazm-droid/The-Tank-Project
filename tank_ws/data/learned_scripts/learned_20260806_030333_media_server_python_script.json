@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-08-06T03:03:33.819891",
+  "topic": "media server python script",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "Taoviqinvicible/Tools-termux",
+      "html_url": "https://github.com/Taoviqinvicible/Tools-termux",
+      "description": "1.[Script Termux] -Cmatrix *apt-get update *apt-get upgrade *apt-get install nmap *apt-get install python *apt-get install list *apt-get install cmatrix *cmatrix  [1/11 18.28] \u202a+62 821-2770-8489\u202c: \u2713Mempercantik Termux $ pkg update && pkg upgrade $ pkg install ruby cowsay toilet figlet $ pkg install ",
+      "stars": 591,
+      "language": null,
+      "default_branch": "master"
+    },
+    {
+      "full_name": "ngovil21/Plex-Cleaner",
+      "html_url": "https://github.com/ngovil21/Plex-Cleaner",
+      "description": "A script to clean up movies and episodes in Plex Media Server",
+      "stars": 244,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "CNTRUN/Termux-command",
+      "html_url": "https://github.com/CNTRUN/Termux-command",
+      "description": "char const* const commands[] = { \"aapt\", \" aapt\", \" zipalign\", \"abduco\", \" abduco\", \"abook\", \" abook\", \"alpine\", \" alpine\", \" pico\", \" pilot\", \" rpdump\", \" rpload\", \"angband\", \" angband\", \"apache2\", \" ab\", \" apachectl\", \" apxs\", \" checkgid\", \" dbmmanage\", \" envvars-std\", \" fcgistarter\", \" htcachecle",
+      "stars": 115,
+      "language": null,
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 2,
+  "findings": [
+    {
+      "type": "command",
+      "value": "docker pull nitrikx/plex-cleaner"
+    },
+    {
+      "type": "command",
+      "value": "docker run -ti -v /path/to/config/folder nitrikx/plex-cleaner"
+    }
+  ],
+  "script_summary": "2 commands"
+}

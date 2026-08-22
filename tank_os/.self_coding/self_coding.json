@@ -1,0 +1,25 @@
+{
+  "changes": [],
+  "tasks": [
+    {
+      "id": "3c8466c9",
+      "description": "High CPU usage (85.0%) \u2014 investigate and optimize",
+      "priority": 2,
+      "source": "health_check",
+      "related_files": [],
+      "suggested_fix": "Check for runaway processes, add throttling",
+      "status": "pending"
+    },
+    {
+      "id": "edeaeeae",
+      "description": "Service mosquitto not running \u2014 investigate",
+      "priority": 1,
+      "source": "health_check",
+      "related_files": [],
+      "suggested_fix": "",
+      "status": "in_progress"
+    }
+  ],
+  "cycle_count": 0,
+  "last_update": 1785107870.5918982
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypenschema="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>tank_learn</name>
+  <version>0.3.0</version>
+  <description>The Tank Project — feedback loop + IQ scoring + online learning (Phase 1: SQLite-WAL feedback store, Phase 2: overnight AI-module discovery, Phase 3: persistent cognitive memory: episodic + semantic + procedural + sleep-time consolidation)</description>
+  <maintainer email="you@example.com">The Tank Project</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

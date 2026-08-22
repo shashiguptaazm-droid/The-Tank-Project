@@ -1,0 +1,87 @@
+{
+  "timestamp": "2026-08-02T03:03:30.309171",
+  "topic": "iot home automation python",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "home-assistant/core",
+      "html_url": "https://github.com/home-assistant/core",
+      "description": ":house_with_garden: Open source home automation that puts local control and privacy first.",
+      "stars": 89625,
+      "language": "Python",
+      "default_branch": "dev"
+    },
+    {
+      "full_name": "esphome/esphome",
+      "html_url": "https://github.com/esphome/esphome",
+      "description": "ESPHome is a system to control your ESP32, ESP8266, BK72xx, RP2040 by simple yet powerful configuration files and control them remotely through Home Automation systems.",
+      "stars": 11479,
+      "language": "C++",
+      "default_branch": "dev"
+    },
+    {
+      "full_name": "domoticz/domoticz",
+      "html_url": "https://github.com/domoticz/domoticz",
+      "description": "Free open source home automation system for Linux, Windows, Raspberry Pi. Supports Z-Wave, Zigbee, MQTT, and 150+ devices.",
+      "stars": 3788,
+      "language": "C++",
+      "default_branch": "development"
+    }
+  ],
+  "total_findings": 12,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "150+ supported hardware types: Z",
+      "description": "Wave, Zigbee, MQTT, RFXCOM, P1 Smart Meter, YouLess Meter, Pulse Counters, 1-Wire, Philips Hue and more"
+    },
+    {
+      "type": "tool",
+      "name": "Event scripting with dzVents (Lua) and Python plugins",
+      "description": "Extended logging"
+    },
+    {
+      "type": "tool",
+      "name": "Push notifications for iPhone, Android and desktop",
+      "description": "Auto learning sensors/switches"
+    },
+    {
+      "type": "tool",
+      "name": "Manual creation of switch codes",
+      "description": "Share / Use external devices"
+    },
+    {
+      "type": "feature",
+      "value": "150+ supported hardware types: Z-Wave, Zigbee, MQTT, RFXCOM, P1 Smart Meter, YouLess Meter, Pulse Counters, 1-Wire, Philips Hue and more"
+    },
+    {
+      "type": "feature",
+      "value": "Event scripting with dzVents (Lua) and Python plugins"
+    },
+    {
+      "type": "feature",
+      "value": "Extended logging"
+    },
+    {
+      "type": "feature",
+      "value": "Push notifications for iPhone, Android and desktop"
+    },
+    {
+      "type": "feature",
+      "value": "Auto learning sensors/switches"
+    },
+    {
+      "type": "feature",
+      "value": "Manual creation of switch codes"
+    },
+    {
+      "type": "feature",
+      "value": "Share / Use external devices"
+    },
+    {
+      "type": "feature",
+      "value": "Designed for simplicity"
+    }
+  ],
+  "script_summary": "4 tools, 8 features"
+}

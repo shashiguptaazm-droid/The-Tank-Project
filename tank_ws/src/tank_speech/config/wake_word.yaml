@@ -1,0 +1,12 @@
+/**:
+  ros__parameters:
+    wake_word_listener:
+      # Set model_path to a custom trained model (.tflite) to override
+      # the openWakeWord preset name. Leave blank to use model_name.
+      model_path: ""
+      model_name: "hey_jarvis"
+      audio_topic: "/audio"
+      threshold: 0.55
+      cooldown_sec: 2.0
+      window_sec: 5.0
+      inference_hz: 12.5

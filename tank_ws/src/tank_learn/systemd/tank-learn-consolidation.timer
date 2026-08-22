@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily The Tank memory-consolidation timer (Phase 3 — episodic→semantic promotion + Ebbinghaus decay + skill smoothing + insight edges). Runs midway through the 03:00–08:00 learning window, after the discovery sweep.
+
+[Timer]
+OnCalendar=*-*-* 06:00:00
+RandomizedDelaySec=600
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,49 @@
+[project]
+name = "gauge-monorepo"
+version = "0.1.0"
+
+[tool.tach]
+exclude = []
+source_roots = [
+    "core/backend/src",
+    "libs/utils/src",
+]
+exact = true
+
+[[tool.tach.modules]]
+path = "gauge.backend.mod1"
+depends_on = []
+
+[[tool.tach.modules]]
+path = "gauge.backend.mod2"
+depends_on = []
+
+[[tool.tach.modules]]
+path = "gauge.backend.mod3"
+depends_on = [
+    { path = "gauge.backend.mod2" },
+]
+
+[[tool.tach.modules]]
+path = "gauge.backend"
+depends_on = []
+
+[[tool.tach.modules]]
+path = "gauge.utils"
+depends_on = []
+
+[[tool.tach.interfaces]]
+expose = [
+    "x",
+]
+from = [
+    "gauge.backend.mod1",
+]
+
+[[tool.tach.interfaces]]
+expose = [
+    "y",
+]
+from = [
+    "gauge.backend.mod2",
+]

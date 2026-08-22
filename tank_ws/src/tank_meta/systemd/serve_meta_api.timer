@@ -1,0 +1,11 @@
+;; Boot-anchored restart timer. Re-activates the service daily so any
+;; crashed instance is reborn, even when StartLimitBurst-sec is hit.
+[Unit]
+Description=Daily restart of tank_meta API
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=24h
+
+[Install]
+WantedBy=timers.target

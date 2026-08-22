@@ -1,0 +1,5 @@
+/log_node:
+  ros__parameters:
+    db_path: "/root/the tank project/tank_ws/data/log.db"
+    topics_to_listen: ""
+    source_label: "log_node"

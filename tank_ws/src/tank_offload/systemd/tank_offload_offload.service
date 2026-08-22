@@ -1,0 +1,24 @@
+[Unit]
+Description=The Tank — trigger an offload sweep via the running daemon
+Documentation=https://=
+# This service hits the running FastAPI daemon over localhost on
+# port 8085 so the daemon remains the sole owner of offload state.
+After=tank_offload.service
+
+[Service]
+Type=oneshot
+User=root
+EnvironmentFile=-/etc/tank/offload.env
+# Use the same bearer token the daemon validates with.
+# If TANK_API_KEY is set, inject it as a header via curl.
+ExecStart=/bin/sh -c '\
+  AUTH_HEADER=""; \
+  if [ -n "$$TANK_API_KEY" ]; then \
+    AUTH_HEADER="Authorization: Bearer $$TANK_API_KEY"; \
+  fi; \
+  curl -fsS -m 30 -X POST \
+       -H "$$AUTH_HEADER" \
+       http://127.0.0.1:8085/api/offload/trigger'
+
+[Install]
+WantedBy=multi-user.target

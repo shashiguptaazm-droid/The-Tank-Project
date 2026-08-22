@@ -1,0 +1,96 @@
+{
+  "timestamp": "2026-07-30T13:51:57.723363",
+  "query": "linux",
+  "duration_ms": 13000.8,
+  "total_results": 9,
+  "results_by_source": {
+    "torrent": {
+      "count": 0,
+      "items": []
+    },
+    "youtube": {
+      "count": 3,
+      "items": [
+        {
+          "source": "youtube",
+          "title": "You're Going To End Up Gaming On Linux...",
+          "url": "https://youtube.com/watch?v=VkLUaozhOv8",
+          "duration": 833,
+          "uploader": "Zack Shutt",
+          "views": 11920
+        },
+        {
+          "source": "youtube",
+          "title": "Why Everyone Is Leaving Arch Linux",
+          "url": "https://youtube.com/watch?v=fkNqOrvtmng",
+          "duration": 301,
+          "uploader": "Linux Ninja",
+          "views": 10131
+        },
+        {
+          "source": "youtube",
+          "title": "Linux's New AI Desktop Has the Community Divided",
+          "url": "https://youtube.com/watch?v=lSS5ePdAOqA",
+          "duration": 781,
+          "uploader": "SavvyNik",
+          "views": 12197
+        }
+      ]
+    },
+    "web": {
+      "count": 3,
+      "items": [
+        {
+          "source": "web",
+          "title": "Linux - Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Linux",
+          "body": "Linux (/ \u02c8l\u026an\u028aks / LIN-uuks) [11] is a family of free and open-source software Unix-like operating systems based on the Linux kernel, [12] which was first released on 17 September 1991 by Linus Torval"
+        },
+        {
+          "source": "web",
+          "title": "Linux",
+          "url": "https://grokipedia.com/page/Linux",
+          "body": "Linux is a free and open-source Unix-like operating system kernel originally authored by Finnish software engineer Linus Torvalds as a personal project in 1991 and first..."
+        },
+        {
+          "source": "web",
+          "title": "Download Linux | Linux.org",
+          "url": "https://www.linux.org/pages/download/",
+          "body": "Find links to popular Linux distributions and download pages on Linux.org Forums. Explore different Linux options and choose the one that suits your needs."
+        }
+      ]
+    },
+    "github": {
+      "count": 3,
+      "items": [
+        {
+          "source": "github",
+          "title": "torvalds/linux",
+          "url": "https://github.com/torvalds/linux",
+          "description": "Linux kernel source tree",
+          "stars": 241072,
+          "language": "C",
+          "updated": "2026-07-30T11:25:20Z"
+        },
+        {
+          "source": "github",
+          "title": "trimstray/the-book-of-secret-knowledge",
+          "url": "https://github.com/trimstray/the-book-of-secret-knowledge",
+          "description": "A collection of inspiring lists, manuals, cheatsheets, blogs, hacks, one-liners, cli/web tools and more.",
+          "stars": 235856,
+          "language": null,
+          "updated": "2026-07-30T11:24:58Z"
+        },
+        {
+          "source": "github",
+          "title": "jlevy/the-art-of-command-line",
+          "url": "https://github.com/jlevy/the-art-of-command-line",
+          "description": "Master the command line, in one page",
+          "stars": 161946,
+          "language": null,
+          "updated": "2026-07-30T10:38:56Z"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "timestamp": "2026-08-16T07:58:25.046302",
+  "topic": "raspberry pi home server",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "BansheeTech/HomeDockOS",
+      "html_url": "https://github.com/BansheeTech/HomeDockOS",
+      "description": "An intuitive, versatile, and powerful home server operating system for self-hosting. Featuring a curated app store and seamless multi-platform support, it\u2019s designed to empower your personal cloud on Raspberry Pi, x86 systems, or your preferred setup.",
+      "stars": 900,
+      "language": "Vue",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "pimatic/pimatic",
+      "html_url": "https://github.com/pimatic/pimatic",
+      "description": "A home automation server and framework for the raspberry pi running on node.js",
+      "stars": 599,
+      "language": "CoffeeScript",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "OliverHi/smarthomeserver",
+      "html_url": "https://github.com/OliverHi/smarthomeserver",
+      "description": "A simple setup for your own smart home server (on a Raspberry Pi)",
+      "stars": 173,
+      "language": null,
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 8,
+  "findings": [
+    {
+      "type": "command",
+      "value": "docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions"
+    },
+    {
+      "type": "command",
+      "value": "docker plugin install grafana/loki-docker-driver:arm-v7 --alias loki --grant-all-permissions"
+    },
+    {
+      "type": "command",
+      "value": "docker-compose -f hosting.yml up -d"
+    },
+    {
+      "type": "command",
+      "value": "docker-compose -f smarthome.yml up -d"
+    },
+    {
+      "type": "command",
+      "value": "docker-compose -f monitoring.yml up -d"
+    },
+    {
+      "type": "command",
+      "value": "docker-compose -f ...yml logs -f"
+    },
+    {
+      "type": "command",
+      "value": "docker-compose -f ...yml ps"
+    },
+    {
+      "type": "command",
+      "value": "docker-compose -f ...yml down"
+    }
+  ],
+  "script_summary": "8 commands"
+}

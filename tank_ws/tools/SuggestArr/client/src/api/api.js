@@ -1,0 +1,227 @@
+import axios from 'axios';
+
+axios.defaults.withCredentials = true;
+
+// Function to test the TMDB API key via the backend proxy (key never exposed client-side)
+export const testTmdbApi = (apiKey) => {
+    return axios.post('/api/tmdb/test', { api_key: apiKey });
+};
+
+// Function to test the OMDb API key (IMDB ratings integration)
+export const testOmdbApi = (apiKey) => {
+    return axios.post('/api/omdb/test', { api_key: apiKey });
+};
+
+// Function to test Jellyfin configuration
+export const testJellyfinApi = (url, token) => {
+    const jellyfinApiUrl = `${url}/Users`; // Endpoint to retrieve Jellyfin users
+    return axios.get(jellyfinApiUrl, {
+        headers: {
+            'X-Emby-Token': token // Send Jellyfin API token in the header
+        }
+    });
+};
+
+// Function to test the Seer configuration and fetch users
+export const testSeerApi = (payload = null) => {
+    if (payload) {
+        return axios.post('/api/seer/get_users', payload);
+    }
+    return axios.get('/api/seer/get_users');
+};
+
+// Function to authenticate a user in Seer
+export const authenticateUser = (url, token, userName, password) => {
+    return axios.post('/api/seer/login', {
+        SEER_API_URL: url,
+        SEER_TOKEN: token,
+        SEER_USER_NAME: userName,
+        SEER_PASSWORD: password
+    });
+};
+
+// Function to fetch Jellyfin libraries
+export function fetchJellyfinLibraries(payload) {
+    return axios.post('/api/jellyfin/libraries', payload);
+}
+
+// Function to fetch Jellyfin Users
+export function fetchJellyfinUsers(payload) {
+    return axios.post('/api/jellyfin/users', payload);
+}
+
+// Function to fetch Plex libraries
+export function fetchPlexLibraries(payload) {
+    return axios.post('/api/plex/libraries', payload);
+}
+
+// Function to fetch Plex Users
+export function fetchPlexUsers(payload) {
+    return axios.post('/api/plex/users', payload);
+}
+
+// Function to fetch Radarr servers from Seer for anime profile configuration
+export const fetchRadarrServers = (payload = null) => {
+    if (payload) {
+        return axios.post('/api/seer/radarr-servers', payload);
+    }
+    return axios.get('/api/seer/radarr-servers');
+};
+
+// Function to fetch Sonarr servers from Seer for anime profile configuration
+export const fetchSonarrServers = (payload = null) => {
+    if (payload) {
+        return axios.post('/api/seer/sonarr-servers', payload);
+    }
+    return axios.get('/api/seer/sonarr-servers');
+};
+
+// AI Search: semantic content search powered by LLM + TMDB
+export const aiSearch = (query, mediaType = 'movie', userIds = [], maxResults = 12, useHistory = true, excludeWatched = true, excludeSeen = false) => {
+    return axios.post('/api/ai-search/query', {
+        query,
+        media_type: mediaType,
+        user_ids: userIds,
+        max_results: maxResults,
+        use_history: useHistory,
+        exclude_watched: excludeWatched,
+        exclude_seen: excludeSeen,
+    });
+};
+
+// AI Search: clear already-recommended history
+export const aiSearchSeenClear = (mediaType = null) => {
+    return axios.delete('/api/ai-search/seen', {
+        data: mediaType ? { media_type: mediaType } : {},
+    });
+};
+
+// AI Search: fetch requests made via AI Search
+export const getAiSearchRequests = (page = 1, perPage = 12, sortBy = 'date-desc') => {
+    return axios.get('/api/automation/requests/ai-search', {
+        params: { page, per_page: perPage, sort_by: sortBy },
+    });
+};
+
+// AI Search: request a specific TMDB item via Seer
+export const aiSearchRequest = (tmdbId, mediaType, rationale = '', metadata = {}, searchQuery = '') => {
+    return axios.post('/api/ai-search/request', {
+        tmdb_id: tmdbId,
+        media_type: mediaType,
+        rationale,
+        metadata,
+        search_query: searchQuery,
+    });
+};
+
+// AI Search: like/dislike feedback
+export const aiSearchFeedbackList = () => {
+    return axios.get('/api/ai-search/feedback');
+};
+
+export const aiSearchFeedbackSet = (tmdbId, mediaType, feedback, title = null, year = null) => {
+    return axios.post('/api/ai-search/feedback', {
+        tmdb_id: tmdbId,
+        media_type: mediaType,
+        feedback,
+        title,
+        year,
+    });
+};
+
+export const aiSearchFeedbackDelete = (tmdbId, mediaType) => {
+    return axios.delete('/api/ai-search/feedback', {
+        data: { tmdb_id: tmdbId, media_type: mediaType },
+    });
+};
+
+// AI Search: check whether LLM is configured and AI search is available
+export const aiSearchStatus = () => {
+    return axios.get('/api/ai-search/status');
+};
+
+// Trakt OAuth device flow (admin, media-user scoped). App credentials are admin
+// settings; account tokens are stored per media-server user (provider + id).
+export const listTraktMediaUsers = () => axios.get('/api/trakt/media-users');
+
+export const startMediaUserTraktDeviceCode = (provider, externalUserId, credentials = {}) =>
+    axios.post(`/api/trakt/media-users/${provider}/${encodeURIComponent(externalUserId)}/device/code`, credentials);
+
+export const pollMediaUserTraktDeviceToken = (provider, externalUserId, deviceCode, credentials = {}) =>
+    axios.post(`/api/trakt/media-users/${provider}/${encodeURIComponent(externalUserId)}/device/token`, { ...credentials, device_code: deviceCode });
+
+export const unlinkMediaUserTrakt = (provider, externalUserId) =>
+    axios.delete(`/api/trakt/media-users/${provider}/${encodeURIComponent(externalUserId)}`);
+
+export const previewMediaUserTraktRecent = (provider, externalUserId, limit = 10) =>
+    axios.get(`/api/trakt/media-users/${provider}/${encodeURIComponent(externalUserId)}/recent`, { params: { limit } });
+
+export const updateTraktSource = (provider, externalUserId, payload) =>
+    axios.put(`/api/trakt/sources/${provider}/${encodeURIComponent(externalUserId)}`, payload);
+
+export const getMyTraktStatus = () => axios.get('/api/trakt/me');
+
+export const listTraktJobUsers = async (role) => {
+    const response = role === 'user' ? await getMyTraktStatus() : await listTraktMediaUsers();
+    return response.data?.media_users || (response.data?.media_user ? [response.data.media_user] : []);
+};
+
+export const startMyTraktDeviceCode = () => axios.post('/api/trakt/me/device/code');
+
+export const pollMyTraktDeviceToken = (deviceCode) =>
+    axios.post('/api/trakt/me/device/token', { device_code: deviceCode });
+
+export const unlinkMyTrakt = () => axios.delete('/api/trakt/me');
+
+export const previewMyTraktRecent = (limit = 10) =>
+    axios.get('/api/trakt/me/recent', { params: { limit } });
+
+
+// Cleanup automation
+export const getCleanupSettings = () => axios.get('/api/cleanup/settings');
+export const setCleanupSettings = (payload) => axios.post('/api/cleanup/settings', payload);
+export const runCleanupNow = (dryRun = null) => axios.post('/api/cleanup/run', dryRun === null ? {} : { dry_run: dryRun });
+export const getCleanupLog = (limit = 100) => axios.get('/api/cleanup/log', { params: { limit } });
+
+// Config export: download a configuration snapshot (admin only)
+export const exportConfig = (includeSecrets = false) => {
+    return axios.get('/api/config/export', {
+        responseType: 'json',
+        params: { include_secrets: includeSecrets ? 'true' : 'false' },
+    });
+};
+
+// Config import: restore a configuration snapshot (admin only)
+export const importConfig = (snapshot) => {
+    return axios.post('/api/config/import', snapshot);
+};
+
+// User management (admin only)
+export const getUsers = () => axios.get('/api/users');
+export const createUserAdmin = (data) => axios.post('/api/users', data);
+export const updateUser = (id, data) => axios.patch(`/api/users/${id}`, data);
+export const updateUserPermissions = (id, data) =>
+    axios.post(`/api/users/${id}/permissions`, data, { withCredentials: true });
+export const deleteUser = (id) => axios.delete(`/api/users/${id}`);
+export const adminLinkProvider = (id, provider, data) =>
+    axios.post(`/api/users/${id}/link/${provider}`, data);
+
+// Media profile linking (any authenticated user)
+export const getMyLinks = () => axios.get('/api/users/me/links');
+export const getMediaServerUsers = (provider) => axios.get(`/api/users/me/link/${provider}/users`);
+export const linkJellyfin = (data) => axios.post('/api/users/me/link/jellyfin', data);
+export const linkEmby = (data) => axios.post('/api/users/me/link/emby', data);
+export const unlinkProvider = (provider) => axios.delete(`/api/users/me/link/${provider}`);
+export const plexOAuthStart = () => axios.get('/api/users/me/link/plex/oauth-start');
+export const plexOAuthPoll = (pinId) => axios.post('/api/users/me/link/plex/oauth-poll', { pin_id: pinId });
+
+// Credential-based self-linking for media integrations
+export const linkJellyfinIntegration = (data) => axios.post('/api/integrations/jellyfin/link', data);
+export const linkEmbyIntegration = (data) => axios.post('/api/integrations/emby/link', data);
+export const linkPlexIntegration = (data) => axios.post('/api/integrations/plex/link', data);
+
+// Own profile update (any authenticated user)
+export const updateMyProfile = (data) => axios.patch('/api/auth/me', data);
+export const getApiKeys = () => axios.get('/api/auth/api-keys');
+export const createApiKey = (data) => axios.post('/api/auth/api-keys', data);
+export const revokeApiKey = (id) => axios.delete(`/api/auth/api-keys/${id}`);

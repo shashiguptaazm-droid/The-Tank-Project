@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-08-22T03:03:34.577655",
+  "topic": "mission planning python scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "antonibote/drone_scripts",
+      "html_url": "https://github.com/antonibote/drone_scripts",
+      "description": "This repository contains Python scripts for controlling drones using dronekit and dronLink, designed to facilitate autonomous flight and mission planning. ",
+      "stars": 0,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "salmazekri/multirotor-related-tasks",
+      "html_url": "https://github.com/salmazekri/multirotor-related-tasks",
+      "description": "This repository features a collection of multi-rotor related tasks: path planning on Ardupilot Mission Planner, YOLOv7 training for alphanumeric detection and a python script that outlines further processing,  and a rough scheme for how the hardware should be connected",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "rajeshkusahu/DEVELOPMENT-OF-WEB---ENABLED-APPLICATION-FOR-USER-SPECIFIC-UPPER-ATMOSPHERIC-PROFILE-GENERATION",
+      "html_url": "https://github.com/rajeshkusahu/DEVELOPMENT-OF-WEB---ENABLED-APPLICATION-FOR-USER-SPECIFIC-UPPER-ATMOSPHERIC-PROFILE-GENERATION",
+      "description": "In The Above Project we use Technology like HTML, CSS, PYTHON,JAVA SCRIPT & FLASK. From the project we learn Accurate knowledge of the upper atmospheric weather underpins a wide spectrum of scientific and operational activities, from flight-level  route optimisation and satellite mission planning to",
+      "stars": 0,
+      "language": "TeX",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 0,
+  "findings": [],
+  "script_summary": "no findings"
+}

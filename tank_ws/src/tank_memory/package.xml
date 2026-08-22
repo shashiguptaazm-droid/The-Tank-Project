@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>tank_memory</name>
+  <version>0.1.0</version>
+  <description>The Tank Project — persistent vector-backed episodic memory (sqlite-vec + sentence-transformers)</description>
+  <maintainer email="you@example.com">The Tank Project</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-sqlite-vec</exec_depend>
+  <exec_depend>sentence-transformers</exec_depend>
+  <exec_depend>torch</exec_depend>
+  <exec_depend>tank_speech</exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

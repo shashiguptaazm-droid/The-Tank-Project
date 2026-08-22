@@ -1,0 +1,89 @@
+{
+  "timestamp": "2026-08-19T03:02:21.631956",
+  "topic": "email automation python scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "SagarBiswas-MultiHAT/EmailBomber",
+      "html_url": "https://github.com/SagarBiswas-MultiHAT/EmailBomber",
+      "description": "A Python script demonstrating automated email sending via Gmail SMTP for educational and testing purposes. Supports email format validation, secure password input using getpass, HTML-formatted messages, and controlled loop-based delivery with delays. Intended to teach SMTP authentication and email a",
+      "stars": 26,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "luizbizzio/power-alert",
+      "html_url": "https://github.com/luizbizzio/power-alert",
+      "description": "\u26a1 A Python script to detect power outages and restorations by monitoring home devices. It sends automated email alerts when power status changes, providing quick notifications for any disruptions in power supply.",
+      "stars": 23,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "OsirisS13/Carrier-Maintenance-Notification-Automation",
+      "html_url": "https://github.com/OsirisS13/Carrier-Maintenance-Notification-Automation",
+      "description": "Python script to search an Outlook mailbox for a telecommunications carrier maintenance notification email, extract the information within and create an Outlook Calendar event for it",
+      "stars": 21,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 13,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone https://github.com/SagarBiswas-MultiHAT/EmailBomber.git"
+    },
+    {
+      "type": "command",
+      "value": "python \"Mail-Boombing_(can attach a HTML phishing link)--v1.2_(Faster).py\""
+    },
+    {
+      "type": "tool",
+      "name": "Python 3.x",
+      "description": "A Gmail account"
+    },
+    {
+      "type": "feature",
+      "value": "**Email Validation:** Ensures the format of both sender and recipient emails is correct."
+    },
+    {
+      "type": "feature",
+      "value": "**Secure Password Input:** Uses `getpass` for securely handling email passwords."
+    },
+    {
+      "type": "feature",
+      "value": "**HTML Email Support:** Sends HTML-formatted emails with a customizable message."
+    },
+    {
+      "type": "feature",
+      "value": "**Multiple Email Sending:** Allows sending a specified number of emails in a loop."
+    },
+    {
+      "type": "feature",
+      "value": "**SMTP Authentication:** Utilizes Gmail's SMTP server for sending emails securely."
+    },
+    {
+      "type": "command",
+      "value": "python power_alert.py"
+    },
+    {
+      "type": "tool",
+      "name": "Python 3.x",
+      "description": "Modules: `smtplib`, `email`, `locale` (included with Python)"
+    },
+    {
+      "type": "feature",
+      "value": "**Network Monitoring:** Checks the status of your modem, router, and other specified devices."
+    },
+    {
+      "type": "feature",
+      "value": "**Email Alerts:** Sends email notifications when a power outage is detected or when power is restored."
+    },
+    {
+      "type": "feature",
+      "value": "**Locale Support:** Configurable to use different locales for date and time formatting."
+    }
+  ],
+  "script_summary": "3 commands, 2 tools, 8 features"
+}

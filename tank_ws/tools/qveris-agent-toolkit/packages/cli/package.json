@@ -1,0 +1,52 @@
+{
+  "name": "@qverisai/cli",
+  "version": "0.11.0",
+  "description": "QVeris CLI for agent capability discovery, inspection, calling, and audit",
+  "type": "module",
+  "bin": {
+    "qveris": "./bin/qveris.mjs"
+  },
+  "scripts": {
+    "test": "node --test",
+    "lint": "eslint . && prettier --check \"src/**/*.mjs\" \"bin/**/*.mjs\" \"test/**/*.mjs\"",
+    "lint:fix": "eslint . --fix && prettier --write \"src/**/*.mjs\" \"bin/**/*.mjs\" \"test/**/*.mjs\"",
+    "test:coverage": "c8 node --test"
+  },
+  "engines": {
+    "node": ">=18.2.0"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "scripts/",
+    "CHANGELOG.md"
+  ],
+  "keywords": [
+    "qveris",
+    "cli",
+    "api",
+    "agent",
+    "capabilities",
+    "tool-calling"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QVerisAI/qveris-agent-toolkit",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://qveris.ai",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "optionalDependencies": {
+    "@napi-rs/keyring": "^1.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "c8": "^11.0.0",
+    "eslint": "^10.6.0",
+    "globals": "^17.7.0",
+    "prettier": "^3.9.5"
+  }
+}

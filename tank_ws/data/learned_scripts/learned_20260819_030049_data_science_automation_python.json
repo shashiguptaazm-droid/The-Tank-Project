@@ -1,0 +1,222 @@
+{
+  "timestamp": "2026-08-19T03:00:49.924624",
+  "topic": "data science automation python",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "scitex-ai/scitex-python",
+      "html_url": "https://github.com/scitex-ai/scitex-python",
+      "description": "Umbrella package for SciTeX \u2014 reproducible science from raw data to manuscript",
+      "stars": 85,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Patotricks15/Ciencia-de-dados-projetos",
+      "html_url": "https://github.com/Patotricks15/Ciencia-de-dados-projetos",
+      "description": "Repository for my data science projects (Web scraping and automation + exploratory data analysis + machine learning + recommendation system)",
+      "stars": 81,
+      "language": "Jupyter Notebook",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "Elysian01/Codify",
+      "html_url": "https://github.com/Elysian01/Codify",
+      "description": "Codify enables data scientists to perform all the tedious and time-consuming tasks such as EDA (exploratory data analysis), data cleaning, data pre-processing, data visualization, modeling, and evaluation in the data-science life cycle, by only conveying the logic of the task in natural language (En",
+      "stars": 43,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 46,
+  "findings": [
+    {
+      "type": "command",
+      "value": "pip install \"scitex[all]\""
+    },
+    {
+      "type": "command",
+      "value": "pip install scitex                     # Core only (minimal)"
+    },
+    {
+      "type": "command",
+      "value": "pip install scitex[plt,stats,scholar]  # Typical research setup"
+    },
+    {
+      "type": "command",
+      "value": "pip install scitex[plt]                # Publication-ready figures (figrecipe)"
+    },
+    {
+      "type": "command",
+      "value": "pip install scitex[stats]              # Statistical testing (23+ tests)"
+    },
+    {
+      "type": "command",
+      "value": "pip install scitex[scholar]            # Literature search, PDF download, BibTeX enrichment"
+    },
+    {
+      "type": "command",
+      "value": "pip install scitex[writer]             # LaTeX manuscript compilation"
+    },
+    {
+      "type": "command",
+      "value": "pip install scitex[audio]              # Text-to-speech"
+    },
+    {
+      "type": "command",
+      "value": "pip install scitex[ai]                 # LLM APIs (OpenAI, Anthropic, Google) + ML tools"
+    },
+    {
+      "type": "command",
+      "value": "pip install scitex[dataset]            # Scientific datasets (DANDI, OpenNeuro, PhysioNet)"
+    },
+    {
+      "type": "command",
+      "value": "pip install scitex[browser]            # Web automation (Playwright)"
+    },
+    {
+      "type": "command",
+      "value": "pip install scitex[capture]            # Screenshot capture and monitoring"
+    },
+    {
+      "type": "command",
+      "value": "pip install scitex[cloud]              # Cloud platform integration"
+    },
+    {
+      "type": "command",
+      "value": "pip install uv && uv pip install \"scitex[all]\""
+    },
+    {
+      "type": "command",
+      "value": "pip install --timeout 600 --retries 5 \"scitex[all]\""
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[all]</code>"
+    },
+    {
+      "type": "pip_package",
+      "value": "\"scitex[all]\""
+    },
+    {
+      "type": "pip_package",
+      "value": "\"scitex[all]\""
+    },
+    {
+      "type": "pip_package",
+      "value": "uv`"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[plt,stats,scholar]"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[plt]"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[stats]"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[scholar]"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[writer]"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[audio]"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[ai]"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[dataset]"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[browser]"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[capture]"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[cloud]"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[plt,stats,scholar]`)"
+    },
+    {
+      "type": "pip_package",
+      "value": "uv"
+    },
+    {
+      "type": "pip_package",
+      "value": "\"scitex[all]\""
+    },
+    {
+      "type": "pip_package",
+      "value": "--timeout"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[io,stats,plt]"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[scholar,writer]"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[audio,browser,dataset,cloud]"
+    },
+    {
+      "type": "pip_package",
+      "value": "-i"
+    },
+    {
+      "type": "pip_package",
+      "value": "-v`"
+    },
+    {
+      "type": "pip_package",
+      "value": "scitex[io]`)"
+    },
+    {
+      "type": "command",
+      "value": "python server.py"
+    },
+    {
+      "type": "command",
+      "value": "npm start"
+    },
+    {
+      "type": "tool",
+      "name": "NER Annotator",
+      "description": "https://github.com/tecoholic/ner-annotator"
+    },
+    {
+      "type": "tool",
+      "name": "spacy",
+      "description": "https://github.com/explosion/spaCy"
+    },
+    {
+      "type": "tool",
+      "name": "Custom NER for Extracting Disease Entities Blog",
+      "description": "https://medium.com/analytics-vidhya/custom-ner-for-extracting-disease-entities-c620aca2e1bb"
+    }
+  ],
+  "script_summary": "17 commands, 26 pip_packages, 3 tools"
+}

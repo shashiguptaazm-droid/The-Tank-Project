@@ -1,0 +1,81 @@
+# Essential host-level dependencies for the Simple Internet universal downloader.
+# See docs/DEPENDENCIES.md for the full rationale + grouping.
+# Install: pip install -r requirements.txt
+
+# 1. Core async & networking
+aiohttp
+httpx
+aiofiles
+requests
+websockets
+python-socketio
+PySocks
+
+# 2. Download engines & extractors
+yt-dlp
+python-libtorrent
+nzbfriends
+sabyenc3
+ipfshttpclient
+
+# 3. Media post-processing
+ffmpeg-python
+mutagen
+Pillow
+subliminal
+babelfish
+pysubs2
+
+# 4. Archive handling
+patool
+py7zr
+rarfile
+
+# 5. Metadata, tagging & MusicBrainz
+musicbrainzngs
+discogs-client
+pyacoustid
+
+# 6. Database & storage
+sqlalchemy
+alembic
+redis
+diskcache
+
+# 7. Task scheduling & automation
+APScheduler
+celery
+watchdog
+feedparser
+
+# 8. Search & scraping
+beautifulsoup4
+lxml
+duckduckgo-search
+google-api-python-client
+wikipedia
+imdbpy
+
+# 9. UI frameworks (web)
+fastapi
+uvicorn
+python-socketio
+Flask-SocketIO
+Jinja2
+flask-cors
+
+# 10. Cloud & remote
+boto3
+google-cloud-storage
+dropbox
+webdavclient3
+python-telegram-bot
+imapclient
+paramiko
+
+# 11. Security & privacy
+cryptography
+keyring
+bcrypt
+pyOpenSSL
+clamd

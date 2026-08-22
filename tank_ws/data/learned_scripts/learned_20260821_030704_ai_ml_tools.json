@@ -1,0 +1,443 @@
+{
+  "timestamp": "2026-08-21T03:07:04.690851",
+  "topic": "ai ml tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "fighting41love/funNLP",
+      "html_url": "https://github.com/fighting41love/funNLP",
+      "description": "\u4e2d\u82f1\u6587\u654f\u611f\u8bcd\u3001\u8bed\u8a00\u68c0\u6d4b\u3001\u4e2d\u5916\u624b\u673a/\u7535\u8bdd\u5f52\u5c5e\u5730/\u8fd0\u8425\u5546\u67e5\u8be2\u3001\u540d\u5b57\u63a8\u65ad\u6027\u522b\u3001\u624b\u673a\u53f7\u62bd\u53d6\u3001\u8eab\u4efd\u8bc1\u62bd\u53d6\u3001\u90ae\u7bb1\u62bd\u53d6\u3001\u4e2d\u65e5\u6587\u4eba\u540d\u5e93\u3001\u4e2d\u6587\u7f29\u5199\u5e93\u3001\u62c6\u5b57\u8bcd\u5178\u3001\u8bcd\u6c47\u60c5\u611f\u503c\u3001\u505c\u7528\u8bcd\u3001\u53cd\u52a8\u8bcd\u8868\u3001\u66b4\u6050\u8bcd\u8868\u3001\u7e41\u7b80\u4f53\u8f6c\u6362\u3001\u82f1\u6587\u6a21\u62df\u4e2d\u6587\u53d1\u97f3\u3001\u6c6a\u5cf0\u6b4c\u8bcd\u751f\u6210\u5668\u3001\u804c\u4e1a\u540d\u79f0\u8bcd\u5e93\u3001\u540c\u4e49\u8bcd\u5e93\u3001\u53cd\u4e49\u8bcd\u5e93\u3001\u5426\u5b9a\u8bcd\u5e93\u3001\u6c7d\u8f66\u54c1\u724c\u8bcd\u5e93\u3001\u6c7d\u8f66\u96f6\u4ef6\u8bcd\u5e93\u3001\u8fde\u7eed\u82f1\u6587\u5207\u5272\u3001\u5404\u79cd\u4e2d\u6587\u8bcd\u5411\u91cf\u3001\u516c\u53f8\u540d\u5b57\u5927\u5168\u3001\u53e4\u8bd7\u8bcd\u5e93\u3001IT\u8bcd\u5e93\u3001\u8d22\u7ecf\u8bcd\u5e93\u3001\u6210\u8bed\u8bcd\u5e93\u3001\u5730\u540d\u8bcd\u5e93\u3001\u5386\u53f2\u540d\u4eba\u8bcd\u5e93\u3001\u8bd7\u8bcd\u8bcd\u5e93\u3001\u533b\u5b66\u8bcd\u5e93\u3001\u996e\u98df\u8bcd\u5e93\u3001\u6cd5\u5f8b\u8bcd\u5e93\u3001\u6c7d\u8f66\u8bcd\u5e93\u3001\u52a8\u7269\u8bcd\u5e93\u3001\u4e2d\u6587\u804a\u5929\u8bed\u6599\u3001\u4e2d\u6587\u8c23\u8a00\u6570\u636e\u3001\u767e\u5ea6\u4e2d\u6587\u95ee\u7b54\u6570\u636e\u96c6\u3001\u53e5\u5b50\u76f8\u4f3c\u5ea6\u5339\u914d\u7b97\u6cd5\u96c6\u5408\u3001bert\u8d44\u6e90\u3001\u6587\u672c\u751f\u6210&\u6458\u8981\u76f8\u5173\u5de5\u5177\u3001cocoNLP\u4fe1\u606f\u62bd\u53d6",
+      "stars": 82569,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "fossasia/visdom",
+      "html_url": "https://github.com/fossasia/visdom",
+      "description": "Tool for real-time visualization, monitoring and collaborative analysis of AI/ML experiments and live data. Supports Python, PyTorch/Torch, NumPy, TensorFlow/Keras https://visdom.dev",
+      "stars": 10273,
+      "language": "Python",
+      "default_branch": "dev"
+    },
+    {
+      "full_name": "mahseema/awesome-ai-tools",
+      "html_url": "https://github.com/mahseema/awesome-ai-tools",
+      "description": "A curated list of Artificial Intelligence Top Tools",
+      "stars": 6006,
+      "language": null,
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 84,
+  "findings": [
+    {
+      "type": "command",
+      "value": "python -m visdom.server -ssl_certfile cert.pem -ssl_keyfile key.pem"
+    },
+    {
+      "type": "command",
+      "value": "python example/demo.py"
+    },
+    {
+      "type": "tool",
+      "name": "`base_url`: the base visdom server url (default: `/`)",
+      "description": "`env`: Default environment to plot to when no `env` is provided (default: `main`)"
+    },
+    {
+      "type": "tool",
+      "name": "`viz`: a connected `visdom.Visdom()` instance",
+      "description": "`env`: environment name (default: auto-generated from timestamp)"
+    },
+    {
+      "type": "tool",
+      "name": "`log_every`: send every N calls per metric",
+      "description": "use with per-batch logging on large datasets (default: `1`)"
+    },
+    {
+      "type": "tool",
+      "name": "`viz`: a connected `visdom.Visdom()` instance (optional",
+      "description": "created internally if not passed)"
+    },
+    {
+      "type": "tool",
+      "name": "`viz`: a connected `visdom.Visdom()` instance",
+      "description": "`env`: environment name (default: `viz.env` if set, otherwise auto-generated from timestamp)"
+    },
+    {
+      "type": "tool",
+      "name": "`jpgquality`: JPG quality (`number` 0",
+      "description": "100). If defined image will be saved as JPG to reduce file size. If not defined image will be saved as PNG."
+    },
+    {
+      "type": "tool",
+      "name": "`caption`: Caption for the image",
+      "description": "`store_history`: Keep all images stored to the same window and attach a slider to the bottom that will let you select the image to view. You must always provide this opt when sending new images to an "
+    },
+    {
+      "type": "tool",
+      "name": "`caption`: caption for the image pane",
+      "description": "`jpgquality`: JPG quality (`number` 0-100). If set, the result is encoded as JPEG. Otherwise PNG."
+    },
+    {
+      "type": "tool",
+      "name": "`nrow`: Number of images in a row",
+      "description": "`padding`: Padding around the image, equal padding around all 4 sides"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.jpgquality`: JPG quality (`number` 0",
+      "description": "100). If defined image will be saved as JPG to reduce file size. If not defined image will be saved as PNG."
+    },
+    {
+      "type": "tool",
+      "name": "`features`: a list of tensors",
+      "description": "`labels`: a list of corresponding labels for the tensors provided for `features`"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.font_size`    : define font size of label (`int`)",
+      "description": "`opts.font_color`    : define font color of label (`string`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.opacity`    : define opacity of chart (`float`)",
+      "description": "`opts.line_width`    : define distance between two sectors and sector to its parents (`int`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.fillarea`    : fill area below line (`boolean`)",
+      "description": "`opts.markers`     : show markers (`boolean`; default = `false`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.legend`      : `table` containing legend names",
+      "description": "`opts.layoutopts`  : `dict` of any additional options that the graph backend accepts for a layout. For example `layoutopts = {'plotly': {'legend': {'x':0, 'y':0}}}`."
+    },
+    {
+      "type": "tool",
+      "name": "`opts.ylabel`     : y",
+      "description": "axis label (`string`; default = `True Positive Rate`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.ylabel`     : y",
+      "description": "axis label (`string`; default = `Precision`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.colormap`: colormap (`string`; default = `'Viridis'`)",
+      "description": "`opts.legend`  : `table` containing legend names"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.rownames`   : `table` containing y",
+      "description": "axis labels"
+    },
+    {
+      "type": "tool",
+      "name": "raw label vectors via `y_true` and `y_pred`, or",
+      "description": "a precomputed confusion matrix via `cm`."
+    },
+    {
+      "type": "tool",
+      "name": "`'true'`: normalize by row (actual class)",
+      "description": "`'pred'`: normalize by column (predicted class)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.ylabel`      : y",
+      "description": "axis label (`string`; default = `Actual`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.rownames`: `table` containing x",
+      "description": "axis labels"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.stacked`    : stack multiple columns in `X`",
+      "description": "`opts.legend`     : `table` containing legend labels"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.numbins`: number of bins (`number`; default = 30)",
+      "description": "`opts.layoutopts`  : `dict` of any additional options that the graph backend accepts for a layout. For example `layoutopts = {'plotly': {'legend': {'x':0, 'y':0}}}`."
+    },
+    {
+      "type": "tool",
+      "name": "`opts.xnumbins`: number of bins along the x",
+      "description": "axis (`number`; default lets Plotly choose)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.ynumbins`: number of bins along the y",
+      "description": "axis (`number`; default lets Plotly choose)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.colormap`: colormap (`string`; default = `'Viridis'`)",
+      "description": "`opts.histnorm`: normalization of the bin counts, one of `''`, `'percent'`, `'probability'`, `'density'`, or `'probability density'`"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.legend`: labels for each of the columns in `X`",
+      "description": "`opts.layoutopts`  : `dict` of any additional options that the graph backend accepts for a layout. For example `layoutopts = {'plotly': {'legend': {'x':0, 'y':0}}}`."
+    },
+    {
+      "type": "tool",
+      "name": "`opts.legend`: labels for each of the columns in `X`",
+      "description": "`opts.showbox`: overlay a mini box plot inside the violin (`bool`; default = `True`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.legend`: `list` containing legend names",
+      "description": "`opts.layoutopts`  : `dict` of any additional options that the graph backend accepts for a layout. For example `layoutopts = {'plotly': {'legend': {'x':0, 'y':0}}}`."
+    },
+    {
+      "type": "tool",
+      "name": "`opts.colormap`: colormap (`string`; default = `'Viridis'`)",
+      "description": "`opts.xmin`    : clip minimum value (`number`; default = `X:min()`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.colormap`: colormap (`string`; default = `'Viridis'`)",
+      "description": "`opts.xmin`    : clip minimum value (`number`; default = `X:min()`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.normalize`:  length of longest arrows (`number`)",
+      "description": "`opts.arrowheads`: show arrow heads (`boolean`; default = `true`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.color`: color (`string`)",
+      "description": "`opts.opacity`: opacity of polygons (`number` between 0 and 1)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.height` : Height of the plot",
+      "description": "`opts.width` :  Width of the plot"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.name_y1` : Axis name for Y1 plot",
+      "description": "`opts.name_y2` : Axis name for Y2 plot"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.title` :  Title of the plot",
+      "description": "`opts.color_title_y1` :  Color of the Y1 axis Title"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.color_tick_y1`  :  Color of the Y1 axis Ticks",
+      "description": "`opts.color_title_y2` :  Color of the Y2 axis Title"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.color_tick_y2`  :  Color of the Y2 axis Ticks",
+      "description": "`opts.side` :  side on which the Y2 tick has to be placed. Has values 'right' or `left`."
+    },
+    {
+      "type": "tool",
+      "name": "`opts.showlegend` :  Display legends (boolean values)",
+      "description": "`opts.top` :  Set the top margin of the plot"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.bottom` :  Set the bottom margin of the plot",
+      "description": "`opts.right` :  Set the right margin of the plot"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.height` : Height of the plot. Default : 500",
+      "description": "`opts.width` : Width of the plot. Default : 500"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.title`       : figure title",
+      "description": "`opts.width`       : figure width"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.height`      : figure height",
+      "description": "`opts.showlegend`  : show legend (`true` or `false`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.xtype`       : type of x",
+      "description": "axis (`'linear'` or `'log'`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.xlabel`      : label of x",
+      "description": "axis"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.xtick`       : show ticks on x",
+      "description": "axis (`boolean`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.xtickmin`    : first tick on x",
+      "description": "axis (`number`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.xtickmax`    : last tick on x",
+      "description": "axis (`number`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.xtickvals`   : locations of ticks on x",
+      "description": "axis (`table` of `number`s)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.xticklabels` : ticks labels on x",
+      "description": "axis (`table` of `string`s)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.xtickstep`   : distances between ticks on x",
+      "description": "axis (`number`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.xtickfont`   : font for x",
+      "description": "axis labels (dict of [font information](https://plot.ly/javascript/reference/#layout-font))"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.ytype`       : type of y",
+      "description": "axis (`'linear'` or `'log'`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.ylabel`      : label of y",
+      "description": "axis"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.ytick`       : show ticks on y",
+      "description": "axis (`boolean`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.ytickmin`    : first tick on y",
+      "description": "axis (`number`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.ytickmax`    : last tick on y",
+      "description": "axis (`number`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.ytickvals`   : locations of ticks on y",
+      "description": "axis (`table` of `number`s)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.yticklabels` : ticks labels on y",
+      "description": "axis (`table` of `string`s)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.ytickstep`   : distances between ticks on y",
+      "description": "axis (`number`)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.ytickfont`   : font for y",
+      "description": "axis labels (dict of [font information](https://plot.ly/javascript/reference/#layout-font))"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.marginleft`  : left margin (in pixels)",
+      "description": "`opts.marginright` : right margin (in pixels)"
+    },
+    {
+      "type": "tool",
+      "name": "`opts.margintop`   : top margin (in pixels)",
+      "description": "`opts.marginbottom`: bottom margin (in pixels)"
+    },
+    {
+      "type": "tool",
+      "name": "`prev_eid`: Environment ID that we want to fork.",
+      "description": "`eid`: New Environment ID that will be created with the fork."
+    },
+    {
+      "type": "tool",
+      "name": "`env`: Environment to search for the window in.",
+      "description": "`win`: Window to return data for. Set to `None` to retrieve all the windows in an environment."
+    },
+    {
+      "type": "tool",
+      "name": "`tags`: Free",
+      "description": "form tags as a dict of `{name: value}`."
+    },
+    {
+      "type": "tool",
+      "name": "`description`: Free",
+      "description": "form description."
+    },
+    {
+      "type": "tool",
+      "name": "`metrics`: A non",
+      "description": "empty dict of `{name: value}` observations."
+    },
+    {
+      "type": "tool",
+      "name": "`both`: the intersection",
+      "description": "runs that match `query` *and* are named in `env_ids`, ordered by `env_ids`. Both must be given and non-empty."
+    },
+    {
+      "type": "tool",
+      "name": "`~/.config/visdom` for Linux",
+      "description": "`~/Library/Preferences/visdom` for OSX"
+    },
+    {
+      "type": "pip_package",
+      "value": "visdom"
+    },
+    {
+      "type": "pip_package",
+      "value": "git+https://github.com/fossasia/visdom"
+    },
+    {
+      "type": "pip_package",
+      "value": "plotly"
+    },
+    {
+      "type": "pip_package",
+      "value": "visdom"
+    },
+    {
+      "type": "pip_package",
+      "value": "visdom"
+    },
+    {
+      "type": "pip_package",
+      "value": "visdom"
+    },
+    {
+      "type": "pip_package",
+      "value": "visdom"
+    },
+    {
+      "type": "pip_package",
+      "value": "visdom"
+    },
+    {
+      "type": "pip_package",
+      "value": "plotly`."
+    },
+    {
+      "type": "pip_package",
+      "value": "kaleido`."
+    }
+  ],
+  "script_summary": "2 commands, 72 tools, 10 pip_packages"
+}

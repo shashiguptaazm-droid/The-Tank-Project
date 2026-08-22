@@ -1,0 +1,89 @@
+{
+  "timestamp": "2026-08-20T03:02:06.488976",
+  "topic": "youtube downloader script python",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "egbertbouman/youtube-comment-downloader",
+      "html_url": "https://github.com/egbertbouman/youtube-comment-downloader",
+      "description": "Simple script for downloading Youtube comments without using the Youtube API",
+      "stars": 1247,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "NeuralNine/youtube-downloader-converter",
+      "html_url": "https://github.com/NeuralNine/youtube-downloader-converter",
+      "description": "A simple Python script that is able to download YouTube videos or playlists and convert them into MP3.",
+      "stars": 543,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "pH-7/Download-Simply-Videos-From-YouTube",
+      "html_url": "https://github.com/pH-7/Download-Simply-Videos-From-YouTube",
+      "description": "Python script that downloads and saves any of your favorite YouTube videos and playlists. All you need to do is just run the Python script and follow the terminal prompt.",
+      "stars": 391,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 12,
+  "findings": [
+    {
+      "type": "command",
+      "value": "pip install youtube-comment-downloader"
+    },
+    {
+      "type": "command",
+      "value": "pip install https://github.com/egbertbouman/youtube-comment-downloader/archive/master.zip"
+    },
+    {
+      "type": "pip_package",
+      "value": "youtube-comment-downloader"
+    },
+    {
+      "type": "pip_package",
+      "value": "https://github.com/egbertbouman/youtube-comment-downloader/archive/master.zip"
+    },
+    {
+      "type": "tool",
+      "name": "macOS",
+      "description": "open Terminal and run:"
+    },
+    {
+      "type": "tool",
+      "name": "Windows",
+      "description": "[download FFmpeg here](https://ffmpeg.org/download.html), unzip it, and add it to your PATH. ([step-by-step guide](https://www.geeksforgeeks.org/how-to-install-ffmpeg-on-windows/))"
+    },
+    {
+      "type": "tool",
+      "name": "Linux (Ubuntu/Debian)",
+      "description": "open a terminal and run:"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.youtube.com/@channelname",
+      "description": "`https://www.youtube.com/channel/UCxxxxxxxxx`"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.youtube.com/c/channelname",
+      "description": "`https://www.youtube.com/user/username`"
+    },
+    {
+      "type": "tool",
+      "name": "Maximum video resolution (currently capped at 1080p)",
+      "description": "Default output folder"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    }
+  ],
+  "script_summary": "2 commands, 4 pip_packages, 6 tools"
+}

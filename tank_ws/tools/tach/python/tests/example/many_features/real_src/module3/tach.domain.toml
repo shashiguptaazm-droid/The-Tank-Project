@@ -1,0 +1,31 @@
+[root]
+depends_on = []
+layer = "low"
+
+[[modules]]
+path = "submodule1"
+cannot_depend_on = ["submodule2"]
+layer = "low"
+utility = true
+
+[[modules]]
+path = "submodule2"
+depends_on = []
+layer = "low"
+
+[[modules]]
+path = "submodule3"
+depends_on = []
+layer = "low"
+
+[[modules]]
+path = "submodule3.closed"
+layer = "closed"
+
+[[modules]]
+path = "submodule3.lowest_open"
+layer = "lowest-open"
+
+[[interfaces]]
+expose = ["content"]
+from = ["<domain_root>"]

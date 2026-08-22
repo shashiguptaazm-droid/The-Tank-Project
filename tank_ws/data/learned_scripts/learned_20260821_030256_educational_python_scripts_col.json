@@ -1,0 +1,61 @@
+{
+  "timestamp": "2026-08-21T03:02:56.522345",
+  "topic": "educational python scripts collection",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "w8mej/ProofOfCoffee",
+      "html_url": "https://github.com/w8mej/ProofOfCoffee",
+      "description": "A dangerously functional collection of experiments. This repository exists at the intersection of \u201cI wonder if this works\u201d and \u201coh no, it worked\u201d. Expect questionable Terraform, overly caffeinated Bash scripts, and Python that may or may not summon cryptographic demons. Perfect for educational purpo",
+      "stars": 7,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "FabrizioMusacchio/neural_dynamics",
+      "html_url": "https://github.com/FabrizioMusacchio/neural_dynamics",
+      "description": "A collection of educational Python script for Neural Dynamics",
+      "stars": 6,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "vladimir-poghosyan/awesome-plpython",
+      "html_url": "https://github.com/vladimir-poghosyan/awesome-plpython",
+      "description": "A curated list of awesome PL/Python scripts, snippets and resources",
+      "stars": 6,
+      "language": "PLpgSQL",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 6,
+  "findings": [
+    {
+      "type": "command",
+      "value": "docker compose up -d"
+    },
+    {
+      "type": "command",
+      "value": "docker compose ps"
+    },
+    {
+      "type": "command",
+      "value": "docker exec -it <container_name> sh"
+    },
+    {
+      "type": "command",
+      "value": "docker exec -it <container_name> psql -U pgawesome"
+    },
+    {
+      "type": "tool",
+      "name": "educational examples",
+      "description": "fun experiments"
+    },
+    {
+      "type": "tool",
+      "name": "practical real",
+      "description": "world utilities"
+    }
+  ],
+  "script_summary": "4 commands, 2 tools"
+}

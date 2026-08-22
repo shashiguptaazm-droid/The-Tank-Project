@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-08-11T03:01:49.321953",
+  "topic": "aria2 automation tools",
+  "repos_scanned": 1,
+  "repos": [
+    {
+      "full_name": "Azzellz/pomelo",
+      "html_url": "https://github.com/Azzellz/pomelo",
+      "description": "Based on Bunjs/Nodejs and Aria2 resource download tool , flexible configuration , support for custom resource parsing and some built-in resource parsing such as RSS",
+      "stars": 3,
+      "language": "TypeScript",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 0,
+  "findings": [],
+  "script_summary": "no findings"
+}

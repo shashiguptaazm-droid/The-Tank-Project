@@ -1,0 +1,89 @@
+{
+  "timestamp": "2026-07-30T14:59:27.943881",
+  "topic": "mqtt home assistant scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "muehlt/home-assistant-findmy",
+      "html_url": "https://github.com/muehlt/home-assistant-findmy",
+      "description": "A python script that reads local FindMy cache files to broadcast device locations (including those of AirTags, AirPods, Apple Watches, iPhones) to Home Assistant via MQTT.",
+      "stars": 96,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "mjmccans/airthings-mqtt-ha",
+      "html_url": "https://github.com/mjmccans/airthings-mqtt-ha",
+      "description": "Python script for Airthings devices that uses mqtt to integrate with Home Assistant via mqtt discovery.",
+      "stars": 45,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "mekaneck/Teslamate-Home-Assistant-MQTT-Autodiscovery",
+      "html_url": "https://github.com/mekaneck/Teslamate-Home-Assistant-MQTT-Autodiscovery",
+      "description": "A Home Assistant Script to auto-discover MQTT topics populated by the Teslamate application",
+      "stars": 39,
+      "language": null,
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 12,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Fix invalid device IDs by removing special characters",
+      "description": "Cleanup of device IDs client side for consistency"
+    },
+    {
+      "type": "tool",
+      "name": "Improved terminal output",
+      "description": "Minor improvements"
+    },
+    {
+      "type": "tool",
+      "name": "Support DeviceGroups",
+      "description": "Write comprehensive tests"
+    },
+    {
+      "type": "pip_package",
+      "value": "home-assistant-findmy`"
+    },
+    {
+      "type": "command",
+      "value": "pip3 install --user paho-mqtt"
+    },
+    {
+      "type": "command",
+      "value": "pip3 install --user bleak"
+    },
+    {
+      "type": "command",
+      "value": "./airthings-mqtt-ha.py --generate_config"
+    },
+    {
+      "type": "tool",
+      "name": "A Raspberry Pi 3/4 with built",
+      "description": "in Bluetooth, or a Bluetooth adapter that supports Bluetooth Low Energy (BLE)."
+    },
+    {
+      "type": "tool",
+      "name": "Copy the file ```airthings",
+      "description": "mqtt-ha.service``` found in the systemd directory of this repository into your ```/etc/systemd/system/``` directory."
+    },
+    {
+      "type": "tool",
+      "name": "Update the ```airthings",
+      "description": "mqtt-ha.service``` file to reflect your usernames and paths."
+    },
+    {
+      "type": "pip_package",
+      "value": "--user"
+    },
+    {
+      "type": "pip_package",
+      "value": "--user"
+    }
+  ],
+  "script_summary": "6 tools, 3 pip_packages, 3 commands"
+}

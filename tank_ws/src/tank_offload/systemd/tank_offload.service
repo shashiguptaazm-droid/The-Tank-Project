@@ -1,0 +1,17 @@
+[Unit]
+Description=The Tank — overflow-storage daemon (FastAPI + ROS 2 watcher)
+Documentation=https://
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/the tank project
+EnvironmentFile=-/etc/tank/offload.env
+ExecStart=/usr/bin/python3 -m tank_offload.scripts.run_offload --host 127.0.0.1 --port 8085
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

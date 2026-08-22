@@ -1,0 +1,155 @@
+{
+  "timestamp": "2026-08-05T03:01:12.686991",
+  "topic": "git automation scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "samrocketman/jenkins-bootstrap-shared",
+      "html_url": "https://github.com/samrocketman/jenkins-bootstrap-shared",
+      "description": "Jenkins as immutable infrastructure made easy.  A repository of shared scripts meant to be used as a git submodule.  Packing Jenkins, plugins, and scripts into immutable packages and images.",
+      "stars": 330,
+      "language": "Groovy",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Sfedfcv/redesigned-pancake",
+      "html_url": "https://github.com/Sfedfcv/redesigned-pancake",
+      "description": "Skip to content github / docs Code Issues 80 Pull requests 35 Discussions Actions Projects 2 Security Insights Merge branch 'main' into 1862-Add-Travis-CI-migration-table  1862-Add-Travis-CI-migration-table (#1869, Iixixi/ZachryTylerWood#102, THEBOLCK79/docs#1, sbnbhk/docs#1) @martin389 martin389 co",
+      "stars": 254,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "joshjohanning/github-misc-scripts",
+      "html_url": "https://github.com/joshjohanning/github-misc-scripts",
+      "description": "GitHub script samples for automation",
+      "stars": 228,
+      "language": "Shell",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 27,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git init"
+    },
+    {
+      "type": "command",
+      "value": "git submodule add https://github.com/samrocketman/jenkins-bootstrap-shared"
+    },
+    {
+      "type": "command",
+      "value": "./jenkins-bootstrap-shared/init.sh"
+    },
+    {
+      "type": "command",
+      "value": "git add -A && git commit -m 'initial commit'"
+    },
+    {
+      "type": "command",
+      "value": "./jenkins_bootstrap.sh"
+    },
+    {
+      "type": "command",
+      "value": "./jenkins-bootstrap-shared/scripts/upgrade/upgrade_build_gradle.sh"
+    },
+    {
+      "type": "command",
+      "value": "git add -A && git commit -m 'plugins are installed'"
+    },
+    {
+      "type": "command",
+      "value": "git init"
+    },
+    {
+      "type": "command",
+      "value": "git submodule add https://github.com/samrocketman/jenkins-bootstrap-shared"
+    },
+    {
+      "type": "command",
+      "value": "./jenkins-bootstrap-shared/init.sh"
+    },
+    {
+      "type": "command",
+      "value": "git add -A && git commit -m 'initial commit'"
+    },
+    {
+      "type": "command",
+      "value": "./jenkins-bootstrap-shared/scripts/upgrade/upgrade_build_gradle.sh"
+    },
+    {
+      "type": "command",
+      "value": "git add -A && git commit -m 'plugins are installed'"
+    },
+    {
+      "type": "command",
+      "value": "docker-compose down"
+    },
+    {
+      "type": "command",
+      "value": "docker-compose up -d"
+    },
+    {
+      "type": "tool",
+      "name": "Jenkins as immutable infrastructure made easy.",
+      "description": "See a [real world example][jbj]."
+    },
+    {
+      "type": "tool",
+      "name": "Mac OS X or Linux.",
+      "description": "GNU awk.  Not installed by default on Mac but available via Homebrew.  `brew"
+    },
+    {
+      "type": "tool",
+      "name": "More than two CPU cores recommended.",
+      "description": "More than 6GB of RAM recommended if running Jenkins."
+    },
+    {
+      "type": "tool",
+      "name": "Internal only company plugins can be installed via maven.",
+      "description": "Install plugins not available in the Jenkins Update Center (i.e. formerly"
+    },
+    {
+      "type": "tool",
+      "name": "group:artifact:version@hpi",
+      "description": "`group:artifact:version@jpi`"
+    },
+    {
+      "type": "tool",
+      "name": "clean",
+      "description": "cleans the build directory and all bootstrap related files."
+    },
+    {
+      "type": "tool",
+      "name": "buildRpm",
+      "description": "builds an RPM package for RHEL based Linux distros."
+    },
+    {
+      "type": "tool",
+      "name": "buildDeb",
+      "description": "builds a DEB package for Debian based Linux distros."
+    },
+    {
+      "type": "tool",
+      "name": "buildTar",
+      "description": "builds a TAR file which is used to build a docker container."
+    },
+    {
+      "type": "tool",
+      "name": "packages",
+      "description": "executes `buildRpm`, `buildDeb`, and `buildTar` tasks."
+    },
+    {
+      "type": "tool",
+      "name": "getjenkins",
+      "description": "Downloads `jenkins.war` to the current directory."
+    },
+    {
+      "type": "tool",
+      "name": "getplugins",
+      "description": "Downloads Jenkins plugin HPI files to `./plugins`."
+    }
+  ],
+  "script_summary": "15 commands, 12 tools"
+}

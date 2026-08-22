@@ -1,0 +1,83 @@
+<!--
+
+Copyright 2017-present, The Visdom Authors
+All rights reserved.
+
+This source code is licensed under the license found in the
+LICENSE file in the root directory of this source tree.
+
+-->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Visdom Login</title>
+
+    <link href={{ static_url("css/base.css") }} rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href={{ static_url("css/login.css") }} rel="stylesheet">
+
+    <!-- Hashing Password using Stanford Javascript Crypto Library-->
+    <script src={{ static_url("js/sjcl.js") }}></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+          // initialize the viewer
+          document.getElementById('submitButton').addEventListener('click', (event) => {
+              const username = document.getElementById('inputUsername').value;
+              let password = document.getElementById('inputPassword').value;
+              password = sjcl.hash.sha256.hash(password)
+              const data =
+              {
+                  username: username,
+                  password: sjcl.codec.hex.fromBits(password)
+              };
+              const dataToSend = JSON.stringify(data);
+              fetch('{{base_url}}', {
+                  method: 'POST',
+                  mode: 'cors',
+                  cache: 'no-cache',
+                  credentials: 'same-origin',
+                  headers: {
+                      'Content-Type': 'application/json; charset=utf-8',
+                  },
+                  redirect: 'follow',
+                  referrer: 'no-referrer',
+                  body: dataToSend,
+              })
+                  .then((response) => {
+                      if (!response.ok) {
+                          throw new Error('Invalid login');
+                      }
+                      window.location.replace("{{base_url}}")
+                  })
+                  .catch((err) => {
+                      console.error('Login request failed:', err);
+                      document.getElementById("errorMessage").textContent = "Invalid Login Information";
+                  });
+              event.preventDefault();
+          });
+      });
+
+  </script>
+
+  </head>
+
+  <body class="text-center">
+    <form class="form-signin">
+      <h1 class="h3 mb-3 font-weight-normal">Visdom Login</h1>
+      <label for="inputUsername" class="sr-only">Username</label>
+      <input name=username type="text" id="inputUsername" class="form-control" placeholder="Username" required autofocus>
+      <label for="inputPassword" class="sr-only">Password</label>
+      <input name=password type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+      <button class="btn btn-lg btn-primary btn-block" type="submit" id="submitButton" >Login</button>
+      <p id="errorMessage"></p>
+    </form>
+  </body>
+</html>

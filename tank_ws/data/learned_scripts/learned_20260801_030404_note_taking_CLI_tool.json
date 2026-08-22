@@ -1,0 +1,135 @@
+{
+  "timestamp": "2026-08-01T03:04:04.240561",
+  "topic": "note taking CLI tool",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "rhysd/notes-cli",
+      "html_url": "https://github.com/rhysd/notes-cli",
+      "description": "Small markdown note taking CLI app playing nicely with your favorite editor and other CLI tools",
+      "stars": 264,
+      "language": "Go",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "Don-No7/Hack-SQL",
+      "html_url": "https://github.com/Don-No7/Hack-SQL",
+      "description": "-- -- File generated with SQLiteStudio v3.2.1 on Sun Feb 7 14:58:28 2021 -- -- Text encoding used: System -- PRAGMA foreign_keys = off; BEGIN TRANSACTION;  -- Table: Commands CREATE TABLE Commands (Command_No INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Name TEXT REFERENCES Programs (Name) NOT NULL, ",
+      "stars": 142,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "thesephist/inc",
+      "html_url": "https://github.com/thesephist/inc",
+      "description": "A note-taking tool based on the principles of incremental note-taking, designed for quickly capturing fleeting ideas and growing a knowledge base over time.",
+      "stars": 130,
+      "language": "Makefile",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 20,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Open existing note by `notes ls",
+      "description": "e` and your favorite editor. `$NOTES_CLI_EDITOR` (or `EDITOR` as fallback) must be set."
+    },
+    {
+      "type": "tool",
+      "name": "Check existing notes on terminal with `notes ls",
+      "description": "o` (`-o` means showing one line information for"
+    },
+    {
+      "type": "tool",
+      "name": "Category: blog",
+      "description": "Tags: golang, file"
+    },
+    {
+      "type": "tool",
+      "name": "Created: 2018",
+      "description": "10-28T07:19:27+09:00"
+    },
+    {
+      "type": "tool",
+      "name": "Category: blog",
+      "description": "Tags: golang, file"
+    },
+    {
+      "type": "tool",
+      "name": "Created: 2018",
+      "description": "10-28T07:19:27+09:00"
+    },
+    {
+      "type": "tool",
+      "name": "Category: blog",
+      "description": "Tags: golang, file"
+    },
+    {
+      "type": "tool",
+      "name": "Created: 2018",
+      "description": "10-28T07:19:27+09:00"
+    },
+    {
+      "type": "tool",
+      "name": "Full path to the note file",
+      "description": "Metadata `Category`, `Tags` and `Created`"
+    },
+    {
+      "type": "tool",
+      "name": "Title of note",
+      "description": "Body of note (up to 10 lines)"
+    },
+    {
+      "type": "tool",
+      "name": "2nd field indicates comma",
+      "description": "separated tags of the note. When note has no tag, it leaves as blank."
+    },
+    {
+      "type": "tool",
+      "name": "Agenda:",
+      "description": "Attendee:"
+    },
+    {
+      "type": "tool",
+      "name": "Category: minutes",
+      "description": "Tags:"
+    },
+    {
+      "type": "tool",
+      "name": "Created: 2018",
+      "description": "11-07T14:19:27+09:00"
+    },
+    {
+      "type": "tool",
+      "name": "Agenda:",
+      "description": "Attendee:"
+    },
+    {
+      "type": "tool",
+      "name": "Category: cat",
+      "description": "Tags:"
+    },
+    {
+      "type": "tool",
+      "name": "Created: 2018",
+      "description": "11-09T02:14:27+09:00"
+    },
+    {
+      "type": "tool",
+      "name": "Category: category1",
+      "description": "Tags:"
+    },
+    {
+      "type": "tool",
+      "name": "Created: 2018",
+      "description": "11-15T23:14:27+09:00"
+    },
+    {
+      "type": "tool",
+      "name": "`show N` to show the full",
+      "description": "length version of a note from a list, if that note is too long to be displayed in full in a list. `show` takes multiple arguments, so writing `show 1-4` and `show 1 2 3 4` will both show notes 1, 2, 3"
+    }
+  ],
+  "script_summary": "20 tools"
+}

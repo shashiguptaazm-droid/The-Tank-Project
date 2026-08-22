@@ -1,0 +1,27 @@
+[Unit]
+Description=TankOS — Graphical AI Operating Environment
+Documentation=https://github.com/the-tank-project/tank_os
+After=network.target sound.target
+Wants=network.target
+Before=display-manager.target
+Conflicts=display-manager.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/the\ tank\ project
+Environment="PYTHONPATH=/usr/local/lib/python3.12/dist-packages:/root/the tank project"
+Environment="TANKOS_QT=1"
+Environment="QT_QPA_PLATFORM=eglfs"
+EnvironmentFile=-/etc/default/tankos
+ExecStartPre=/usr/bin/env python3 -c "from tank_os.core.event_bus import EventBus"
+ExecStart=/usr/bin/env python3 -m tank_os.shell.main
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=30
+TimeoutStopSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=graphical.target

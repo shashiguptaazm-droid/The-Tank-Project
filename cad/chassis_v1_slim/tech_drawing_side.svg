@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 220" font-family="Inter, Arial, sans-serif" font-size="11">
+  <defs>
+    <pattern id="clipHatch" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#a16207" stroke-width="0.6"/>
+    </pattern>
+    <marker id="arr2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 z" fill="#0f172a"/>
+    </marker>
+  </defs>
+
+  <rect width="600" height="220" fill="#fafaf9"/>
+  <rect x="40" y="40" width="520" height="140" fill="#ffffff" stroke="#475569" stroke-width="0.8"/>
+
+  <text x="300" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f172a">CHASSIS v1 SLIM — SIDE VIEW (24 mm body height)</text>
+
+  <g transform="translate(60 100) scale(2.4 2.4)">
+    <!-- body slab -->
+    <rect x="0" y="-12" width="80" height="24" fill="#e2e8f0" stroke="#0f172a" stroke-width="0.6" rx="1.4"/>
+    <!-- pi recess  (top opening from y=-7 to y=0, depth shown as dotted line above slab) -->
+    <rect x="22" y="-16" width="28" height="10" fill="#fef3c7" stroke="#b45309" stroke-width="0.5" stroke-dasharray="1 1"/>
+    <!-- motor bay (extruded stub on the right) -->
+    <rect x="80" y="-6" width="14" height="12" fill="#bbf7d0" stroke="#15803d" stroke-width="0.6"/>
+    <line x1="88" y1="0" x2="100" y2="0" stroke="#15803d" stroke-width="0.5" marker-start="url(#arr2)" marker-end="url(#arr2)"/>
+    <!-- shock pivot -->
+    <rect x="6" y="-12" width="3" height="24" fill="#fde68a" stroke="#a16207" stroke-width="0.4"/>
+    <!-- belt clip cavity -->
+    <rect x="40" y="-12" width="10" height="-6" fill="url(#clipHatch)" stroke="#a16207" stroke-width="0.5"/>
+
+    <!-- vertical dimension (overall height) -->
+    <line x1="-12" y1="12" x2="-12" y2="-12" stroke="#0f172a" stroke-width="0.6" marker-start="url(#arr2)" marker-end="url(#arr2)"/>
+    <text x="-18" y="0" font-size="5" fill="#0f172a">24 mm total</text>
+
+    <line x1="-7" y1="12" x2="-7" y2="0" stroke="#475569" stroke-width="0.5" marker-start="url(#arr2)" marker-end="url(#arr2)"/>
+    <text x="-9" y="6" font-size="4" fill="#475569">floor 4 mm</text>
+
+    <line x1="-7" y1="-7" x2="-7" y2="-12" stroke="#475569" stroke-width="0.5" marker-start="url(#arr2)" marker-end="url(#arr2)"/>
+    <text x="-9" y="-9.5" font-size="4" fill="#475569">top 4 mm</text>
+
+    <line x1="20" y1="16" x2="50" y2="16" stroke="#0f172a" stroke-width="0.6" marker-start="url(#arr2)" marker-end="url(#arr2)"/>
+    <text x="32" y="20" font-size="4" fill="#0f172a">Pi pocket 30 mm</text>
+  </g>
+
+  <g transform="translate(60 100) scale(2.4 2.4)">
+    <line x1="0" y1="40" x2="100" y2="40" stroke="#0f172a" stroke-width="0.5" stroke-dasharray="2 2"/>
+  </g>
+
+  <g transform="translate(60 230) scale(1)">
+    <text x="0" y="0" font-size="9" fill="#0f172a" font-weight="bold">SECTION NOTES</text>
+    <text x="0" y="14" font-size="9" fill="#0f172a">Body slab = 24 mm (4 mm floor + 16 mm mid + 4 mm top ceiling of Pi pocket)</text>
+    <text x="0" y="26" font-size="9" fill="#0f172a">Pi recess depth 18 mm — accommodates Pi 5 + M.2 HAT+ stack (22 mm max, just fits)</text>
+    <text x="0" y="38" font-size="9" fill="#0f172a">Battery bay = base_floor_h (4 mm) clearance only; cells sit laterally (Ø 18.4 mm × 65 mm)</text>
+    <text x="0" y="50" font-size="9" fill="#0f172a">Motor bay extends 14 mm beyond body — drops in any TT / N20 motor of similar envelope</text>
+    <text x="0" y="62" font-size="9" fill="#0f172a">Belt-clip latches 6 mm below the top deck — keeps the silhouette under 30 mm</text>
+  </g>
+</svg>

@@ -1,0 +1,39 @@
+{
+  "timestamp": "2026-08-15T03:03:56.093103",
+  "topic": "motion detection automation",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "ap-atul/Video-Editing-Automation",
+      "html_url": "https://github.com/ap-atul/Video-Editing-Automation",
+      "description": "Allows you to edit videos automatically using Motion Detection",
+      "stars": 33,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "SciCraft9/DIY-Security-CAM",
+      "html_url": "https://github.com/SciCraft9/DIY-Security-CAM",
+      "description": "A DIY smart security camera using ESP32-CAM & PIR sensor that captures photos on motion detection and sends alerts via Telegram. Includes live video streaming, battery-powered setup, and full Arduino code with wiring diagrams. Great for beginners and home automation projects.",
+      "stars": 22,
+      "language": "C++",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "VasuGoel/smart-home-automation-system",
+      "html_url": "https://github.com/VasuGoel/smart-home-automation-system",
+      "description": "Intelligent Home Automation System to automate your entire house with features like motion detection, voice control and so much more.",
+      "stars": 14,
+      "language": "C++",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 1,
+  "findings": [
+    {
+      "type": "pip_package",
+      "value": "-r"
+    }
+  ],
+  "script_summary": "1 pip_packages"
+}

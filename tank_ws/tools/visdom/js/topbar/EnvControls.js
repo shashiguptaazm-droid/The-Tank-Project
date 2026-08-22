@@ -1,0 +1,205 @@
+/**
+ * Copyright 2017-present, The Visdom Authors
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
+
+import { Eraser, Eye, FolderOpen, Save } from 'lucide-react';
+import TreeSelect, { SHOW_CHILD } from 'rc-tree-select';
+import React, { useContext, useState } from 'react';
+
+import ApiContext from '../api/ApiContext';
+
+function EnvControls(props) {
+  const { connected, sessionInfo, sendSaveAll } = useContext(ApiContext);
+  const readonly = sessionInfo.readonly;
+  const {
+    envList,
+    envIDs,
+    envSelectorStyle,
+    onEnvSelect,
+    onEnvClear,
+    onEnvManageButton,
+    showAllEnvWindows,
+    onToggleShowAll,
+  } = props;
+  const [confirmClear, setConfirmClear] = useState(false);
+
+  // tree select setup
+  // -------
+  var slist = envList.slice();
+  slist.sort();
+
+  var childrenByPrefix = {};
+  slist.forEach((env) => {
+    var idx = env.indexOf('_');
+    if (idx > 0) {
+      var prefix = env.substring(0, idx);
+      if (!childrenByPrefix[prefix]) childrenByPrefix[prefix] = [];
+      childrenByPrefix[prefix].push(env);
+    }
+  });
+
+  var env_options2 = [];
+  var parentKeys = {};
+
+  Object.keys(childrenByPrefix)
+    .sort()
+    .forEach((prefix) => {
+      parentKeys[prefix] = '__group__' + prefix;
+      env_options2.push({
+        key: '__group__' + prefix,
+        pId: 0,
+        label: prefix,
+        value: '__group__' + prefix,
+      });
+    });
+
+  slist.forEach((env) => {
+    var idx = env.indexOf('_');
+    var prefix = idx > 0 ? env.substring(0, idx) : null;
+    var parentKey = 0;
+
+    if (prefix && parentKeys[prefix] !== undefined) {
+      parentKey = parentKeys[prefix];
+    } else if (parentKeys[env] !== undefined) {
+      parentKey = parentKeys[env];
+    }
+
+    env_options2.push({
+      key: env,
+      pId: parentKey,
+      label: env,
+      value: env,
+    });
+  });
+
+  const validEnvIDs = envIDs.filter((env) => slist.indexOf(env) !== -1);
+  const currentIdx = envIDs.length > 0 ? slist.indexOf(envIDs[0]) : -1;
+  const hasSingleSelectedEnv = envIDs.length === 1 && currentIdx !== -1;
+  const onPrevEnv = () => {
+    if (hasSingleSelectedEnv && currentIdx > 0) {
+      onEnvSelect([slist[currentIdx - 1]]);
+    }
+  };
+  const onNextEnv = () => {
+    if (hasSingleSelectedEnv && currentIdx < slist.length - 1) {
+      onEnvSelect([slist[currentIdx + 1]]);
+    }
+  };
+  const isDisabled = !connected || readonly || !hasSingleSelectedEnv;
+  const isAtStart = isDisabled || currentIdx <= 0;
+  const isAtEnd = isDisabled || currentIdx >= slist.length - 1;
+
+  // rendering
+  // ---------
+  return (
+    <span>
+      <span>Environment&nbsp;</span>
+      <div
+        className="btn-group navbar-btn"
+        role="group"
+        aria-label="Environment:"
+      >
+        <div className="btn-group" role="group">
+          <TreeSelect
+            style={envSelectorStyle}
+            allowClear={true}
+            dropdownStyle={{
+              maxHeight: 'calc(100vh - 200px)',
+              overflow: 'auto',
+              wordBreak: 'break-all',
+            }}
+            placeholder={<i>Select environment(s)</i>}
+            treeLine
+            maxTagTextLength={1000}
+            inputValue={null}
+            value={validEnvIDs}
+            treeData={env_options2}
+            treeNodeFilterProp="label"
+            treeDataSimpleMode={{ id: 'key', rootPId: 0 }}
+            treeCheckable
+            showCheckedStrategy={SHOW_CHILD}
+            listHeight={2000}
+            dropdownMatchSelectWidth={false}
+            onChange={onEnvSelect}
+            treeDefaultExpandedKeys={[]}
+          />
+          {slist.length > 1 && (
+            <div className="env-arrow-wrapper">
+              <button
+                aria-label="Previous Environment"
+                className="env-arrow-btn"
+                title="Previous Environment"
+                disabled={isAtStart}
+                onClick={onPrevEnv}
+              >
+                ▲
+              </button>
+              <button
+                aria-label="Next Environment"
+                className="env-arrow-btn"
+                title="Next Environment"
+                disabled={isAtEnd}
+                onClick={onNextEnv}
+              >
+                ▼
+              </button>
+            </div>
+          )}
+        </div>
+        <button
+          id="clear-button"
+          title={confirmClear ? 'Are you sure?' : 'Clear Current Environment'}
+          className={
+            confirmClear ? 'btn btn-warning btn-sm' : 'btn btn-default btn-sm'
+          }
+          disabled={!(connected && envIDs.length > 0 && !readonly)}
+          onClick={() => {
+            if (confirmClear) {
+              onEnvClear();
+              setConfirmClear(false);
+            } else setConfirmClear(true);
+          }}
+          onBlur={() => setConfirmClear(false)}
+        >
+          <Eraser size={14} />
+        </button>
+        <button
+          title="Save All Environments"
+          className="btn btn-default btn-sm"
+          disabled={!(connected && !readonly)}
+          onClick={sendSaveAll}
+        >
+          <Save size={14} />
+        </button>
+        <button
+          title="Manage Environments"
+          className="btn btn-default btn-sm"
+          disabled={!(connected && envIDs.length > 0 && !readonly)}
+          onClick={onEnvManageButton}
+        >
+          <FolderOpen size={14} />
+        </button>
+        {envIDs.length > 1 && (
+          <button
+            title="Show All Windows from All Environments"
+            className={
+              showAllEnvWindows
+                ? 'btn btn-primary btn-sm'
+                : 'btn btn-default btn-sm'
+            }
+            onClick={onToggleShowAll}
+          >
+            <Eye size={14} />
+          </button>
+        )}
+      </div>
+    </span>
+  );
+}
+
+export default EnvControls;

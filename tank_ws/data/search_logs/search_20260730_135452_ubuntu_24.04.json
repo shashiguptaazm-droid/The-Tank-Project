@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-07-30T13:54:52.030151",
+  "query": "ubuntu 24.04",
+  "duration_ms": 7255.5,
+  "total_results": 3,
+  "results_by_source": {
+    "torrent": {
+      "count": 3,
+      "items": [
+        {
+          "provider": "ThePirateBay",
+          "id": "76519964",
+          "title": "ubuntu-24.04.1-desktop-amd64.iso",
+          "time": "Sun, 08 Sep 2024 18:18:48 GMT",
+          "seeds": 53,
+          "peers": 7,
+          "size": "6.2 GB",
+          "magnet": "magnet:?xt=urn:btih:4A3F5E08BCEF825718EDA30637230585E3330599&dn=ubuntu-24.04.1-desktop-amd64.iso&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2F9.rarbg.to%3A2920%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.pirateparty.gr%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.cyberia.is%3A6969%2Fannounce",
+          "numFiles": 1,
+          "status": "trusted",
+          "category": "303",
+          "imdb": "",
+          "_provider": "ThePirateBay",
+          "source": "torrent"
+        },
+        {
+          "title": "VanDine K  The Ultimate Ubuntu Handbook  A complete guide to Ubuntu 24 04,  2025",
+          "link": "http://itorrents.net/torrent/7B6CAE55DB21441F06EA00A25C2A21E11752EEE2.torrent?title=VanDine-K-The-Ultimate-Ubuntu-Handbook-A-complete-guide-to-Ubuntu-24-04--2025",
+          "seeds": 15,
+          "peers": 1,
+          "time": "11 months ago",
+          "size": "10.99 MB",
+          "desc": "https://www.limetorrents.info/VanDine-K-The-Ultimate-Ubuntu-Handbook-A-complete-guide-to-Ubuntu-24-04--2025-torrent-19124982.html",
+          "provider": "Limetorrents",
+          "_provider": "Limetorrents",
+          "magnet": "",
+          "source": "torrent"
+        },
+        {
+          "provider": "ThePirateBay",
+          "id": "80062964",
+          "title": "VanDine K. The Ultimate Ubuntu Handbook. A complete guide to Ubuntu 24.04,..2025",
+          "time": "Mon, 04 Aug 2025 10:51:10 GMT",
+          "seeds": 11,
+          "peers": 0,
+          "size": "11.5 MB",
+          "magnet": "magnet:?xt=urn:btih:7B6CAE55DB21441F06EA00A25C2A21E11752EEE2&dn=VanDine%20K.%20The%20Ultimate%20Ubuntu%20Handbook.%20A%20complete%20guide%20to%20Ubuntu%2024.04%2C..2025&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2F9.rarbg.to%3A2920%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.pirateparty.gr%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.cyberia.is%3A6969%2Fannounce",
+          "numFiles": 1,
+          "status": "vip",
+          "category": "601",
+          "imdb": "",
+          "_provider": "ThePirateBay",
+          "source": "torrent"
+        }
+      ]
+    }
+  }
+}

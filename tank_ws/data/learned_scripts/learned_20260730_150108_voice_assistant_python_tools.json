@@ -1,0 +1,739 @@
+{
+  "timestamp": "2026-07-30T15:01:08.559985",
+  "topic": "voice assistant python tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "Peuqui/AIfred-Intelligence",
+      "html_url": "https://github.com/Peuqui/AIfred-Intelligence",
+      "description": "\ud83e\udd35 AIfred-Intelligence \u2014 self-hosted Multi-Agent Assistant with Debate Modes (Symposion/Tribunal), Voice (STT + Streaming-TTS), RAG with Long-Term Memory, Web Research and Tool-Calling. Reachable via Web-UI or Telegram/Discord/Email/EPIM. Multi-Backend: llama-swap, Ollama, vLLM, TabbyAPI.",
+      "stars": 33,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "bertrandmbanwi/Jarvis",
+      "html_url": "https://github.com/bertrandmbanwi/Jarvis",
+      "description": "Open-source AI assistant with voice control, browser automation, desktop overlay, and 109+ tools. Built with Python, Next.js, and Three.js.",
+      "stars": 28,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "theaifutureguy/Vocal-Agent",
+      "html_url": "https://github.com/theaifutureguy/Vocal-Agent",
+      "description": "A sophisticated real-time voice assistant that seamlessly integrates speech recognition, AI reasoning, and neural text-to-speech synthesis. It is designed for natural conversational interactions with advanced tool-calling capabilities.",
+      "stars": 26,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 144,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Message Hub",
+      "description": "AIfred as Communication Central**: AIfred monitors external channels and processes incoming messages autonomously. **Runs headless** \u2014 no browser needed. Channel plugins listen in the background, the "
+    },
+    {
+      "type": "tool",
+      "name": "Agent Long",
+      "description": "Term Memory**: Per-agent persistent memory via ChromaDB (BGE-M3 embeddings) \u2014 agents autonomously store insights, combined recall (10 recent + semantic search), session pinning. Memory Browser for ins"
+    },
+    {
+      "type": "tool",
+      "name": "Tool",
+      "description": "Output Token Cap**: Single tool result is capped to keep `system + history + memory + tool_result \u2264 75%` of the active model's context window \u2014 guarantees the model has 25% headroom for its answer. JS"
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "Agent Debate System**: AIfred + Sokrates + Salomo + Vision + unlimited custom agents"
+    },
+    {
+      "type": "tool",
+      "name": "Voice",
+      "description": "Based Mode Switching**: Switch modes, agents, and research settings via natural language \u2014 \"Start Tribunal\", \"Switch to Sokrates\", \"Use deep research and discuss X\". The Automatik-LLM detects mode swi"
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "Backend Support**: llama.cpp via llama-swap (GGUF), Ollama (GGUF), vLLM (AWQ), TabbyAPI (EXL2), Cloud APIs (Qwen, DeepSeek, Claude)"
+    },
+    {
+      "type": "tool",
+      "name": "Stress Burn",
+      "description": "In**: TTS engines are measured under a worst-case bilingual synthesis load on first use. Peak VRAM is cached in `data/tts_vram_cache.json` \u2014 calibrations and live inference use the measured value plus"
+    },
+    {
+      "type": "tool",
+      "name": "Frame",
+      "description": "Source Pipeline**: Plug-in based \u2014 drop a `frame_source` plugin under `plugins/vision_sources/`, it auto-registers with the FrameHub. Built-in: webcam (V4L2 + MJPEG passthrough), file-system snapshot."
+    },
+    {
+      "type": "tool",
+      "name": "RTSP / IP / Wi",
+      "description": "Fi Cameras**: `rtsp_source` \u2014 configured via `rtsp_cameras` in settings, not auto-scanned. Credentials never live in the config: user/password come from the **CredentialBroker** (`.env`), and the full"
+    },
+    {
+      "type": "tool",
+      "name": "Side",
+      "description": "Channel Routing**: Calibration writes a separate `<base>-vlm-<key>` llama-swap profile that holds the VLM's measured VRAM on the second-highest-compute-class GPU. Chat-path resolver picks that profile"
+    },
+    {
+      "type": "tool",
+      "name": "Per",
+      "description": "Camera Briefing**: Each camera carries its own role/identity prompt (e.g. \"hallway near front door\"), prepended to the VLM call so analyses are context-aware"
+    },
+    {
+      "type": "tool",
+      "name": "Zone Masks (ignore / GDPR",
+      "description": "blackout / ROI)**: Per-source painted grid, three types mixable in one frame \u2014 red ignores motion (swaying trees), black blacks out pixels before save *and* before the VLM (GDPR: street/neighbour neve"
+    },
+    {
+      "type": "tool",
+      "name": "Auto",
+      "description": "Describe (nightly + on-demand)**: Background surveillance keeps the VLM off; scene descriptions are backfilled, clustered (one call per happening, not per frame). The nightly garbage collection (03:00"
+    },
+    {
+      "type": "tool",
+      "name": "VRAM Pre",
+      "description": "Check before Bulk-Worker**: Bulk VLM-Analyse aborts cleanly if the side-channel GPU doesn't have enough headroom for the configured VLM batch \u2014 no half-completed run with OOM mid-stream"
+    },
+    {
+      "type": "tool",
+      "name": "AI Cameras (Edge",
+      "description": "AI) as trigger, own detectors decide**: Cameras with on-device person/vehicle/animal detection (`profile: ai_camera`) are polled (`GetAiState`) as a cheap pre-filter; the decision is then made by AIfr"
+    },
+    {
+      "type": "tool",
+      "name": "Vigilantia Feed Live",
+      "description": "Card**: Inline UI card on the main page showing the last N events from any watcher source, refreshed via the 500ms heartbeat (no extra timers, no per-tick state delta \u2014 see [_vigilantia_feed_mixin.py]"
+    },
+    {
+      "type": "tool",
+      "name": "VL Follow",
+      "description": "Up**: Visual Q&A continuation across multiple turns referencing the same image"
+    },
+    {
+      "type": "tool",
+      "name": "Harmony",
+      "description": "Template Support**: GPT-OSS-120B with official Harmony format"
+    },
+    {
+      "type": "tool",
+      "name": "Custom agents addressable by ID or display name (auto",
+      "description": "detected via intent detection)"
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "Agent messages use `role: system` with `[MULTI-AGENT CONTEXT]` prefix"
+    },
+    {
+      "type": "tool",
+      "name": "Each agent sees the conversation from their own perspective",
+      "description": "Sokrates sees AIfred's answers as `[AIFRED]:` (user role), his own as `assistant`"
+    },
+    {
+      "type": "tool",
+      "name": "Round number placeholder `{round_num}`",
+      "description": "Sokrates knows which round it is"
+    },
+    {
+      "type": "tool",
+      "name": "Maximum 1",
+      "description": "2 critique points per round"
+    },
+    {
+      "type": "tool",
+      "name": "Sokrates only critiques",
+      "description": "never decides consensus (that's Salomo's job)"
+    },
+    {
+      "type": "tool",
+      "name": "Auto mode: Intent",
+      "description": "Detection determines base temperature (FACTUAL=0.2, MIXED=0.5, CREATIVE=1.1)"
+    },
+    {
+      "type": "tool",
+      "name": "Manual mode: Per",
+      "description": "agent temperature in the sampling table"
+    },
+    {
+      "type": "tool",
+      "name": "Top",
+      "description": "K, Top-P, Min-P, Repeat-Penalty**: NOT persisted \u2014 reset to model-specific defaults from llama-swap YAML config on every restart"
+    },
+    {
+      "type": "tool",
+      "name": "Standard responses: No label (clean display)",
+      "description": "Multi-Agent modes: `[{Mode}: {Action} R{N}]` format"
+    },
+    {
+      "type": "tool",
+      "name": "Standard: `\ud83c\udfa9 AIfred` (no label)",
+      "description": "Auto-Consensus R1: `\ud83c\udfa9 AIfred [Auto-Consensus: Refinement R1]`"
+    },
+    {
+      "type": "tool",
+      "name": "Tribunal R2: `\ud83c\udfdb\ufe0f Sokrates [Tribunal: Critique R2]`",
+      "description": "Final Verdict: `\ud83d\udc51 Salomo [Tribunal: Verdict R3]`"
+    },
+    {
+      "type": "tool",
+      "name": "Sokrates",
+      "description": "LLM and Salomo-LLM separately selectable (can be different models)"
+    },
+    {
+      "type": "tool",
+      "name": "Max debate rounds (1",
+      "description": "10, default: 3)"
+    },
+    {
+      "type": "tool",
+      "name": "Discussion mode in Settings panel",
+      "description": "\ud83d\udca1 Help icon opens modal with all modes overview"
+    },
+    {
+      "type": "tool",
+      "name": "All agents (AIfred, Sokrates, Salomo) support Thinking Mode",
+      "description": "`<think>` blocks formatted as collapsibles"
+    },
+    {
+      "type": "tool",
+      "name": "VRAM",
+      "description": "Aware Context**: Automatic context sizing based on available GPU memory"
+    },
+    {
+      "type": "tool",
+      "name": "llama",
+      "description": "swap Autoscan**: Automatic model discovery on service start (`scripts/llama-swap-autoscan.py`) \u2014 **zero manual YAML editing required**"
+    },
+    {
+      "type": "tool",
+      "name": "MOSS",
+      "description": "TTS 1.7B** delivers the best speech quality of all open-source models (SIM 73-79%), but at a cost: ~18-22 seconds per sentence makes it unsuitable for streaming. Audio is generated as a batch after th"
+    },
+    {
+      "type": "tool",
+      "name": "DashScope Qwen3",
+      "description": "TTS** adds cloud-based voice cloning via Alibaba Cloud's API. By default it uses sentence-level streaming (same as XTTS) for better intonation. A realtime WebSocket mode (word-level chunks, ~200ms fir"
+    },
+    {
+      "type": "tool",
+      "name": "Visible HTML5 `<audio>` widget with blob",
+      "description": "URL prefetching (next 2 chunks pre-fetched into memory)"
+    },
+    {
+      "type": "tool",
+      "name": "SSE",
+      "description": "based audio streaming from backend to browser (persistent connection, 15s keepalive)"
+    },
+    {
+      "type": "tool",
+      "name": "Per",
+      "description": "provider model memory (each provider remembers its last used model)"
+    },
+    {
+      "type": "tool",
+      "name": "Vision model filtering (excludes `",
+      "description": "vl` variants from main LLM dropdown)"
+    },
+    {
+      "type": "tool",
+      "name": "Streaming support with real",
+      "description": "time output"
+    },
+    {
+      "type": "tool",
+      "name": "Testing larger models without hardware investment",
+      "description": "Mobile/laptop usage without dedicated GPU"
+    },
+    {
+      "type": "tool",
+      "name": "Automatik",
+      "description": "LLM** (Intent Detection, Query Optimization, Addressee Detection): Medium instruct models recommended"
+    },
+    {
+      "type": "tool",
+      "name": "Prevents bias from previous conversation context",
+      "description": "Decision based purely on current question + Vision data"
+    },
+    {
+      "type": "tool",
+      "name": "Cache Hit: 0 + optional 1 Compression",
+      "description": "RAG Context: 2-6 + optional 1 Compression"
+    },
+    {
+      "type": "tool",
+      "name": "Web Research: 4",
+      "description": "5 + optional 1 Compression"
+    },
+    {
+      "type": "tool",
+      "name": "Direct Answer: 2",
+      "description": "3 + optional 1 Compression"
+    },
+    {
+      "type": "tool",
+      "name": "Decision",
+      "description": "Making without history**: Unbiased decision based purely on current query"
+    },
+    {
+      "type": "tool",
+      "name": "Query",
+      "description": "Optimization with history**: Context-aware search for follow-up questions"
+    },
+    {
+      "type": "tool",
+      "name": "Main",
+      "description": "LLM with full history**: Complete conversation context for coherent responses"
+    },
+    {
+      "type": "tool",
+      "name": "Enables context",
+      "description": "aware follow-up queries (e.g., \"Tell me more about that\")"
+    },
+    {
+      "type": "tool",
+      "name": "Limited to 3 turns to keep prompt focused",
+      "description": "Vision JSON injected for image-based searches"
+    },
+    {
+      "type": "tool",
+      "name": "With Cache: 1",
+      "description": "2 + optional 1 Compression"
+    },
+    {
+      "type": "tool",
+      "name": "Without Cache: 3",
+      "description": "4 + optional 1 Compression"
+    },
+    {
+      "type": "tool",
+      "name": "Parallel URL scraping (3 URLs)",
+      "description": "Background LLM preload (Ollama only)"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/state.py",
+      "description": "Main state management, send_message()"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/lib/conversation_handler.py",
+      "description": "Decision logic, RAG context"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/lib/research/orchestrator.py",
+      "description": "Top-level orchestration (incl. URL ranking)"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/lib/research/cache_handler.py",
+      "description": "Session cache"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/lib/research/query_processor.py",
+      "description": "Query optimization + search"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/lib/research/url_ranker.py",
+      "description": "LLM-based URL relevance ranking (NEW)"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/lib/research/scraper_orchestrator.py",
+      "description": "Parallel scraping"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/lib/research/context_builder.py",
+      "description": "Context building + LLM"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/lib/document_store.py",
+      "description": "ChromaDB Documents collection \u2014 token-accurate"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/lib/file_manager.py",
+      "description": "Single source of truth for file-system +"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/lib/vector_cache.py",
+      "description": "ChromaDB semantic cache for web research,"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/lib/agent_memory.py",
+      "description": "Per-agent ChromaDB memory collections"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/lib/tool_output_cap.py",
+      "description": "Token budget for tool results"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/lib/debug_format.py",
+      "description": "Tool-call/result formatting for the"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/lib/intent_detector.py",
+      "description": "Temperature selection"
+    },
+    {
+      "type": "tool",
+      "name": "aifred/lib/agent_tools.py",
+      "description": "Web search, scraping, context building"
+    },
+    {
+      "type": "tool",
+      "name": "\"Start tribunal and discuss climate change\"",
+      "description": "switches to Tribunal mode AND answers"
+    },
+    {
+      "type": "tool",
+      "name": "\"Schalt auf Tiefrecherche\"",
+      "description": "switches to deep research"
+    },
+    {
+      "type": "tool",
+      "name": "\"D\u00e9marre le tribunal\"",
+      "description": "works in French"
+    },
+    {
+      "type": "tool",
+      "name": "\"Nur Sokrates soll antworten\"",
+      "description": "locks the agent to Sokrates"
+    },
+    {
+      "type": "tool",
+      "name": "Per",
+      "description": "session Config**: Agent, discussion mode, and research mode stored per session (not global)"
+    },
+    {
+      "type": "tool",
+      "name": "Python 3.10+",
+      "description": "**LLM Backend** (choose one):"
+    },
+    {
+      "type": "tool",
+      "name": "8GB+ RAM (12GB+ recommended for larger models)",
+      "description": "Docker (for ChromaDB Vector Cache)"
+    },
+    {
+      "type": "tool",
+      "name": "58 built",
+      "description": "in voices + custom voice cloning (6-10s reference audio)"
+    },
+    {
+      "type": "tool",
+      "name": "Automatic GPU/CPU selection based on available VRAM",
+      "description": "**Manual CPU-Mode Toggle**: Save GPU VRAM for larger LLM context window (slower TTS)"
+    },
+    {
+      "type": "tool",
+      "name": "Multilingual support (16 languages) with automatic code",
+      "description": "switching (DE/EN mixed)"
+    },
+    {
+      "type": "tool",
+      "name": "Per",
+      "description": "agent voices with individual pitch and speed settings"
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "Agent TTS Queue**: Sequential playback of AIfred \u2192 Sokrates \u2192 Salomo responses"
+    },
+    {
+      "type": "tool",
+      "name": "Async TTS generation (doesn't block next LLM inference)",
+      "description": "**VRAM Management**: In GPU mode, ~2 GB VRAM is reserved and deducted from LLM context window"
+    },
+    {
+      "type": "tool",
+      "name": "Zero",
+      "description": "shot voice cloning (reference audio, no transcription needed)"
+    },
+    {
+      "type": "tool",
+      "name": "20 languages including German and English",
+      "description": "Excellent speech quality (EN SIM 73.42%, ZH SIM 78.82% - best open-source)"
+    },
+    {
+      "type": "tool",
+      "name": "Recommended for high",
+      "description": "quality offline audio generation, not for real-time streaming"
+    },
+    {
+      "type": "tool",
+      "name": "Each backend remembers its last used models",
+      "description": "When switching backends, the correct models are automatically restored"
+    },
+    {
+      "type": "tool",
+      "name": "Automatik",
+      "description": "LLM**: Reasoning always DISABLED for Automatik decisions (8x faster)"
+    },
+    {
+      "type": "tool",
+      "name": "Summaries appear inline where compression occurred",
+      "description": "Each summary as collapsible with header (number, message count)"
+    },
+    {
+      "type": "tool",
+      "name": "FIFO applies only to `llm_history` (LLM sees 1 summary)",
+      "description": "`chat_history` keeps ALL summaries (user sees full history)"
+    },
+    {
+      "type": "tool",
+      "name": "Executes `systemctl restart aifred",
+      "description": "intelligence`"
+    },
+    {
+      "type": "tool",
+      "name": "Browser reloads automatically after short delay",
+      "description": "Debug logs cleared, sessions preserved"
+    },
+    {
+      "type": "tool",
+      "name": "The frontend auto",
+      "description": "detects the local IP (e.g., `http://192.168.0.252:8002`)"
+    },
+    {
+      "type": "tool",
+      "name": "Disables Vite Hot Module Replacement (HMR) WebSocket",
+      "description": "Prevents \"failed to connect to websocket localhost:3002\" errors"
+    },
+    {
+      "type": "tool",
+      "name": "Reduces resource usage (no dev server overhead)",
+      "description": "Still recompiles on restart when code changes"
+    },
+    {
+      "type": "tool",
+      "name": "No FOUC (CSS loaded synchronously)",
+      "description": "Slightly higher RAM usage (hot reload server)"
+    },
+    {
+      "type": "tool",
+      "name": "More console warnings (React Strict Mode)",
+      "description": "Non-minified bundles (slightly larger)"
+    },
+    {
+      "type": "tool",
+      "name": "Streaming responses work in parallel",
+      "description": "each user gets their own real-time updates"
+    },
+    {
+      "type": "tool",
+      "name": "Request queuing",
+      "description": "Ollama automatically queues concurrent requests internally"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 Chat history (`chat_history`, `llm_history`)",
+      "description": "\u2705 Current messages and streaming responses"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 Image uploads and crop state",
+      "description": "\u2705 Session ID and device ID (cookie-based)"
+    },
+    {
+      "type": "tool",
+      "name": "\u26a0\ufe0f All settings are global (temperature, Multi",
+      "description": "Agent mode, RoPE factors, etc.)"
+    },
+    {
+      "type": "tool",
+      "name": "Each user gets their own correct answer",
+      "description": "Ollama's internal queue handles concurrent requests sequentially"
+    },
+    {
+      "type": "tool",
+      "name": "Settings changes affect all users immediately",
+      "description": "Running requests are safe (parameters already passed to backend)"
+    },
+    {
+      "type": "tool",
+      "name": "Empty sessions are small (~1",
+      "description": "5 KB each)"
+    },
+    {
+      "type": "tool",
+      "name": "Hardware is single",
+      "description": "user oriented**: All users must share the configured backend/models"
+    },
+    {
+      "type": "tool",
+      "name": "Single",
+      "description": "user setups (home server, personal workstation)"
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "user server with concurrent requests"
+    },
+    {
+      "type": "tool",
+      "name": "Maximum generation speed and throughput",
+      "description": "Multi-GPU setups (full tensor split control)"
+    },
+    {
+      "type": "tool",
+      "name": "Large context windows (direct VRAM calibration)",
+      "description": "Production deployments where every tok/s counts"
+    },
+    {
+      "type": "tool",
+      "name": "Quick setup and experimentation",
+      "description": "Automatic model management (`ollama pull`)"
+    },
+    {
+      "type": "tool",
+      "name": "Simpler configuration for beginners",
+      "description": "--"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "vllm"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/YOUR_USERNAME/Jarvis.git"
+    },
+    {
+      "type": "command",
+      "value": "./start.sh full"
+    },
+    {
+      "type": "command",
+      "value": "python -m pytest tests/ -v"
+    },
+    {
+      "type": "command",
+      "value": "python -m pytest tests/ -v --cov=jarvis --cov-report=term-missing"
+    },
+    {
+      "type": "command",
+      "value": "bash scripts/validate.sh"
+    },
+    {
+      "type": "command",
+      "value": "bash scripts/package_macos_app.sh"
+    },
+    {
+      "type": "command",
+      "value": "bash scripts/package_macos_app.sh --install-user"
+    },
+    {
+      "type": "command",
+      "value": "curl -fsSL https://ollama.com/install.sh | sh"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/danieladdisonorg/Vocal-Agent.git"
+    },
+    {
+      "type": "command",
+      "value": "pip3 install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "pip3 install --no-deps kokoro-onnx==0.4.7"
+    },
+    {
+      "type": "command",
+      "value": "python3 main.py"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83c\udf99\ufe0f Real",
+      "description": "time Speech Processing**: Advanced speech recognition using Whisper large-v1 with Silero VAD for accurate voice activity detection"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83c\udf10 Web",
+      "description": "Connected Intelligence**: Integrated web search capabilities (Google Search, Wikipedia, ArXiv) for up-to-date information"
+    },
+    {
+      "type": "tool",
+      "name": "\u26a1 Low",
+      "description": "Latency Pipeline**: Optimized audio processing for real-time conversational experience"
+    },
+    {
+      "type": "tool",
+      "name": "af_heart",
+      "description": "Warm, friendly tone"
+    },
+    {
+      "type": "tool",
+      "name": "af_sky",
+      "description": "Clear, professional tone"
+    },
+    {
+      "type": "tool",
+      "name": "af_bella",
+      "description": "Expressive, dynamic tone"
+    },
+    {
+      "type": "tool",
+      "name": "Additional profiles available in `voices",
+      "description": "v1.0.bin`"
+    },
+    {
+      "type": "tool",
+      "name": "Check microphone permissions",
+      "description": "Verify audio device selection in system settings"
+    },
+    {
+      "type": "tool",
+      "name": "Test with `python3",
+      "description": "c \"import sounddevice; print(sounddevice.query_devices())\"`"
+    },
+    {
+      "type": "tool",
+      "name": "Ensure stable internet connection",
+      "description": "Verify sufficient disk space (models require ~8GB)"
+    },
+    {
+      "type": "tool",
+      "name": "Text",
+      "description": "to-Speech Generation**: ~100-300ms"
+    },
+    {
+      "type": "tool",
+      "name": "Code style and standards",
+      "description": "Testing requirements"
+    },
+    {
+      "type": "tool",
+      "name": "Pull request process",
+      "description": "Issue reporting"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "--no-deps"
+    }
+  ],
+  "script_summary": "128 tools, 4 pip_packages, 12 commands"
+}

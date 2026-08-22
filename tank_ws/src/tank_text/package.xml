@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>tank_text</name>
+  <version>0.1.0</version>
+  <description>The Tank Project — STT (Whisper) + TTS (Piper)</description>
+  <maintainer email="you@example.com">The Tank Project</maintainer>
+  <license>TODO</license>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>tank_speech</exec_depend>
+  <exec_depend>openai-whisper</exec_depend>
+  <exec_depend>piper-tts</exec_depend>
+  <exec_depend>torch</exec_depend>
+  <exec_depend>tflite-runtime</exec_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>

@@ -1,0 +1,201 @@
+{
+  "timestamp": "2026-08-12T03:03:58.785528",
+  "topic": "security hardening scripts linux",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "dolegi/lockdown.sh",
+      "html_url": "https://github.com/dolegi/lockdown.sh",
+      "description": "Lockdown your linux install. The simple zero config linux hardening script",
+      "stars": 368,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "zszszszsz/.config",
+      "html_url": "https://github.com/zszszszsz/.config",
+      "description": "# # Automatically generated file; DO NOT EDIT. # OpenWrt Configuration # CONFIG_MODULES=y CONFIG_HAVE_DOT_CONFIG=y # CONFIG_TARGET_sunxi is not set # CONFIG_TARGET_apm821xx is not set # CONFIG_TARGET_ath25 is not set CONFIG_TARGET_ar71xx=y # CONFIG_TARGET_ath79 is not set # CONFIG_TARGET_bcm27xx is ",
+      "stars": 351,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "maldevel/blue-team",
+      "html_url": "https://github.com/maldevel/blue-team",
+      "description": "Blue Team Scripts",
+      "stars": 254,
+      "language": "Shell",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 38,
+  "findings": [
+    {
+      "type": "command",
+      "value": "wget https://raw.githubusercontent.com/x08d/lockdown.sh/master/lockdown.sh"
+    },
+    {
+      "type": "command",
+      "value": "./lockdown.sh"
+    },
+    {
+      "type": "tool",
+      "name": "Zero Config",
+      "description": "Zero Install"
+    },
+    {
+      "type": "tool",
+      "name": "Updates packages",
+      "description": "Restricts firewall to only allow ssh on `141`"
+    },
+    {
+      "type": "tool",
+      "name": "Installs [fail2ban](https://www.fail2ban.org)",
+      "description": "Configures the kernel"
+    },
+    {
+      "type": "tool",
+      "name": "Adds daily cronjob to update packages on server",
+      "description": "Installs and configures [auditd](https://linux.die.net/man/8/auditd) with sensible rules"
+    },
+    {
+      "type": "tool",
+      "name": "Disables core dumps",
+      "description": "Restricts logins"
+    },
+    {
+      "type": "tool",
+      "name": "Create a new admin user",
+      "description": "Restricts ssh and enables only the created admin user"
+    },
+    {
+      "type": "tool",
+      "name": "Adds a legal banner to /etc/issue and /etc/issue.net",
+      "description": "Installs packages recommended by [lynis](https://github.com/CISOfy/lynis)"
+    },
+    {
+      "type": "tool",
+      "name": "Installs and sets up [aide](https://github.com/aide/aide)",
+      "description": "Enables process accounting"
+    },
+    {
+      "type": "tool",
+      "name": "Disables uncommon filesystems",
+      "description": "Disables firewire and usb storage"
+    },
+    {
+      "type": "tool",
+      "name": "Disables uncommon network protocols",
+      "description": "Restricts access to /root"
+    },
+    {
+      "type": "tool",
+      "name": "Restrict access to compilers",
+      "description": "Moves tmp to tmpfs"
+    },
+    {
+      "type": "tool",
+      "name": "Remounts /tmp /proc /dev /run to be more restrictive",
+      "description": "Purges old and removed packages"
+    },
+    {
+      "type": "tool",
+      "name": "Debian 10",
+      "description": "Debian 8"
+    },
+    {
+      "type": "tool",
+      "name": "(Should work with most debian and debian based OS's)",
+      "description": "Others are coming soon"
+    },
+    {
+      "type": "feature",
+      "value": "Updates packages"
+    },
+    {
+      "type": "feature",
+      "value": "Restricts firewall to only allow ssh on `141`"
+    },
+    {
+      "type": "feature",
+      "value": "Installs [fail2ban](https://www.fail2ban.org)"
+    },
+    {
+      "type": "feature",
+      "value": "Configures the kernel"
+    },
+    {
+      "type": "feature",
+      "value": "Adds daily cronjob to update packages on server"
+    },
+    {
+      "type": "feature",
+      "value": "Installs and configures [auditd](https://linux.die.net/man/8/auditd) with sensible rules"
+    },
+    {
+      "type": "feature",
+      "value": "Disables core dumps"
+    },
+    {
+      "type": "feature",
+      "value": "Restricts logins"
+    },
+    {
+      "type": "feature",
+      "value": "Create a new admin user"
+    },
+    {
+      "type": "feature",
+      "value": "Restricts ssh and enables only the created admin user"
+    },
+    {
+      "type": "feature",
+      "value": "Adds a legal banner to /etc/issue and /etc/issue.net"
+    },
+    {
+      "type": "feature",
+      "value": "Installs packages recommended by [lynis](https://github.com/CISOfy/lynis)"
+    },
+    {
+      "type": "feature",
+      "value": "Installs and sets up [aide](https://github.com/aide/aide)"
+    },
+    {
+      "type": "feature",
+      "value": "Enables process accounting"
+    },
+    {
+      "type": "feature",
+      "value": "Disables uncommon filesystems"
+    },
+    {
+      "type": "feature",
+      "value": "Disables firewire and usb storage"
+    },
+    {
+      "type": "feature",
+      "value": "Disables uncommon network protocols"
+    },
+    {
+      "type": "feature",
+      "value": "Restricts access to /root"
+    },
+    {
+      "type": "feature",
+      "value": "Restrict access to compilers"
+    },
+    {
+      "type": "feature",
+      "value": "Moves tmp to tmpfs"
+    },
+    {
+      "type": "feature",
+      "value": "Remounts /tmp /proc /dev /run to be more restrictive"
+    },
+    {
+      "type": "feature",
+      "value": "Purges old and removed packages"
+    }
+  ],
+  "script_summary": "2 commands, 14 tools, 22 features"
+}

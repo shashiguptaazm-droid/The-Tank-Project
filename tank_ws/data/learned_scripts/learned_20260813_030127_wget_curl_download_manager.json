@@ -1,0 +1,84 @@
+{
+  "timestamp": "2026-08-13T03:01:27.409838",
+  "topic": "wget curl download manager",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "zszszszsz/.config",
+      "html_url": "https://github.com/zszszszsz/.config",
+      "description": "# # Automatically generated file; DO NOT EDIT. # OpenWrt Configuration # CONFIG_MODULES=y CONFIG_HAVE_DOT_CONFIG=y # CONFIG_TARGET_sunxi is not set # CONFIG_TARGET_apm821xx is not set # CONFIG_TARGET_ath25 is not set CONFIG_TARGET_ar71xx=y # CONFIG_TARGET_ath79 is not set # CONFIG_TARGET_bcm27xx is ",
+      "stars": 351,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "trycatchnet/distrofuse",
+      "html_url": "https://github.com/trycatchnet/distrofuse",
+      "description": "Distrofuse is an open-source project that creates a single, cross-distribution interface for diverse Linux package managers (Snap, Flatpak, DNF, Pacman, etc.). It also significantly enhances curl into a smarter download and content management utility. ",
+      "stars": 2,
+      "language": "C",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "gobindacpi/Kubernetes-Installation-on-Ubuntu20.04",
+      "html_url": "https://github.com/gobindacpi/Kubernetes-Installation-on-Ubuntu20.04",
+      "description": "Kubernetes Install On Ubuntu 20.4  Install Docker  ************************************************************   sudo apt-get remove docker docker-engine docker.io containerd runc sudo apt-get update curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings",
+      "stars": 2,
+      "language": null,
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 12,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone git@github.com:trycatchh/distrofuse.git"
+    },
+    {
+      "type": "tool",
+      "name": "GCC Compiler",
+      "description": "Any of the **Package Managers**"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83e\udde9 **Easy to use**: Install any package from which manager you want."
+    },
+    {
+      "type": "feature",
+      "value": "\u26a1 **Fast**: Install packages from the closest mirror for the fastest downloading experience."
+    },
+    {
+      "type": "feature",
+      "value": "\ud83d\udd0d **Modern UI**: Download and Install packages within **Modern and easy to track UI**"
+    },
+    {
+      "type": "feature",
+      "value": "\ud83d\udcdd **Package Managers**: You can currently use **Flatpak, dnf, pacman** and **apt**."
+    },
+    {
+      "type": "feature",
+      "value": "\ud83d\udee1\ufe0f **Active Development**: This project will be developed for **widely used** package managers like **aur, yum, snap, etc.** and Customization."
+    },
+    {
+      "type": "command",
+      "value": "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg"
+    },
+    {
+      "type": "command",
+      "value": "curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add"
+    },
+    {
+      "type": "command",
+      "value": "docker version"
+    },
+    {
+      "type": "command",
+      "value": "wget https://docs.projectcalico.org/manifests/custom-resources.yaml           ;;;edit and set ip block is 10.244.0.0/16"
+    },
+    {
+      "type": "command",
+      "value": "wget https://docs.projectcalico.org/manifests/tigera-operator.yaml"
+    }
+  ],
+  "script_summary": "6 commands, 1 tools, 5 features"
+}

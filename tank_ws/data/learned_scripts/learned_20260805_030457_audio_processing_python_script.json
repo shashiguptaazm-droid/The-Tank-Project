@@ -1,0 +1,364 @@
+{
+  "timestamp": "2026-08-05T03:04:57.226588",
+  "topic": "audio processing python script",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "zszszszsz/.config",
+      "html_url": "https://github.com/zszszszsz/.config",
+      "description": "# # Automatically generated file; DO NOT EDIT. # OpenWrt Configuration # CONFIG_MODULES=y CONFIG_HAVE_DOT_CONFIG=y # CONFIG_TARGET_sunxi is not set # CONFIG_TARGET_apm821xx is not set # CONFIG_TARGET_ath25 is not set CONFIG_TARGET_ar71xx=y # CONFIG_TARGET_ath79 is not set # CONFIG_TARGET_bcm27xx is ",
+      "stars": 351,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "danielraffel/dodgylegally",
+      "html_url": "https://github.com/danielraffel/dodgylegally",
+      "description": "Google Colab Python script designed for creative audio processing and sampling",
+      "stars": 9,
+      "language": "Jupyter Notebook",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "SysAdminDoc/SunoJump",
+      "html_url": "https://github.com/SysAdminDoc/SunoJump",
+      "description": "Audio fingerprint masking tool for Suno AI. 10-pass processing pipeline with non-uniform segment transforms, PyQt6 GUI, batch processing, presets, and in-app preview.",
+      "stars": 9,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 75,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone https://github.com/SysAdminDoc/SunoJump.git"
+    },
+    {
+      "type": "command",
+      "value": "python -m pip install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "python sunojump.py"
+    },
+    {
+      "type": "command",
+      "value": "python -m pip install -r requirements-dev.txt"
+    },
+    {
+      "type": "command",
+      "value": "python tools/audit_dependencies.py"
+    },
+    {
+      "type": "command",
+      "value": "python tools/audit_licenses.py"
+    },
+    {
+      "type": "command",
+      "value": "python tools/build_release.py"
+    },
+    {
+      "type": "command",
+      "value": "python sunojump.py"
+    },
+    {
+      "type": "command",
+      "value": "python sunojump.py -i song.wav -p aggressive"
+    },
+    {
+      "type": "command",
+      "value": "python sunojump.py -i song.wav --pitch 1.5 --phase 0.5 --spectral 0.4"
+    },
+    {
+      "type": "command",
+      "value": "python sunojump.py -i ./my_songs/ -o ./output/ -p moderate -f flac"
+    },
+    {
+      "type": "command",
+      "value": "python sunojump.py -i song.wav -p aggressive --reencode 128"
+    },
+    {
+      "type": "command",
+      "value": "python sunojump.py --resume ./output/SunoJump_Batch_....sunojump-batch.json"
+    },
+    {
+      "type": "command",
+      "value": "python sunojump.py --resume ./output/SunoJump_Batch_....sunojump-batch.json --retry failed"
+    },
+    {
+      "type": "command",
+      "value": "python sunojump.py -i signed.wav --c2pa-policy allow-removal"
+    },
+    {
+      "type": "tool",
+      "name": "A signal",
+      "description": "change or landmark-overlap value does not predict or guarantee any platform, recognition, moderation, or detector outcome."
+    },
+    {
+      "type": "tool",
+      "name": "Python 3.11+",
+      "description": "ffmpeg (optional, for Lossy Re-encode pass)"
+    },
+    {
+      "type": "tool",
+      "name": "PyQt6 Multimedia (optional, for in",
+      "description": "app preview playback; usually bundled)"
+    },
+    {
+      "type": "tool",
+      "name": "LUFS",
+      "description": "preserving Dynamic EQ** \u2014 reshapes band energy without silently changing perceived loudness"
+    },
+    {
+      "type": "tool",
+      "name": "Psychoacoustic noise shaping",
+      "description": "keeps injected pink noise lower in quiet regions and under louder spectral masks"
+    },
+    {
+      "type": "tool",
+      "name": "Narrowband candidate scan",
+      "description": "locates stable spectral candidates per file and targets them during spectral perturbation"
+    },
+    {
+      "type": "tool",
+      "name": "STFT window sweeps",
+      "description": "varies 1024/2048/4096-point windows across randomized spectral segments"
+    },
+    {
+      "type": "tool",
+      "name": "Per",
+      "description": "band spectral controls** \u2014 tune sub-bass, low-mids, presence, and air perturbation independently"
+    },
+    {
+      "type": "tool",
+      "name": "Coupled non",
+      "description": "uniform pitch/tempo processing** \u2014 varies pitch and timing together while keeping segment boundaries aligned"
+    },
+    {
+      "type": "tool",
+      "name": "4 built",
+      "description": "in presets** \u2014 Gentle, Moderate, Aggressive, Extreme + Custom"
+    },
+    {
+      "type": "tool",
+      "name": "Per",
+      "description": "pass toggles and strength sliders** \u2014 fine-grained control"
+    },
+    {
+      "type": "tool",
+      "name": "Render Preview",
+      "description": "hear a 30-second sample with your current settings before committing to full-file processing"
+    },
+    {
+      "type": "tool",
+      "name": "Compare Presets",
+      "description": "one click renders a 20-second sample per preset so you can A/B/C/D audition all four, then apply your favorite"
+    },
+    {
+      "type": "tool",
+      "name": "Responsive, keyboard",
+      "description": "complete GUI** \u2014 panels reflow down to 560\u00d7360, long labels wrap at enlarged font sizes and in RTL layouts, focus is visible, queue actions have keyboard equivalents, and sliders expose displayed unit"
+    },
+    {
+      "type": "tool",
+      "name": "Explicit codec export",
+      "description": "WAV/FLAC/OGG export directly, with MP3/M4A export enabled when ffmpeg is available"
+    },
+    {
+      "type": "tool",
+      "name": "Contained input decoding",
+      "description": "bounded pure-Python container inspection runs before a time/memory/output-capped decoder process; mismatched containers, IRCAM, and WAV IMA ADPCM are rejected before libsndfile"
+    },
+    {
+      "type": "tool",
+      "name": "C2PA provenance guardrail",
+      "description": "locates embedded or adjacent Content Credentials before decode, blocks by default, and records manifest hashes plus the explicit output-without-source-credentials decision without claiming cryptograph"
+    },
+    {
+      "type": "tool",
+      "name": "Transactional output saves",
+      "description": "reserves collision-free names across processes, validates same-folder temporary renders, and atomically publishes without replacing an existing audio or sidecar destination"
+    },
+    {
+      "type": "tool",
+      "name": "Privacy",
+      "description": "controlled diagnostics** \u2014 every GUI and CLI run writes a bounded local log with path redaction on by default; users control retention, preview redaction, confirm deletion, and export atomic support Z"
+    },
+    {
+      "type": "tool",
+      "name": "Scoped local evidence",
+      "description": "reports `sunojump.signal_change v1` plus typed `measured`, `unavailable`, or `error` results from experimental `sunojump.constellation v1`"
+    },
+    {
+      "type": "tool",
+      "name": "Truthful terminal states",
+      "description": "jobs and batches report `succeeded`, `partial`, `failed`, or `cancelled` with stable error codes; only an all-success batch reaches 100%"
+    },
+    {
+      "type": "tool",
+      "name": "Lifecycle",
+      "description": "safe cancellation** \u2014 one Cancel control covers batches, previews, and preset comparisons; closing waits for confirmed worker exit and never removes active temp storage"
+    },
+    {
+      "type": "tool",
+      "name": "Replayable output evidence",
+      "description": "every render displays its effective seed; WAV/FLAC same-environment replays are byte-tested, while sidecars name exact muxer/codec dependencies when bytes are build-sensitive"
+    },
+    {
+      "type": "tool",
+      "name": "Identity",
+      "description": "safe batch queue** \u2014 drag/drop multiple files, reorder them, and process them sequentially; stable job IDs prevent late worker results from attaching to replacement rows"
+    },
+    {
+      "type": "tool",
+      "name": "Resumable batch manifests",
+      "description": "every batch atomically persists inputs, seeds, configuration, attempts, terminal states, and artifact hashes; interrupted and failed-only work can be resumed without replacing existing files"
+    },
+    {
+      "type": "tool",
+      "name": "Custom preset save/load",
+      "description": "export your tuned settings to JSON, share, or reuse"
+    },
+    {
+      "type": "tool",
+      "name": "Guarded in",
+      "description": "memory processing** \u2014 input size/decode limits are enforced; the Humanization pass processes long audio in chunks"
+    },
+    {
+      "type": "tool",
+      "name": "Open Output",
+      "description": "one-click to output folder in your file manager"
+    },
+    {
+      "type": "tool",
+      "name": "Versioned signal",
+      "description": "change metric** \u2014 inspect a sample-domain difference value with explicit scope"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "feature",
+      "value": "**11-pass audio processing pipeline** \u2014 metadata strip, spectral perturbation, dynamic EQ, pitch/tempo micro-shift, phase scrambling, stereo manipulation, noise injection, dynamics, humanization, loss"
+    },
+    {
+      "type": "feature",
+      "value": "**LUFS-preserving Dynamic EQ** \u2014 reshapes band energy without silently changing perceived loudness"
+    },
+    {
+      "type": "feature",
+      "value": "**Psychoacoustic noise shaping** \u2014 keeps injected pink noise lower in quiet regions and under louder spectral masks"
+    },
+    {
+      "type": "feature",
+      "value": "**Narrowband candidate scan** \u2014 locates stable spectral candidates per file and targets them during spectral perturbation"
+    },
+    {
+      "type": "feature",
+      "value": "**STFT window sweeps** \u2014 varies 1024/2048/4096-point windows across randomized spectral segments"
+    },
+    {
+      "type": "feature",
+      "value": "**Per-band spectral controls** \u2014 tune sub-bass, low-mids, presence, and air perturbation independently"
+    },
+    {
+      "type": "feature",
+      "value": "**Coupled non-uniform pitch/tempo processing** \u2014 varies pitch and timing together while keeping segment boundaries aligned"
+    },
+    {
+      "type": "feature",
+      "value": "**4 built-in presets** \u2014 Gentle, Moderate, Aggressive, Extreme + Custom"
+    },
+    {
+      "type": "feature",
+      "value": "**Per-pass toggles and strength sliders** \u2014 fine-grained control"
+    },
+    {
+      "type": "feature",
+      "value": "**Render Preview** \u2014 hear a 30-second sample with your current settings before committing to full-file processing"
+    },
+    {
+      "type": "feature",
+      "value": "**Compare Presets** \u2014 one click renders a 20-second sample per preset so you can A/B/C/D audition all four, then apply your favorite"
+    },
+    {
+      "type": "feature",
+      "value": "**In-app A/B playback** \u2014 play original and processed side-by-side without leaving the app"
+    },
+    {
+      "type": "feature",
+      "value": "**Responsive, keyboard-complete GUI** \u2014 panels reflow down to 560\u00d7360, long labels wrap at enlarged font sizes and in RTL layouts, focus is visible, queue actions have keyboard equivalents, and slider"
+    },
+    {
+      "type": "feature",
+      "value": "**Explicit codec export** \u2014 WAV/FLAC/OGG export directly, with MP3/M4A export enabled when ffmpeg is available"
+    },
+    {
+      "type": "feature",
+      "value": "**Contained input decoding** \u2014 bounded pure-Python container inspection runs before a time/memory/output-capped decoder process; mismatched containers, IRCAM, and WAV IMA ADPCM are rejected before lib"
+    },
+    {
+      "type": "feature",
+      "value": "**C2PA provenance guardrail** \u2014 locates embedded or adjacent Content Credentials before decode, blocks by default, and records manifest hashes plus the explicit output-without-source-credentials decis"
+    },
+    {
+      "type": "feature",
+      "value": "**Transactional output saves** \u2014 reserves collision-free names across processes, validates same-folder temporary renders, and atomically publishes without replacing an existing audio or sidecar destin"
+    },
+    {
+      "type": "feature",
+      "value": "**Privacy-controlled diagnostics** \u2014 every GUI and CLI run writes a bounded local log with path redaction on by default; users control retention, preview redaction, confirm deletion, and export atomic"
+    },
+    {
+      "type": "feature",
+      "value": "**Scoped local evidence** \u2014 reports `sunojump.signal_change v1` plus typed `measured`, `unavailable`, or `error` results from experimental `sunojump.constellation v1`"
+    },
+    {
+      "type": "feature",
+      "value": "**Truthful terminal states** \u2014 jobs and batches report `succeeded`, `partial`, `failed`, or `cancelled` with stable error codes; only an all-success batch reaches 100%"
+    },
+    {
+      "type": "feature",
+      "value": "**Lifecycle-safe cancellation** \u2014 one Cancel control covers batches, previews, and preset comparisons; closing waits for confirmed worker exit and never removes active temp storage"
+    },
+    {
+      "type": "feature",
+      "value": "**Replayable output evidence** \u2014 every render displays its effective seed; WAV/FLAC same-environment replays are byte-tested, while sidecars name exact muxer/codec dependencies when bytes are build-se"
+    },
+    {
+      "type": "feature",
+      "value": "**Identity-safe batch queue** \u2014 drag/drop multiple files, reorder them, and process them sequentially; stable job IDs prevent late worker results from attaching to replacement rows"
+    },
+    {
+      "type": "feature",
+      "value": "**Resumable batch manifests** \u2014 every batch atomically persists inputs, seeds, configuration, attempts, terminal states, and artifact hashes; interrupted and failed-only work can be resumed without re"
+    },
+    {
+      "type": "feature",
+      "value": "**Custom preset save/load** \u2014 export your tuned settings to JSON, share, or reuse"
+    },
+    {
+      "type": "feature",
+      "value": "**Guarded in-memory processing** \u2014 input size/decode limits are enforced; the Humanization pass processes long audio in chunks"
+    },
+    {
+      "type": "feature",
+      "value": "**Open Output** \u2014 one-click to output folder in your file manager"
+    },
+    {
+      "type": "feature",
+      "value": "**Versioned signal-change metric** \u2014 inspect a sample-domain difference value with explicit scope"
+    }
+  ],
+  "script_summary": "15 commands, 29 tools, 3 pip_packages, 28 features"
+}

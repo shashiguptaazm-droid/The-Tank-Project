@@ -1,0 +1,166 @@
+{
+  "timestamp": "2026-08-16T03:01:50.137613",
+  "topic": "spotify downloader tool",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "SwapnilSoni1999/spotify-dl",
+      "html_url": "https://github.com/SwapnilSoni1999/spotify-dl",
+      "description": "Spotify Downloader and alternative of Spotdl(python) tool made in NodeJS based on youtube-dl ",
+      "stars": 1663,
+      "language": "JavaScript",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "rafaelrafaaa0/Djael-Media-Grabber",
+      "html_url": "https://github.com/rafaelrafaaa0/Djael-Media-Grabber",
+      "description": "Best YouTube & Spotify Playlist to MP3 Downloader Tool 2026",
+      "stars": 116,
+      "language": "HTML",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Delitefully/spotify-canvas-downloader",
+      "html_url": "https://github.com/Delitefully/spotify-canvas-downloader",
+      "description": "Tool to get Canvas cover videos from Spotify",
+      "stars": 79,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 29,
+  "findings": [
+    {
+      "type": "command",
+      "value": "npm install -g https://github.com/swapnilsoni1999/spotify-dl"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/SwapnilSoni1999/spotify-dl"
+    },
+    {
+      "type": "command",
+      "value": "npm install"
+    },
+    {
+      "type": "command",
+      "value": "npm link"
+    },
+    {
+      "type": "command",
+      "value": "docker run -it --user=$(id -u):$(id -g) -v $(pwd):/download --rm ghcr.io/swapnilsoni1999/spotify-dl <options-to-spotify-dl defaults to --help>"
+    },
+    {
+      "type": "command",
+      "value": "docker run -it --user=$(id -u):$(id -g) -v $(pwd):/download --rm ghcr.io/swapnilsoni1999/spotify-dl \"https://open.spotify.com/....\""
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/SwapnilSoni1999/spotify-dl"
+    },
+    {
+      "type": "command",
+      "value": "docker build -t spotify-dl ."
+    },
+    {
+      "type": "command",
+      "value": "docker run -it --user=$(id -u):$(id -g) -v $(pwd):/download --rm spotify-dl \"https://open.spotify.com/....\""
+    },
+    {
+      "type": "tool",
+      "name": "you now need to add `127.0.0.1 some",
+      "description": "random-host.com` to `/etc/hosts` if linux or `C:\\Windows\\System32\\Drivers\\etc\\hosts` if windows"
+    },
+    {
+      "type": "npm_package",
+      "value": "https://github.com/swapnilsoni1999/spotify-dl`"
+    },
+    {
+      "type": "npm_package",
+      "value": "https://github.com/swapnilsoni1999/spotify-dl"
+    },
+    {
+      "type": "npm_package",
+      "value": "npm"
+    },
+    {
+      "type": "tool",
+      "name": "Spotify",
+      "description": "Full playlist, album, and artist discography extraction with collaborative playlist support"
+    },
+    {
+      "type": "tool",
+      "name": "YouTube / YouTube Music",
+      "description": "Public, unlisted, and private playlist processing with adaptive quality selection"
+    },
+    {
+      "type": "tool",
+      "name": "SoundCloud",
+      "description": "Set, repost, and liked track aggregation"
+    },
+    {
+      "type": "tool",
+      "name": "Deezer",
+      "description": "Flow, playlist, and chart extraction"
+    },
+    {
+      "type": "tool",
+      "name": "Apple Music",
+      "description": "User-created and editorial playlist mirroring"
+    },
+    {
+      "type": "tool",
+      "name": "Bandcamp",
+      "description": "Full discography and collection downloads with lossless source detection"
+    },
+    {
+      "type": "tool",
+      "name": "Digital Millennium Copyright Act (DMCA) compliance",
+      "description": "No circumvention of regional restrictions or license violations"
+    },
+    {
+      "type": "tool",
+      "name": "Rate Limiting",
+      "description": "Intelligent throttling prevents abuse of streaming platform infrastructure"
+    },
+    {
+      "type": "tool",
+      "name": "Attribution Preservation",
+      "description": "All embedded metadata retains original creator, composer, and publisher information"
+    },
+    {
+      "type": "tool",
+      "name": "Private Content Privacy",
+      "description": "No storage of user account credentials or access tokens"
+    },
+    {
+      "type": "tool",
+      "name": "Custom output formats (WAV, AIFF, DSD)",
+      "description": "Alternative metadata sources (Discogs, MusicBrainz, Wikidata)"
+    },
+    {
+      "type": "tool",
+      "name": "Post",
+      "description": "processing hooks (volume leveling, silence trimming, gapless encoding)"
+    },
+    {
+      "type": "tool",
+      "name": "Custom storage providers (S3",
+      "description": "compatible buckets, WebDAV, SFTP)"
+    },
+    {
+      "type": "tool",
+      "name": "Extracted content should only be retained for personal, non",
+      "description": "commercial use in accordance with fair use provisions"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/Delitefully/spotify-canvas-downloader"
+    },
+    {
+      "type": "command",
+      "value": "docker-compose up"
+    }
+  ],
+  "script_summary": "11 commands, 15 tools, 3 npm_packages"
+}

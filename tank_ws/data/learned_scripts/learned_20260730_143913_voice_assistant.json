@@ -1,0 +1,411 @@
+{
+  "timestamp": "2026-07-30T14:39:13.620889",
+  "topic": "voice assistant",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "RasaHQ/rasa",
+      "html_url": "https://github.com/RasaHQ/rasa",
+      "description": "\ud83d\udcac   Open source machine learning framework to automate text- and voice-based conversations: NLU, dialogue management, connect to Slack, Facebook, and more - Create chatbots and voice assistants",
+      "stars": 21270,
+      "language": "Python",
+      "default_branch": "3.6.x"
+    },
+    {
+      "full_name": "huggingface/speech-to-speech",
+      "html_url": "https://github.com/huggingface/speech-to-speech",
+      "description": "Build local voice agents with open-source models",
+      "stars": 8237,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "huangjunsen0406/py-xiaozhi",
+      "html_url": "https://github.com/huangjunsen0406/py-xiaozhi",
+      "description": "Open-source AI assistant ecosystem with MCP integrations, multimodal workflows, IoT support, and cross-platform voice interaction.",
+      "stars": 3427,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 86,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Built",
+      "description": "in copilot:** A specialized AI assistant helps you generate code, debug flows, and expand your agent instantly."
+    },
+    {
+      "type": "tool",
+      "name": "Facebook Messenger",
+      "description": "Slack"
+    },
+    {
+      "type": "tool",
+      "name": "Google Hangouts",
+      "description": "Webex Teams"
+    },
+    {
+      "type": "tool",
+      "name": "Microsoft Bot Framework",
+      "description": "Rocket.Chat"
+    },
+    {
+      "type": "tool",
+      "name": "Mattermost",
+      "description": "Telegram"
+    },
+    {
+      "type": "tool",
+      "name": "Twilio",
+      "description": "Your own custom conversational channels"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83e\udd13 [Read the docs](https://rasa.com/docs/rasa/)",
+      "description": "\ud83d\ude01 [Install Rasa](https://rasa.com/docs/rasa/installation/environment-set-up)"
+    },
+    {
+      "type": "feature",
+      "value": "**Network:** Meet engineers building production agents"
+    },
+    {
+      "type": "feature",
+      "value": "**Learn:** Discuss practical patterns, not just theory"
+    },
+    {
+      "type": "feature",
+      "value": "**Access:** Direct influence on the Hello Rasa roadmap and early access to features"
+    },
+    {
+      "type": "feature",
+      "value": "Facebook Messenger"
+    },
+    {
+      "type": "feature",
+      "value": "Slack"
+    },
+    {
+      "type": "feature",
+      "value": "Google Hangouts"
+    },
+    {
+      "type": "feature",
+      "value": "Webex Teams"
+    },
+    {
+      "type": "feature",
+      "value": "Microsoft Bot Framework"
+    },
+    {
+      "type": "feature",
+      "value": "Rocket.Chat"
+    },
+    {
+      "type": "feature",
+      "value": "Mattermost"
+    },
+    {
+      "type": "feature",
+      "value": "Telegram"
+    },
+    {
+      "type": "feature",
+      "value": "Twilio"
+    },
+    {
+      "type": "feature",
+      "value": "Your own custom conversational channels"
+    },
+    {
+      "type": "command",
+      "value": "pip install speech-to-speech"
+    },
+    {
+      "type": "command",
+      "value": "python scripts/listen_and_play_realtime.py --host 127.0.0.1 --port 8765"
+    },
+    {
+      "type": "command",
+      "value": "pip install speech-to-speech"
+    },
+    {
+      "type": "command",
+      "value": "pip install \"qwentts-cpp-python==0.3.1+cu130\" \\"
+    },
+    {
+      "type": "command",
+      "value": "pip install \"qwentts-cpp-python==0.3.1+cu124\" \\"
+    },
+    {
+      "type": "command",
+      "value": "pip install \"qwentts-cpp-python==0.3.1+cpu\" \\"
+    },
+    {
+      "type": "command",
+      "value": "pip install speech-to-speech"
+    },
+    {
+      "type": "command",
+      "value": "pip install \"speech-to-speech[kokoro]\"          # Kokoro-82M TTS on non-macOS"
+    },
+    {
+      "type": "command",
+      "value": "pip install \"speech-to-speech[pocket]\"          # Pocket TTS"
+    },
+    {
+      "type": "command",
+      "value": "pip install \"speech-to-speech[chattts]\"         # ChatTTS"
+    },
+    {
+      "type": "command",
+      "value": "pip install \"speech-to-speech[facebook-mms]\"    # MMS TTS"
+    },
+    {
+      "type": "command",
+      "value": "pip install \"speech-to-speech[faster-whisper]\"  # Faster Whisper STT"
+    },
+    {
+      "type": "command",
+      "value": "pip install \"speech-to-speech[whisper-mlx]\"     # Lightning Whisper MLX STT on macOS"
+    },
+    {
+      "type": "command",
+      "value": "pip install \"speech-to-speech[paraformer]\"      # Paraformer STT through FunASR"
+    },
+    {
+      "type": "command",
+      "value": "pip install \"speech-to-speech[mlx-lm]\"          # mlx-vlm support for vision models on macOS"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/huggingface/speech-to-speech.git"
+    },
+    {
+      "type": "command",
+      "value": "python scripts/benchmark_tts.py \\"
+    },
+    {
+      "type": "command",
+      "value": "python scripts/listen_and_play.py --host <IP address of your server>"
+    },
+    {
+      "type": "command",
+      "value": "docker compose up"
+    },
+    {
+      "type": "tool",
+      "name": "Parakeet TDT for STT",
+      "description": "OpenAI-compatible API for the language model"
+    },
+    {
+      "type": "tool",
+      "name": "Qwen3",
+      "description": "TTS for speech output, using the GGML backend by default on non-macOS platforms and `mlx-audio` on Apple Silicon"
+    },
+    {
+      "type": "tool",
+      "name": "Adds `",
+      "description": "-device mps` to use MPS for all models."
+    },
+    {
+      "type": "tool",
+      "name": "Sets Parakeet TDT for STT.",
+      "description": "Sets MLX LM as the LLM backend."
+    },
+    {
+      "type": "tool",
+      "name": "Sets Qwen3",
+      "description": "TTS for TTS, using `mlx-audio` with the `6bit` MLX variant by default."
+    },
+    {
+      "type": "tool",
+      "name": "Sets `",
+      "description": "-mode local`."
+    },
+    {
+      "type": "tool",
+      "name": "Self",
+      "description": "hosted servers**: `responses-api` and `chat-completions` can point at a local [vLLM](https://github.com/vllm-project/vllm) or [llama.cpp](https://github.com/ggerganov/llama.cpp) server."
+    },
+    {
+      "type": "tool",
+      "name": "a common `",
+      "description": "-device`, if every part should run on the same device"
+    },
+    {
+      "type": "tool",
+      "name": "STT implementation (`",
+      "description": "-stt`)"
+    },
+    {
+      "type": "tool",
+      "name": "LLM backend (`",
+      "description": "-llm_backend`: `transformers`, `mlx-lm`, `responses-api`, or `chat-completions`)"
+    },
+    {
+      "type": "tool",
+      "name": "TTS implementation (`",
+      "description": "-tts`)"
+    },
+    {
+      "type": "tool",
+      "name": "logging level",
+      "description": "realtime pipeline pool size (`--num_pipelines`)"
+    },
+    {
+      "type": "pip_package",
+      "value": "speech-to-speech"
+    },
+    {
+      "type": "pip_package",
+      "value": "speech-to-speech"
+    },
+    {
+      "type": "pip_package",
+      "value": "\"qwentts-cpp-python==0.3.1+cu130\""
+    },
+    {
+      "type": "pip_package",
+      "value": "\"qwentts-cpp-python==0.3.1+cu124\""
+    },
+    {
+      "type": "pip_package",
+      "value": "\"qwentts-cpp-python==0.3.1+cpu\""
+    },
+    {
+      "type": "pip_package",
+      "value": "speech-to-speech"
+    },
+    {
+      "type": "pip_package",
+      "value": "\"speech-to-speech[kokoro]\""
+    },
+    {
+      "type": "pip_package",
+      "value": "\"speech-to-speech[pocket]\""
+    },
+    {
+      "type": "pip_package",
+      "value": "\"speech-to-speech[chattts]\""
+    },
+    {
+      "type": "pip_package",
+      "value": "\"speech-to-speech[facebook-mms]\""
+    },
+    {
+      "type": "pip_package",
+      "value": "\"speech-to-speech[faster-whisper]\""
+    },
+    {
+      "type": "pip_package",
+      "value": "\"speech-to-speech[whisper-mlx]\""
+    },
+    {
+      "type": "pip_package",
+      "value": "\"speech-to-speech[paraformer]\""
+    },
+    {
+      "type": "pip_package",
+      "value": "\"speech-to-speech[mlx-lm]\""
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/huangjunsen0406/py-xiaozhi.git"
+    },
+    {
+      "type": "command",
+      "value": "./format_code.sh"
+    },
+    {
+      "type": "command",
+      "value": "python main.py"
+    },
+    {
+      "type": "command",
+      "value": "python main.py --mode cli"
+    },
+    {
+      "type": "command",
+      "value": "python main.py --protocol websocket  # WebSocket (default)"
+    },
+    {
+      "type": "command",
+      "value": "python main.py --protocol mqtt       # MQTT protocol"
+    },
+    {
+      "type": "tool",
+      "name": "Real",
+      "description": "time Voice AI** \u2014 Opus codec with auto frame detection (RFC 6716 TOC parsing), async streaming, sub-20ms latency"
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "modal Vision** \u2014 Camera capture + vision-language model integration for image understanding and scene perception"
+    },
+    {
+      "type": "tool",
+      "name": "MCP Tool Ecosystem",
+      "description": "Modular JSON-RPC 2.0 tool server: music player, camera, screenshot, app management, weather, volume control"
+    },
+    {
+      "type": "tool",
+      "name": "Cross",
+      "description": "platform Deployment** \u2014 Windows 10+ / macOS 10.15+ / Linux (x86_64 & ARM), optimized for Raspberry Pi and edge boards"
+    },
+    {
+      "type": "tool",
+      "name": "Multiple UI Modes",
+      "description": "PySide6 + QML GUI / CLI / GPIO, adapting to desktop, headless server, and embedded environments"
+    },
+    {
+      "type": "tool",
+      "name": "Offline Wake Word",
+      "description": "Sherpa-ONNX based on-device keyword spotting with custom wake word support"
+    },
+    {
+      "type": "tool",
+      "name": "IoT & Embodied AI Ready",
+      "description": "GPIO interface for robotics control, hardware actuation, and sensor integration"
+    },
+    {
+      "type": "tool",
+      "name": "WebSocket / MQTT",
+      "description": "Dual protocol communication with WSS/TLS encrypted transmission and auto-reconnection"
+    },
+    {
+      "type": "tool",
+      "name": "Plugin Architecture",
+      "description": "Event-driven async design, clean dependency injection, extensible plugin system"
+    },
+    {
+      "type": "tool",
+      "name": "Voice Wake",
+      "description": "up**: Requires downloading Sherpa-ONNX speech recognition models"
+    },
+    {
+      "type": "tool",
+      "name": "Carefully read [\u9879\u76ee\u6587\u6863](https://huangjunsen0406.github.io/py",
+      "description": "xiaozhi/) for startup tutorials and file descriptions"
+    },
+    {
+      "type": "tool",
+      "name": "Event",
+      "description": "Driven Architecture**: Based on asyncio asynchronous event loop, supporting high-concurrency processing"
+    },
+    {
+      "type": "tool",
+      "name": "Test",
+      "description": "Driven**: Write unit tests to ensure code quality"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    }
+  ],
+  "script_summary": "32 tools, 13 features, 25 commands, 16 pip_packages"
+}

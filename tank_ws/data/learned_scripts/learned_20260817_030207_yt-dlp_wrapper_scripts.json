@@ -1,0 +1,197 @@
+{
+  "timestamp": "2026-08-17T03:02:07.403950",
+  "topic": "yt-dlp wrapper scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "mrblomblo/yt-dlp-usage-script",
+      "html_url": "https://github.com/mrblomblo/yt-dlp-usage-script",
+      "description": "This script is made to make usage of YT-DLP easier.",
+      "stars": 78,
+      "language": "Batchfile",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Lazza/ffmpeg-wrapper-scripts",
+      "html_url": "https://github.com/Lazza/ffmpeg-wrapper-scripts",
+      "description": "FFmpeg wrappers useful for yt-dlp and Stacher",
+      "stars": 3,
+      "language": "Shell",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "sharunashwanth/insta-dl",
+      "html_url": "https://github.com/sharunashwanth/insta-dl",
+      "description": "A wrapper script to download Instagram posts using yt-dlp and gallery-dl",
+      "stars": 2,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 36,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Semi",
+      "description": "automatic setup (automatic creation of folders and log file) *(see photo below)*"
+    },
+    {
+      "type": "tool",
+      "name": "Easy [customization](https://github.com/mrblomblo/yt",
+      "description": "dlp-usage-script#customization) with YT-DLP CLI args in VARS.txt"
+    },
+    {
+      "type": "tool",
+      "name": "aargs:",
+      "description": "-embed-chapters --embed-metadata --embed-thumbnail"
+    },
+    {
+      "type": "tool",
+      "name": "vargs:",
+      "description": "-embed-chapters --embed-metadata --embed-thumbnail"
+    },
+    {
+      "type": "tool",
+      "name": "margs:",
+      "description": "-sponsorblock-remove \"music_offtopic\""
+    },
+    {
+      "type": "tool",
+      "name": "Most of the args used for the music command",
+      "description": "[YTDLnis](https://github.com/deniscerri/ytdlnis)"
+    },
+    {
+      "type": "tool",
+      "name": "URL check",
+      "description": "[Google Gemini](https://gemini.google.com)"
+    },
+    {
+      "type": "tool",
+      "name": "Improved dependency check",
+      "description": "[Google Gemini](https://gemini.google.com)"
+    },
+    {
+      "type": "tool",
+      "name": "Help with troubleshooting VARS.txt not loading properly",
+      "description": "[Microsoft Copilot](https://copilot.microsoft.com/)"
+    },
+    {
+      "type": "tool",
+      "name": "Discovery that lead to a bug being fixed",
+      "description": "[FrostyMangg](https://www.youtube.com/@FrostyMangg)"
+    },
+    {
+      "type": "tool",
+      "name": "Getting the current directory (for update.bat)",
+      "description": "[Tamara Wijsman](https://superuser.com/a/160712)"
+    },
+    {
+      "type": "feature",
+      "value": "Audio downloads (mp3) *(see photo below)*"
+    },
+    {
+      "type": "feature",
+      "value": "Video downloads (mp4) *(see photo below)*"
+    },
+    {
+      "type": "feature",
+      "value": "Music downloads (FLAC) *(see photo below)*"
+    },
+    {
+      "type": "feature",
+      "value": "Semi-automatic setup (automatic creation of folders and log file) *(see photo below)*"
+    },
+    {
+      "type": "feature",
+      "value": "Detection of missing dependencies *(see photo below)*"
+    },
+    {
+      "type": "feature",
+      "value": "Detection of invalid URL format and invalid user inputs"
+    },
+    {
+      "type": "feature",
+      "value": "Easy [customization](https://github.com/mrblomblo/yt-dlp-usage-script#customization) with YT-DLP CLI args in VARS.txt"
+    },
+    {
+      "type": "feature",
+      "value": "Easy updates with [update.bat](https://github.com/mrblomblo/yt-dlp-usage-script#updates)"
+    },
+    {
+      "type": "feature",
+      "value": "Manual resolution picker (*Disabled by default, but can be enabled in VARS.txt*)"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/yourusername/instagram-downloader.git"
+    },
+    {
+      "type": "command",
+      "value": "pip install requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "python script.py \"https://www.instagram.com/p/EXAMPLE/\" \"output_filename\""
+    },
+    {
+      "type": "tool",
+      "name": "Download Instagram videos, reels, and multi",
+      "description": "posts"
+    },
+    {
+      "type": "tool",
+      "name": "Automatically convert images to JPG (optional)",
+      "description": "Uses cookies for authenticated downloads"
+    },
+    {
+      "type": "tool",
+      "name": "Supports playlist downloading",
+      "description": "Simple and user-friendly command-line usage"
+    },
+    {
+      "type": "tool",
+      "name": "yt-dlp",
+      "description": "For downloading Instagram videos"
+    },
+    {
+      "type": "tool",
+      "name": "gallery-dl",
+      "description": "For extracting Instagram images"
+    },
+    {
+      "type": "tool",
+      "name": "Pillow",
+      "description": "For image processing (JPG conversion)"
+    },
+    {
+      "type": "tool",
+      "name": "Requests",
+      "description": "For handling HTTP requests"
+    },
+    {
+      "type": "pip_package",
+      "value": "requirements.txt"
+    },
+    {
+      "type": "feature",
+      "value": "Download Instagram videos, reels, and multi-posts"
+    },
+    {
+      "type": "feature",
+      "value": "Automatically convert images to JPG (optional)"
+    },
+    {
+      "type": "feature",
+      "value": "Uses cookies for authenticated downloads"
+    },
+    {
+      "type": "feature",
+      "value": "Supports playlist downloading"
+    },
+    {
+      "type": "feature",
+      "value": "Simple and user-friendly command-line usage"
+    }
+  ],
+  "script_summary": "18 tools, 14 features, 3 commands, 1 pip_packages"
+}

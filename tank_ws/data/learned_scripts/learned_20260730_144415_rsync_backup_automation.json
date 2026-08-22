@@ -1,0 +1,197 @@
+{
+  "timestamp": "2026-07-30T14:44:15.805874",
+  "topic": "rsync backup automation",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "mk-fg/lafs-backup-tool",
+      "html_url": "https://github.com/mk-fg/lafs-backup-tool",
+      "description": "Tool to securely push incremental (think \"rsync --link-dest\") backups to tahoe-lafs",
+      "stars": 9,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "chzvz/usb-auto-sync",
+      "html_url": "https://github.com/chzvz/usb-auto-sync",
+      "description": "Automatically sync a folder to a USB drive whenever it\u2019s plugged in.",
+      "stars": 5,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "florian101010/NAS-Docker-Backup-rsync",
+      "html_url": "https://github.com/florian101010/NAS-Docker-Backup-rsync",
+      "description": "Docker backup script for NAS systems with parallelization, error handling, and automatic container management. Uses rsync for data synchronization, supports ACL preservation, and includes fallback mechanisms for broad compatibility.",
+      "stars": 4,
+      "language": "Shell",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 36,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "(optional) [pyliblzma](https://launchpad.net/pyliblzma)",
+      "description": "if xz compression is used"
+    },
+    {
+      "type": "tool",
+      "name": "Phase one: generate queue",
+      "description": "file with an ordered list of path of files/dirs and"
+    },
+    {
+      "type": "tool",
+      "name": "Phase two: read queue",
+      "description": "file line-by-line and upload each file (checking if it's"
+    },
+    {
+      "type": "tool",
+      "name": "lafs_op",
+      "description": "instance of LAFSOperation subclass, representing currently running"
+    },
+    {
+      "type": "tool",
+      "name": "`optz`, `optz_parser`",
+      "description": "argparse namespace and ArgumentParser objects."
+    },
+    {
+      "type": "pip_package",
+      "value": "'git+https://github.com/mk-fg/lafs-backup-tool.git#egg=lafs-backup-tool'"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/chzvz/usb-auto-sync.git"
+    },
+    {
+      "type": "tool",
+      "name": "your source folder changes",
+      "description": "the USB is plugged in and mounted"
+    },
+    {
+      "type": "command",
+      "value": "wget https://raw.githubusercontent.com/florian101010/NAS-Docker-Backup-rsync/main/docker_backup.sh && \\"
+    },
+    {
+      "type": "command",
+      "value": "wget https://raw.githubusercontent.com/florian101010/NAS-Docker-Backup-rsync/main/test_rsync_fix.sh && \\"
+    },
+    {
+      "type": "command",
+      "value": "wget https://raw.githubusercontent.com/florian101010/NAS-Docker-Backup-rsync/main/docker_backup_de.sh && \\"
+    },
+    {
+      "type": "command",
+      "value": "wget https://raw.githubusercontent.com/florian101010/NAS-Docker-Backup-rsync/main/test_rsync_fix_de.sh && \\"
+    },
+    {
+      "type": "command",
+      "value": "./docker_backup.sh --dry-run"
+    },
+    {
+      "type": "command",
+      "value": "./docker_backup.sh"
+    },
+    {
+      "type": "command",
+      "value": "./docker_backup.sh --auto"
+    },
+    {
+      "type": "command",
+      "value": "./docker_backup.sh --dry-run"
+    },
+    {
+      "type": "command",
+      "value": "./docker_backup.sh"
+    },
+    {
+      "type": "command",
+      "value": "./docker_backup.sh --auto"
+    },
+    {
+      "type": "command",
+      "value": "./docker_backup.sh --auto --parallel 4 --use-stop"
+    },
+    {
+      "type": "command",
+      "value": "./docker_backup.sh --auto --preserve-acl"
+    },
+    {
+      "type": "command",
+      "value": "docker ps -a"
+    },
+    {
+      "type": "command",
+      "value": "docker logs <container_name>"
+    },
+    {
+      "type": "command",
+      "value": "./docker_backup.sh --auto"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/florian101010/NAS-Docker-Backup-rsync.git"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\udee1\ufe0f Production",
+      "description": "Safe**: Thread-safe operations with atomic lock protection"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\udcca Real",
+      "description": "time Monitoring**: Live container status tracking with color-coded progress indicators"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\udd04 rsync",
+      "description": "based Synchronization**: Standard rsync behavior with intelligent flag validation and multi-tier fallback"
+    },
+    {
+      "type": "tool",
+      "name": "Always test with `",
+      "description": "-dry-run` first"
+    },
+    {
+      "type": "tool",
+      "name": "Ensure backup destination has 2x source size available",
+      "description": "Use `--parallel 4` for faster backups on powerful systems"
+    },
+    {
+      "type": "tool",
+      "name": "Fail",
+      "description": "Fast**: `set -euo pipefail` prevents unnoticed errors"
+    },
+    {
+      "type": "tool",
+      "name": "Directory size comparison with configurable tolerance",
+      "description": "File and directory count verification"
+    },
+    {
+      "type": "tool",
+      "name": "ACL and extended attributes support (when available)",
+      "description": "Detailed error reporting with specific rsync exit code analysis"
+    },
+    {
+      "type": "tool",
+      "name": "Detailed container status with color",
+      "description": "coded terminal output"
+    },
+    {
+      "type": "tool",
+      "name": "Thread",
+      "description": "safe logging for parallel operations"
+    },
+    {
+      "type": "tool",
+      "name": "\u25b6 Container started (green)",
+      "description": "\u23f8 Container stopped (yellow)"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\uddd1 Container removed (red)",
+      "description": "\ud83d\udce6 Container created (blue)"
+    }
+  ],
+  "script_summary": "18 tools, 1 pip_packages, 17 commands"
+}

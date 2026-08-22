@@ -1,0 +1,218 @@
+{
+  "timestamp": "2026-07-31T03:03:31.456300",
+  "topic": "plex jellyfin automation",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "DialmasterOrg/Youtarr",
+      "html_url": "https://github.com/DialmasterOrg/Youtarr",
+      "description": "Self-hosted web app that automates downloading, organizing, and scheduling YouTube channel content with support for Plex, Kodi, Emby and Jellyfin",
+      "stars": 1467,
+      "language": "TypeScript",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "RandomNinjaAtk/arr-scripts",
+      "html_url": "https://github.com/RandomNinjaAtk/arr-scripts",
+      "description": "Extended Container Scripts - Automation scripts to make life easier!",
+      "stars": 1447,
+      "language": "Shell",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "giuseppe99barchetta/SuggestArr",
+      "html_url": "https://github.com/giuseppe99barchetta/SuggestArr",
+      "description": "Effortlessly request recommended movies, TV shows and anime to Jellyseer/Overseer based on your recently watched content on Jellyfin, Plex or Emby\u2014let SuggestArr handle it all automatically, keeping your library fresh with new and exciting content!",
+      "stars": 1234,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 41,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Family",
+      "description": "Friendly**: Create curated, safe YouTube experiences with multi-library support"
+    },
+    {
+      "type": "tool",
+      "name": "Channel Grouping & Multi",
+      "description": "Library Support**: Organize channels into custom subfolders (e.g., `__kids`, `__music`, `__news`) to create separate media server libraries"
+    },
+    {
+      "type": "tool",
+      "name": "Auto",
+      "description": "Cleanup**: Age and space-based removal of videos with dry-run previews"
+    },
+    {
+      "type": "tool",
+      "name": "Powered by yt",
+      "description": "dlp**: Uses [yt-dlp](https://github.com/yt-dlp/yt-dlp) under the hood for YouTube integration and downloads"
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "Media Server Support**: Supports Jellyfin, Plex, and Emby for retrieving media content."
+    },
+    {
+      "type": "tool",
+      "name": "Pending",
+      "description": "Request Job Pause**: Skip scheduled or manual jobs while Seer still has requests waiting for approval or denial."
+    },
+    {
+      "type": "tool",
+      "name": "Unwatched",
+      "description": "Suggestion Pause**: Optionally pause scheduled recommendation jobs when a user has not watched a SuggestArr request within a configurable number of days; manual runs remain available."
+    },
+    {
+      "type": "tool",
+      "name": "Real",
+      "description": "Time Logs**: View and filter logs in real time (e.g., `INFO`, `ERROR`, `DEBUG`)."
+    },
+    {
+      "type": "tool",
+      "name": "Per",
+      "description": "User Request Visibility**: Filter requests by media-server account, or let administrators limit regular users to requests for their linked Plex, Jellyfin, or Emby account."
+    },
+    {
+      "type": "tool",
+      "name": "Configuration Pre",
+      "description": "testing**: Automatically validates API keys and URLs during setup."
+    },
+    {
+      "type": "tool",
+      "name": "Recent Trakt watches can be used as recommendation seeds.",
+      "description": "Fully watched Trakt items can be added to the skip-watched set."
+    },
+    {
+      "type": "tool",
+      "name": "keeps favorited items",
+      "description": "skips items no longer present in the media library"
+    },
+    {
+      "type": "tool",
+      "name": "logs what would be deleted in dry",
+      "description": "run mode"
+    },
+    {
+      "type": "tool",
+      "name": "Natural language queries",
+      "description": "describe mood, genre, decade, language, or specific themes"
+    },
+    {
+      "type": "tool",
+      "name": "Viewing",
+      "description": "history personalisation** \u2014 the AI tailors results based on what you (or your users) have already watched"
+    },
+    {
+      "type": "tool",
+      "name": "Exclude already",
+      "description": "watched titles** \u2014 hide content you've already seen"
+    },
+    {
+      "type": "tool",
+      "name": "One",
+      "description": "click requesting** \u2014 send results directly to Seer without leaving the page"
+    },
+    {
+      "type": "tool",
+      "name": "Query interpretation badge",
+      "description": "see how the AI parsed your query (genres, year range, language, min rating)"
+    },
+    {
+      "type": "tool",
+      "name": "\u2615 [Ko",
+      "description": "fi](https://ko-fi.com/ciuse99)"
+    },
+    {
+      "type": "feature",
+      "value": "**Multi-Media Server Support**: Supports Jellyfin, Plex, and Emby for retrieving media content."
+    },
+    {
+      "type": "feature",
+      "value": "**TMDb Integration**: Searches for similar movies and TV shows on TMDb."
+    },
+    {
+      "type": "feature",
+      "value": "**AI-Powered Recommendations** *(beta)*: Uses any OpenAI-compatible LLM (OpenAI, Ollama, Gemini, LiteLLM\u2026) to generate hyper-personalized suggestions based on watch history, complete with AI reasoning"
+    },
+    {
+      "type": "feature",
+      "value": "**AI Search** *(beta)*: Describe in natural language what you want to watch and let the AI find matching titles, personalised to your viewing history, with one-click request to Seer."
+    },
+    {
+      "type": "feature",
+      "value": "**Trakt Watch History**: Let each user link their own Trakt account. SuggestArr can use Trakt recent watches as recommendation seeds and skip content already watched on Trakt."
+    },
+    {
+      "type": "feature",
+      "value": "**Automated Requests**: Sends download requests for recommended content to Seer."
+    },
+    {
+      "type": "feature",
+      "value": "**Pending-Request Job Pause**: Skip scheduled or manual jobs while Seer still has requests waiting for approval or denial."
+    },
+    {
+      "type": "feature",
+      "value": "**Unwatched-Suggestion Pause**: Optionally pause scheduled recommendation jobs when a user has not watched a SuggestArr request within a configurable number of days; manual runs remain available."
+    },
+    {
+      "type": "feature",
+      "value": "**Cleanup Automation**: Optionally prune old SuggestArr-originated requests and files when users never favorite them in Plex, Jellyfin, or Emby."
+    },
+    {
+      "type": "feature",
+      "value": "**Web Interface**: A user-friendly interface for configuration and management."
+    },
+    {
+      "type": "feature",
+      "value": "**Real-Time Logs**: View and filter logs in real time (e.g., `INFO`, `ERROR`, `DEBUG`)."
+    },
+    {
+      "type": "feature",
+      "value": "**User Selection**: Choose specific users to initiate requests, allowing management and approval of auto-requested content."
+    },
+    {
+      "type": "feature",
+      "value": "**Per-User Request Visibility**: Filter requests by media-server account, or let administrators limit regular users to requests for their linked Plex, Jellyfin, or Emby account."
+    },
+    {
+      "type": "feature",
+      "value": "**Cron Job Management**: Update the cron job schedule directly from the web interface."
+    },
+    {
+      "type": "feature",
+      "value": "**Configuration Pre-testing**: Automatically validates API keys and URLs during setup."
+    },
+    {
+      "type": "feature",
+      "value": "**Content Filtering**: Exclude requests for content already available on streaming platforms in your country."
+    },
+    {
+      "type": "feature",
+      "value": "**External Database Support**: Use external databases (PostgreSQL, MySQL) in addition to SQLite for improved scalability and performance."
+    },
+    {
+      "type": "feature",
+      "value": "Recent Trakt watches can be used as recommendation seeds."
+    },
+    {
+      "type": "feature",
+      "value": "Fully watched Trakt items can be added to the skip-watched set."
+    },
+    {
+      "type": "feature",
+      "value": "Each SuggestArr user links their own Trakt account from their profile."
+    },
+    {
+      "type": "feature",
+      "value": "Admins configure only the shared Trakt app credentials."
+    },
+    {
+      "type": "feature",
+      "value": "A collapsible **Recent Trakt Preview** panel shows the latest items fetched from Trakt when opened."
+    }
+  ],
+  "script_summary": "19 tools, 22 features"
+}

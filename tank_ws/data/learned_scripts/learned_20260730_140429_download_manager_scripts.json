@@ -1,0 +1,380 @@
+{
+  "timestamp": "2026-07-30T14:04:29.289247",
+  "topic": "download manager scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "tytsxai/IDM-Activation-Script-Chinese",
+      "html_url": "https://github.com/tytsxai/IDM-Activation-Script-Chinese",
+      "description": "IDM \u6fc0\u6d3b\u811a\u672c\u4e2d\u6587\u7248 \u00b7 GPL-3.0 \u5f00\u6e90 Windows \u6279\u5904\u7406\u5de5\u5177\uff1a\u652f\u6301\u8bd5\u7528\u671f\u51bb\u7ed3\u3001\u666e\u901a\u6fc0\u6d3b\u3001\u4e00\u952e\u91cd\u7f6e\u4e0e\u73af\u5883\u81ea\u68c0\uff0cGBK \u4e2d\u6587\u83dc\u5355\u65e0\u4e71\u7801 | Chinese edition of IDM Activation Script \u2014 GBK-encoded batch toolkit for Internet Download Manager on Windows 7/8/10/11, no binary patching, automatic registry backup",
+      "stars": 1153,
+      "language": "Batchfile",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Y0URD34TH/Project-GLD",
+      "html_url": "https://github.com/Y0URD34TH/Project-GLD",
+      "description": "Project GLD is a game library and download manager, which supports community made Lua scripts for downloading and searching games.",
+      "stars": 482,
+      "language": "Lua",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "zszszszsz/.config",
+      "html_url": "https://github.com/zszszszsz/.config",
+      "description": "# # Automatically generated file; DO NOT EDIT. # OpenWrt Configuration # CONFIG_MODULES=y CONFIG_HAVE_DOT_CONFIG=y # CONFIG_TARGET_sunxi is not set # CONFIG_TARGET_apm821xx is not set # CONFIG_TARGET_ath25 is not set CONFIG_TARGET_ar71xx=y # CONFIG_TARGET_ath79 is not set # CONFIG_TARGET_bcm27xx is ",
+      "stars": 351,
+      "language": "Shell",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 69,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "\u4f1a\u4fee\u6539 IDM \u76f8\u5173\u6ce8\u518c\u8868\u952e\uff08\u8fd0\u884c\u524d\u81ea\u52a8\u5907\u4efd\u3001\u53ef\u8fd8\u539f\uff09\uff0c\u5efa\u8bae\u53ea\u5728\u81ea\u5df1\u53ef\u63a7\u7684\u8bbe\u5907\u4e0a\u4f7f\u7528\u3002",
+      "description": "SmartScreen / Defender / \u7b2c\u4e09\u65b9\u6740\u8f6f\u53ef\u80fd\u62e6\u622a\u672a\u7b7e\u540d\u6279\u5904\u7406\uff0c\u5c5e\u5e38\u89c1\u8bef\u62a5\uff1b\u53ef\u5148\u6821\u9a8c SHA256 \u518d\u8fd0\u884c\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "\u6700\u65b0\u7248\u538b\u7f29\u5305\uff08\u70b9\u51fb\u53f3\u952e\u53e6\u5b58\u4e3a\uff09\uff1a[IDM",
+      "description": "Activation-Script.zip](https://github.com/tytsxai/IDM-Activation-Script-Chinese/raw/main/release/IDM-Activation-Script.zip)"
+    },
+    {
+      "type": "tool",
+      "name": "\u6821\u9a8c\u503c\uff08SHA256\uff09\uff1a[IDM",
+      "description": "Activation-Script.zip.sha256](https://github.com/tytsxai/IDM-Activation-Script-Chinese/raw/main/release/IDM-Activation-Script.zip.sha256)"
+    },
+    {
+      "type": "tool",
+      "name": "[\u9879\u76ee\u7b80\u4ecb](#\u9879\u76ee\u7b80\u4ecb)",
+      "description": "[\u5feb\u901f\u4e0b\u8f7d](#\u5feb\u901f\u4e0b\u8f7d)"
+    },
+    {
+      "type": "tool",
+      "name": "[\u529f\u80fd\u7279\u6027](#\u529f\u80fd\u7279\u6027)",
+      "description": "[\u7cfb\u7edf\u8981\u6c42](#\u7cfb\u7edf\u8981\u6c42)"
+    },
+    {
+      "type": "tool",
+      "name": "[\u4f7f\u7528\u65b9\u6cd5](#\u4f7f\u7528\u65b9\u6cd5)",
+      "description": "[\u529f\u80fd\u8bf4\u660e](#\u529f\u80fd\u8bf4\u660e)"
+    },
+    {
+      "type": "tool",
+      "name": "[\u4f7f\u7528\u573a\u666f](#\u4f7f\u7528\u573a\u666f)",
+      "description": "[\u5e38\u89c1\u95ee\u9898](#\u5e38\u89c1\u95ee\u9898)"
+    },
+    {
+      "type": "tool",
+      "name": "[\u6280\u672f\u7ec6\u8282](#\u6280\u672f\u7ec6\u8282)",
+      "description": "[\u6587\u4ef6\u8bf4\u660e](#\u6587\u4ef6\u8bf4\u660e)"
+    },
+    {
+      "type": "tool",
+      "name": "[\u66f4\u65b0\u65e5\u5fd7](#\u66f4\u65b0\u65e5\u5fd7)",
+      "description": "[\u7ef4\u62a4\u4e0e\u8d21\u732e](#\u7ef4\u62a4\u4e0e\u8d21\u732e)"
+    },
+    {
+      "type": "tool",
+      "name": "[\u76f8\u5173\u94fe\u63a5](#\u76f8\u5173\u94fe\u63a5)",
+      "description": "[\u514d\u8d23\u58f0\u660e](#\u514d\u8d23\u58f0\u660e)"
+    },
+    {
+      "type": "tool",
+      "name": "[\u8bb8\u53ef\u8bc1](#\u8bb8\u53ef\u8bc1)",
+      "description": "[\u7248\u672c\u4e0e\u7ef4\u62a4](#\u7248\u672c\u4e0e\u7ef4\u62a4)"
+    },
+    {
+      "type": "tool",
+      "name": "\u53f3\u952e\u811a\u672c\u6587\u4ef6",
+      "description": "\u9009\u62e9\"\u4ee5\u7ba1\u7406\u5458\u8eab\u4efd\u8fd0\u884c\""
+    },
+    {
+      "type": "tool",
+      "name": "\u8054\u7cfb\u672c\u673a/\u57df\u7ba1\u7406\u5458\u89e3\u9664\u9650\u5236",
+      "description": "\u5728 PowerShell \u7ec8\u7aef\u6267\u884c `Set-ExecutionPolicy RemoteSigned`\uff08\u9700\u7ba1\u7406\u5458\u6743\u9650\uff09"
+    },
+    {
+      "type": "tool",
+      "name": "24H2 \u9ed8\u8ba4\u542f\u7528 SmartScreen \u4e0e\u4e91\u4fdd\u62a4\uff0c\u9996\u6b21\u8fd0\u884c\u65f6\u53ef\u80fd\u5f39\u51fa\"\u5df2\u963b\u6b62\"\u63d0\u793a",
+      "description": "\u53f3\u952e `\u5f00\u59cb\u6fc0\u6d3b.cmd` \u2192 \u5c5e\u6027 \u2192 \u5e95\u90e8\u52fe\u9009\"\u89e3\u9664\u9501\u5b9a\"\uff0c\u518d\u4ee5\u7ba1\u7406\u5458\u8eab\u4efd\u8fd0\u884c"
+    },
+    {
+      "type": "tool",
+      "name": "\u672c\u811a\u672c\u6d89\u53ca\u6ce8\u518c\u8868\u5199\u5165\u3001WMI \u67e5\u8be2\u4e0e PowerShell \u63d0\u6743\uff0c\u542f\u53d1\u5f0f\u5f15\u64ce\u53ef\u80fd\u4ea7\u751f\u8bef\u62a5",
+      "description": "\u5982\u679c\u4fe1\u4efb\u672c\u4ed3\u5e93\u53d1\u5e03\u7684 `release` \u4ea7\u7269\uff08\u53ef\u7528 `release/IDM-Activation-Script.zip.sha256` \u6821\u9a8c\uff09\uff0c\u53ef\u628a\u89e3\u538b\u76ee\u5f55\u52a0\u5165 Defender \u6392\u9664\u9879\u518d\u8fd0\u884c"
+    },
+    {
+      "type": "tool",
+      "name": "\u6821\u9a8c\u547d\u4ee4\uff1aPowerShell \u91cc `Get",
+      "description": "FileHash IDM-Activation-Script.zip -Algorithm SHA256`\uff0c\u4e0e `.sha256` \u6587\u4ef6\u5185\u5bb9\u6bd4\u5bf9"
+    },
+    {
+      "type": "tool",
+      "name": "WDAC \u6216 AppLocker \u7b56\u7565\u901a\u5e38\u4f1a\u963b\u6b62\u672a\u7b7e\u540d\u811a\u672c\u8fd0\u884c\uff0c\u8fd9\u662f\u4f01\u4e1a IT \u7684\u7b56\u7565\u5c42\u62e6\u622a\uff0c\u4e0d\u662f\u811a\u672c\u672c\u8eab\u7684\u95ee\u9898",
+      "description": "\u6b63\u786e\u5904\u7406\u65b9\u5f0f\u662f\u8054\u7cfb IT \u83b7\u53d6\u6388\u6743\uff0c\u4e0d\u5efa\u8bae\u7ed5\u8fc7"
+    },
+    {
+      "type": "tool",
+      "name": "\u672c\u811a\u672c\u57fa\u4e8e IDM \u6ce8\u518c\u8868 CLSID \u7ed3\u6784\u5de5\u4f5c\uff0cIDM 6.x \u7cfb\u5217\u6574\u4f53\u4fdd\u6301\u517c\u5bb9",
+      "description": "\u82e5\u66f4\u65b0 IDM \u540e\u53d1\u73b0\u6fc0\u6d3b\u5931\u6548\uff0c\u5efa\u8bae\u5148\u5728\u83dc\u5355\u9009 `[3]` \u6267\u884c\"\u91cd\u7f6e\u6fc0\u6d3b\"\uff08\u6216 `IAS.cmd /res`\uff09\uff0c\u518d\u91cd\u65b0\u9009\u62e9 `[2]` \"\u6fc0\u6d3b\"\uff1b\u82e5\u6fc0\u6d3b\u540e\u4ecd\u63d0\u793a\u672a\u6ce8\u518c\uff0c\u6539\u7528 `[1]` \"\u51bb\u7ed3\u6fc0\u6d3b\""
+    },
+    {
+      "type": "tool",
+      "name": "\u811a\u672c\u4e0d\u662f\u5e38\u9a7b\u7a0b\u5e8f\uff0c\u6267\u884c\u5b8c\u6210\u540e\u4e0d\u4f1a\u7559\u540e\u53f0\u8fdb\u7a0b\u3002",
+      "description": "\u51bb\u7ed3/\u6fc0\u6d3b\u6d41\u7a0b\u53ef\u80fd\u4f1a\u77ed\u6682\u542f\u52a8 IDM \u505a\u72b6\u6001\u9a8c\u8bc1\uff1b\u5982\u679c IDM \u4e4b\u540e\u53c8\u81ea\u5df1\u51fa\u73b0\uff0c\u901a\u5e38\u662f IDM \u81ea\u8eab\u7684\u542f\u52a8\u9879\u3001\u6258\u76d8\u9a7b\u7559\u3001\u6d4f\u89c8\u5668\u96c6\u6210\u6216\u8ba1\u5212\u4efb\u52a1\u884c\u4e3a\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "\u53ef\u4ee5\u5728 IDM \u8bbe\u7f6e\u91cc\u5173\u95ed\"\u5f00\u673a\u542f\u52a8\"/\u6258\u76d8\u76f8\u5173\u9009\u9879\uff0c\u5e76\u5728\u4efb\u52a1\u7ba1\u7406\u5668\u7684\"\u542f\u52a8\u5e94\u7528\"\u91cc\u786e\u8ba4 IDM \u6ca1\u6709\u88ab\u8bbe\u7f6e\u4e3a\u5f00\u673a\u542f\u52a8\u3002",
+      "description": "\u5982\u4ecd\u5f02\u5e38\uff0c\u8bf7\u5728 Issue \u4e2d\u8865\u5145 `\u5f00\u59cb\u6fc0\u6d3b.cmd` \u5b8c\u6574\u73af\u5883\u68c0\u6d4b\u8f93\u51fa\u3001\u5b9e\u9645\u8fd0\u884c\u5165\u53e3\u3001IDM \u7248\u672c\u548c\u590d\u73b0\u6b65\u9aa4\uff1b\u53ea\u5199 `1` \u6216\u7a7a\u65e5\u5fd7\u65e0\u6cd5\u5224\u65ad\u811a\u672c\u95ee\u9898\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "\u6240\u6709 `.cmd`/`.txt` \u6587\u4ef6\u4f7f\u7528 GBK\uff08\u4ee3\u7801\u9875 936\uff09\u4fdd\u5b58\uff0c\u5e76\u5728\u8fd0\u884c\u65f6\u5f3a\u5236\u5207\u6362\u63a7\u5236\u53f0\u5230\u76f8\u540c\u4ee3\u7801\u9875\u4ee5\u4fdd\u8bc1\u4e2d\u6587\u663e\u793a\u3002",
+      "description": "\u5728 UTF-8 \u73af\u5883\u4e0b\u9605\u8bfb\u6e90\u7801\uff0c\u53ef\u4f7f\u7528 `iconv -f GBK -t UTF-8 IAS.cmd`\uff08\u6216\u66ff\u6362\u4e3a\u5176\u4ed6\u6587\u4ef6\u540d\uff09\u6216\u652f\u6301 GBK \u7684\u6587\u672c\u7f16\u8f91\u5668\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 \u4e0d\u4fee\u6539 IDM \u7a0b\u5e8f\u6587\u4ef6",
+      "description": "\u2705 \u4ec5\u4fee\u6539\u6ce8\u518c\u8868\u914d\u7f6e"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 \u81ea\u52a8\u5907\u4efd\uff0c\u53ef\u968f\u65f6\u6062\u590d",
+      "description": "\u2705 \u5f00\u6e90\u900f\u660e\uff0c\u4ee3\u7801\u53ef\u5ba1\u67e5"
+    },
+    {
+      "type": "tool",
+      "name": "\u53d1\u5e03\u5305\u6539\u7528\u56fa\u5b9a\u6587\u4ef6\u540d `IDM",
+      "description": "Activation-Script.zip`**\uff08\u4e0d\u5e26\u7248\u672c\u53f7\uff09\uff1a\u4ee5\u524d\u6bcf\u53d1\u4e00\u7248\u5c31\u591a\u4e00\u4e2a `IDM-Activation-Script-v<\u7248\u672c>.zip`\uff0cREADME / `llms.txt` / `README.en.md` \u7684\u4e0b\u8f7d\u94fe\u63a5\u6bcf\u6b21\u90fd\u8981\u8ddf\u7740\u6539\uff0c\u6f0f\u6539\u5c31\u4f1a\u6307\u5411\u65e7\u5305\u3002\u73b0\u5728\u94fe\u63a5\u4e00\u6b21\u5199\u6b7b\u3001\u6c38\u8fdc\u6307\u5411\u6700\u65b0\u7248\uff1b\u7248\u672c\u53f7\u7531 Git tag\u3001Release \u6807\u9898\u3001`CHANGELOG.md` \u548c `IAS.c"
+    },
+    {
+      "type": "tool",
+      "name": "`IAS.cmd` \u7248\u672c\u53f7 `1.4.0` \u2192 `1.4.1`\uff0c\u4fdd\u6301\u811a\u672c\u81ea\u62a5\u7248\u672c\u4e0e tag\u3001\u53d1\u5e03\u5305\u4e00\u81f4\u3002",
+      "description": "**\u811a\u672c\u903b\u8f91\u96f6\u6539\u52a8**\uff0c\u529f\u80fd\u4e0e v1.4.0 \u5b8c\u5168\u4e00\u81f4\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "\u83dc\u5355\u7f16\u53f7\u76f8\u5e94\u8c03\u6574\uff1a`[6] \u4e0b\u8f7d IDM`\u3001`[7] \u5e2e\u52a9`\uff0c`[1]` `[2]` `[3]` \u4fdd\u6301\u4e0d\u53d8\u3002",
+      "description": "\u65b0\u589e FAQ **Q15**\uff08\u5173\u95ed IDM \u66f4\u65b0\u63d0\u793a\u7684\u5b8c\u6574\u6b65\u9aa4\u4e0e\u5f71\u54cd\uff09\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "CI \u589e\u52a0\u5192\u70df\u7528\u4f8b\uff1a\u65e0 IDM \u73af\u5883\u4e0b `IAS.cmd /noupd /silent` \u5e94\u8fd4\u56de\u7801 1\u3002",
+      "description": "\u8fd0\u884c\u65f6\u53d1\u5e03\u5305\u66f4\u65b0\u4e3a `IDM-Activation-Script-v1.4.0.zip`\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "\u8fd0\u884c\u65f6\u53d1\u5e03\u5305\u66f4\u65b0\u4e3a `IDM",
+      "description": "Activation-Script-v1.3.9.zip`\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "\u8d21\u732e\u6307\u5357\uff1a[CONTRIBUTING.md](./CONTRIBUTING.md)",
+      "description": "\u67b6\u6784 / \u7ed3\u6784\u8bf4\u660e\uff1a[ARCHITECTURE.md](./ARCHITECTURE.md)"
+    },
+    {
+      "type": "tool",
+      "name": "\u5f00\u6e90\u7ef4\u62a4\u7b56\u7565\uff1a[OPEN_SOURCE_POLICY.md](./OPEN_SOURCE_POLICY.md)",
+      "description": "\u7ef4\u62a4 / \u53d1\u5e03\u68c0\u67e5\u6e05\u5355\uff1a[docs/maintenance-checklist.md](./docs/maintenance-checklist.md)"
+    },
+    {
+      "type": "tool",
+      "name": "Windows \u5192\u70df\u57fa\u7ebf\uff1a[docs/reports/smoke",
+      "description": "win-baseline.md](./docs/reports/smoke-win-baseline.md)"
+    },
+    {
+      "type": "tool",
+      "name": "\u5b89\u5168\u6f0f\u6d1e\u4e0a\u62a5\uff1a[SECURITY.md](./SECURITY.md)",
+      "description": "CI \u6821\u9a8c\u811a\u672c\uff1a[tools/validate.ps1](./tools/validate.ps1)\uff08\u5728 GitHub Actions \u7684 `Windows validation` \u5de5\u4f5c\u6d41\u4e2d\u6267\u884c\uff09"
+    },
+    {
+      "type": "tool",
+      "name": "\u672c\u5de5\u5177\u4ec5\u7528\u4e8e\u5b66\u4e60 Windows \u6ce8\u518c\u8868\u64cd\u4f5c\u548c\u6279\u5904\u7406\u7f16\u7a0b",
+      "description": "Internet Download Manager \u662f Tonec Inc. \u7684\u5546\u4e1a\u8f6f\u4ef6\uff0c**\u672c\u4ed3\u5e93\u4e0e Tonec Inc. \u65e0\u4efb\u4f55\u96b6\u5c5e\u3001\u6388\u6743\u6216\u5408\u4f5c\u5173\u7cfb**\uff0c\u4e5f\u4e0d\u5206\u53d1 IDM \u5b89\u88c5\u5305"
+    },
+    {
+      "type": "tool",
+      "name": "\u8bf7\u652f\u6301\u6b63\u7248\u8f6f\u4ef6\uff0c\u8d2d\u4e70\u5b98\u65b9\u6388\u6743",
+      "description": "\u957f\u671f\u4f7f\u7528\u5efa\u8bae\u8d2d\u4e70\u6b63\u7248\uff1ahttps://www.internetdownloadmanager.com/buy_now.html"
+    },
+    {
+      "type": "tool",
+      "name": "\u53ef\u81ea\u7531\u4f7f\u7528\u3001\u5b66\u4e60\u3001\u4fee\u6539\u4e0e\u518d\u5206\u53d1\u811a\u672c\uff1b",
+      "description": "\u4e8c\u6b21\u53d1\u5e03\u5fc5\u987b\u4fdd\u7559 GPL-3.0 \u8bb8\u53ef\u8bc1\u6587\u672c\u3001\u7248\u6743\u58f0\u660e\u4e0e\u4fee\u6539\u8bb0\u5f55\uff1b"
+    },
+    {
+      "type": "tool",
+      "name": "\u57fa\u4e8e\u672c\u9879\u76ee\u6d3e\u751f\u7684\u4f5c\u54c1\u9700\u4ee5\u76f8\u540c\u6216\u517c\u5bb9\u7684 GPL \u8bb8\u53ef\u8bc1\u53d1\u5e03\uff1b",
+      "description": "\u4f5c\u8005\u4e0d\u5bf9\u811a\u672c\u4f7f\u7528\u8fc7\u7a0b\u4e2d\u4ea7\u751f\u7684\u4efb\u4f55\u76f4\u63a5\u6216\u95f4\u63a5\u635f\u5931\u627f\u62c5\u8d23\u4efb\uff0c\u8be6\u89c1 `LICENSE` \u4e2d\"NO WARRANTY\"\u6761\u6b3e\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "\u7531\u672c\u4ed3\u5e93\u72ec\u7acb\u7ef4\u62a4\uff0c\u57fa\u4e8e\u771f\u5b9e\u4f7f\u7528\u53cd\u9988\u6301\u7eed\u8fed\u4ee3\uff0c\u4fdd\u6301 GPL",
+      "description": "3.0 \u5f00\u6e90\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "[Project Showcase](#project",
+      "description": "showcase)"
+    },
+    {
+      "type": "tool",
+      "name": "[Getting Started](#getting",
+      "description": "started)"
+    },
+    {
+      "type": "tool",
+      "name": "[How to Sponsor](#how",
+      "description": "to-sponsor)"
+    },
+    {
+      "type": "tool",
+      "name": "Achievement support (pop",
+      "description": "up notification + sound on completion)"
+    },
+    {
+      "type": "tool",
+      "name": "Support for joystick configuration, command",
+      "description": "line arguments & shortcuts"
+    },
+    {
+      "type": "tool",
+      "name": "Built",
+      "description": "in download manager based on aria2 with lots of file host resolvers, resulting in max download speed"
+    },
+    {
+      "type": "tool",
+      "name": "Minimalist built",
+      "description": "in torrent client based on Libtorrent, with Real-Debrid & TorBox support"
+    },
+    {
+      "type": "tool",
+      "name": "Built",
+      "description": "in Lua code editor with tabs and themes"
+    },
+    {
+      "type": "tool",
+      "name": "Built",
+      "description": "in lightweight browser with ad, popup, and redirect blockers"
+    },
+    {
+      "type": "tool",
+      "name": "Built",
+      "description": "in theme editor and fully customizable UI"
+    },
+    {
+      "type": "tool",
+      "name": "Over 50 in",
+      "description": "app achievements you can unlock by discovering cool shit in GLD"
+    },
+    {
+      "type": "tool",
+      "name": "Native joystick support",
+      "description": "you can navigate GLD with just your joystick!"
+    },
+    {
+      "type": "tool",
+      "name": "To back up your game library and favorites list go to \"Documents/Project",
+      "description": "GLD/GameList\"."
+    },
+    {
+      "type": "tool",
+      "name": "Settings are saved in the \"Documents/Project",
+      "description": "GLD/Configs\" folder."
+    },
+    {
+      "type": "tool",
+      "name": "[FitGirl](https://github.com/Y0URD34TH/Project",
+      "description": "GLD/blob/main/Scripts/FitGirl.lua) / [1337x version](https://github.com/Y0URD34TH/Project-GLD/blob/Update-V6.97/Scripts/%5B1337x%5D%20FitGirl.lua)** [\ud83e\uddf2]"
+    },
+    {
+      "type": "tool",
+      "name": "[Dodi](https://github.com/Y0URD34TH/Project",
+      "description": "GLD/blob/Update-V6.97/Scripts/%5B1337x%5D%20DODI.lua)** [\ud83e\uddf2]"
+    },
+    {
+      "type": "tool",
+      "name": "[AnkerGames](https://github.com/Y0URD34TH/Project",
+      "description": "GLD/blob/main/Scripts/AnkerGames.lua)** [\ud83d\udce5]"
+    },
+    {
+      "type": "tool",
+      "name": "[GOG",
+      "description": "Games](https://github.com/Y0URD34TH/Project-GLD/blob/main/Scripts/GOG-Games.lua)** [\ud83e\uddf2]"
+    },
+    {
+      "type": "tool",
+      "name": "[DirectX](https://www.microsoft.com/en",
+      "description": "us/download/details.aspx?id=35)"
+    },
+    {
+      "type": "tool",
+      "name": "[jma](https://github.com/Y0URD34TH)",
+      "description": "*Lead Developer / Founder*"
+    },
+    {
+      "type": "tool",
+      "name": "[qiracy](https://github.com/qiracy)",
+      "description": "*Tester / Developer / Designer*"
+    },
+    {
+      "type": "tool",
+      "name": "[argonptg](https://github.com/argonptg)",
+      "description": "*Designer / Profile system developer*"
+    },
+    {
+      "type": "tool",
+      "name": "[Gumbo HTML](https://github.com/google/gumbo",
+      "description": "parser)"
+    },
+    {
+      "type": "tool",
+      "name": "Click the [Use this template](https://github.com/P3TERX/Actions",
+      "description": "OpenWrt/generate) button to create a new repository."
+    },
+    {
+      "type": "tool",
+      "name": "[Microsoft](https://www.microsoft.com)",
+      "description": "[Microsoft Azure](https://azure.microsoft.com)"
+    },
+    {
+      "type": "tool",
+      "name": "[GitHub](https://github.com)",
+      "description": "[GitHub Actions](https://github.com/features/actions)"
+    },
+    {
+      "type": "tool",
+      "name": "[tmate](https://github.com/tmate",
+      "description": "io/tmate)"
+    },
+    {
+      "type": "tool",
+      "name": "[mxschmitt/action",
+      "description": "tmate](https://github.com/mxschmitt/action-tmate)"
+    },
+    {
+      "type": "tool",
+      "name": "[csexton/debugger",
+      "description": "action](https://github.com/csexton/debugger-action)"
+    },
+    {
+      "type": "tool",
+      "name": "[Cisco](https://www.cisco.com/)",
+      "description": "[OpenWrt](https://github.com/openwrt/openwrt)"
+    },
+    {
+      "type": "tool",
+      "name": "[Lean's OpenWrt](https://github.com/coolsnowwolf/lede)",
+      "description": "[Cowtransfer](https://cowtransfer.com)"
+    },
+    {
+      "type": "tool",
+      "name": "[WeTransfer](https://wetransfer.com/)",
+      "description": "[Mikubill/transfer](https://github.com/Mikubill/transfer)"
+    }
+  ],
+  "script_summary": "69 tools"
+}

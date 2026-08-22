@@ -1,0 +1,342 @@
+{
+  "timestamp": "2026-08-04T03:04:22.308580",
+  "topic": "security hardening scripts linux",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "bivlked/amneziawg-installer",
+      "html_url": "https://github.com/bivlked/amneziawg-installer",
+      "description": "One-command install script for self-hosted AmneziaWG 2.0 VPN on Ubuntu and Debian: DPI bypass, traffic obfuscation, auto-hardening, client management",
+      "stars": 1038,
+      "language": "Shell",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "dolegi/lockdown.sh",
+      "html_url": "https://github.com/dolegi/lockdown.sh",
+      "description": "Lockdown your linux install. The simple zero config linux hardening script",
+      "stars": 368,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "zszszszsz/.config",
+      "html_url": "https://github.com/zszszszsz/.config",
+      "description": "# # Automatically generated file; DO NOT EDIT. # OpenWrt Configuration # CONFIG_MODULES=y CONFIG_HAVE_DOT_CONFIG=y # CONFIG_TARGET_sunxi is not set # CONFIG_TARGET_apm821xx is not set # CONFIG_TARGET_ath25 is not set CONFIG_TARGET_ar71xx=y # CONFIG_TARGET_ath79 is not set # CONFIG_TARGET_bcm27xx is ",
+      "stars": 351,
+      "language": "Shell",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 67,
+  "findings": [
+    {
+      "type": "command",
+      "value": "wget -O install_amneziawg.sh https://raw.githubusercontent.com/bivlked/amneziawg-installer/v5.23.0/install_amneziawg.sh"
+    },
+    {
+      "type": "command",
+      "value": "wget -O install_amneziawg.sh https://raw.githubusercontent.com/bivlked/amneziawg-installer/v5.23.0/install_amneziawg.sh"
+    },
+    {
+      "type": "command",
+      "value": "wget -O install_amneziawg.sh https://raw.githubusercontent.com/bivlked/amneziawg-installer/v5.23.0/install_amneziawg.sh"
+    },
+    {
+      "type": "command",
+      "value": "wget -O install_amneziawg_en.sh https://raw.githubusercontent.com/bivlked/amneziawg-installer/v5.23.0/install_amneziawg_en.sh"
+    },
+    {
+      "type": "tool",
+      "name": "\u0414\u0435\u0448\u0451\u0432\u044b\u0439 \u0438\u043b\u0438 \u0441\u043b\u0430\u0431\u044b\u0439 VPS, ARM (Raspberry Pi, Oracle Ampere)",
+      "description": "**\u044d\u0442\u043e\u0442 \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u0449\u0438\u043a** \u0441 \u0433\u043e\u0442\u043e\u0432\u044b\u043c\u0438 prebuilt'\u0430\u043c\u0438, \u0431\u0435\u0437 \u043e\u0436\u0438\u0434\u0430\u043d\u0438\u044f \u0441\u0431\u043e\u0440\u043a\u0438 \u043c\u043e\u0434\u0443\u043b\u044f."
+    },
+    {
+      "type": "tool",
+      "name": "\u0423\u0441\u0442\u0430\u043d\u043e\u0432\u043a\u0430 \u043c\u044b\u0448\u043a\u043e\u0439 \u0431\u0435\u0437 \u0442\u0435\u0440\u043c\u0438\u043d\u0430\u043b\u0430",
+      "description": "\u0434\u0435\u0441\u043a\u0442\u043e\u043f-\u043a\u043b\u0438\u0435\u043d\u0442 **Amnezia VPN**."
+    },
+    {
+      "type": "tool",
+      "name": "\u041d\u0443\u0436\u0435\u043d \u0433\u0440\u0430\u0444\u0438\u0447\u0435\u0441\u043a\u0438\u0439 \u043a\u043b\u0438\u0435\u043d\u0442 \u0438\u043b\u0438 \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043a\u0430 \u043c\u044b\u0448\u043a\u043e\u0439 \u0431\u0435\u0437 \u0442\u0435\u0440\u043c\u0438\u043d\u0430\u043b\u0430",
+      "description": "\u0434\u0435\u0441\u043a\u0442\u043e\u043f-\u043a\u043b\u0438\u0435\u043d\u0442 **Amnezia VPN**."
+    },
+    {
+      "type": "tool",
+      "name": "\u041e\u0431\u0445\u043e\u0434 \u0431\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u043e\u043a",
+      "description": "AmneziaWG 2.0 \u0441 \u043e\u0431\u0444\u0443\u0441\u043a\u0430\u0446\u0438\u0435\u0439 \u0442\u0440\u0430\u0444\u0438\u043a\u0430. DPI \u043d\u0435 \u0434\u0435\u0442\u0435\u043a\u0442\u0438\u0440\u0443\u0435\u0442 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435"
+    },
+    {
+      "type": "tool",
+      "name": "\u041e\u0434\u043d\u0430 \u043a\u043e\u043c\u0430\u043d\u0434\u0430",
+      "description": "\u0433\u043e\u0442\u043e\u0432\u044b\u0439 VPN** - \u043e\u0442 \u0447\u0438\u0441\u0442\u043e\u0433\u043e VPS \u0434\u043e \u0440\u0430\u0431\u043e\u0442\u0430\u044e\u0449\u0435\u0433\u043e \u0441\u0435\u0440\u0432\u0435\u0440\u0430 \u0441 \u043a\u043b\u0438\u0435\u043d\u0442\u0441\u043a\u0438\u043c\u0438 \u043a\u043e\u043d\u0444\u0438\u0433\u0430\u043c\u0438 \u0438 QR-\u043a\u043e\u0434\u0430\u043c\u0438"
+    },
+    {
+      "type": "tool",
+      "name": "\u0411\u0435\u0437\u043e\u043f\u0430\u0441\u043d\u043e\u0441\u0442\u044c \u0438\u0437 \u043a\u043e\u0440\u043e\u0431\u043a\u0438",
+      "description": "UFW, Fail2Ban, sysctl hardening, \u0441\u0442\u0440\u043e\u0433\u0438\u0435 \u043f\u0440\u0430\u0432\u0430 \u0434\u043e\u0441\u0442\u0443\u043f\u0430 (600/700)"
+    },
+    {
+      "type": "tool",
+      "name": "\u0423\u0434\u043e\u0431\u043d\u043e\u0435 \u0443\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435",
+      "description": "\u0434\u043e\u0431\u0430\u0432\u043b\u0435\u043d\u0438\u0435/\u0443\u0434\u0430\u043b\u0435\u043d\u0438\u0435 \u043a\u043b\u0438\u0435\u043d\u0442\u043e\u0432, \u0432\u0440\u0435\u043c\u0435\u043d\u043d\u044b\u0435 \u043a\u043b\u0438\u0435\u043d\u0442\u044b \u0441 \u0430\u0432\u0442\u043e-\u0443\u0434\u0430\u043b\u0435\u043d\u0438\u0435\u043c, \u0441\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0430, \u0431\u044d\u043a\u0430\u043f\u044b"
+    },
+    {
+      "type": "tool",
+      "name": "\u0428\u0438\u0440\u043e\u043a\u0430\u044f \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0430 \u041e\u0421",
+      "description": "Ubuntu 24.04/25.10/26.04 \u0438 Debian 12/13"
+    },
+    {
+      "type": "tool",
+      "name": "x86_64 \u0438 ARM",
+      "description": "\u043e\u0431\u043b\u0430\u0447\u043d\u044b\u0435 VPS, Raspberry Pi 3/4/5, ARM64-\u0441\u0435\u0440\u0432\u0435\u0440\u044b (AWS Graviton, Oracle Ampere, Hetzner)"
+    },
+    {
+      "type": "tool",
+      "name": "\u041e\u043f\u0442\u0438\u043c\u0438\u0437\u0430\u0446\u0438\u044f \u0434\u043b\u044f \u043c\u043e\u0431\u0438\u043b\u044c\u043d\u044b\u0445 \u0441\u0435\u0442\u0435\u0439",
+      "description": "`--preset=mobile` \u0434\u043b\u044f Tele2, Yota, \u041c\u0435\u0433\u0430\u0444\u043e\u043d \u0438 \u0434\u0440\u0443\u0433\u0438\u0445 \u043e\u043f\u0435\u0440\u0430\u0442\u043e\u0440\u043e\u0432 \u0441 DPI-\u0431\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u043a\u0430\u043c\u0438. \u0422\u043e\u043d\u043a\u0430\u044f \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430 \u0447\u0435\u0440\u0435\u0437 `--jc`, `--jmin`, `--jmax` ([\u043f\u043e\u0434\u0440\u043e\u0431\u043d\u0435\u0435](ADVANCED.md#presets-adv))"
+    },
+    {
+      "type": "tool",
+      "name": "\u041e\u043f\u0446\u0438\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0439 dual",
+      "description": "stack IPv6** - \u0444\u043b\u0430\u0433 `--allow-ipv6-tunnel` \u0434\u043e\u0431\u0430\u0432\u043b\u044f\u0435\u0442 IPv6 \u0432\u043d\u0443\u0442\u0440\u0438 \u0442\u0443\u043d\u043d\u0435\u043b\u044f \u0440\u044f\u0434\u043e\u043c \u0441 IPv4 (\u043f\u043e \u0443\u043c\u043e\u043b\u0447\u0430\u043d\u0438\u044e \u0432\u044b\u043a\u043b\u044e\u0447\u0435\u043d\u043e, [\u043f\u043e\u0434\u0440\u043e\u0431\u043d\u0435\u0435](ADVANCED.md#ipv6-tunnel-adv))"
+    },
+    {
+      "type": "tool",
+      "name": "\u041d\u0430\u0442\u0438\u0432\u043d\u0430\u044f \u0433\u0435\u043d\u0435\u0440\u0430\u0446\u0438\u044f \u043a\u043b\u044e\u0447\u0435\u0439 \u0438 \u043a\u043e\u043d\u0444\u0438\u0433\u043e\u0432 \u0447\u0435\u0440\u0435\u0437 `awg`",
+      "description": "\u0431\u0435\u0437 Python \u0438 \u0432\u043d\u0435\u0448\u043d\u0438\u0445 \u0437\u0430\u0432\u0438\u0441\u0438\u043c\u043e\u0441\u0442\u0435\u0439"
+    },
+    {
+      "type": "tool",
+      "name": "Hardware",
+      "description": "aware \u043e\u043f\u0442\u0438\u043c\u0438\u0437\u0430\u0446\u0438\u044f: swap, NIC offloads, \u0441\u0435\u0442\u0435\u0432\u044b\u0435 \u0431\u0443\u0444\u0435\u0440\u044b \u043d\u0430 \u043e\u0441\u043d\u043e\u0432\u0435 \u0445\u0430\u0440\u0430\u043a\u0442\u0435\u0440\u0438\u0441\u0442\u0438\u043a \u0441\u0435\u0440\u0432\u0435\u0440\u0430"
+    },
+    {
+      "type": "tool",
+      "name": "DKMS",
+      "description": "\u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0430\u044f \u043f\u0435\u0440\u0435\u0441\u0431\u043e\u0440\u043a\u0430 \u043c\u043e\u0434\u0443\u043b\u044f \u044f\u0434\u0440\u0430 \u043f\u0440\u0438 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u0438"
+    },
+    {
+      "type": "tool",
+      "name": "\u0421\u0442\u0430\u0442\u0438\u0441\u0442\u0438\u043a\u0430 \u0442\u0440\u0430\u0444\u0438\u043a\u0430 \u043f\u043e \u043a\u043b\u0438\u0435\u043d\u0442\u0430\u043c (`stats`, `stats",
+      "description": "-json`)"
+    },
+    {
+      "type": "tool",
+      "name": "\u0412\u0440\u0435\u043c\u0435\u043d\u043d\u044b\u0435 \u043a\u043b\u0438\u0435\u043d\u0442\u044b \u0441 \u0430\u0432\u0442\u043e",
+      "description": "\u0443\u0434\u0430\u043b\u0435\u043d\u0438\u0435\u043c (`--expires=1h`, `7d`, `4w` \u0438 \u0434\u0440.)"
+    },
+    {
+      "type": "tool",
+      "name": "\u0414\u0438\u0430\u0433\u043d\u043e\u0441\u0442\u0438\u0447\u0435\u0441\u043a\u0438\u0439 \u043e\u0442\u0447\u0451\u0442 (`",
+      "description": "-diagnostic`) \u0438 \u043f\u043e\u043b\u043d\u0430\u044f \u0434\u0435\u0438\u043d\u0441\u0442\u0430\u043b\u043b\u044f\u0446\u0438\u044f (`--uninstall`)"
+    },
+    {
+      "type": "tool",
+      "name": "\u0412\u043e\u0437\u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u0435 \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043a\u0438 \u043f\u043e\u0441\u043b\u0435 \u043f\u0435\u0440\u0435\u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0438",
+      "description": "\u0441\u043a\u0440\u0438\u043f\u0442 \u043f\u0440\u043e\u0434\u043e\u043b\u0436\u0438\u0442 \u0441 \u043d\u0443\u0436\u043d\u043e\u0433\u043e \u0448\u0430\u0433\u0430"
+    },
+    {
+      "type": "tool",
+      "name": "Yota",
+      "description": "\u041c\u043e\u0441\u043a\u0432\u0430, `--preset=mobile`"
+    },
+    {
+      "type": "tool",
+      "name": "Tele2",
+      "description": "\u041c\u043e\u0441\u043a\u0432\u0430 (`--preset=mobile`); \u041a\u0440\u0430\u0441\u043d\u043e\u044f\u0440\u0441\u043a (`--preset=mobile`; \u0432 \u043c\u0430\u0439\u0441\u043a\u0443\u044e \u0432\u043e\u043b\u043d\u0443 2026 \u0437\u0430\u0440\u0430\u0431\u043e\u0442\u0430\u043b `I1=<r 48>`)"
+    },
+    {
+      "type": "tool",
+      "name": "\u0422\u0430\u0442\u0442\u0435\u043b\u0435\u043a\u043e\u043c / \u041b\u0435\u0442\u0430\u0439",
+      "description": "\u0422\u0430\u0442\u0430\u0440\u0441\u0442\u0430\u043d, `--preset=mobile`"
+    },
+    {
+      "type": "tool",
+      "name": "\u041c\u0435\u0433\u0430\u0444\u043e\u043d",
+      "description": "\u0440\u0435\u0433\u0438\u043e\u043d\u044b, `--preset=mobile` + \u0443\u0434\u0430\u043b\u0438\u0442\u044c \u043f\u0430\u0440\u0430\u043c\u0435\u0442\u0440 `I1`"
+    },
+    {
+      "type": "tool",
+      "name": "\u0411\u0438\u043b\u0430\u0439\u043d",
+      "description": "\u0434\u0435\u0444\u043e\u043b\u0442\u043d\u044b\u0439 preset, \u0444\u043b\u0430\u0433\u0438 \u043d\u0435 \u043d\u0443\u0436\u043d\u044b"
+    },
+    {
+      "type": "tool",
+      "name": "\u0414\u043e\u043c\u0430\u0448\u043d\u0438\u0439/\u043f\u0440\u043e\u0432\u043e\u0434\u043d\u043e\u0439 \u0438\u043d\u0442\u0435\u0440\u043d\u0435\u0442",
+      "description": "\u0434\u0435\u0444\u043e\u043b\u0442, \u043a\u0430\u043a \u043f\u0440\u0430\u0432\u0438\u043b\u043e, \u00ab\u0438\u0437 \u043a\u043e\u0440\u043e\u0431\u043a\u0438\u00bb"
+    },
+    {
+      "type": "tool",
+      "name": "\u0411\u043e\u043b\u044c\u0448\u043e\u0439 \u0438\u043b\u0438 \u043d\u0435\u043e\u0433\u0440\u0430\u043d\u0438\u0447\u0435\u043d\u043d\u044b\u0439 \u0442\u0440\u0430\u0444\u0438\u043a \u0438 \u043a\u0430\u043d\u0430\u043b \u043e\u0442 1 \u0413\u0431\u0438\u0442/\u0441.",
+      "description": "\u041f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0430 \u043d\u0443\u0436\u043d\u043e\u0439 \u041e\u0421 (Ubuntu 24.04+ / Debian 12+) \u0438 root-\u0434\u043e\u0441\u0442\u0443\u043f."
+    },
+    {
+      "type": "command",
+      "value": "wget https://raw.githubusercontent.com/x08d/lockdown.sh/master/lockdown.sh"
+    },
+    {
+      "type": "command",
+      "value": "./lockdown.sh"
+    },
+    {
+      "type": "tool",
+      "name": "Zero Config",
+      "description": "Zero Install"
+    },
+    {
+      "type": "tool",
+      "name": "Updates packages",
+      "description": "Restricts firewall to only allow ssh on `141`"
+    },
+    {
+      "type": "tool",
+      "name": "Installs [fail2ban](https://www.fail2ban.org)",
+      "description": "Configures the kernel"
+    },
+    {
+      "type": "tool",
+      "name": "Adds daily cronjob to update packages on server",
+      "description": "Installs and configures [auditd](https://linux.die.net/man/8/auditd) with sensible rules"
+    },
+    {
+      "type": "tool",
+      "name": "Disables core dumps",
+      "description": "Restricts logins"
+    },
+    {
+      "type": "tool",
+      "name": "Create a new admin user",
+      "description": "Restricts ssh and enables only the created admin user"
+    },
+    {
+      "type": "tool",
+      "name": "Adds a legal banner to /etc/issue and /etc/issue.net",
+      "description": "Installs packages recommended by [lynis](https://github.com/CISOfy/lynis)"
+    },
+    {
+      "type": "tool",
+      "name": "Installs and sets up [aide](https://github.com/aide/aide)",
+      "description": "Enables process accounting"
+    },
+    {
+      "type": "tool",
+      "name": "Disables uncommon filesystems",
+      "description": "Disables firewire and usb storage"
+    },
+    {
+      "type": "tool",
+      "name": "Disables uncommon network protocols",
+      "description": "Restricts access to /root"
+    },
+    {
+      "type": "tool",
+      "name": "Restrict access to compilers",
+      "description": "Moves tmp to tmpfs"
+    },
+    {
+      "type": "tool",
+      "name": "Remounts /tmp /proc /dev /run to be more restrictive",
+      "description": "Purges old and removed packages"
+    },
+    {
+      "type": "tool",
+      "name": "Debian 10",
+      "description": "Debian 8"
+    },
+    {
+      "type": "tool",
+      "name": "(Should work with most debian and debian based OS's)",
+      "description": "Others are coming soon"
+    },
+    {
+      "type": "feature",
+      "value": "Updates packages"
+    },
+    {
+      "type": "feature",
+      "value": "Restricts firewall to only allow ssh on `141`"
+    },
+    {
+      "type": "feature",
+      "value": "Installs [fail2ban](https://www.fail2ban.org)"
+    },
+    {
+      "type": "feature",
+      "value": "Configures the kernel"
+    },
+    {
+      "type": "feature",
+      "value": "Adds daily cronjob to update packages on server"
+    },
+    {
+      "type": "feature",
+      "value": "Installs and configures [auditd](https://linux.die.net/man/8/auditd) with sensible rules"
+    },
+    {
+      "type": "feature",
+      "value": "Disables core dumps"
+    },
+    {
+      "type": "feature",
+      "value": "Restricts logins"
+    },
+    {
+      "type": "feature",
+      "value": "Create a new admin user"
+    },
+    {
+      "type": "feature",
+      "value": "Restricts ssh and enables only the created admin user"
+    },
+    {
+      "type": "feature",
+      "value": "Adds a legal banner to /etc/issue and /etc/issue.net"
+    },
+    {
+      "type": "feature",
+      "value": "Installs packages recommended by [lynis](https://github.com/CISOfy/lynis)"
+    },
+    {
+      "type": "feature",
+      "value": "Installs and sets up [aide](https://github.com/aide/aide)"
+    },
+    {
+      "type": "feature",
+      "value": "Enables process accounting"
+    },
+    {
+      "type": "feature",
+      "value": "Disables uncommon filesystems"
+    },
+    {
+      "type": "feature",
+      "value": "Disables firewire and usb storage"
+    },
+    {
+      "type": "feature",
+      "value": "Disables uncommon network protocols"
+    },
+    {
+      "type": "feature",
+      "value": "Restricts access to /root"
+    },
+    {
+      "type": "feature",
+      "value": "Restrict access to compilers"
+    },
+    {
+      "type": "feature",
+      "value": "Moves tmp to tmpfs"
+    },
+    {
+      "type": "feature",
+      "value": "Remounts /tmp /proc /dev /run to be more restrictive"
+    },
+    {
+      "type": "feature",
+      "value": "Purges old and removed packages"
+    }
+  ],
+  "script_summary": "6 commands, 39 tools, 22 features"
+}

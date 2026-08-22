@@ -1,0 +1,97 @@
+{
+  "timestamp": "2026-08-09T03:04:08.848182",
+  "topic": "object detection CLI tool",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "bigdata-pw/florence-tool",
+      "html_url": "https://github.com/bigdata-pw/florence-tool",
+      "description": "The Florence Tool CLI provides a command-line interface for processing images using the Florence-2 model. This tool allows users to apply various visual and text-based tasks, such as object detection, captioning, and OCR, on individual images or entire folders of images.",
+      "stars": 16,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "questionmark1122/cnn10",
+      "html_url": "https://github.com/questionmark1122/cnn10",
+      "description": "#!bash # # bash completion support for core Git. # # Copyright (C) 2006,2007 Shawn O. Pearce <spearce@spearce.org> # Conceptually based on gitcompletion (http://gitweb.hawaga.org.uk/). # Distributed under the GNU General Public License, version 2.0. # # The contained completion routines provide supp",
+      "stars": 16,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "RanaCoding-cs/Face-Detection",
+      "html_url": "https://github.com/RanaCoding-cs/Face-Detection",
+      "description": "\u200bA Python-based real-time object detection and motion tracking CLI tool built for Termux & Android, featuring MobileNet-SSD, auto-adaptive bounding boxes, object locking, and a Cyber HUD web UI.python opencv termux object-detection motion-tracking mobilenet-ssd computer-vision cyberpunk-hud android",
+      "stars": 4,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 15,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone https://github.com/bigdata-pw/florence-tool.git"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "pip install -e ."
+    },
+    {
+      "type": "command",
+      "value": "python -m florence_tool.cli run [OPTIONS]"
+    },
+    {
+      "type": "tool",
+      "name": "`florence_tool.py`: Main class that implements the Florence",
+      "description": "2 model handling and processing logic."
+    },
+    {
+      "type": "tool",
+      "name": "`cli.py`: Command",
+      "description": "line interface built with `Click`."
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "feature",
+      "value": "**Model Loading:** Load and run the Florence-2 model from a local path or Hugging Face hub."
+    },
+    {
+      "type": "feature",
+      "value": "**Task Variety:** Supports a wide range of tasks, including captioning, object detection, dense region captioning, OCR, and more."
+    },
+    {
+      "type": "feature",
+      "value": "**Batch Processing:** Efficiently process images in batches from a folder."
+    },
+    {
+      "type": "feature",
+      "value": "**Recursive Search:** Optionally process images within subdirectories."
+    },
+    {
+      "type": "feature",
+      "value": "**Customizable Output:** Save results in JSON, CSV, or plain text formats with optional suffixes and overwrite modes."
+    },
+    {
+      "type": "feature",
+      "value": "**Flexible Image Handling:** Specify the image file extensions to process, allowing for flexibility in file types."
+    },
+    {
+      "type": "pip_package",
+      "value": "numpy"
+    }
+  ],
+  "script_summary": "4 commands, 2 tools, 3 pip_packages, 6 features"
+}

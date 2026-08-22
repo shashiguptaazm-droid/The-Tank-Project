@@ -1,0 +1,54 @@
+{
+  "timestamp": "2026-08-07T03:01:55.722502",
+  "topic": "educational tools python CLI",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "JLospinoso/memcachedump",
+      "html_url": "https://github.com/JLospinoso/memcachedump",
+      "description": "Python/Shodan tool for dumping exposed memcached server contents into local text files.",
+      "stars": 141,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "Enmn/KickNoSub",
+      "html_url": "https://github.com/Enmn/KickNoSub",
+      "description": "Extract direct stream URLs from Kick videos in your preferred quality for educational and research purposes.",
+      "stars": 104,
+      "language": "JavaScript",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "JLospinoso/unfurl",
+      "html_url": "https://github.com/JLospinoso/unfurl",
+      "description": "Entropy-based link vulnerability analysis tool for campaign and email URLs.",
+      "stars": 62,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 4,
+  "findings": [
+    {
+      "type": "pip_package",
+      "value": "shodan"
+    },
+    {
+      "type": "tool",
+      "name": "Bypass subscriber",
+      "description": "only restrictions or paywalls."
+    },
+    {
+      "type": "tool",
+      "name": "You are responsible for your own actions.",
+      "description": "The authors are not liable for any misuse."
+    },
+    {
+      "type": "tool",
+      "name": "Kick API ecosystem",
+      "description": "Open-source Python community"
+    }
+  ],
+  "script_summary": "1 pip_packages, 3 tools"
+}

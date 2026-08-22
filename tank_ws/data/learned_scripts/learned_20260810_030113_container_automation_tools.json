@@ -1,0 +1,283 @@
+{
+  "timestamp": "2026-08-10T03:01:13.227274",
+  "topic": "container automation tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "av/harbor",
+      "html_url": "https://github.com/av/harbor",
+      "description": "Stop configuring your AI stack. Start using it. One command brings a complete pre-wired LLM stack with hundreds of services to explore.",
+      "stars": 3160,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Corsinvest/cv4pve-autosnap",
+      "html_url": "https://github.com/Corsinvest/cv4pve-autosnap",
+      "description": "Automatic snapshot tool for Proxmox VE VMs and containers with retention policies",
+      "stars": 561,
+      "language": "C#",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "cholcombe973/autodock",
+      "html_url": "https://github.com/cholcombe973/autodock",
+      "description": "Autodock. The docker container automation tool.",
+      "stars": 375,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 53,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "v0.5.5",
+      "description": "New Speech-to-Speech (s2s) backend service, Dify upgraded to 1.x, and a large service repair sweep restoring Open WebUI web search, OpenHands, Perplexica, mistral.rs, TGI, Nexa, and a dozen more"
+    },
+    {
+      "type": "tool",
+      "name": "v0.5.4",
+      "description": "Repairs first-boot and integration failures across 20+ services found by the new runnable integration suite, plus Boost error responses that propagate real backend status codes"
+    },
+    {
+      "type": "tool",
+      "name": "v0.5.3",
+      "description": "Boost agentic modules (`quickhop`, `deephop`, `autocheck`, `diffscope`) with `harbor launch --workflow` routing, grok CLI launch support, and faster HF downloads via `hf_transfer`"
+    },
+    {
+      "type": "tool",
+      "name": "v0.5.2",
+      "description": "Fixes `.env` corruption when several Harbor commands run at once and stops `harbor doctor` from hanging on non-interactive stdin"
+    },
+    {
+      "type": "tool",
+      "name": "v0.5.1",
+      "description": "Faster `harbor doctor` with timeout-guarded compose checks and early exit for `--check` mode"
+    },
+    {
+      "type": "tool",
+      "name": "v0.5.0",
+      "description": "DMR, MLX, oMLX, and Daytona services, llamacpp replaces Ollama as default backend, in-app guided install, agent skills CLI, tab completion, and port conflict detection"
+    },
+    {
+      "type": "tool",
+      "name": "v0.4.19",
+      "description": "Boost Anthropic and Responses API compat layers, `harbor launch` command, ik_llama.cpp service, Boost workflows and tools module"
+    },
+    {
+      "type": "tool",
+      "name": "If you're comfortable with Docker and Linux administration",
+      "description": "you likely don't need Harbor to manage your local LLM environment. However, while growing it - you're also likely to eventually arrive to a similar solution. I know this for a fact, since that's exact"
+    },
+    {
+      "type": "tool",
+      "name": "Convenience factor",
+      "description": "single CLI with a lot of services and features, accessible from anywhere on your host."
+    },
+    {
+      "type": "command",
+      "value": "wget https://github.com/Corsinvest/cv4pve-autosnap/releases/download/VERSION/cv4pve-autosnap-linux-x64.zip"
+    },
+    {
+      "type": "command",
+      "value": "./cv4pve-autosnap --host=YOUR_HOST --api-token=user@realm!token=uuid --vmid=100 snap --label=daily --keep=7"
+    },
+    {
+      "type": "tool",
+      "name": "Self",
+      "description": "contained binary** \u2014 no runtime to install, copy and run"
+    },
+    {
+      "type": "tool",
+      "name": "Cross",
+      "description": "platform** \u2014 Windows, Linux, macOS"
+    },
+    {
+      "type": "tool",
+      "name": "API",
+      "description": "based** \u2014 no root or SSH access required"
+    },
+    {
+      "type": "tool",
+      "name": "Cluster",
+      "description": "aware** \u2014 works across all nodes automatically"
+    },
+    {
+      "type": "tool",
+      "name": "High availability",
+      "description": "multiple host support for automatic failover"
+    },
+    {
+      "type": "tool",
+      "name": "Flexible targeting",
+      "description": "select VMs by ID, name, pool, tag, node or pattern ([see VM/CT Selection](#vmct-selection))"
+    },
+    {
+      "type": "tool",
+      "name": "Retention policies",
+      "description": "configurable keep count per label"
+    },
+    {
+      "type": "tool",
+      "name": "Multiple schedules",
+      "description": "use labels (hourly, daily, weekly, monthly) ([see Scheduling](#scheduling-with-cron))"
+    },
+    {
+      "type": "tool",
+      "name": "Memory state",
+      "description": "optional RAM state preservation with `--state`"
+    },
+    {
+      "type": "tool",
+      "name": "Hook scripts",
+      "description": "custom automation before/after each phase ([see Hook Scripts](#hook-scripts))"
+    },
+    {
+      "type": "tool",
+      "name": "Storage monitoring",
+      "description": "skip snapshot if storage above threshold"
+    },
+    {
+      "type": "tool",
+      "name": "QEMU Guest Agent",
+      "description": "warns if not enabled on a VM; recommended for consistent snapshots ([setup guide](docs/snapshot-consistency.md))"
+    },
+    {
+      "type": "tool",
+      "name": "Parallel execution",
+      "description": "snapshot multiple VMs concurrently with `--max-parallel` ([see Performance](#performance))"
+    },
+    {
+      "type": "tool",
+      "name": "Dry",
+      "description": "run** mode \u2014 test without making changes"
+    },
+    {
+      "type": "feature",
+      "value": "**Self-contained binary** \u2014 no runtime to install, copy and run"
+    },
+    {
+      "type": "feature",
+      "value": "**Cross-platform** \u2014 Windows, Linux, macOS"
+    },
+    {
+      "type": "feature",
+      "value": "**API-based** \u2014 no root or SSH access required"
+    },
+    {
+      "type": "feature",
+      "value": "**Cluster-aware** \u2014 works across all nodes automatically"
+    },
+    {
+      "type": "feature",
+      "value": "**High availability** \u2014 multiple host support for automatic failover"
+    },
+    {
+      "type": "feature",
+      "value": "**Flexible targeting** \u2014 select VMs by ID, name, pool, tag, node or pattern ([see VM/CT Selection](#vmct-selection))"
+    },
+    {
+      "type": "feature",
+      "value": "**Retention policies** \u2014 configurable keep count per label"
+    },
+    {
+      "type": "feature",
+      "value": "**Multiple schedules** \u2014 use labels (hourly, daily, weekly, monthly) ([see Scheduling](#scheduling-with-cron))"
+    },
+    {
+      "type": "feature",
+      "value": "**Memory state** \u2014 optional RAM state preservation with `--state`"
+    },
+    {
+      "type": "feature",
+      "value": "**Hook scripts** \u2014 custom automation before/after each phase ([see Hook Scripts](#hook-scripts))"
+    },
+    {
+      "type": "feature",
+      "value": "**Storage monitoring** \u2014 skip snapshot if storage above threshold"
+    },
+    {
+      "type": "feature",
+      "value": "**QEMU Guest Agent** \u2014 warns if not enabled on a VM; recommended for consistent snapshots ([setup guide](docs/snapshot-consistency.md))"
+    },
+    {
+      "type": "feature",
+      "value": "**Parallel execution** \u2014 snapshot multiple VMs concurrently with `--max-parallel` ([see Performance](#performance))"
+    },
+    {
+      "type": "feature",
+      "value": "**API token** support (Proxmox VE 6.2+)"
+    },
+    {
+      "type": "feature",
+      "value": "**Dry-run** mode \u2014 test without making changes"
+    },
+    {
+      "type": "tool",
+      "name": "-u,",
+      "description": "username"
+    },
+    {
+      "type": "tool",
+      "name": "-u,",
+      "description": "username"
+    },
+    {
+      "type": "tool",
+      "name": "-f,",
+      "description": "-formation"
+    },
+    {
+      "type": "tool",
+      "name": "-u,",
+      "description": "-username"
+    },
+    {
+      "type": "tool",
+      "name": "-f,",
+      "description": "-formation"
+    },
+    {
+      "type": "tool",
+      "name": "-n,",
+      "description": "-number"
+    },
+    {
+      "type": "tool",
+      "name": "-c,",
+      "description": "-cpu_shares"
+    },
+    {
+      "type": "tool",
+      "name": "-r,",
+      "description": "-ram"
+    },
+    {
+      "type": "tool",
+      "name": "-s,",
+      "description": "-hostname_scheme"
+    },
+    {
+      "type": "tool",
+      "name": "-p,",
+      "description": "-port"
+    },
+    {
+      "type": "tool",
+      "name": "-d,",
+      "description": "-delete_formation"
+    },
+    {
+      "type": "tool",
+      "name": "-v,",
+      "description": "-volume"
+    },
+    {
+      "type": "tool",
+      "name": "-x,",
+      "description": "-verify"
+    }
+  ],
+  "script_summary": "36 tools, 2 commands, 15 features"
+}

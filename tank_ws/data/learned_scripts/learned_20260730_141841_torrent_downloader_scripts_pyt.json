@@ -1,0 +1,75 @@
+{
+  "timestamp": "2026-07-30T14:18:41.863470",
+  "topic": "torrent downloader scripts python",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "jacopo-j/tnt-downloader",
+      "html_url": "https://github.com/jacopo-j/tnt-downloader",
+      "description": "Script che permette di cercare e scaricare file torrent da TNTVillage.",
+      "stars": 57,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "notjedi/pyratebay",
+      "html_url": "https://github.com/notjedi/pyratebay",
+      "description": "Python script to download torrents from piratebay.",
+      "stars": 11,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "kushagra12/torrent-downloader",
+      "html_url": "https://github.com/kushagra12/torrent-downloader",
+      "description": "Simple python scripts for lazy guys.",
+      "stars": 5,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 9,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone https://github.com/jacopo-j/tnt-downloader.git"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "tool",
+      "name": "eseguire il file `tntdl",
+      "description": "win-setup.bat` per installare automaticamente i moduli di Python richiesti."
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "tool",
+      "name": "BeautifulSoup",
+      "description": "`pip install bs4`"
+    },
+    {
+      "type": "tool",
+      "name": "Selenium",
+      "description": "`pip install selenium`"
+    },
+    {
+      "type": "tool",
+      "name": "Chrome (Supports headless mode)",
+      "description": "Firefox"
+    },
+    {
+      "type": "pip_package",
+      "value": "bs4`"
+    },
+    {
+      "type": "pip_package",
+      "value": "selenium`"
+    }
+  ],
+  "script_summary": "2 commands, 4 tools, 3 pip_packages"
+}

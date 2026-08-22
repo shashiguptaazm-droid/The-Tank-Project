@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "project": "The Tank Project",
+  "tagline": "Tracked Raspberry Pi 5 AI-companion robot with eyes + GPU vision + persistent memory + RAG + voice",
+  "controller": "Raspberry Pi 5 (8 GB)",
+  "ros_distro": "humble",
+  "build_system": "colcon + ament_python",
+  "workspace": "the tank project/tank_ws",
+  "python_min": "3.10",
+  "packages": [
+    "tank_bringup", "tank_motion", "tank_sensors", "tank_vision",
+    "tank_navigation", "tank_speech", "tank_memory", "tank_assistant",
+    "tank_text", "tank_dock", "tank_health", "tank_security",
+    "tank_dashboard", "tank_nas", "tank_meta"
+  ],
+  "top_level_dirs": {
+    "scripts/": "host-side provisioning + offline CLIs (provision_pi5.sh, replay_memory.py, search_meta.py, index_workspace.py)",
+    "firmware/": "out-of-tree Arduino sketches (esp32-s3 eyes)",
+    "docs/": "user-facing deployment notes"
+  },
+  "key_decisions": "see content/decisions.json",
+  "key_hardware": "see content/hardware.json",
+  "provision_cmd": "bash scripts/provision_pi5.sh --apply",
+  "launch_orchestrator": "ros2 launch tank_bringup robot.launch.py",
+  "dashboard_url": "https://tank.local/dashboard (via nginx reverse-proxy)",
+  "external_links": {
+    "ros2_humble": "https://docs.ros.org/en/humble/",
+    "pi5_pinout": "https://datasheets.raspberrypi.com/picore/Pico-R3-A4-Pinout.pdf",
+    "rplidar_ros": "https://github.com/Slamtec/rplidar_ros",
+    "openwakeword": "https://github.com/dscripnikov/openWakeWord",
+    "ultralytics": "https://docs.ultralytics.com/"
+  }
+}

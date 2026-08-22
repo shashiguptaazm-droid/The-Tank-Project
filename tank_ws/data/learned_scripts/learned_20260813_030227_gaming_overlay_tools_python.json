@@ -1,0 +1,227 @@
+{
+  "timestamp": "2026-08-13T03:02:27.144812",
+  "topic": "gaming overlay tools python",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "filt3rr/vael",
+      "html_url": "https://github.com/filt3rr/vael",
+      "description": "AI-powered EVE Online intelligence agent \u2014 44 tools, Claude Desktop MCP, live ESI, Discord alerts, game overlay",
+      "stars": 4,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Raptor-1996/raptor-rto",
+      "html_url": "https://github.com/Raptor-1996/raptor-rto",
+      "description": "russian-translator, ghost-recon-wildlands, watchdogs, cis-games, english-patch, overlay-translator, easyocr, python-tool, gaming-tool",
+      "stars": 1,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "azproject138/crosshair-for-gaming",
+      "html_url": "https://github.com/azproject138/crosshair-for-gaming",
+      "description": "PB Crosshair Tool \u2014 Point Blank Sniper Overlay Version 1.0.0 | Python + PyQt5",
+      "stars": 0,
+      "language": "HTML",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 41,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone https://github.com/filt3rr/eve-agent.git"
+    },
+    {
+      "type": "command",
+      "value": "python -m venv .venv"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "pip install -e ."
+    },
+    {
+      "type": "tool",
+      "name": "SITREP protocol",
+      "description": "Vael checks your situation before you even ask"
+    },
+    {
+      "type": "tool",
+      "name": "Wallet, skills, assets, location, ship, fittings",
+      "description": "Market orders (open + history), wallet journal"
+    },
+    {
+      "type": "tool",
+      "name": "Industry jobs (active + completed)",
+      "description": "Skill queue with training time calculations"
+    },
+    {
+      "type": "tool",
+      "name": "Manufacturing cost calculator with live mineral prices",
+      "description": "P&L tracking by activity (trading, exploration, missions, industry)"
+    },
+    {
+      "type": "tool",
+      "name": "System danger rating (1",
+      "description": "10) from 7-day kill data"
+    },
+    {
+      "type": "tool",
+      "name": "Character public dossier",
+      "description": "corp, alliance, killboard stats"
+    },
+    {
+      "type": "tool",
+      "name": "Real",
+      "description": "time recent kills in any system"
+    },
+    {
+      "type": "tool",
+      "name": "Regional kill heat maps",
+      "description": "Undock risk assessment for your current location"
+    },
+    {
+      "type": "tool",
+      "name": "Game overlay",
+      "description": "transparent HUD floating over EVE (system, ISK, queue, orders, alerts)"
+    },
+    {
+      "type": "tool",
+      "name": "Discord alerts",
+      "description": "Vael pings your phone for skill completions, order fills, industry jobs"
+    },
+    {
+      "type": "tool",
+      "name": "Background notifier",
+      "description": "polls ESI every 5 minutes across all channels"
+    },
+    {
+      "type": "tool",
+      "name": "Configurable watches",
+      "description": "set custom triggers (price thresholds, danger spikes, ISK milestones)"
+    },
+    {
+      "type": "tool",
+      "name": "Weekly digest",
+      "description": "auto-generated Sunday report with ISK performance, skill progress, and Vael's assessment"
+    },
+    {
+      "type": "tool",
+      "name": "Step",
+      "description": "by-step scanning walkthrough"
+    },
+    {
+      "type": "tool",
+      "name": "Site type guide (Relic, Data, Combat, Gas, Wormhole)",
+      "description": "Hacking minigame guide (node types, strategy, common mistakes)"
+    },
+    {
+      "type": "tool",
+      "name": "ISK expectations by security class",
+      "description": "Ship fitting recommendations calibrated to your actual skill levels"
+    },
+    {
+      "type": "tool",
+      "name": "Python 3.11+",
+      "description": "[Claude Desktop](https://claude.ai/download)"
+    },
+    {
+      "type": "tool",
+      "name": "An EVE Online account",
+      "description": "A Discord server (optional, for phone alerts)"
+    },
+    {
+      "type": "tool",
+      "name": "The `.env` file is gitignored and never committed",
+      "description": "All ESI access is **read-only** by default (no write scopes)"
+    },
+    {
+      "type": "tool",
+      "name": "The EVE Online third",
+      "description": "party developer community"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/yourusername/raptor-rto.git"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "python raptor_launcher.py"
+    },
+    {
+      "type": "tool",
+      "name": "Windows 10/11",
+      "description": "Python 3.12 or higher"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "command",
+      "value": "pip install PyQt5"
+    },
+    {
+      "type": "command",
+      "value": "python crosshair_overlay.py"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 6 bentuk crosshair (Cross, Dot, Circle, +Dot, T",
+      "description": "Style, X-Hair)"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 7 preset warna + custom color picker",
+      "description": "\u2705 Atur ukuran, ketebalan, gap, opacity"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 Outline/shadow untuk kontras",
+      "description": "\u2705 Show/hide crosshair toggle"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 Drag posisi crosshair (tombol D",
+      "description": "pad)"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 Auto",
+      "description": "detect resolusi layar"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 Save & load preset otomatis",
+      "description": "\u2705 Always-on-top overlay transparan"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 Panel kontrol bisa di",
+      "description": "drag bebas"
+    },
+    {
+      "type": "pip_package",
+      "value": "PyQt5"
+    }
+  ],
+  "script_summary": "9 commands, 28 tools, 4 pip_packages"
+}

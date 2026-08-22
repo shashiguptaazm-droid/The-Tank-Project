@@ -1,0 +1,45 @@
+{
+  "timestamp": "2026-07-30T14:30:21.479371",
+  "topic": "backup script python linux",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "udinparla/aa.py",
+      "html_url": "https://github.com/udinparla/aa.py",
+      "description": "#!/usr/bin/env python import re import hashlib import Queue from random import choice import threading import time import urllib2 import sys import socket  try:     import paramiko      PARAMIKO_IMPORTED = True except ImportError:     PARAMIKO_IMPORTED = False    USER_AGENT = [\"Mozilla/5.0 (Windows;",
+      "stars": 28,
+      "language": null,
+      "default_branch": "master"
+    },
+    {
+      "full_name": "Tutorialwork/Linux-Backup-Script",
+      "html_url": "https://github.com/Tutorialwork/Linux-Backup-Script",
+      "description": "An Python script to backup your Linux server automatically without programming knowledge",
+      "stars": 20,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "AnonStar/home_backup",
+      "html_url": "https://github.com/AnonStar/home_backup",
+      "description": "This is a backup-script written in python using rsync. It is tested on Ubuntu 14.04 and Arch Linux (using --legacy). It can backup incremental and differential. It will send you an email and summarize the backup.",
+      "stars": 15,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 2,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Install Python with ``apt install python3 python3",
+      "description": "pip``"
+    },
+    {
+      "type": "tool",
+      "name": "Edit the ``config.py`` with a text editor like Notepad++",
+      "description": "Setup cronjob with ``crontab -e``."
+    }
+  ],
+  "script_summary": "2 tools"
+}

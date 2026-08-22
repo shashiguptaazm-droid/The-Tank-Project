@@ -1,0 +1,734 @@
+{
+  "timestamp": "2026-08-10T03:04:54.972358",
+  "topic": "security hardening",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "imthenachoman/How-To-Secure-A-Linux-Server",
+      "html_url": "https://github.com/imthenachoman/How-To-Secure-A-Linux-Server",
+      "description": "An evolving how-to guide for securing a Linux server.",
+      "stars": 30250,
+      "language": null,
+      "default_branch": "master"
+    },
+    {
+      "full_name": "CISOfy/lynis",
+      "html_url": "https://github.com/CISOfy/lynis",
+      "description": "Lynis - Security auditing tool for Linux, macOS, and UNIX-based systems. Assists with compliance testing (HIPAA/ISO27001/PCI DSS) and system hardening. Agentless, and installation optional.",
+      "stars": 16127,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "prowler-cloud/prowler",
+      "html_url": "https://github.com/prowler-cloud/prowler",
+      "description": "Prowler is the world\u2019s most widely used open-source cloud security platform that automates security and compliance across any cloud environment.",
+      "stars": 14556,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 141,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "https://cloudpro.zone/index.php/2018/01/18/debian",
+      "description": "9-3-server-setup-guide-part-1/ - # Debian 9.3 server setup guide"
+    },
+    {
+      "type": "tool",
+      "name": "https://blog.vigilcode.com/2011/04/ubuntu",
+      "description": "server-initial-security-quick-secure-setup-part-i/ - Ubuntu Server Initial Security guide"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.tldp.org/LDP/sag/html/index.html",
+      "description": "https://seifried.org/lasg/"
+    },
+    {
+      "type": "tool",
+      "name": "https://news.ycombinator.com/item?id=19178964",
+      "description": "https://wiki.archlinux.org/index.php/Security - many folks have also recommended this one"
+    },
+    {
+      "type": "tool",
+      "name": "https://securecompliance.co/linux",
+      "description": "server-hardening-checklist/"
+    },
+    {
+      "type": "tool",
+      "name": "A desktop class computer...",
+      "description": "With a single NIC..."
+    },
+    {
+      "type": "tool",
+      "name": "Connected to a consumer grade router...",
+      "description": "Getting a dynamic WAN IP provided by the ISP..."
+    },
+    {
+      "type": "tool",
+      "name": "With WAN+LAN on IPV4...",
+      "description": "And LAN using [NAT](https://en.wikipedia.org/wiki/Network_address_translation)..."
+    },
+    {
+      "type": "tool",
+      "name": "Why do you want to secure your server?",
+      "description": "How much security do you want or not want?"
+    },
+    {
+      "type": "tool",
+      "name": "Keep your system up",
+      "description": "to-date (i.e. `sudo apt update && sudo apt upgrade` on Debian based systems)."
+    },
+    {
+      "type": "tool",
+      "name": "File paths and settings also may differ slightly",
+      "description": "- check with your distribution's documentation if you have issues."
+    },
+    {
+      "type": "tool",
+      "name": "Read the whole guide before you start. Your use",
+      "description": "case and/or principals may call for not doing something or for changing the order."
+    },
+    {
+      "type": "tool",
+      "name": "Ed25519 public/private SSH keys:",
+      "description": "private key on your client"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.ssh.com/ssh/public",
+      "description": "key-authentication"
+    },
+    {
+      "type": "tool",
+      "name": "https://help.ubuntu.com/community/SSH/OpenSSH/Keys",
+      "description": "https://linux-audit.com/using-ed25519-openssh-keys-instead-of-dsa-rsa-ecdsa/"
+    },
+    {
+      "type": "tool",
+      "name": "https://wiki.archlinux.org/index.php/SSH_Keys",
+      "description": "https://www.ssh.com/ssh/copy-id"
+    },
+    {
+      "type": "tool",
+      "name": "man ssh-keygen",
+      "description": "`man ssh-copy-id`"
+    },
+    {
+      "type": "tool",
+      "name": "`man ssh",
+      "description": "add`"
+    },
+    {
+      "type": "tool",
+      "name": "man groupadd",
+      "description": "`man usermod`"
+    },
+    {
+      "type": "tool",
+      "name": "https://linux",
+      "description": "audit.com/audit-and-harden-your-ssh-configuration/"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.ssh.com/ssh/sshd_config/",
+      "description": "https://www.techbrown.com/harden-ssh-secure-linux-vps-server/ (broken; try http://web.archive.org/web/20200413100933/https://www.techbrown.com/harden-ssh-secure-linux-vps-server/)"
+    },
+    {
+      "type": "tool",
+      "name": "https://serverfault.com/questions/660160/openssh",
+      "description": "difference-between-internal-sftp-and-sftp-server/660325"
+    },
+    {
+      "type": "tool",
+      "name": "man sshd_config",
+      "description": "Thanks to [than0s](https://github.com/than0s) for [how to find duplicate settings](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server/issues/38)."
+    },
+    {
+      "type": "tool",
+      "name": "remove all Diffie",
+      "description": "Hellman keys that are less than 3072 bits long"
+    },
+    {
+      "type": "tool",
+      "name": "https://infosec.mozilla.org/guidelines/key_management",
+      "description": "`man moduli`"
+    },
+    {
+      "type": "tool",
+      "name": "https://github.com/google/google",
+      "description": "authenticator-libpam"
+    },
+    {
+      "type": "tool",
+      "name": "https://en.wikipedia.org/wiki/Linux_PAM",
+      "description": "https://en.wikipedia.org/wiki/Time-based_One-time_Password_algorithm"
+    },
+    {
+      "type": "tool",
+      "name": "https://fastmail.blog/2016/07/22/how",
+      "description": "totp-authenticator-apps-work/"
+    },
+    {
+      "type": "tool",
+      "name": "https://jemurai.com/2018/10/11/how",
+      "description": "it-works-totp-based-mfa/"
+    },
+    {
+      "type": "tool",
+      "name": "See [https://github.com/imthenachoman/How",
+      "description": "To-Secure-A-Linux-Server/issues/39](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server/issues/39) for a note on some distributions making it so `sudo` does not require a password. Thanks to"
+    },
+    {
+      "type": "tool",
+      "name": "NTP client installed and keeping server time in",
+      "description": "sync"
+    },
+    {
+      "type": "tool",
+      "name": "https://cloudpro.zone/index.php/2018/01/27/debian",
+      "description": "9-3-server-setup-guide-part-4/"
+    },
+    {
+      "type": "tool",
+      "name": "https://en.wikipedia.org/wiki/Network_Time_Protocol",
+      "description": "https://www.pool.ntp.org/en/"
+    },
+    {
+      "type": "tool",
+      "name": "https://serverfault.com/questions/957302/securing",
+      "description": "hardening-ntp-client-on-linux-servers-config-file/957450#957450"
+    },
+    {
+      "type": "tool",
+      "name": "https://tf.nist.gov/tf",
+      "description": "cgi/servers.cgi"
+    },
+    {
+      "type": "tool",
+      "name": "https://linux",
+      "description": "audit.com/linux-system-hardening-adding-hidepid-to-proc/"
+    },
+    {
+      "type": "tool",
+      "name": "https://likegeeks.com/secure",
+      "description": "linux-server-hardening-best-practices/#Hardening-proc-Directory"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.cyberciti.biz/faq/linux",
+      "description": "hide-processes-from-other-users/"
+    },
+    {
+      "type": "tool",
+      "name": "Automatic, unattended, updates of critical security patches",
+      "description": "Automatic emails of remaining pending updates"
+    },
+    {
+      "type": "tool",
+      "name": "unattended",
+      "description": "upgrades to automatically do system updates you want (i.e. critical security updates)"
+    },
+    {
+      "type": "tool",
+      "name": "apt",
+      "description": "listchanges to get details about package changes before they are installed/upgraded"
+    },
+    {
+      "type": "tool",
+      "name": "https://wiki.debian.org/UnattendedUpgrades",
+      "description": "https://debian-handbook.info/browse/stable/sect.regular-upgrades.html"
+    },
+    {
+      "type": "tool",
+      "name": "https://blog.sleeplessbeastie.eu/2015/01/02/how",
+      "description": "to-perform-unattended-upgrades/"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.vultr.com/docs/how",
+      "description": "to-set-up-unattended-upgrades-on-debian-9-stretch"
+    },
+    {
+      "type": "tool",
+      "name": "https://github.com/mvo5/unattended",
+      "description": "upgrades"
+    },
+    {
+      "type": "tool",
+      "name": "https://wiki.debian.org/UnattendedUpgrades#apt",
+      "description": "listchanges"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.cyberciti.biz/faq/apt",
+      "description": "get-apticron-send-email-upgrades-available/"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.unixmen.com/how",
+      "description": "to-get-email-notifications-for-new-updates-on-debianubuntu/"
+    },
+    {
+      "type": "tool",
+      "name": "`/etc/apt/apt.conf.d/50unattended",
+      "description": "upgrades`"
+    },
+    {
+      "type": "tool",
+      "name": "https://hackaday.com/2017/11/02/what",
+      "description": "is-entropy-and-how-do-i-get-more-of-it/"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.2uo.de/myths",
+      "description": "about-urandom"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.gnu.org/software/hurd/user/tlecarrour/rng",
+      "description": "tools.html"
+    },
+    {
+      "type": "tool",
+      "name": "https://wiki.archlinux.org/index.php/Rng",
+      "description": "tools"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.howtoforge.com/helping",
+      "description": "the-random-number-generator-to-gain-enough-entropy-with-rng-tools-debian-lenny"
+    },
+    {
+      "type": "tool",
+      "name": "https://access.redhat.com/documentation/en",
+      "description": "us/red_hat_enterprise_linux/6/html/security_guide/sect-security_guide-encryption-using_the_random_number_generator"
+    },
+    {
+      "type": "tool",
+      "name": "Thanks to [nuvious](https://github.com/nuvious/pam",
+      "description": "duress) for this tool"
+    },
+    {
+      "type": "tool",
+      "name": "http://www.cipherdyne.org/psad/",
+      "description": "http://www.cipherdyne.org/psad/docs/config.html"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.thefanclub.co.za/how",
+      "description": "to/how-install-psad-intrusion-detection-ubuntu-1204-lts-server"
+    },
+    {
+      "type": "tool",
+      "name": "https://serverfault.com/a/447604/289829",
+      "description": "https://serverfault.com/a/770424/289829"
+    },
+    {
+      "type": "tool",
+      "name": "https://gist.github.com/netson/c45b2dc4e835761fbccc",
+      "description": "Thanks to [moltenbit](https://github.com/moltenbit) for catching the issue ([#61](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server/issues/61)) with `psadwatchd`."
+    },
+    {
+      "type": "tool",
+      "name": "https://www.fail2ban.org/",
+      "description": "https://blog.vigilcode.com/2011/05/ufw-with-fail2ban-quick-secure-setup-part-ii/"
+    },
+    {
+      "type": "tool",
+      "name": "https://dodwell.us/security/ufw",
+      "description": "fail2ban-portscan.html"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.howtoforge.com/community/threads/fail2ban",
+      "description": "and-ufw-on-debian.77261/"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.crowdsec.net/",
+      "description": "[Read how CrowdSec curates the Community Blocklist](https://www.crowdsec.net/our-data)"
+    },
+    {
+      "type": "tool",
+      "name": "https://aide.github.io/",
+      "description": "https://www.hiroom2.com/2017/06/09/debian-8-file-integrity-check-with-aide/"
+    },
+    {
+      "type": "tool",
+      "name": "https://blog.rapid7.com/2017/06/30/how",
+      "description": "to-install-and-configure-aide-on-ubuntu-linux/"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.stephenrlang.com/2016/03/using",
+      "description": "aide-for-file-integrity-monitoring-fim-on-ubuntu/"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.howtoforge.com/how",
+      "description": "to-configure-the-aide-advanced-intrusion-detection-environment-file-integrity-scanner-for-your-website"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.tecmint.com/check",
+      "description": "integrity-of-file-and-directory-using-aide-in-linux/"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.cyberciti.biz/faq/debian",
+      "description": "ubuntu-linux-software-integrity-checking-with-aide/"
+    },
+    {
+      "type": "tool",
+      "name": "https://github.com/imthenachoman/How",
+      "description": "To-Secure-A-Linux-Server/issues/83"
+    },
+    {
+      "type": "tool",
+      "name": "ClamAV is a virus scanner",
+      "description": "ClamAV-Freshclam is a service that keeps the virus definitions updated"
+    },
+    {
+      "type": "tool",
+      "name": "ClamAV",
+      "description": "Daemon keeps the `clamd` process running to make scanning faster"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.clamav.net/documents/installation",
+      "description": "on-debian-and-ubuntu-linux-distributions"
+    },
+    {
+      "type": "tool",
+      "name": "https://wiki.debian.org/ClamAV",
+      "description": "https://www.osradar.com/install-clamav-debian-9-ubuntu-18/"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.lisenet.com/2014/automate",
+      "description": "clamav-to-perform-daily-system-scan-and-send-email-notifications-on-linux/"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.howtoforge.com/tutorial/configure",
+      "description": "clamav-to-scan-and-notify-virus-and-malware/"
+    },
+    {
+      "type": "tool",
+      "name": "https://serverfault.com/questions/741299/is",
+      "description": "there-a-way-to-keep-clamav-updated-on-debian-8"
+    },
+    {
+      "type": "tool",
+      "name": "https://askubuntu.com/questions/250290/how",
+      "description": "do-i-scan-for-viruses-with-clamav"
+    },
+    {
+      "type": "tool",
+      "name": "https://ngothang.com/how",
+      "description": "to-install-clamav-and-configure-daily-scanning-on-centos/"
+    },
+    {
+      "type": "tool",
+      "name": "To scan files/folders use the `clamscan` program.",
+      "description": "`clamscan` runs as the user it is executed as so it needs read permissions to the files/folders it is scanning."
+    },
+    {
+      "type": "tool",
+      "name": "To scan a directory: `clamscan",
+      "description": "r /path/to/folder`."
+    },
+    {
+      "type": "tool",
+      "name": "You can use the `",
+      "description": "i` switch to only print infected files."
+    },
+    {
+      "type": "tool",
+      "name": "http://rkhunter.sourceforge.net/",
+      "description": "https://www.cyberciti.biz/faq/howto-check-linux-rootkist-with-detectors-software/"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.tecmint.com/install",
+      "description": "rootkit-hunter-scan-for-rootkits-backdoors-in-linux/"
+    },
+    {
+      "type": "tool",
+      "name": "http://www.chkrootkit.org/",
+      "description": "https://www.cyberciti.biz/faq/howto-check-linux-rootkist-with-detectors-software/"
+    },
+    {
+      "type": "tool",
+      "name": "https://askubuntu.com/questions/258658/eth0",
+      "description": "packet-sniffer-sbin-dhclient"
+    },
+    {
+      "type": "tool",
+      "name": "Logwatch configured to send a daily e",
+      "description": "mail summary of all of the server's status and logs"
+    },
+    {
+      "type": "tool",
+      "name": "https://sourceforge.net/projects/logwatch/",
+      "description": "https://www.digitalocean.com/community/tutorials/how-to-install-and-use-logwatch-log-analyzer-and-reporter-on-a-vps"
+    },
+    {
+      "type": "tool",
+      "name": "find out non",
+      "description": "localhost what ports are open and listening for connections"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.tecmint.com/find",
+      "description": "open-ports-in-linux/"
+    },
+    {
+      "type": "tool",
+      "name": "https://cisofy.com/documentation/lynis/get",
+      "description": "started/"
+    },
+    {
+      "type": "tool",
+      "name": "https://packages.cisofy.com/community/#debian",
+      "description": "ubuntu"
+    },
+    {
+      "type": "tool",
+      "name": "https://thelinuxcode.com/audit",
+      "description": "lynis-ubuntu-server/"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.vultr.com/docs/install",
+      "description": "lynis-on-debian-8"
+    },
+    {
+      "type": "tool",
+      "name": "OSSEC",
+      "description": "HIDS installed"
+    },
+    {
+      "type": "tool",
+      "name": "https://github.com/torvalds/linux/tree/master/Documentation",
+      "description": "https://www.cyberciti.biz/faq/linux-kernel-etcsysctl-conf-security-hardening/"
+    },
+    {
+      "type": "tool",
+      "name": "https://geektnt.com/sysctl",
+      "description": "conf-hardening.html"
+    },
+    {
+      "type": "tool",
+      "name": "https://linoxide.com/how",
+      "description": "tos/linux-server-protection/"
+    },
+    {
+      "type": "tool",
+      "name": "https://github.com/klaver/sysctl/blob/master/sysctl.conf",
+      "description": "https://cloudpro.zone/index.php/2018/01/30/debian-9-3-server-setup-guide-part-5/"
+    },
+    {
+      "type": "tool",
+      "name": "https://selivan.github.io/2017/12/21/grub2",
+      "description": "password-for-all-but-default-menu-entries.html"
+    },
+    {
+      "type": "tool",
+      "name": "https://help.ubuntu.com/community/Grub2/Passwords",
+      "description": "https://computingforgeeks.com/how-to-protect-grub-with-password-on-debian-ubuntu-and-kali-linux/"
+    },
+    {
+      "type": "tool",
+      "name": "man grub",
+      "description": "`man grub-mkpasswd-pbkdf2`"
+    },
+    {
+      "type": "tool",
+      "name": "https://bugs.debian.org/cgi",
+      "description": "bin/bugreport.cgi?bug=806852"
+    },
+    {
+      "type": "tool",
+      "name": "https://github.com/systemd/systemd/issues/7115",
+      "description": "https://github.com/karelzak/util-linux/commit/7ff1162e67164cb4ece19dd809c26272461aa254"
+    },
+    {
+      "type": "tool",
+      "name": "https://github.com/systemd/systemd/issues/11596",
+      "description": "https://www.reddit.com/r/selfhosted/comments/aoxd4l/new_guide_created_by_me_how_to_secure_a_linux/eg4rkfi/"
+    },
+    {
+      "type": "tool",
+      "name": "umask is a Bash built",
+      "description": "in which means a user can change their own umask setting."
+    },
+    {
+      "type": "tool",
+      "name": "https://www.linuxnix.com/umask",
+      "description": "define-linuxunix/"
+    },
+    {
+      "type": "tool",
+      "name": "https://serverfault.com/questions/818783/which",
+      "description": "umask-is-more-secure-in-linux-022-or-027"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.cyberciti.biz/tips/understanding",
+      "description": "linux-unix-umask-value-usage.html"
+    },
+    {
+      "type": "tool",
+      "name": "`mail` configured to send e",
+      "description": "mails from your server using [Gmail](https://mail.google.com/)"
+    },
+    {
+      "type": "tool",
+      "name": "https://wiki.debian.org/Exim",
+      "description": "https://wiki.debian.org/GmailAndExim4"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.exim.org/exim",
+      "description": "html-current/doc/html/spec_html/ch-encrypted_smtp_connections_using_tlsssl.html"
+    },
+    {
+      "type": "tool",
+      "name": "https://php.quicoto.com/setup",
+      "description": "exim4-to-use-gmail-in-ubuntu/"
+    },
+    {
+      "type": "tool",
+      "name": "https://www.fastmail.com/help/technical/ssltlsstarttls.html",
+      "description": "exim4 fails for messages with long lines - [issue #29](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server/issues/29) and https://blog.dhampir.no/content/exim4-line-length-in-debian-stretch-"
+    },
+    {
+      "type": "tool",
+      "name": "https://github.com/imthenachoman/How",
+      "description": "To-Secure-A-Linux-Server/issues/106"
+    },
+    {
+      "type": "tool",
+      "name": "https://blog.shadypixel.com/log",
+      "description": "iptables-messages-to-a-separate-file-with-rsyslog/"
+    },
+    {
+      "type": "tool",
+      "name": "https://gist.github.com/netson/c45b2dc4e835761fbccc",
+      "description": "https://www.rsyslog.com/doc/v8-stable/configuration/actions.html"
+    },
+    {
+      "type": "tool",
+      "name": "https://news.ycombinator.com/item?id=19177435#19178618",
+      "description": "https://www.reddit.com/r/linuxadmin/comments/arx7xo/howtosecurealinuxserver_an_evolving_howto_guide/"
+    },
+    {
+      "type": "tool",
+      "name": "Automated security auditing",
+      "description": "Compliance testing (e.g. ISO27001, PCI-DSS, HIPAA)"
+    },
+    {
+      "type": "tool",
+      "name": "Configuration and asset management",
+      "description": "Software patch management"
+    },
+    {
+      "type": "tool",
+      "name": "System hardening",
+      "description": "Penetration testing (privilege escalation)"
+    },
+    {
+      "type": "tool",
+      "name": "System administrators",
+      "description": "Auditors"
+    },
+    {
+      "type": "tool",
+      "name": "Security officers",
+      "description": "Penetration testers"
+    },
+    {
+      "type": "tool",
+      "name": "Cloud",
+      "description": "Specific Frameworks:** AWS Foundational Technical Review (FTR), AWS Well-Architected Framework, and BSI C5"
+    },
+    {
+      "type": "tool",
+      "name": "`git` installed.",
+      "description": "`uv` installed: [uv installation](https://docs.astral.sh/uv/getting-started/installation/)."
+    },
+    {
+      "type": "tool",
+      "name": "`v3",
+      "description": "latest`: Synchronizes with the `v3` branch. Note that this version is not stable."
+    },
+    {
+      "type": "tool",
+      "name": "`stable`: Always points to the latest release.",
+      "description": "`v4-stable`: Always points to the latest release for v4."
+    },
+    {
+      "type": "tool",
+      "name": "`v3",
+      "description": "stable`: Always points to the latest release for v3."
+    },
+    {
+      "type": "tool",
+      "name": "Prowler CLI:",
+      "description": "[DockerHub](https://hub.docker.com/r/prowlercloud/prowler/tags)"
+    },
+    {
+      "type": "tool",
+      "name": "Prowler Local Server:",
+      "description": "[DockerHub - Prowler UI](https://hub.docker.com/r/prowlercloud/prowler-ui/tags)"
+    },
+    {
+      "type": "tool",
+      "name": "Your own workstation",
+      "description": "A Kubernetes Job"
+    },
+    {
+      "type": "tool",
+      "name": "Google Compute Engine",
+      "description": "Azure Virtual Machines (VMs)"
+    },
+    {
+      "type": "tool",
+      "name": "Amazon EC2 instances",
+      "description": "AWS Fargate or other container platforms"
+    },
+    {
+      "type": "tool",
+      "name": "Framework",
+      "description": "specific rules** (React 19, Next.js 15, Django DRF, Tailwind 4)"
+    },
+    {
+      "type": "pip_package",
+      "value": "prowler"
+    },
+    {
+      "type": "npm_package",
+      "value": "pnpm"
+    },
+    {
+      "type": "feature",
+      "value": "**Coding patterns** for each component (SDK, API, UI, MCP Server)"
+    },
+    {
+      "type": "feature",
+      "value": "**Testing conventions** (pytest, Playwright)"
+    },
+    {
+      "type": "feature",
+      "value": "**Architecture guidelines** (Clean Architecture, RLS patterns)"
+    },
+    {
+      "type": "feature",
+      "value": "**Framework-specific rules** (React 19, Next.js 15, Django DRF, Tailwind 4)"
+    }
+  ],
+  "script_summary": "135 tools, 1 pip_packages, 1 npm_packages, 4 features"
+}

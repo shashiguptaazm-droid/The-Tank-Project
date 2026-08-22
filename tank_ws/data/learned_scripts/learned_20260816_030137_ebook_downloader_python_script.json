@@ -1,0 +1,107 @@
+{
+  "timestamp": "2026-08-16T03:01:37.578760",
+  "topic": "ebook downloader python script",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "vodibe/booktab-downloader",
+      "html_url": "https://github.com/vodibe/booktab-downloader",
+      "description": "Python script for downloading books as PDF from Booktab software.",
+      "stars": 14,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "aravvv/EbookDownloader",
+      "html_url": "https://github.com/aravvv/EbookDownloader",
+      "description": "A python script for automating a site that downloads the book you want to read in your Downloads folder in aa pdf or Epub format. ",
+      "stars": 1,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "qu0tex/Scene-Release-Organiser-NFO-Downloader",
+      "html_url": "https://github.com/qu0tex/Scene-Release-Organiser-NFO-Downloader",
+      "description": "This tool is a Windows batch/python script designed to automate the extraction, sorting, and clean-up of Scene releases, especially for 0day and eBook packs plus more!",
+      "stars": 1,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 15,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Added manual .nfo download mode",
+      "description": "simply enter one or more release names."
+    },
+    {
+      "type": "tool",
+      "name": "Extracts missing file_id.diz from .zip archives using 7",
+      "description": "Zip. (fallbacks to WinRAR if 7-Zip is not installed.)."
+    },
+    {
+      "type": "tool",
+      "name": "Moves foreign",
+      "description": "language releases based on folder name keywords like GERMAN, FRENCH, SPANISH, etc to a _foreign folder."
+    },
+    {
+      "type": "tool",
+      "name": "Optional logging",
+      "description": "a ProcessErrorLog.txt is only created if issues are detected."
+    },
+    {
+      "type": "tool",
+      "name": "7-Zip",
+      "description": "(https://7-zip.org) - Required to extract \".diz\" files."
+    },
+    {
+      "type": "tool",
+      "name": "WinRAR",
+      "description": "(https://win-rar.com) - Used as a fallback for \".diz\" extraction."
+    },
+    {
+      "type": "tool",
+      "name": "Python 3.13.3",
+      "description": "(https://python.org/downloads/release/python-3133/) - Required for everything to work."
+    },
+    {
+      "type": "tool",
+      "name": "Python Packages: [Selenium]",
+      "description": "(https://selenium.dev/downloads/)"
+    },
+    {
+      "type": "tool",
+      "name": "GeckoDriver (Firefox)",
+      "description": "(https://github.com/mozilla/geckodriver/releases)"
+    },
+    {
+      "type": "tool",
+      "name": "ChromeDriver (Chrome)",
+      "description": "(https://developer.chrome.com/docs/chromedriver/downloads)"
+    },
+    {
+      "type": "tool",
+      "name": "The script auto",
+      "description": "selects Firefox for Selenium if available, otherwise it falls back to Chrome if Firefox is not installed."
+    },
+    {
+      "type": "tool",
+      "name": "During .nfo downloading, a browser window may briefly open",
+      "description": "do not close it manually, it will close on its own when finished."
+    },
+    {
+      "type": "pip_package",
+      "value": "selenium\""
+    },
+    {
+      "type": "pip_package",
+      "value": "colorama\""
+    },
+    {
+      "type": "pip_package",
+      "value": "colorama)"
+    }
+  ],
+  "script_summary": "12 tools, 3 pip_packages"
+}

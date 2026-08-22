@@ -1,0 +1,141 @@
+{
+  "timestamp": "2026-08-12T03:00:56.905433",
+  "topic": "sql automation CLI tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "kysely-org/kysely-ctl",
+      "html_url": "https://github.com/kysely-org/kysely-ctl",
+      "description": "Command-line tool for Kysely, Knex-compatible, works in Node.js, Deno, Bun, etc.",
+      "stars": 315,
+      "language": "TypeScript",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "leonmeka/sortql-cli",
+      "html_url": "https://github.com/leonmeka/sortql-cli",
+      "description": "A file management automation tool with SQL-like syntax.",
+      "stars": 61,
+      "language": "TypeScript",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "fsistemas/sql2json",
+      "html_url": "https://github.com/fsistemas/sql2json",
+      "description": "Python CLI tool to run queries against sqltatabases and convert the results to json, csv, excel in the command line or python program. Easy to use for Humans, automations, LLMS/Agents",
+      "stars": 55,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 25,
+  "findings": [
+    {
+      "type": "command",
+      "value": "npm i -g kysely-ctl"
+    },
+    {
+      "type": "command",
+      "value": "npm i -D kysely-ctl"
+    },
+    {
+      "type": "npm_package",
+      "value": "kysely-ctl"
+    },
+    {
+      "type": "npm_package",
+      "value": "-D"
+    },
+    {
+      "type": "tool",
+      "name": "<b>Watch Mode:</b> Automatically re",
+      "description": "run the queries whenever a file or folder is added, removed, or modified."
+    },
+    {
+      "type": "tool",
+      "name": "<b>Cross",
+      "description": "Platform:</b> Works seamlessly across different operating systems, including Windows, macOS, and Linux."
+    },
+    {
+      "type": "tool",
+      "name": "<b>Open",
+      "description": "Source:</b> Fully open-source codebase, allowing you to contribute and modify the source code."
+    },
+    {
+      "type": "command",
+      "value": "pipx install \"sql2json[postgres,mysql]\""
+    },
+    {
+      "type": "command",
+      "value": "pip install \"sql2json[postgres,mysql]\""
+    },
+    {
+      "type": "command",
+      "value": "pipx install sql2json           # same, minimal"
+    },
+    {
+      "type": "command",
+      "value": "pipx inject sql2json psycopg2-binary pymysql         # add to the pipx install"
+    },
+    {
+      "type": "command",
+      "value": "pipx inject sql2json pyodbc"
+    },
+    {
+      "type": "command",
+      "value": "pipx upgrade sql2json                                 # pipx install"
+    },
+    {
+      "type": "command",
+      "value": "pip install --upgrade \"sql2json[postgres,mysql]\"      # inside a venv"
+    },
+    {
+      "type": "command",
+      "value": "pipx list                                # shows pipx-managed versions"
+    },
+    {
+      "type": "command",
+      "value": "docker run --rm docker.io/fsistemas/sql2json --query \"SELECT 1 AS a, 2 AS b\""
+    },
+    {
+      "type": "command",
+      "value": "docker.io/fsistemas/sql2json --name default --query sales_monthly --date_from \"START_CURRENT_MONTH-1\""
+    },
+    {
+      "type": "command",
+      "value": "docker.io/fsistemas/sql2json --name default --query default"
+    },
+    {
+      "type": "tool",
+      "name": "`run_query2json`, `run_query_by_name`",
+      "description": "`list_connections`, `list_queries`"
+    },
+    {
+      "type": "tool",
+      "name": "`parse_parameter` (from `sql2json.parameter`)",
+      "description": "`__version__`"
+    },
+    {
+      "type": "tool",
+      "name": "Documented flags: `",
+      "description": "-name`, `--query`, plus `--first`, `--key`, `--value`, `--wrapper`, `--jsonkeys`, `--format`, `--output`, `--timezone`, and arbitrary `--<bind_param>` values."
+    },
+    {
+      "type": "pip_package",
+      "value": "\"sql2json[postgres,mysql]\""
+    },
+    {
+      "type": "pip_package",
+      "value": "--break-system-packages"
+    },
+    {
+      "type": "pip_package",
+      "value": "--upgrade"
+    },
+    {
+      "type": "pip_package",
+      "value": "--no-cache-dir"
+    }
+  ],
+  "script_summary": "13 commands, 2 npm_packages, 6 tools, 4 pip_packages"
+}

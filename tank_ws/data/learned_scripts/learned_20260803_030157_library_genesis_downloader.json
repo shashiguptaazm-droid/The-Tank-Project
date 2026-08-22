@@ -1,0 +1,78 @@
+{
+  "timestamp": "2026-08-03T03:01:57.028475",
+  "topic": "library genesis downloader",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "goodlibs/goodlibs",
+      "html_url": "https://github.com/goodlibs/goodlibs",
+      "description": "Download books from a \ud83d\udcda Goodreads shelf using \u26f5 Library Genesis.",
+      "stars": 93,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "KhaliLounis/Books-Downloader",
+      "html_url": "https://github.com/KhaliLounis/Books-Downloader",
+      "description": "This Python script allows you to search for a book using the Google Books API and download it from the Library Genesis website if available in PDF format.",
+      "stars": 20,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "jorgec/libgen_bulk",
+      "html_url": "https://github.com/jorgec/libgen_bulk",
+      "description": "Bulk Downloader for Library Genesis",
+      "stars": 11,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 10,
+  "findings": [
+    {
+      "type": "command",
+      "value": "pip3 install goodlibs"
+    },
+    {
+      "type": "pip_package",
+      "value": "goodlibs"
+    },
+    {
+      "type": "tool",
+      "name": "Search for books using the Google Books API",
+      "description": "Retrieve potential authors from the Google Books API"
+    },
+    {
+      "type": "tool",
+      "name": "Search for the book on Library Genesis",
+      "description": "Provide a direct download link for books available in PDF format on Library Genesis"
+    },
+    {
+      "type": "tool",
+      "name": "Python 3.x installed on your system",
+      "description": "Required Python packages: `beautifulsoup4`, `requests`, `webbrowser`"
+    },
+    {
+      "type": "feature",
+      "value": "Search for books using the Google Books API"
+    },
+    {
+      "type": "feature",
+      "value": "Retrieve potential authors from the Google Books API"
+    },
+    {
+      "type": "feature",
+      "value": "Search for the book on Library Genesis"
+    },
+    {
+      "type": "feature",
+      "value": "Provide a direct download link for books available in PDF format on Library Genesis"
+    },
+    {
+      "type": "command",
+      "value": "python libgen_bulk.py --source=\"sources.txt\" --outdir=\"<your output folder>\""
+    }
+  ],
+  "script_summary": "2 commands, 1 pip_packages, 3 tools, 4 features"
+}

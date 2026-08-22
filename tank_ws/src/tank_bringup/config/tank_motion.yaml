@@ -1,0 +1,25 @@
+/**:
+  ros__parameters:
+    motor_controller:
+      track_width: 0.30
+      wheel_radius: 0.05
+      max_linear_velocity: 0.8
+      max_angular_velocity: 1.5
+      max_rpm: 220.0
+      # Standard "safe" Pi 5 GPIO pins. Override here per-robot.
+      dir_left_pin: 17
+      pwm_left_pin: 18
+      dir_right_pin: 27
+      pwm_right_pin: 22
+      pwm_frequency: 1000
+    pan_tilt_controller:
+      i2c_address: 64           # 0x40 — PCA9685 default
+      pwm_frequency: 50
+      pan_channel: 0
+      tilt_channel: 1
+      pan_min: -1.5708          # -90°
+      pan_max:  1.5708          # +90°
+      tilt_min: -0.7854         # -45°
+      tilt_max:  0.7854         # +45°
+    safety_watchdog:
+      heartbeat_timeout_sec: 1.5

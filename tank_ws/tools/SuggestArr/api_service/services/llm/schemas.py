@@ -1,0 +1,126 @@
+"""Pydantic schemas for structured LLM responses.
+
+All models use ``extra="forbid"`` so that unexpected fields returned by the LLM
+trigger a ``ValidationError``, which causes the retry mechanism in
+``_call_with_validation`` to kick in with a corrective system message.
+"""
+
+from __future__ import annotations
+
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, field_validator
+
+
+# ---------------------------------------------------------------------------
+# get_recommendations_from_history schemas
+# ---------------------------------------------------------------------------
+
+class RecommendationItem(BaseModel):
+    """A single media recommendation produced by the LLM."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    title: str
+    year: int
+    rationale: str
+    source_title: Optional[str] = None
+
+
+class RecommendationList(BaseModel):
+    """Top-level wrapper for the LLM recommendation response.
+
+    Wrapping the array in an object is required so that JSON-object mode (used
+    by OpenAI-compatible providers) can be activated — those APIs require the
+    root JSON value to be an object, not a bare array.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    recommendations: list[RecommendationItem]
+
+
+# ---------------------------------------------------------------------------
+# interpret_search_query schemas
+# ---------------------------------------------------------------------------
+
+class DiscoverParams(BaseModel):
+    """TMDB discover filter parameters extracted from the user's natural-language query."""
+
+    # Extra fields the LLM might include are silently ignored: the TMDB client
+    # only reads known keys, so unknown extras are harmless.
+    model_config = ConfigDict(extra="ignore")
+
+    genres: Optional[list[str]] = None
+    year_from: Optional[int] = None
+    year_to: Optional[int] = None
+    original_language: Optional[str] = None
+    sort_by: Optional[str] = None
+    min_rating: Optional[float] = None
+
+    @field_validator("original_language", mode="before")
+    @classmethod
+    def coerce_language_list(cls, v):
+        """Coerce a list of language codes into a single ISO 639-1 code.
+
+        The LLM may incorrectly return multiple language codes as a list (e.g.,
+        ["da", "no", "sv"] for "Nordic western"). This validator takes the first
+        element to ensure Pydantic validation succeeds. Downstream normalization
+        can then apply further refinement if needed.
+        """
+        if isinstance(v, list):
+            if not v:
+                return None
+            return str(v[0])
+        return v
+
+
+class SuggestedTitle(BaseModel):
+    """A single specific title suggestion produced by the LLM for AI search."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    title: str
+    year: Optional[int] = None
+    rationale: str
+
+
+class ReferenceTitle(BaseModel):
+    """A title explicitly named as a similarity reference in an AI search query."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    title: str
+    year: Optional[int] = None
+
+
+class SearchQueryInterpretation(BaseModel):
+    """Top-level response model for :func:`interpret_search_query`."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    discover_params: DiscoverParams
+    suggested_titles: list[SuggestedTitle]
+    reference_titles: list[ReferenceTitle] = []
+
+
+# ---------------------------------------------------------------------------
+# AI search result rationale generation schemas
+# ---------------------------------------------------------------------------
+
+class SearchResultRationaleItem(BaseModel):
+    """A single LLM-generated rationale tied to a suggested result title/year."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    title: str
+    year: Optional[int] = None
+    rationale: str
+
+
+class SearchResultRationaleList(BaseModel):
+    """Top-level wrapper for per-result AI search rationales."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    rationales: list[SearchResultRationaleItem]

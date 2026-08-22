@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Tank — Preferences</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body data-theme="dark">
+<header class="hero">
+  <div class="wordmark">
+    <span class="logo" aria-hidden="true">▣</span>
+    <div>
+      <h1>The Tank <span class="dim">/ Preferences</span></h1>
+      <p class="lede">Teach your robot how to talk, where to go, what to remember.</p>
+    </div>
+  </div>
+  <div class="auth-row">
+    <label class="auth-token" for="api-token"><span class="sr-only">API token</span>
+      <input id="api-token" type="password"
+             placeholder="Bearer token (TANK_API_KEY)"
+             autocomplete="off" spellcheck="false" />
+    </label>
+    <button id="auth-save" class="btn btn-secondary" type="button">Save token</button>
+    <span id="auth-status" class="status-pill" role="status">checking…</span>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Preferences sections">
+  <button class="tab" role="tab" id="tab-persona"  aria-selected="true"  data-panel="persona">Persona</button>
+  <button class="tab" role="tab" id="tab-motion"   aria-selected="false" data-panel="motion">Motion</button>
+  <button class="tab" role="tab" id="tab-privacy"  aria-selected="false" data-panel="privacy">Privacy</button>
+  <button class="tab" role="tab" id="tab-audio"    aria-selected="false" data-panel="audio">Audio</button>
+  <button class="tab" role="tab" id="tab-memory"   aria-selected="false" data-panel="memory">Memory</button>
+  <button class="tab" role="tab" id="tab-preview"  aria-selected="false" data-panel="preview">Preview</button>
+</nav>
+
+<main>
+  <!-- PERSONA -------------------------------------------------------- -->
+  <section class="panel" id="panel-persona" role="tabpanel" aria-labelledby="tab-persona">
+    <h2>Persona</h2>
+    <p class="hint">How <em>Tank</em> introduces itself and answers.</p>
+
+    <div class="grid two">
+      <label class="field">
+        <span>Name</span>
+        <input type="text" id="p-name" maxlength="40" placeholder="Tank">
+      </label>
+      <label class="field">
+        <span>Time zone</span>
+        <input type="text" id="p-tz" maxlength="40" placeholder="UTC">
+      </label>
+    </div>
+
+    <div class="grid two">
+      <label class="field">
+        <span>Tone</span>
+        <select id="p-tone">
+          <option value="warm">warm</option>
+          <option value="professional">professional</option>
+          <option value="playful">playful</option>
+          <option value="dry">dry</option>
+          <option value="quirky">quirky</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Response style</span>
+        <select id="p-style">
+          <option value="concise">concise</option>
+          <option value="balanced">balanced</option>
+          <option value="detailed">detailed</option>
+          <option value="chatty">chatty</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="grid two">
+      <label class="field">
+        <span>Emoji use</span>
+        <select id="p-emoji">
+          <option value="off">off</option>
+          <option value="subtle">subtle</option>
+          <option value="moderate">moderate</option>
+          <option value="lots">lots</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Voice rate <small id="p-rate-out">1.00</small></span>
+        <input type="range" id="p-rate" min="0.5" max="2.0" step="0.05">
+      </label>
+    </div>
+
+    <div class="grid two">
+      <label class="field">
+        <span>Voice pitch <small id="p-pitch-out">1.00</small></span>
+        <input type="range" id="p-pitch" min="0.5" max="2.0" step="0.05">
+      </label>
+      <label class="field">
+        <span>Voice volume <small id="p-vol-out">1.00</small></span>
+        <input type="range" id="p-vol" min="0.0" max="1.0" step="0.05">
+      </label>
+    </div>
+
+    <label class="field">
+      <span>Backstory</span>
+      <textarea id="p-backstory" rows="3"
+                placeholder="A short paragraph — who you are, what you do."></textarea>
+    </label>
+
+    <label class="field">
+      <span>Signature phrases <small>(one per line, max 8)</small></span>
+      <textarea id="p-phrases" rows="3"
+                placeholder="How can I help today?&#10;Standing by.&#10;Ready when you are."></textarea>
+    </label>
+
+    <div class="row">
+      <button class="btn btn-primary" id="save-persona">Save persona</button>
+      <button class="btn btn-ghost"   id="reset-persona">Reset to defaults</button>
+      <span id="persona-status" class="status-pill" role="status"></span>
+    </div>
+
+    <ul id="persona-warnings" class="warnings"></ul>
+  </section>
+
+  <!-- MOTION --------------------------------------------------------- -->
+  <section class="panel hidden" id="panel-motion" role="tabpanel" aria-labelledby="tab-motion">
+    <h2>Motion</h2>
+    <p class="hint">Physical limits — how fast, how close, which patrol.</p>
+
+    <div class="grid two">
+      <label class="field">
+        <span>Max speed <small id="m-speed-out">0.40 m/s</small></span>
+        <input type="range" id="m-speed" min="0.05" max="0.8" step="0.01">
+      </label>
+      <label class="field">
+        <span>Turn rate <small id="m-turn-out">0.80 rad/s</small></span>
+        <input type="range" id="m-turn" min="0.1" max="2.0" step="0.05">
+      </label>
+    </div>
+
+    <div class="grid two">
+      <label class="field">
+        <span>Follow distance <small id="m-follow-out">0.80 m</small></span>
+        <input type="range" id="m-follow" min="0.3" max="2.0" step="0.05">
+      </label>
+      <label class="field">
+        <span>Obstacle stop distance <small id="m-stop-out">0.30 m</small></span>
+        <input type="range" id="m-stop" min="0.10" max="1.0" step="0.01">
+      </label>
+    </div>
+
+    <label class="field">
+      <span>Patrol mode</span>
+      <select id="m-patrol">
+        <option value="off">off</option>
+        <option value="random">random</option>
+        <option value="waypoint">waypoint</option>
+      </select>
+    </label>
+
+    <label class="field inline">
+      <input type="checkbox" id="m-chime">
+      <span>Play chime on task arrival</span>
+    </label>
+
+    <div class="row">
+      <button class="btn btn-primary" id="save-motion">Save motion</button>
+      <button class="btn btn-ghost"   id="reset-motion">Reset to defaults</button>
+      <span id="motion-status" class="status-pill" role="status"></span>
+    </div>
+  </section>
+
+  <!-- PRIVACY -------------------------------------------------------- -->
+  <section class="panel hidden" id="panel-privacy" role="tabpanel" aria-labelledby="tab-privacy">
+    <h2>Privacy</h2>
+    <p class="hint">What the AI may record, share, and recall.</p>
+
+    <label class="field inline">
+      <input type="checkbox" id="pr-share-rec">
+      <span>Share recordings with remote endpoints (rare; needs opt-in)</span>
+    </label>
+    <label class="field inline">
+      <input type="checkbox" id="pr-telemetry">
+      <span>Include battery / health telemetry in the LLM prompt</span>
+    </label>
+    <label class="field inline">
+      <input type="checkbox" id="pr-remember">
+      <span>Add conversation to tank_memory on shutdown</span>
+    </label>
+    <label class="field inline">
+      <input type="checkbox" id="pr-blur">
+      <span>Auto-blur faces in recordings before saving</span>
+    </label>
+
+    <label class="field">
+      <span>Auto-delete recordings after <small id="pr-days-out">7 days</small></span>
+      <input type="range" id="pr-days" min="0" max="30" step="1">
+      <small class="dim">Set to 0 to keep forever.</small>
+    </label>
+
+    <div class="row">
+      <button class="btn btn-primary" id="save-privacy">Save privacy</button>
+      <button class="btn btn-ghost"   id="reset-privacy">Reset to defaults</button>
+      <span id="privacy-status" class="status-pill" role="status"></span>
+    </div>
+  </section>
+
+  <!-- AUDIO ---------------------------------------------------------- -->
+  <section class="panel hidden" id="panel-audio" role="tabpanel" aria-labelledby="tab-audio">
+    <h2>Audio</h2>
+    <p class="hint">Wake word sensitivity and TTS voice.</p>
+
+    <div class="grid two">
+      <label class="field">
+        <span>Wake sensitivity <small id="a-wake-out">0.55</small></span>
+        <input type="range" id="a-wake" min="0.1" max="0.95" step="0.01">
+      </label>
+      <label class="field">
+        <span>Chime volume <small id="a-vol-out">0.60</small></span>
+        <input type="range" id="a-vol" min="0" max="1" step="0.05">
+      </label>
+    </div>
+
+    <label class="field inline">
+      <input type="checkbox" id="a-chime">
+      <span>Play wake chime</span>
+    </label>
+
+    <div class="grid two">
+      <label class="field">
+        <span>TTS voice</span>
+        <select id="a-voice">
+          <option value="en_US-lessac-medium">en_US-lessac-medium (default)</option>
+          <option value="en_US-amy-medium">en_US-amy-medium</option>
+          <option value="en_US-ryan-medium">en_US-ryan-medium</option>
+          <option value="en_GB-alan-medium">en_GB-alan-medium</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Speech language</span>
+        <select id="a-lang">
+          <option value="en-US">English (US)</option>
+          <option value="en-GB">English (UK)</option>
+          <option value="hi-IN">Hindi</option>
+          <option value="es-ES">Spanish (ES)</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="row">
+      <button class="btn btn-primary" id="save-audio">Save audio</button>
+      <button class="btn btn-ghost"   id="reset-audio">Reset to defaults</button>
+      <span id="audio-status" class="status-pill" role="status"></span>
+    </div>
+  </section>
+
+  <!-- MEMORY --------------------------------------------------------- -->
+  <section class="panel hidden" id="panel-memory" role="tabpanel" aria-labelledby="tab-memory">
+    <h2>Memory</h2>
+    <p class="hint">What Tank has remembered about you.</p>
+
+    <div class="grid two">
+      <label class="field">
+        <span>Your name</span>
+        <input type="text" id="mem-name" maxlength="40" placeholder="(unknown)">
+      </label>
+      <div class="field readonly">
+        <span>Last seen</span>
+        <strong id="mem-last">—</strong>
+      </div>
+    </div>
+
+    <h3>Custom facts</h3>
+    <ul id="mem-facts" class="fact-list"></ul>
+    <form id="mem-form" class="row">
+      <input type="text" id="mem-new-fact" maxlength="240" placeholder="Remember that I prefer tea to coffee.">
+      <button class="btn btn-primary" type="submit">Remember</button>
+    </form>
+
+    <h3>Recent moods</h3>
+    <ul id="mem-moods" class="mood-list"></ul>
+
+    <div class="row">
+      <button class="btn btn-ghost"   id="mem-clear-facts">Erase facts</button>
+      <button class="btn btn-ghost"   id="mem-clear-all">Erase everything</button>
+      <button class="btn btn-secondary" id="mem-touch">I just talked to you</button>
+      <span id="mem-status" class="status-pill" role="status"></span>
+    </div>
+  </section>
+
+  <!-- PREVIEW -------------------------------------------------------- -->
+  <section class="panel hidden" id="panel-preview" role="tabpanel" aria-labelledby="tab-preview">
+    <h2>Preview</h2>
+    <p class="hint">What Tank's <code>system</code> prompt will look like with your current settings.</p>
+    <div class="row">
+      <button class="btn btn-secondary" id="refresh-prompt">Refresh prompt</button>
+      <button class="btn btn-secondary" id="refresh-dialogue">Refresh dialogue</button>
+    </div>
+    <h3>System prompt</h3>
+    <pre id="prompt-out" class="codeblock" aria-live="polite"></pre>
+    <h3>Dialogue samples</h3>
+    <ul id="dialogue-out" class="dialogue-list"></ul>
+  </section>
+</main>
+
+<footer>
+  <small>tank_personalize · port 8084 · SQLite-backed · privacy-first.</small>
+</footer>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

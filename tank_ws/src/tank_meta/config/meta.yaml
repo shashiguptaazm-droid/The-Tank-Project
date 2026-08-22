@@ -1,0 +1,7 @@
+/meta_node:
+  ros__parameters:
+    db_path: "/root/the tank project/tank_ws/data/meta.db"
+    workspace_root: "/root/the tank project/tank_ws"
+    content_root: "/root/the tank project/tank_ws/src/tank_meta/content"
+    docs_root: "/root/the tank project/docs"
+    auto_reindex_sec: 0.0

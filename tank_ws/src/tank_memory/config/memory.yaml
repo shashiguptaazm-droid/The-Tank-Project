@@ -1,0 +1,11 @@
+/**:
+  ros__parameters:
+    memory_node:
+      # SQLite database file.  Parent directory is created on first run.
+      db_path: "tank_ws/data/memory.db"
+      # sentence-transformers hub id; ships with Hugging Face cache.
+      embedding_model: "all-MiniLM-L6-v2"
+      # Heartbeat snapshot of recent events over /memory/recent_snapshot.
+      snapshot_period_sec: 30.0
+      # LRU cap; 0 disables auto-compaction.  10k is fine for Pi5 NVMe.
+      auto_compact_events: 10000

@@ -1,0 +1,876 @@
+<template>
+  <div class="settings-users" :class="{ 'settings-users--embedded': embedded }">
+    <div class="section-header">
+      <h2>My Profile</h2>
+      <p>Update your account credentials and link your media server account.</p>
+    </div>
+
+    <div class="settings-grid">
+
+      <!-- ── Account Information ─────────────────────────────────────────── -->
+      <div class="settings-group accounts-group">
+        <div class="group-title-row accounts-group__heading">
+          <h3>
+            <i class="fas fa-user-circle"></i>
+            Account Information
+          </h3>
+        </div>
+        <p class="card-desc">Manage your username and password.</p>
+
+        <!-- Username -->
+        <form class="account-form-section" @submit.prevent="saveUsername">
+          <div class="account-section-heading">
+            <span class="account-section-heading__icon"><i class="fas fa-user"></i></span>
+            <div><h4 class="subsection-title">Username</h4><p>How your account is identified in SuggestArr.</p></div>
+          </div>
+          <div class="form-group">
+            <label class="account-field-label" for="newUsername">New username</label>
+            <input
+              id="newUsername"
+              v-model="usernameForm.value"
+              type="text"
+              class="form-control"
+              :placeholder="currentUser?.username || 'Current username'"
+              maxlength="64"
+              :disabled="isSavingUsername"
+            />
+          </div>
+          <div v-if="usernameError" class="error-banner">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ usernameError }}
+          </div>
+          <div v-if="usernameSuccess" class="success-banner">
+            <i class="fas fa-check-circle"></i>
+            {{ usernameSuccess }}
+          </div>
+          <button
+            type="submit"
+            class="btn btn-outline btn-sm"
+            :disabled="isSavingUsername || !usernameForm.value.trim()"
+          >
+            <i :class="isSavingUsername ? 'fas fa-spinner fa-spin' : 'fas fa-save'"></i>
+            {{ isSavingUsername ? 'Saving…' : 'Save Username' }}
+          </button>
+        </form>
+
+        <div class="section-divider"></div>
+
+        <!-- Password -->
+        <form class="account-form-section" @submit.prevent="savePassword">
+          <div class="account-section-heading">
+            <span class="account-section-heading__icon"><i class="fas fa-shield-alt"></i></span>
+            <div><h4 class="subsection-title">Password</h4><p>Use a strong password to protect your account.</p></div>
+          </div>
+          <div class="form-group">
+            <label class="account-field-label" for="currentPassword">Current password</label>
+            <input
+              id="currentPassword"
+              v-model="passwordForm.current"
+              type="password"
+              class="form-control"
+              placeholder="Current password"
+              autocomplete="current-password"
+              :disabled="isSavingPassword"
+            />
+          </div>
+          <div class="form-group">
+            <label class="account-field-label" for="newPassword">New password</label>
+            <input
+              id="newPassword"
+              v-model="passwordForm.new"
+              type="password"
+              class="form-control"
+              placeholder="At least 8 characters"
+              autocomplete="new-password"
+              :disabled="isSavingPassword"
+            />
+          </div>
+          <div class="form-group">
+            <label class="account-field-label" for="confirmPassword">Confirm new password</label>
+            <input
+              id="confirmPassword"
+              v-model="passwordForm.confirm"
+              type="password"
+              class="form-control"
+              placeholder="Repeat new password"
+              autocomplete="new-password"
+              :disabled="isSavingPassword"
+            />
+          </div>
+          <div v-if="passwordError" class="error-banner">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ passwordError }}
+          </div>
+          <div v-if="passwordSuccess" class="success-banner">
+            <i class="fas fa-check-circle"></i>
+            {{ passwordSuccess }}
+          </div>
+          <button
+            type="submit"
+            class="btn btn-outline btn-sm"
+            :disabled="isSavingPassword || !passwordForm.current || !passwordForm.new || !passwordForm.confirm"
+          >
+            <i :class="isSavingPassword ? 'fas fa-spinner fa-spin' : 'fas fa-lock'"></i>
+            {{ isSavingPassword ? 'Saving…' : 'Change Password' }}
+          </button>
+        </form>
+
+      </div>
+
+      <ApiKeysPanel />
+
+      <!-- ── Media Server Link ────────────────────────────────────────────── -->
+      <div v-if="isLinkableService" class="settings-group">
+        <h3>
+          <i :class="providerIcon"></i>
+          {{ providerLabel }} Account
+        </h3>
+
+        <p class="card-desc">
+          Link your {{ providerLabel }} account so SuggestArr can personalise recommendations based on your watch history.
+        </p>
+
+        <!-- Already linked -->
+        <div v-if="currentLink" class="user-row">
+          <div class="user-identity">
+            <div class="user-avatar">
+              <i :class="providerIcon"></i>
+            </div>
+            <div class="user-info">
+              <span class="user-name">{{ currentLink.external_username }}</span>
+              <span class="user-meta">{{ providerLabel }} account</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="btn btn-danger btn-sm icon-btn"
+            :disabled="isUnlinking"
+            title="Unlink account"
+            @click="unlinkAccount"
+          >
+            <i :class="isUnlinking ? 'fas fa-spinner fa-spin' : 'fas fa-unlink'"></i>
+          </button>
+        </div>
+
+        <!-- Link form: credential-based self-linking -->
+        <template v-else>
+          <div v-if="isPlexService">
+            <div v-if="linkError" class="error-banner">
+              <i class="fas fa-exclamation-circle"></i>
+              {{ linkError }}
+            </div>
+            <button
+              type="button"
+              class="btn btn-outline btn-sm"
+              :disabled="isLinking"
+              @click="linkPlexWithOAuth"
+            >
+              <i :class="isLinking ? 'fas fa-spinner fa-spin' : 'fas fa-link'"></i>
+              {{ isLinking ? 'Waiting for Plex…' : 'Link Plex Account' }}
+            </button>
+          </div>
+
+          <form v-else @submit.prevent="linkAccount">
+            <div v-if="isDirectoryBackedService" class="form-group">
+              <label for="linkServerUser">{{ providerLabel }} account</label>
+              <BaseDropdown
+                id="linkServerUser"
+                v-model="selectedServerUserId"
+                :options="serverUserOptions"
+                placeholder="Select your account"
+                :disabled="isLinking || isLoadingServerUsers"
+              />
+              <small v-if="isLoadingServerUsers" class="form-help">
+                Loading {{ providerLabel }} users…
+              </small>
+              <small v-else class="form-help">
+                Username is loaded from the configured {{ providerLabel }} server.
+              </small>
+            </div>
+
+            <div v-else class="form-group">
+              <label for="linkUsername">{{ providerLabel }} username</label>
+              <input
+                id="linkUsername"
+                v-model="linkForm.username"
+                type="text"
+                class="form-control"
+                :placeholder="`${providerLabel} username`"
+                autocomplete="username"
+                :disabled="isLinking"
+              />
+            </div>
+            <div class="form-group">
+              <label for="linkPassword">{{ providerLabel }} password</label>
+              <input
+                id="linkPassword"
+                v-model="linkForm.password"
+                type="password"
+                class="form-control"
+                placeholder="Password"
+                autocomplete="current-password"
+                :disabled="isLinking"
+              />
+            </div>
+
+            <div v-if="linkError" class="error-banner">
+              <i class="fas fa-exclamation-circle"></i>
+              {{ linkError }}
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-outline btn-sm"
+              :disabled="isLinking || !canSubmitLink"
+            >
+              <i :class="isLinking ? 'fas fa-spinner fa-spin' : 'fas fa-link'"></i>
+              {{ isLinking ? 'Linking…' : `Link ${providerLabel} Account` }}
+            </button>
+          </form>
+        </template>
+
+        <div class="section-divider"></div>
+        <h3><i class="fas fa-tv"></i> Trakt Account</h3>
+        <TraktMediaUsers
+          mode="self"
+          :trakt-configured="isTraktAppConfigured"
+          embedded
+        />
+      </div>
+
+      <!-- No linkable service configured -->
+      <div v-if="!isLinkableService && hasProviderContext" class="settings-group">
+        <h3>
+          <i class="fas fa-plug"></i>
+          Media Server
+        </h3>
+        <div class="list-empty">
+          <i class="fas fa-info-circle"></i>
+          No linkable media server is configured. An admin must configure Jellyfin, Emby, or Plex first.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+import { useAuth } from '@/composables/useAuth';
+import {
+  getMediaServerUsers,
+  getMyLinks,
+  linkJellyfinIntegration,
+  linkEmbyIntegration,
+  plexOAuthPoll,
+  plexOAuthStart,
+  unlinkProvider,
+  updateMyProfile,
+} from '@/api/api';
+import BaseDropdown from '@/components/common/BaseDropdown.vue';
+import TraktMediaUsers from './TraktMediaUsers.vue';
+import ApiKeysPanel from './ApiKeysPanel.vue';
+
+const PROVIDER_META = {
+  jellyfin: { label: 'Jellyfin', icon: 'fas fa-server' },
+  emby:     { label: 'Emby',     icon: 'fas fa-server' },
+  plex:     { label: 'Plex',     icon: 'fas fa-play-circle' },
+};
+
+export default {
+  name: 'UserProfile',
+
+  components: { BaseDropdown, TraktMediaUsers, ApiKeysPanel },
+
+  props: {
+    config: Object,
+    isLoading: Boolean,
+    embedded: Boolean,
+  },
+
+  setup() {
+    const { currentUser, accessToken } = useAuth();
+    return { currentUser, accessToken };
+  },
+
+  data() {
+    return {
+      // Account form state
+      usernameForm: { value: '' },
+      passwordForm: { current: '', new: '', confirm: '' },
+      isSavingUsername: false,
+      isSavingPassword: false,
+      usernameError: null,
+      usernameSuccess: null,
+      passwordError: null,
+      passwordSuccess: null,
+
+      // Linked accounts
+      links: [],
+
+      // Jellyfin / Emby users fetched from API
+      serverUsers: [],
+      selectedServerUserId: '',
+      isLoadingServerUsers: false,
+
+      // Provider availability for non-admin users
+      configStatus: {
+        selected_service: '',
+        trakt_app_configured: false,
+      },
+
+      // Credential-based link form
+      linkForm: { username: '', password: '' },
+
+      // Linking / unlinking state
+      isLinking: false,
+      isUnlinking: false,
+      linkError: null,
+
+    };
+  },
+
+  computed: {
+    selectedService() {
+      return (
+        this.config?.SELECTED_SERVICE
+        || this.configStatus?.selected_service
+        || ''
+      ).toLowerCase();
+    },
+
+    isLinkableService() {
+      return ['jellyfin', 'emby', 'plex'].includes(this.selectedService);
+    },
+
+    isDirectoryBackedService() {
+      return ['jellyfin', 'emby'].includes(this.selectedService);
+    },
+
+    isPlexService() {
+      return this.selectedService === 'plex';
+    },
+
+    hasProviderContext() {
+      return this.config?.SELECTED_SERVICE !== undefined
+        || this.configStatus?.selected_service !== undefined;
+    },
+
+    providerLabel() {
+      return PROVIDER_META[this.selectedService]?.label || '';
+    },
+
+    providerIcon() {
+      return PROVIDER_META[this.selectedService]?.icon || 'fas fa-server';
+    },
+
+    currentLink() {
+      return this.links.find(l => l.provider === this.selectedService) || null;
+    },
+
+    isTraktAppConfigured() {
+      return !!(
+        this.config?.TRAKT_CLIENT_ID && this.config?.TRAKT_CLIENT_SECRET
+      ) || this.configStatus?.trakt_app_configured === true;
+    },
+
+    serverUserOptions() {
+      return this.serverUsers.map((user) => ({
+        label: user.name,
+        value: user.id,
+      }));
+    },
+
+    selectedServerUser() {
+      return this.serverUsers.find((user) => user.id === this.selectedServerUserId) || null;
+    },
+
+    canSubmitLink() {
+      if (this.isPlexService) {
+        return true;
+      }
+
+      if (!this.linkForm.password) {
+        return false;
+      }
+
+      if (this.isDirectoryBackedService) {
+        return !!this.selectedServerUserId;
+      }
+
+      return !!this.linkForm.username.trim();
+    },
+  },
+
+  async mounted() {
+    await this.loadConfigStatus();
+    await this.loadLinks();
+    await this.loadServerUsers();
+  },
+
+  watch: {
+    selectedService: {
+      immediate: false,
+      async handler() {
+        this.linkError = null;
+        this.linkForm.username = '';
+        this.linkForm.password = '';
+        this.selectedServerUserId = '';
+        this.serverUsers = [];
+        await this.loadServerUsers();
+      },
+    },
+  },
+
+  methods: {
+    // ── Links ──────────────────────────────────────────────────────────────
+
+    async loadConfigStatus() {
+      try {
+        const res = await axios.get('/api/config/status', {
+          withCredentials: true,
+          timeout: 10000,
+        });
+        this.configStatus = res.data || { selected_service: '' };
+      } catch (err) {
+        console.error('Failed to load config status', err);
+      }
+    },
+
+    async loadLinks() {
+      try {
+        const res = await getMyLinks();
+        this.links = res.data;
+      } catch (err) {
+        console.error('Failed to load media links', err);
+      }
+    },
+
+    async loadServerUsers() {
+      if (!this.isDirectoryBackedService) {
+        this.serverUsers = [];
+        this.selectedServerUserId = '';
+        return;
+      }
+
+      this.isLoadingServerUsers = true;
+      try {
+        const res = await getMediaServerUsers(this.selectedService);
+        this.serverUsers = Array.isArray(res.data) ? res.data : [];
+      } catch (err) {
+        this.serverUsers = [];
+        this.linkError = err.response?.data?.error || `Failed to load ${this.providerLabel} users`;
+      } finally {
+        this.isLoadingServerUsers = false;
+      }
+    },
+
+    async linkAccount() {
+      if (!this.canSubmitLink) return;
+      this.linkError = null;
+      this.isLinking = true;
+      try {
+        const resolvedUsername = this.isDirectoryBackedService
+          ? this.selectedServerUser?.name || ''
+          : this.linkForm.username.trim();
+        const payload = {
+          username: resolvedUsername,
+          password: this.linkForm.password,
+        };
+
+        let response;
+        if (this.selectedService === 'jellyfin') {
+          response = await linkJellyfinIntegration(payload);
+        } else if (this.selectedService === 'emby') {
+          response = await linkEmbyIntegration(payload);
+        }
+
+        const linkedName = response?.data?.external_username || this.linkForm.username.trim();
+        this.$toast.success(`${this.providerLabel} account linked as ${linkedName}`);
+        this.linkForm.username = '';
+        this.linkForm.password = '';
+        this.selectedServerUserId = '';
+        await this.loadLinks();
+      } catch (err) {
+        this.linkError = err.response?.data?.error || `Failed to link ${this.providerLabel} account`;
+      } finally {
+        this.isLinking = false;
+      }
+    },
+
+    async linkPlexWithOAuth() {
+      this.linkError = null;
+      this.isLinking = true;
+      try {
+        const start = await plexOAuthStart();
+        const { pin_id: pinId, auth_url: authUrl } = start.data || {};
+        if (!pinId || !authUrl) {
+          throw new Error('Invalid Plex OAuth response');
+        }
+
+        window.open(authUrl, 'plex-oauth', 'width=600,height=760');
+
+        for (let attempt = 0; attempt < 60; attempt += 1) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          const poll = await plexOAuthPoll(pinId);
+          if (poll.data?.status === 'linked') {
+            const linkedName = poll.data.external_username || 'Plex';
+            this.$toast.success(`${this.providerLabel} account linked as ${linkedName}`);
+            await this.loadLinks();
+            return;
+          }
+        }
+
+        this.linkError = 'Plex authorization timed out. Please try again.';
+      } catch (err) {
+        this.linkError = err.response?.data?.error || `Failed to link ${this.providerLabel} account`;
+      } finally {
+        this.isLinking = false;
+      }
+    },
+
+    async unlinkAccount() {
+      this.isUnlinking = true;
+      try {
+        await unlinkProvider(this.selectedService);
+        this.$toast.success(`${this.providerLabel} account unlinked`);
+        await this.loadLinks();
+      } catch (err) {
+        this.$toast.error(err.response?.data?.error || `Failed to unlink ${this.providerLabel}`);
+      } finally {
+        this.isUnlinking = false;
+      }
+    },
+
+    // ── Account updates ────────────────────────────────────────────────────
+
+    async saveUsername() {
+      this.usernameError = null;
+      this.usernameSuccess = null;
+      const newName = this.usernameForm.value.trim();
+      if (!newName) return;
+      this.isSavingUsername = true;
+      try {
+        const res = await updateMyProfile({ username: newName });
+        // Update singleton auth state so the header reflects the new name immediately.
+        if (this.currentUser) this.currentUser.username = newName;
+        if (res.data.access_token) this.accessToken = res.data.access_token;
+        this.usernameSuccess = 'Username updated.';
+        this.usernameForm.value = '';
+      } catch (err) {
+        this.usernameError = err.response?.data?.error || 'Failed to update username';
+      } finally {
+        this.isSavingUsername = false;
+      }
+    },
+
+    async savePassword() {
+      this.passwordError = null;
+      this.passwordSuccess = null;
+      if (this.passwordForm.new !== this.passwordForm.confirm) {
+        this.passwordError = 'New passwords do not match.';
+        return;
+      }
+      this.isSavingPassword = true;
+      try {
+        await updateMyProfile({
+          current_password: this.passwordForm.current,
+          new_password: this.passwordForm.new,
+        });
+        this.passwordSuccess = 'Password changed successfully.';
+        this.passwordForm = { current: '', new: '', confirm: '' };
+      } catch (err) {
+        this.passwordError = err.response?.data?.error || 'Failed to change password';
+      } finally {
+        this.isSavingPassword = false;
+      }
+    },
+  },
+};
+</script>
+
+<style scoped>
+/* ── Outer wrapper ─────────────────────────────────────────────────────── */
+.settings-users {
+  color: var(--color-text-primary);
+  padding: var(--spacing-lg);
+}
+
+.settings-users--embedded {
+  padding: 0;
+}
+
+/* ── Section header ────────────────────────────────────────────────────── */
+.section-header {
+  margin-bottom: 2rem;
+}
+
+.section-header h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-primary);
+}
+
+.section-header p {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ── Settings grid ─────────────────────────────────────────────────────── */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* ── Settings group card ───────────────────────────────────────────────── */
+.settings-group {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-md);
+  padding: 1.5rem;
+}
+
+.settings-group h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.accounts-group {
+  grid-column: 1 / 1;
+}
+
+.accounts-group__heading {
+  margin-bottom: var(--spacing-md);
+}
+
+.account-form-section {
+  gap: var(--spacing-sm);
+}
+
+.account-section-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+}
+
+.account-section-heading__icon {
+  display: inline-flex;
+  width: var(--spacing-xl);
+  height: var(--spacing-xl);
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  background: var(--surface-glass-subtle);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-full);
+}
+
+.account-section-heading p {
+  margin: var(--spacing-xs) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+
+/* Form elements */
+
+.form-group label {
+  display: block;
+  margin-top: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--color-bg-interactive);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  transition: var(--transition-base);
+  min-height: 44px;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--color-bg-active);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-control:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-group .form-control {
+  flex: 1;
+}
+
+.form-help {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+.mb-3 { margin-bottom: 0.75rem; }
+
+.group-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.group-title-row h3 {
+  margin: 0;
+}
+
+.card-desc {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+/* ── Form sub-sections ─────────────────────────────────────────────────── */
+.settings-group form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.subsection-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.section-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 1.25rem 0;
+}
+
+/* ── Empty / loading state ─────────────────────────────────────────────── */
+.list-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem 1rem;
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-sm);
+}
+
+/* ── User row (linked state) ───────────────────────────────────────────── */
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--border-radius-sm);
+}
+
+.user-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+}
+
+.user-meta {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.icon-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Feedback banners ──────────────────────────────────────────────────── */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-danger);
+  font-size: 0.875rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--border-radius-sm);
+}
+
+.success-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-success);
+  font-size: 0.875rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--border-radius-sm);
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

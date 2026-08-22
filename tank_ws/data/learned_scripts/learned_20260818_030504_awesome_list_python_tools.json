@@ -1,0 +1,3811 @@
+{
+  "timestamp": "2026-08-18T03:05:04.688796",
+  "topic": "awesome list python tools",
+  "repos_scanned": 5,
+  "repos": [
+    {
+      "full_name": "vinta/awesome-python",
+      "html_url": "https://github.com/vinta/awesome-python",
+      "description": "The definitive list that answers \"I want to do X in Python, which tool should I use?\"",
+      "stars": 314508,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "fighting41love/funNLP",
+      "html_url": "https://github.com/fighting41love/funNLP",
+      "description": "\u4e2d\u82f1\u6587\u654f\u611f\u8bcd\u3001\u8bed\u8a00\u68c0\u6d4b\u3001\u4e2d\u5916\u624b\u673a/\u7535\u8bdd\u5f52\u5c5e\u5730/\u8fd0\u8425\u5546\u67e5\u8be2\u3001\u540d\u5b57\u63a8\u65ad\u6027\u522b\u3001\u624b\u673a\u53f7\u62bd\u53d6\u3001\u8eab\u4efd\u8bc1\u62bd\u53d6\u3001\u90ae\u7bb1\u62bd\u53d6\u3001\u4e2d\u65e5\u6587\u4eba\u540d\u5e93\u3001\u4e2d\u6587\u7f29\u5199\u5e93\u3001\u62c6\u5b57\u8bcd\u5178\u3001\u8bcd\u6c47\u60c5\u611f\u503c\u3001\u505c\u7528\u8bcd\u3001\u53cd\u52a8\u8bcd\u8868\u3001\u66b4\u6050\u8bcd\u8868\u3001\u7e41\u7b80\u4f53\u8f6c\u6362\u3001\u82f1\u6587\u6a21\u62df\u4e2d\u6587\u53d1\u97f3\u3001\u6c6a\u5cf0\u6b4c\u8bcd\u751f\u6210\u5668\u3001\u804c\u4e1a\u540d\u79f0\u8bcd\u5e93\u3001\u540c\u4e49\u8bcd\u5e93\u3001\u53cd\u4e49\u8bcd\u5e93\u3001\u5426\u5b9a\u8bcd\u5e93\u3001\u6c7d\u8f66\u54c1\u724c\u8bcd\u5e93\u3001\u6c7d\u8f66\u96f6\u4ef6\u8bcd\u5e93\u3001\u8fde\u7eed\u82f1\u6587\u5207\u5272\u3001\u5404\u79cd\u4e2d\u6587\u8bcd\u5411\u91cf\u3001\u516c\u53f8\u540d\u5b57\u5927\u5168\u3001\u53e4\u8bd7\u8bcd\u5e93\u3001IT\u8bcd\u5e93\u3001\u8d22\u7ecf\u8bcd\u5e93\u3001\u6210\u8bed\u8bcd\u5e93\u3001\u5730\u540d\u8bcd\u5e93\u3001\u5386\u53f2\u540d\u4eba\u8bcd\u5e93\u3001\u8bd7\u8bcd\u8bcd\u5e93\u3001\u533b\u5b66\u8bcd\u5e93\u3001\u996e\u98df\u8bcd\u5e93\u3001\u6cd5\u5f8b\u8bcd\u5e93\u3001\u6c7d\u8f66\u8bcd\u5e93\u3001\u52a8\u7269\u8bcd\u5e93\u3001\u4e2d\u6587\u804a\u5929\u8bed\u6599\u3001\u4e2d\u6587\u8c23\u8a00\u6570\u636e\u3001\u767e\u5ea6\u4e2d\u6587\u95ee\u7b54\u6570\u636e\u96c6\u3001\u53e5\u5b50\u76f8\u4f3c\u5ea6\u5339\u914d\u7b97\u6cd5\u96c6\u5408\u3001bert\u8d44\u6e90\u3001\u6587\u672c\u751f\u6210&\u6458\u8981\u76f8\u5173\u5de5\u5177\u3001cocoNLP\u4fe1\u606f\u62bd\u53d6",
+      "stars": 82513,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "atinfo/awesome-test-automation",
+      "html_url": "https://github.com/atinfo/awesome-test-automation",
+      "description": "A curated list of awesome test automation frameworks, tools, libraries, and software for different programming languages. Sponsored by https://zapple.tech and https://automated-testing.info",
+      "stars": 7134,
+      "language": null,
+      "default_branch": "master"
+    },
+    {
+      "full_name": "lukasmasuch/best-of-python",
+      "html_url": "https://github.com/lukasmasuch/best-of-python",
+      "description": "\ud83c\udfc6 A ranked list of awesome Python open-source libraries and tools. Updated weekly.",
+      "stars": 4568,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "dahlia/awesome-sqlalchemy",
+      "html_url": "https://github.com/dahlia/awesome-sqlalchemy",
+      "description": "A curated list of awesome tools for SQLAlchemy",
+      "stars": 3050,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 892,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Agent Skills",
+      "description": "[django-ai-plugins](https://github.com/vintasoftware/django-ai-plugins) - Django backend agent skills for Django, DRF, Celery, and Django-specific code review."
+    },
+    {
+      "type": "tool",
+      "name": "Orchestration",
+      "description": "[langchain](https://github.com/langchain-ai/langchain) - Building applications with LLMs through composability."
+    },
+    {
+      "type": "tool",
+      "name": "Vendor Agent SDKs",
+      "description": "[openai-agents](https://github.com/openai/openai-agents-python) - OpenAI's framework for building and managing AI agents."
+    },
+    {
+      "type": "tool",
+      "name": "Personal Assistants",
+      "description": "[hermes-agent](https://github.com/nousresearch/hermes-agent) - An adaptive personal AI assistant that grows with you."
+    },
+    {
+      "type": "tool",
+      "name": "Prompt Optimization",
+      "description": "[dspy](https://github.com/stanfordnlp/dspy) - A framework for programming, not prompting, language models."
+    },
+    {
+      "type": "tool",
+      "name": "Data Layer",
+      "description": "[instructor](https://github.com/567-labs/instructor) - A library for extracting structured data from LLMs, powered by Pydantic."
+    },
+    {
+      "type": "tool",
+      "name": "Pre",
+      "description": "trained Models"
+    },
+    {
+      "type": "tool",
+      "name": "LLM Inference and Serving",
+      "description": "[sglang](https://github.com/sgl-project/sglang) - A high-performance serving framework for large language models and multimodal models."
+    },
+    {
+      "type": "tool",
+      "name": "LLM Gateways",
+      "description": "[LiteLLM](https://github.com/BerriAI/litellm) - Call 100+ LLMs using OpenAI format."
+    },
+    {
+      "type": "tool",
+      "name": "Image and Video Generation",
+      "description": "[diffusers](https://github.com/huggingface/diffusers) - A library that provides pre-trained diffusion models for generating and editing images, audio, and video."
+    },
+    {
+      "type": "tool",
+      "name": "Fine",
+      "description": "tuning"
+    },
+    {
+      "type": "tool",
+      "name": "Speech",
+      "description": "[openai-whisper](https://github.com/openai/whisper) - A general-purpose automatic speech recognition model trained on 680k hours of multilingual and multitask supervised data."
+    },
+    {
+      "type": "tool",
+      "name": "Frameworks",
+      "description": "[pytorch](https://github.com/pytorch/pytorch) - Tensors and Dynamic neural networks in Python with strong GPU acceleration."
+    },
+    {
+      "type": "tool",
+      "name": "Reinforcement Learning",
+      "description": "[gymnasium](https://github.com/Farama-Foundation/Gymnasium) - A standard API for reinforcement learning environments with popular reference environments ([gym](https://github.com/openai/gym) successor"
+    },
+    {
+      "type": "tool",
+      "name": "General",
+      "description": "[scikit-learn](https://github.com/scikit-learn/scikit-learn) - The most popular Python library for Machine Learning with extensive documentation and community support."
+    },
+    {
+      "type": "tool",
+      "name": "Gradient Boosting",
+      "description": "[xgboost](https://github.com/dmlc/xgboost) - A scalable, portable, and distributed gradient boosting library."
+    },
+    {
+      "type": "tool",
+      "name": "Time Series Forecasting",
+      "description": "[timesfm](https://github.com/google-research/timesfm) - A pretrained foundation model from Google Research for time-series forecasting."
+    },
+    {
+      "type": "tool",
+      "name": "General",
+      "description": "[nltk](https://github.com/nltk/nltk) - A leading platform for building Python programs to work with human language data."
+    },
+    {
+      "type": "tool",
+      "name": "Chinese",
+      "description": "[jieba](https://github.com/fxsjy/jieba) - The most popular Chinese text segmentation library."
+    },
+    {
+      "type": "tool",
+      "name": "General",
+      "description": "[opencv-python](https://github.com/opencv/opencv-python) - Open Source Computer Vision Library."
+    },
+    {
+      "type": "tool",
+      "name": "OCR",
+      "description": "[pytesseract](https://github.com/madmaze/pytesseract) - A wrapper for [Google Tesseract OCR](https://github.com/tesseract-ocr)."
+    },
+    {
+      "type": "tool",
+      "name": "Synchronous",
+      "description": "[flask](https://github.com/pallets/flask) - A microframework for Python."
+    },
+    {
+      "type": "tool",
+      "name": "Asynchronous",
+      "description": "[starlette](https://github.com/Kludex/starlette) - A lightweight ASGI framework and toolkit for building high-performance async services."
+    },
+    {
+      "type": "tool",
+      "name": "Django",
+      "description": "[django-rest-framework](https://github.com/encode/django-rest-framework) - A powerful and flexible toolkit to build web APIs."
+    },
+    {
+      "type": "tool",
+      "name": "Flask",
+      "description": "[apiflask](https://github.com/apiflask/apiflask) - A lightweight Python web API framework based on Flask and Marshmallow."
+    },
+    {
+      "type": "tool",
+      "name": "Framework Agnostic",
+      "description": "[fastapi](https://github.com/fastapi/fastapi) - A modern, fast, web framework for building APIs with standard Python type hints."
+    },
+    {
+      "type": "tool",
+      "name": "RPC",
+      "description": "[grpcio](https://github.com/grpc/grpc) - HTTP/2-based RPC framework with Python bindings, built by Google."
+    },
+    {
+      "type": "tool",
+      "name": "ASGI",
+      "description": "[uvicorn](https://github.com/Kludex/uvicorn) - A lightning-fast ASGI server implementation, using uvloop and httptools."
+    },
+    {
+      "type": "tool",
+      "name": "WSGI",
+      "description": "[gunicorn](https://github.com/benoitc/gunicorn) - Pre-forked, ported from Ruby's Unicorn project."
+    },
+    {
+      "type": "tool",
+      "name": "OAuth",
+      "description": "[oauthlib](https://github.com/oauthlib/oauthlib) - A generic and thorough implementation of the OAuth request-signing logic."
+    },
+    {
+      "type": "tool",
+      "name": "JWT",
+      "description": "[pyjwt](https://github.com/jpadilla/pyjwt) - JSON Web Token implementation in Python."
+    },
+    {
+      "type": "tool",
+      "name": "Permissions",
+      "description": "[django-guardian](https://github.com/django-guardian/django-guardian) - Implementation of per-object permissions for Django."
+    },
+    {
+      "type": "tool",
+      "name": "Clients",
+      "description": "[requests](https://github.com/psf/requests) - HTTP Requests for Humans."
+    },
+    {
+      "type": "tool",
+      "name": "URL Manipulation",
+      "description": "[yarl](https://github.com/aio-libs/yarl) - Yet another URL library."
+    },
+    {
+      "type": "tool",
+      "name": "Frameworks",
+      "description": "[browser-use](https://github.com/browser-use/browser-use) - Make websites accessible for AI agents with easy browser automation."
+    },
+    {
+      "type": "tool",
+      "name": "Content Extraction",
+      "description": "[feedparser](https://github.com/kurtmckee/feedparser) - Universal feed parser."
+    },
+    {
+      "type": "tool",
+      "name": "Relational Databases",
+      "description": "[sqlalchemy](https://github.com/sqlalchemy/sqlalchemy) - The Python SQL Toolkit and Object Relational Mapper."
+    },
+    {
+      "type": "tool",
+      "name": "NoSQL Databases",
+      "description": "[pynamodb](https://github.com/pynamodb/PynamoDB) - A Pythonic interface for [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)."
+    },
+    {
+      "type": "tool",
+      "name": "MySQL",
+      "description": "[awesome-mysql](https://github.com/shlomi-noach/awesome-mysql)"
+    },
+    {
+      "type": "tool",
+      "name": "PostgreSQL",
+      "description": "[awesome-postgres](https://github.com/dhamaniasad/awesome-postgres)"
+    },
+    {
+      "type": "tool",
+      "name": "SQLite",
+      "description": "[awesome-sqlite](https://github.com/planetopendata/awesome-sqlite)"
+    },
+    {
+      "type": "tool",
+      "name": "ClickHouse",
+      "description": "[clickhouse-connect](https://github.com/ClickHouse/clickhouse-connect) - The official ClickHouse client, with SQLAlchemy and Superset connectors."
+    },
+    {
+      "type": "tool",
+      "name": "Other Relational Databases",
+      "description": "[pyodbc](https://github.com/mkleehammer/pyodbc) - An ODBC bridge for connecting to SQL Server and any other ODBC-accessible database."
+    },
+    {
+      "type": "tool",
+      "name": "NoSQL Databases",
+      "description": "[redis](https://github.com/redis/redis-py) - The Python client for Redis."
+    },
+    {
+      "type": "tool",
+      "name": "Analytical",
+      "description": "[duckdb](https://github.com/duckdb/duckdb) - An in-process SQL OLAP database management system; optimized for analytics and fast queries, similar to SQLite but for analytical workloads."
+    },
+    {
+      "type": "tool",
+      "name": "Vector",
+      "description": "[chromadb](https://github.com/chroma-core/chroma) - An open-source embedding database for building AI applications with embeddings and semantic search."
+    },
+    {
+      "type": "tool",
+      "name": "Key",
+      "description": "Value & Document"
+    },
+    {
+      "type": "tool",
+      "name": "General",
+      "description": "[awswrangler](https://github.com/aws/aws-sdk-pandas) - Pandas integration with AWS services like Athena, Glue, Redshift, S3, and DynamoDB."
+    },
+    {
+      "type": "tool",
+      "name": "Financial Data",
+      "description": "[yfinance](https://github.com/ranaroussi/yfinance) - Easy Pythonic way to download market and financial data from Yahoo Finance."
+    },
+    {
+      "type": "tool",
+      "name": "Plotting",
+      "description": "[matplotlib](https://github.com/matplotlib/matplotlib) - A Python 2D plotting library."
+    },
+    {
+      "type": "tool",
+      "name": "Specialized",
+      "description": "[cartopy](https://github.com/SciTools/cartopy) - A cartographic python library with matplotlib support."
+    },
+    {
+      "type": "tool",
+      "name": "Dashboards and Apps",
+      "description": "[streamlit](https://github.com/streamlit/streamlit) - A framework which lets you build dashboards, generate reports, or create chat apps in minutes."
+    },
+    {
+      "type": "tool",
+      "name": "Core",
+      "description": "[numpy](https://github.com/numpy/numpy) - A fundamental package for scientific computing with Python."
+    },
+    {
+      "type": "tool",
+      "name": "Symbolic Mathematics",
+      "description": "[sympy](https://github.com/sympy/sympy) - A Python library for symbolic mathematics."
+    },
+    {
+      "type": "tool",
+      "name": "Statistics",
+      "description": "[statsmodels](https://github.com/statsmodels/statsmodels) - Statistical modeling and econometrics in Python."
+    },
+    {
+      "type": "tool",
+      "name": "Biology and Chemistry",
+      "description": "[biopython](https://github.com/biopython/biopython) - Biopython is a set of freely available tools for biological computation."
+    },
+    {
+      "type": "tool",
+      "name": "Physics and Engineering",
+      "description": "[astropy](https://github.com/astropy/astropy) - A community Python library for Astronomy."
+    },
+    {
+      "type": "tool",
+      "name": "Simulation and Modeling",
+      "description": "[pymc](https://github.com/pymc-devs/pymc) - Probabilistic programming and Bayesian modeling in Python."
+    },
+    {
+      "type": "tool",
+      "name": "Graphs and Networks",
+      "description": "[networkx](https://github.com/networkx/networkx) - A high-productivity software for complex networks."
+    },
+    {
+      "type": "tool",
+      "name": "Computational Geometry",
+      "description": "[shapely](https://github.com/shapely/shapely) - Manipulation and analysis of geometric objects in the Cartesian plane."
+    },
+    {
+      "type": "tool",
+      "name": "Other",
+      "description": "[colour-science](https://github.com/colour-science/colour) - Implementing a comprehensive number of colour theory transformations and algorithms."
+    },
+    {
+      "type": "tool",
+      "name": "Algorithms",
+      "description": "[sortedcontainers](https://github.com/grantjenks/python-sortedcontainers) - Fast and pure-Python implementation of sorted collections."
+    },
+    {
+      "type": "tool",
+      "name": "Design Patterns",
+      "description": "[transitions](https://github.com/pytransitions/transitions) - A lightweight, object-oriented finite state machine implementation."
+    },
+    {
+      "type": "tool",
+      "name": "Code Analysis",
+      "description": "[vulture](https://github.com/jendrikseipp/vulture) - A tool for finding and analyzing dead Python code."
+    },
+    {
+      "type": "tool",
+      "name": "Git Hooks",
+      "description": "[pre-commit](https://github.com/pre-commit/pre-commit) - A framework for managing and maintaining multi-language pre-commit hooks."
+    },
+    {
+      "type": "tool",
+      "name": "Linters and Formatters",
+      "description": "[ruff](https://github.com/astral-sh/ruff) - An extremely fast Python linter and code formatter."
+    },
+    {
+      "type": "tool",
+      "name": "Refactoring",
+      "description": "[rope](https://github.com/python-rope/rope) - Rope is a python refactoring library."
+    },
+    {
+      "type": "tool",
+      "name": "Type Checkers",
+      "description": "[awesome-python-typing](https://github.com/typeddjango/awesome-python-typing)"
+    },
+    {
+      "type": "tool",
+      "name": "Type Annotations Generators",
+      "description": "[monkeytype](https://github.com/Instagram/MonkeyType) - A system for Python that generates static type annotations by collecting runtime types."
+    },
+    {
+      "type": "tool",
+      "name": "Frameworks",
+      "description": "[pytest](https://github.com/pytest-dev/pytest) - A mature full-featured Python testing tool."
+    },
+    {
+      "type": "tool",
+      "name": "Test Runners",
+      "description": "[tox](https://github.com/tox-dev/tox) - Auto builds and tests distributions in multiple Python versions"
+    },
+    {
+      "type": "tool",
+      "name": "Browser Automation",
+      "description": "[playwright-python](https://github.com/microsoft/playwright-python) - Python version of the Playwright testing and automation library."
+    },
+    {
+      "type": "tool",
+      "name": "Load Testing",
+      "description": "[locust](https://github.com/locustio/locust) - Scalable user load testing tool written in Python."
+    },
+    {
+      "type": "tool",
+      "name": "API Testing",
+      "description": "[schemathesis](https://github.com/schemathesis/schemathesis) - A tool for automatic property-based testing of web applications built with Open API / Swagger specifications."
+    },
+    {
+      "type": "tool",
+      "name": "Mock",
+      "description": "[mock](https://docs.python.org/3/library/unittest.mock.html) - (Python standard library) A mocking and patching library."
+    },
+    {
+      "type": "tool",
+      "name": "Object Factories",
+      "description": "[factory_boy](https://github.com/FactoryBoy/factory_boy) - A test fixtures replacement for Python."
+    },
+    {
+      "type": "tool",
+      "name": "Code Coverage",
+      "description": "[coverage](https://github.com/coveragepy/coveragepy) - Code coverage measurement."
+    },
+    {
+      "type": "tool",
+      "name": "Fake Data",
+      "description": "[faker](https://github.com/joke2k/faker) - A Python package that generates fake data."
+    },
+    {
+      "type": "tool",
+      "name": "pdb",
+      "description": "like Debugger"
+    },
+    {
+      "type": "tool",
+      "name": "Tracing",
+      "description": "[hunter](https://github.com/ionelmc/python-hunter) - A flexible code tracing toolkit."
+    },
+    {
+      "type": "tool",
+      "name": "Profiler",
+      "description": "[py-spy](https://github.com/benfred/py-spy) - A sampling profiler for Python programs. Written in Rust."
+    },
+    {
+      "type": "tool",
+      "name": "Others",
+      "description": "[django-debug-toolbar](https://github.com/django-commons/django-debug-toolbar) - Display various debug information for Django."
+    },
+    {
+      "type": "tool",
+      "name": "Cloud Providers",
+      "description": "[boto3](https://github.com/boto/boto3) - Python interface to Amazon Web Services."
+    },
+    {
+      "type": "tool",
+      "name": "Configuration Management",
+      "description": "[ansible](https://github.com/ansible/ansible) - A radically simple IT automation platform."
+    },
+    {
+      "type": "tool",
+      "name": "Deployment",
+      "description": "[fabric](https://github.com/fabric/fabric) - A simple, Pythonic tool for remote execution and deployment."
+    },
+    {
+      "type": "tool",
+      "name": "Monitoring and Processes",
+      "description": "[psutil](https://github.com/giampaolo/psutil) - A cross-platform process and system utilities module."
+    },
+    {
+      "type": "tool",
+      "name": "Other",
+      "description": "[borgbackup](https://github.com/borgbackup/borg) - A deduplicating archiver with compression and encryption."
+    },
+    {
+      "type": "tool",
+      "name": "Task Scheduling",
+      "description": "[apscheduler](https://github.com/agronholm/apscheduler) - A light but powerful in-process task scheduler that lets you schedule functions."
+    },
+    {
+      "type": "tool",
+      "name": "Workflow Orchestration",
+      "description": "[apache-airflow](https://github.com/apache/airflow) - Airflow is a platform to programmatically author, schedule and monitor workflows."
+    },
+    {
+      "type": "tool",
+      "name": "CLI Development",
+      "description": "[argparse](https://docs.python.org/3/library/argparse.html) - (Python standard library) Command-line option and argument parsing."
+    },
+    {
+      "type": "tool",
+      "name": "Terminal Rendering",
+      "description": "[tqdm](https://github.com/tqdm/tqdm) - Fast, extensible progress bar for loops and CLI."
+    },
+    {
+      "type": "tool",
+      "name": "TUI Frameworks",
+      "description": "[textual](https://github.com/Textualize/textual) - A framework for building interactive user interfaces that run in the terminal and the browser."
+    },
+    {
+      "type": "tool",
+      "name": "Database CLIs",
+      "description": "[pgcli](https://github.com/dbcli/pgcli) - PostgreSQL CLI with autocompletion and syntax highlighting."
+    },
+    {
+      "type": "tool",
+      "name": "Downloaders",
+      "description": "[yt-dlp](https://github.com/yt-dlp/yt-dlp) - A command-line program to download videos from YouTube and other video sites, a fork of youtube-dl."
+    },
+    {
+      "type": "tool",
+      "name": "HTTP Clients",
+      "description": "[httpie](https://github.com/httpie/cli) - A command line HTTP client, a user-friendly cURL replacement."
+    },
+    {
+      "type": "tool",
+      "name": "Project Scaffolding",
+      "description": "[cookiecutter](https://github.com/cookiecutter/cookiecutter) - A command-line utility that creates projects from cookiecutters (project templates)."
+    },
+    {
+      "type": "tool",
+      "name": "Shells",
+      "description": "[xonsh](https://github.com/xonsh/xonsh/) - A Python-powered shell. Full-featured and cross-platform."
+    },
+    {
+      "type": "tool",
+      "name": "Terminal Workflow",
+      "description": "[tmuxp](https://github.com/tmux-python/tmuxp) - A [tmux](https://github.com/tmux/tmux) session manager."
+    },
+    {
+      "type": "tool",
+      "name": "Desktop",
+      "description": "[pygobject](https://github.com/GNOME/pygobject) - Python Bindings for GLib/GObject/GIO/GTK+ (GTK+3)."
+    },
+    {
+      "type": "tool",
+      "name": "Tkinter",
+      "description": "[tkinter](https://docs.python.org/3/library/tkinter.html) - (Python standard library) The standard Python interface to the Tcl/Tk GUI toolkit."
+    },
+    {
+      "type": "tool",
+      "name": "Web",
+      "description": "based"
+    },
+    {
+      "type": "tool",
+      "name": "Wrappers",
+      "description": "[gooey](https://github.com/chriskiehl/Gooey) - Turn command line programs into a full GUI application with one line."
+    },
+    {
+      "type": "tool",
+      "name": "Encoding and Unicode",
+      "description": "[charset-normalizer](https://github.com/jawah/charset_normalizer) - Universal character encoding detector, the default of the requests ecosystem."
+    },
+    {
+      "type": "tool",
+      "name": "Fuzzy Matching",
+      "description": "[rapidfuzz](https://github.com/rapidfuzz/RapidFuzz) - Rapid fuzzy string matching using various string metrics, with a C++ core."
+    },
+    {
+      "type": "tool",
+      "name": "General",
+      "description": "[difflib](https://docs.python.org/3/library/difflib.html) - (Python standard library) Helpers for computing deltas."
+    },
+    {
+      "type": "tool",
+      "name": "Internationalization",
+      "description": "[babel](https://github.com/python-babel/babel) - An internationalization library for Python."
+    },
+    {
+      "type": "tool",
+      "name": "Parser",
+      "description": "[pygments](https://github.com/pygments/pygments) - A generic syntax highlighter."
+    },
+    {
+      "type": "tool",
+      "name": "Transliteration and Slugs",
+      "description": "[python-slugify](https://github.com/un33k/python-slugify) - A Python slugify library that translates unicode to ASCII."
+    },
+    {
+      "type": "tool",
+      "name": "Unique identifiers",
+      "description": "[shortuuid](https://github.com/skorokithakis/shortuuid) - A generator library for concise, unambiguous and URL-safe UUIDs."
+    },
+    {
+      "type": "tool",
+      "name": "General",
+      "description": "[pyelftools](https://github.com/eliben/pyelftools) - Parsing and analyzing ELF files and DWARF debugging information."
+    },
+    {
+      "type": "tool",
+      "name": "File Conversion",
+      "description": "[markitdown](https://github.com/microsoft/markitdown) - Python tool for converting files and office documents to Markdown."
+    },
+    {
+      "type": "tool",
+      "name": "Excel",
+      "description": "[openpyxl](https://openpyxl.readthedocs.io/en/stable/) - A library for reading and writing Excel 2010 xlsx/xlsm/xltx/xltm files."
+    },
+    {
+      "type": "tool",
+      "name": "Word",
+      "description": "[python-docx](https://github.com/python-openxml/python-docx) - Reads, queries and modifies Microsoft Word 2007/2008 docx files."
+    },
+    {
+      "type": "tool",
+      "name": "PowerPoint",
+      "description": "[python-pptx](https://github.com/scanny/python-pptx) - Python library for creating and updating PowerPoint (.pptx) files."
+    },
+    {
+      "type": "tool",
+      "name": "PDF",
+      "description": "[pypdf](https://github.com/py-pdf/pypdf) - A library capable of splitting, merging, cropping, and transforming PDF pages."
+    },
+    {
+      "type": "tool",
+      "name": "HTML",
+      "description": "to-PDF"
+    },
+    {
+      "type": "tool",
+      "name": "Markdown",
+      "description": "[markdown-it-py](https://github.com/executablebooks/markdown-it-py) - Markdown parser with 100% CommonMark support, extensions, and syntax plugins."
+    },
+    {
+      "type": "tool",
+      "name": "Data Formats",
+      "description": "[tomllib](https://docs.python.org/3/library/tomllib.html) - (Python standard library) Parse TOML files."
+    },
+    {
+      "type": "tool",
+      "name": "Barcodes and QR Codes",
+      "description": "[qrcode](https://github.com/lincolnloop/python-qrcode) - A pure Python QR Code generator."
+    },
+    {
+      "type": "tool",
+      "name": "General",
+      "description": "[pillow](https://github.com/python-pillow/Pillow) - Pillow is the friendly [PIL](https://www.pythonware.com/products/pil/) fork."
+    },
+    {
+      "type": "tool",
+      "name": "Image Serving",
+      "description": "[thumbor](https://github.com/thumbor/thumbor) - A smart imaging service. It enables on-demand crop, re-sizing and flipping of images."
+    },
+    {
+      "type": "tool",
+      "name": "Audio",
+      "description": "[pydub](https://github.com/jiaaro/pydub) - Manipulate audio with a simple and easy high level interface."
+    },
+    {
+      "type": "tool",
+      "name": "Video",
+      "description": "[moviepy](https://github.com/Zulko/moviepy) - A module for script-based movie editing with many formats, including animated GIFs."
+    },
+    {
+      "type": "tool",
+      "name": "Metadata",
+      "description": "[mutagen](https://github.com/quodlibet/mutagen) - A Python module to handle audio metadata."
+    },
+    {
+      "type": "tool",
+      "name": "3D Engines",
+      "description": "[panda3d](https://github.com/panda3d/panda3d) - 3D game engine developed by Disney."
+    },
+    {
+      "type": "tool",
+      "name": "Game Frameworks",
+      "description": "[pygame](https://github.com/pygame/pygame) - Pygame is a set of Python modules designed for writing games."
+    },
+    {
+      "type": "tool",
+      "name": "Visual Novels",
+      "description": "[renpy](https://github.com/renpy/renpy) - A Visual Novel engine."
+    },
+    {
+      "type": "tool",
+      "name": "Async I/O",
+      "description": "[asyncio](https://docs.python.org/3/library/asyncio.html) - (Python standard library) Asynchronous I/O, event loop, coroutines and tasks."
+    },
+    {
+      "type": "tool",
+      "name": "Parallelism",
+      "description": "[concurrent.futures](https://docs.python.org/3/library/concurrent.futures.html) - (Python standard library) A high-level interface for asynchronously executing callables."
+    },
+    {
+      "type": "tool",
+      "name": "Package Managers",
+      "description": "[pip](https://github.com/pypa/pip) - The package installer for Python."
+    },
+    {
+      "type": "tool",
+      "name": "Build Backends",
+      "description": "[setuptools](https://github.com/pypa/setuptools) - The historical and still most widely used pyproject build backend."
+    },
+    {
+      "type": "tool",
+      "name": "Executables",
+      "description": "[pyinstaller](https://github.com/pyinstaller/pyinstaller) - Converts Python programs into stand-alone executables (cross-platform)."
+    },
+    {
+      "type": "tool",
+      "name": "Obfuscation",
+      "description": "[pyarmor](https://github.com/dashingsoft/pyarmor) - A tool used to obfuscate python scripts, bind obfuscated scripts to fixed machine or expire obfuscated scripts."
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/protocolbuffers/protobuf"
+    },
+    {
+      "type": "command",
+      "value": "pip install protobuf"
+    },
+    {
+      "type": "command",
+      "value": "npm install google-protobuf"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/google/flatbuffers"
+    },
+    {
+      "type": "command",
+      "value": "pip install flatbuffers"
+    },
+    {
+      "type": "command",
+      "value": "npm install flatbuffers"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/ijl/orjson"
+    },
+    {
+      "type": "command",
+      "value": "pip install orjson"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/marshmallow-code/marshmallow"
+    },
+    {
+      "type": "command",
+      "value": "pip install marshmallow"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/uqfoundation/dill"
+    },
+    {
+      "type": "command",
+      "value": "pip install dill"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/cloudpipe/cloudpickle"
+    },
+    {
+      "type": "command",
+      "value": "pip install cloudpickle"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/etingof/pyasn1"
+    },
+    {
+      "type": "command",
+      "value": "pip install pyasn1"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/simplejson/simplejson"
+    },
+    {
+      "type": "command",
+      "value": "pip install simplejson"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/jsonpickle/jsonpickle"
+    },
+    {
+      "type": "command",
+      "value": "pip install jsonpickle"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/python-rapidjson/python-rapidjson"
+    },
+    {
+      "type": "command",
+      "value": "pip install python-rapidjson"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/explosion/srsly"
+    },
+    {
+      "type": "command",
+      "value": "pip install srsly"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/samuelcolvin/rtoml"
+    },
+    {
+      "type": "command",
+      "value": "pip install rtoml"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pandas-dev/pandas"
+    },
+    {
+      "type": "command",
+      "value": "pip install pandas"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pola-rs/polars"
+    },
+    {
+      "type": "command",
+      "value": "pip install polars"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/h5py/h5py"
+    },
+    {
+      "type": "command",
+      "value": "pip install h5py"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pydata/xarray"
+    },
+    {
+      "type": "command",
+      "value": "pip install xarray"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pydata/numexpr"
+    },
+    {
+      "type": "command",
+      "value": "pip install numexpr"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/zarr-developers/zarr-python"
+    },
+    {
+      "type": "command",
+      "value": "pip install zarr"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/msiemens/tinydb"
+    },
+    {
+      "type": "command",
+      "value": "pip install tinydb"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/ekzhu/datasketch"
+    },
+    {
+      "type": "command",
+      "value": "pip install datasketch"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pydata/bottleneck"
+    },
+    {
+      "type": "command",
+      "value": "pip install Bottleneck"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/PyTables/PyTables"
+    },
+    {
+      "type": "command",
+      "value": "pip install tables"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/modin-project/modin"
+    },
+    {
+      "type": "command",
+      "value": "pip install modin"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/vaexio/vaex"
+    },
+    {
+      "type": "command",
+      "value": "pip install vaex"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/patx/pickledb"
+    },
+    {
+      "type": "command",
+      "value": "pip install pickledb"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/InvestmentSystems/static-frame"
+    },
+    {
+      "type": "command",
+      "value": "pip install static-frame"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/tobgu/pyrsistent"
+    },
+    {
+      "type": "command",
+      "value": "pip install pyrsistent"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/jab/bidict"
+    },
+    {
+      "type": "command",
+      "value": "pip install bidict"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/mewwts/addict"
+    },
+    {
+      "type": "command",
+      "value": "pip install addict"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/mahmoud/glom"
+    },
+    {
+      "type": "command",
+      "value": "pip install glom"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/c0fec0de/anytree"
+    },
+    {
+      "type": "command",
+      "value": "pip install anytree"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/aio-libs/multidict"
+    },
+    {
+      "type": "command",
+      "value": "pip install multidict"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/fabiocaccamo/python-benedict"
+    },
+    {
+      "type": "command",
+      "value": "pip install python-benedict"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/MagicStack/immutables"
+    },
+    {
+      "type": "command",
+      "value": "pip install immutables"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/aio-libs/janus"
+    },
+    {
+      "type": "command",
+      "value": "pip install janus"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/cdgriffith/Box"
+    },
+    {
+      "type": "command",
+      "value": "pip install python-box"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/samuelcolvin/pydantic"
+    },
+    {
+      "type": "command",
+      "value": "pip install pydantic"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/Julian/jsonschema"
+    },
+    {
+      "type": "command",
+      "value": "pip install jsonschema"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/keleshev/schema"
+    },
+    {
+      "type": "command",
+      "value": "pip install schema"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pyeve/cerberus"
+    },
+    {
+      "type": "command",
+      "value": "pip install cerberus"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/alecthomas/voluptuous"
+    },
+    {
+      "type": "command",
+      "value": "pip install voluptuous"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/JoshData/python-email-validator"
+    },
+    {
+      "type": "command",
+      "value": "pip install email-validator"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/holoviz/param"
+    },
+    {
+      "type": "command",
+      "value": "pip install param"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/crdoconnor/strictyaml"
+    },
+    {
+      "type": "command",
+      "value": "pip install strictyaml"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/samuelcolvin/dirty-equals"
+    },
+    {
+      "type": "command",
+      "value": "pip install dirty-equals"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/keon/algorithms"
+    },
+    {
+      "type": "command",
+      "value": "pip install algorithms"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/arrow-py/arrow"
+    },
+    {
+      "type": "command",
+      "value": "pip install arrow"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/scrapinghub/dateparser"
+    },
+    {
+      "type": "command",
+      "value": "pip install dateparser"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/stub42/pytz"
+    },
+    {
+      "type": "command",
+      "value": "pip install pytz"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/vacanza/holidays"
+    },
+    {
+      "type": "command",
+      "value": "pip install holidays"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/regebro/tzlocal"
+    },
+    {
+      "type": "command",
+      "value": "pip install tzlocal"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/dateutil/dateutil"
+    },
+    {
+      "type": "command",
+      "value": "pip install python-dateutil"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/sdispater/pendulum"
+    },
+    {
+      "type": "command",
+      "value": "pip install pendulum"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/fsspec/filesystem_spec"
+    },
+    {
+      "type": "command",
+      "value": "pip install fsspec"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/gorakhargosh/watchdog"
+    },
+    {
+      "type": "command",
+      "value": "pip install watchdog"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/tox-dev/py-filelock"
+    },
+    {
+      "type": "command",
+      "value": "pip install filelock"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/Tinche/aiofiles"
+    },
+    {
+      "type": "command",
+      "value": "pip install aiofiles"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/benhoyt/scandir"
+    },
+    {
+      "type": "command",
+      "value": "pip install scandir"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/python/typing"
+    },
+    {
+      "type": "command",
+      "value": "pip install typing"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pyca/bcrypt"
+    },
+    {
+      "type": "command",
+      "value": "pip install bcrypt"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/Legrandin/pycryptodome"
+    },
+    {
+      "type": "command",
+      "value": "pip install pycryptodomex"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/google/tink"
+    },
+    {
+      "type": "command",
+      "value": "pip install tink"
+    },
+    {
+      "type": "command",
+      "value": "npm install tink-crypto"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/boto/botocore"
+    },
+    {
+      "type": "command",
+      "value": "pip install botocore"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/ansible/ansible"
+    },
+    {
+      "type": "command",
+      "value": "pip install ansible"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/docker/docker-py"
+    },
+    {
+      "type": "command",
+      "value": "pip install docker"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pulumi/pulumi"
+    },
+    {
+      "type": "command",
+      "value": "pip install pulumi"
+    },
+    {
+      "type": "command",
+      "value": "npm install @pulumi/pulumi"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/paramiko/paramiko"
+    },
+    {
+      "type": "command",
+      "value": "pip install paramiko"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/aws/aws-cli"
+    },
+    {
+      "type": "command",
+      "value": "pip install awscli"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/kubernetes-client/python"
+    },
+    {
+      "type": "command",
+      "value": "pip install kubernetes"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/ktbyers/netmiko"
+    },
+    {
+      "type": "command",
+      "value": "pip install netmiko"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/tomerfiliba/plumbum"
+    },
+    {
+      "type": "command",
+      "value": "pip install plumbum"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/docker/compose"
+    },
+    {
+      "type": "command",
+      "value": "pip install docker-compose"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/fabric/fabric"
+    },
+    {
+      "type": "command",
+      "value": "pip install fabric"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/Fizzadar/pyinfra"
+    },
+    {
+      "type": "command",
+      "value": "pip install pyinfra"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/emre/storm"
+    },
+    {
+      "type": "command",
+      "value": "pip install storm"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/amoffat/sh"
+    },
+    {
+      "type": "command",
+      "value": "pip install sh"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/Supervisor/supervisor"
+    },
+    {
+      "type": "command",
+      "value": "pip install supervisor"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/agronholm/anyio"
+    },
+    {
+      "type": "command",
+      "value": "pip install anyio"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/MagicStack/uvloop"
+    },
+    {
+      "type": "command",
+      "value": "pip install uvloop"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/tiangolo/asyncer"
+    },
+    {
+      "type": "command",
+      "value": "pip install asyncer"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/aiokitchen/aiomisc"
+    },
+    {
+      "type": "command",
+      "value": "pip install aiomisc"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/theskumar/python-dotenv"
+    },
+    {
+      "type": "command",
+      "value": "pip install python-dotenv"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/ipython/traitlets"
+    },
+    {
+      "type": "command",
+      "value": "pip install traitlets"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/omry/omegaconf"
+    },
+    {
+      "type": "command",
+      "value": "pip install omegaconf"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/facebookresearch/hydra"
+    },
+    {
+      "type": "command",
+      "value": "pip install hydra"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/rochacbruno/dynaconf"
+    },
+    {
+      "type": "command",
+      "value": "pip install dynaconf"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/DiffSK/configobj"
+    },
+    {
+      "type": "command",
+      "value": "pip install configobj"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/willkg/everett"
+    },
+    {
+      "type": "command",
+      "value": "pip install everett"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pallets/click"
+    },
+    {
+      "type": "command",
+      "value": "pip install click"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/Textualize/rich"
+    },
+    {
+      "type": "command",
+      "value": "pip install rich"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/tiangolo/typer"
+    },
+    {
+      "type": "command",
+      "value": "pip install typer"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/google/python-fire"
+    },
+    {
+      "type": "command",
+      "value": "pip install fire"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/tmbo/questionary"
+    },
+    {
+      "type": "command",
+      "value": "pip install questionary"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/kislyuk/argcomplete"
+    },
+    {
+      "type": "command",
+      "value": "pip install argcomplete"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/prompt-toolkit/python-prompt-toolkit"
+    },
+    {
+      "type": "command",
+      "value": "pip install prompt_toolkit"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/bw2/ConfigArgParse"
+    },
+    {
+      "type": "command",
+      "value": "pip install configargparse"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/jazzband/docopt-ng"
+    },
+    {
+      "type": "command",
+      "value": "pip install docopt-ng"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/erikrose/blessings"
+    },
+    {
+      "type": "command",
+      "value": "pip install blessings"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/kdeldycke/click-extra"
+    },
+    {
+      "type": "command",
+      "value": "pip install click-extra"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/tkem/cachetools"
+    },
+    {
+      "type": "command",
+      "value": "pip install cachetools"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/aio-libs/aiocache"
+    },
+    {
+      "type": "command",
+      "value": "pip install aiocache"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pydanny/cached-property"
+    },
+    {
+      "type": "command",
+      "value": "pip install cached-property"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/bbangert/beaker"
+    },
+    {
+      "type": "command",
+      "value": "pip install beaker"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/lericson/pylibmc"
+    },
+    {
+      "type": "command",
+      "value": "pip install pylibmc"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/kivy/kivy"
+    },
+    {
+      "type": "command",
+      "value": "pip install kivy"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/hoffstadt/DearPyGui"
+    },
+    {
+      "type": "command",
+      "value": "pip install dearpygui"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/chriskiehl/Gooey"
+    },
+    {
+      "type": "command",
+      "value": "pip install gooey"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/beeware/toga"
+    },
+    {
+      "type": "command",
+      "value": "pip install toga"
+    },
+    {
+      "type": "command",
+      "value": "npm install @pybee/toga"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/chardet/chardet"
+    },
+    {
+      "type": "command",
+      "value": "pip install chardet"
+    },
+    {
+      "type": "command",
+      "value": "npm install @pypi/chardet"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/daviddrysdale/python-phonenumbers"
+    },
+    {
+      "type": "command",
+      "value": "pip install phonenumbers"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/jmoiron/humanize"
+    },
+    {
+      "type": "command",
+      "value": "pip install humanize"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/un33k/python-slugify"
+    },
+    {
+      "type": "command",
+      "value": "pip install python-slugify"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/WojciechMula/pyahocorasick"
+    },
+    {
+      "type": "command",
+      "value": "pip install pyahocorasick"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/carpedm20/emoji"
+    },
+    {
+      "type": "command",
+      "value": "pip install emoji"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/alexanderlukanin13/coolname"
+    },
+    {
+      "type": "command",
+      "value": "pip install coolname"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/scrapinghub/price-parser"
+    },
+    {
+      "type": "command",
+      "value": "pip install price-parser"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/boto/boto3"
+    },
+    {
+      "type": "command",
+      "value": "pip install boto3"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/sqlalchemy/alembic"
+    },
+    {
+      "type": "command",
+      "value": "pip install alembic"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/redis/redis-py"
+    },
+    {
+      "type": "command",
+      "value": "pip install redis"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/sqlalchemy/sqlalchemy"
+    },
+    {
+      "type": "command",
+      "value": "pip install SQLAlchemy"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/googleapis/google-cloud-python"
+    },
+    {
+      "type": "command",
+      "value": "pip install google-cloud-storage"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/dpkp/kafka-python"
+    },
+    {
+      "type": "command",
+      "value": "pip install kafka-python"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/Azure/azure-sdk-for-python"
+    },
+    {
+      "type": "command",
+      "value": "pip install azure-storage-blob"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/elastic/elasticsearch-py"
+    },
+    {
+      "type": "command",
+      "value": "pip install elasticsearch"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/boto/s3transfer"
+    },
+    {
+      "type": "command",
+      "value": "pip install s3transfer"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/coleifer/peewee"
+    },
+    {
+      "type": "command",
+      "value": "pip install peewee"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/PyMySQL/PyMySQL"
+    },
+    {
+      "type": "command",
+      "value": "pip install PyMySQL"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/fsspec/s3fs"
+    },
+    {
+      "type": "command",
+      "value": "pip install s3fs"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/mongodb/mongo-python-driver"
+    },
+    {
+      "type": "command",
+      "value": "pip install pymongo"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/tiangolo/sqlmodel"
+    },
+    {
+      "type": "command",
+      "value": "pip install sqlmodel"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/googleapis/python-bigquery"
+    },
+    {
+      "type": "command",
+      "value": "pip install google-cloud-bigquery"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/ibis-project/ibis"
+    },
+    {
+      "type": "command",
+      "value": "pip install ibis-framework"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/tortoise/tortoise-orm"
+    },
+    {
+      "type": "command",
+      "value": "pip install tortoise-orm"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/googleapis/python-bigquery-pandas"
+    },
+    {
+      "type": "command",
+      "value": "pip install pandas-gbq"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/awslabs/aws-data-wrangler"
+    },
+    {
+      "type": "command",
+      "value": "pip install awswrangler"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/datastax/python-driver"
+    },
+    {
+      "type": "command",
+      "value": "pip install cassandra-driver"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/googleapis/python-bigtable"
+    },
+    {
+      "type": "command",
+      "value": "pip install google-cloud-bigtable"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/MongoEngine/mongoengine"
+    },
+    {
+      "type": "command",
+      "value": "pip install mongoengine"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/prometheus/client_python"
+    },
+    {
+      "type": "command",
+      "value": "pip install prometheus_client"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/ponyorm/pony"
+    },
+    {
+      "type": "command",
+      "value": "pip install pony"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/kayak/pypika"
+    },
+    {
+      "type": "command",
+      "value": "pip install pypika"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/PyMySQL/mysqlclient"
+    },
+    {
+      "type": "command",
+      "value": "pip install mysqlclient"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pudo/dataset"
+    },
+    {
+      "type": "command",
+      "value": "pip install dataset"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/confluentinc/confluent-kafka-python"
+    },
+    {
+      "type": "command",
+      "value": "pip install confluent-kafka"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pynamodb/PynamoDB"
+    },
+    {
+      "type": "command",
+      "value": "pip install pynamodb"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/apache/libcloud"
+    },
+    {
+      "type": "command",
+      "value": "pip install apache-libcloud"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/piccolo-orm/piccolo"
+    },
+    {
+      "type": "command",
+      "value": "pip install piccolo"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/oracle/python-cx_Oracle"
+    },
+    {
+      "type": "command",
+      "value": "pip install cx-Oracle"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/minio/minio-py"
+    },
+    {
+      "type": "command",
+      "value": "pip install minio"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/django-haystack/pysolr"
+    },
+    {
+      "type": "command",
+      "value": "pip install pysolr"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/encode/databases"
+    },
+    {
+      "type": "command",
+      "value": "pip install databases"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/art049/odmantic"
+    },
+    {
+      "type": "command",
+      "value": "pip install odmantic"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/python-happybase/happybase"
+    },
+    {
+      "type": "command",
+      "value": "pip install happybase"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/neo4j/neo4j-python-driver"
+    },
+    {
+      "type": "command",
+      "value": "pip install neo4j-driver"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/Scille/umongo"
+    },
+    {
+      "type": "command",
+      "value": "pip install umongo"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/amol-/depot"
+    },
+    {
+      "type": "command",
+      "value": "pip install filedepot"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/psycopg/psycopg"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/mcfunley/pugsql"
+    },
+    {
+      "type": "command",
+      "value": "pip install pugsql"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/cloudant/python-cloudant"
+    },
+    {
+      "type": "command",
+      "value": "pip install cloudant"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/huggingface/datasets"
+    },
+    {
+      "type": "command",
+      "value": "pip install datasets"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/joke2k/faker"
+    },
+    {
+      "type": "command",
+      "value": "pip install Faker"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/jazzband/tablib"
+    },
+    {
+      "type": "command",
+      "value": "pip install tablib"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/ahupp/python-magic"
+    },
+    {
+      "type": "command",
+      "value": "pip install python-magic"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/martinblech/xmltodict"
+    },
+    {
+      "type": "command",
+      "value": "pip install xmltodict"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/python-excel/xlrd"
+    },
+    {
+      "type": "command",
+      "value": "pip install xlrd"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/wkentaro/gdown"
+    },
+    {
+      "type": "command",
+      "value": "pip install gdown"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/xlwings/xlwings"
+    },
+    {
+      "type": "command",
+      "value": "pip install xlwings"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/deanmalmgren/textract"
+    },
+    {
+      "type": "command",
+      "value": "pip install textract"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/RaRe-Technologies/smart_open"
+    },
+    {
+      "type": "command",
+      "value": "pip install smart-open"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/intake/intake"
+    },
+    {
+      "type": "command",
+      "value": "pip install intake"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/wireservice/csvkit"
+    },
+    {
+      "type": "command",
+      "value": "pip install csvkit"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/camelot-dev/camelot"
+    },
+    {
+      "type": "command",
+      "value": "pip install camelot"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/snorkel-team/snorkel"
+    },
+    {
+      "type": "command",
+      "value": "pip install snorkel"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/rom1504/img2dataset"
+    },
+    {
+      "type": "command",
+      "value": "pip install img2dataset"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/singer-io/getting-started"
+    },
+    {
+      "type": "command",
+      "value": "pip install singer-python"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/upgini/upgini"
+    },
+    {
+      "type": "command",
+      "value": "pip install upgini"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/turicas/rows"
+    },
+    {
+      "type": "command",
+      "value": "pip install rows"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/apache/airflow"
+    },
+    {
+      "type": "command",
+      "value": "pip install apache-airflow"
+    },
+    {
+      "type": "command",
+      "value": "docker pull apache/airflow"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/celery/celery"
+    },
+    {
+      "type": "command",
+      "value": "pip install celery"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/rq/rq"
+    },
+    {
+      "type": "command",
+      "value": "pip install rq"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/apache/beam"
+    },
+    {
+      "type": "command",
+      "value": "pip install apache-beam"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/joblib/joblib"
+    },
+    {
+      "type": "command",
+      "value": "pip install joblib"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/PrefectHQ/prefect"
+    },
+    {
+      "type": "command",
+      "value": "pip install prefect"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/dagster-io/dagster"
+    },
+    {
+      "type": "command",
+      "value": "pip install dagster"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/spotify/luigi"
+    },
+    {
+      "type": "command",
+      "value": "pip install luigi"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/great-expectations/great_expectations"
+    },
+    {
+      "type": "command",
+      "value": "pip install great_expectations"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/dbt-labs/dbt-core"
+    },
+    {
+      "type": "command",
+      "value": "pip install dbt"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/kedro-org/kedro"
+    },
+    {
+      "type": "command",
+      "value": "pip install kedro"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/petl-developers/petl"
+    },
+    {
+      "type": "command",
+      "value": "pip install petl"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/zenml-io/zenml"
+    },
+    {
+      "type": "command",
+      "value": "pip install zenml"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/samuelcolvin/arq"
+    },
+    {
+      "type": "command",
+      "value": "pip install arq"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/coleifer/huey"
+    },
+    {
+      "type": "command",
+      "value": "pip install huey"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/combust/mleap"
+    },
+    {
+      "type": "command",
+      "value": "pip install mleap"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/cocoindex-io/cocoindex"
+    },
+    {
+      "type": "command",
+      "value": "pip install cocoindex"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/nerevu/riko"
+    },
+    {
+      "type": "command",
+      "value": "pip install riko"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/closeio/tasktiger"
+    },
+    {
+      "type": "command",
+      "value": "pip install tasktiger"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/databand-ai/dbnd"
+    },
+    {
+      "type": "command",
+      "value": "pip install dbnd"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pdpipe/pdpipe"
+    },
+    {
+      "type": "command",
+      "value": "pip install pdpipe"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/analysiscenter/batchflow"
+    },
+    {
+      "type": "command",
+      "value": "pip install batchflow"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/kubeflow-kale/kale"
+    },
+    {
+      "type": "command",
+      "value": "pip install kubeflow-kale"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/yaml/pyyaml"
+    },
+    {
+      "type": "command",
+      "value": "pip install pyyaml"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/jmcnamara/XlsxWriter"
+    },
+    {
+      "type": "command",
+      "value": "pip install xlsxwriter"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/jmespath/jmespath.py"
+    },
+    {
+      "type": "command",
+      "value": "pip install jmespath"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/seperman/deepdiff"
+    },
+    {
+      "type": "command",
+      "value": "pip install deepdiff"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/python-attrs/attrs"
+    },
+    {
+      "type": "command",
+      "value": "pip install attrs"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/jd/tenacity"
+    },
+    {
+      "type": "command",
+      "value": "pip install tenacity"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/more-itertools/more-itertools"
+    },
+    {
+      "type": "command",
+      "value": "pip install more-itertools"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/mahmoud/boltons"
+    },
+    {
+      "type": "command",
+      "value": "pip install boltons"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/ets-labs/python-dependency-injector"
+    },
+    {
+      "type": "command",
+      "value": "pip install dependency-injector"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/dry-python/returns"
+    },
+    {
+      "type": "command",
+      "value": "pip install returns"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/SethMMorton/natsort"
+    },
+    {
+      "type": "command",
+      "value": "pip install natsort"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/rholder/retrying"
+    },
+    {
+      "type": "command",
+      "value": "pip install retrying"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/Erotemic/ubelt"
+    },
+    {
+      "type": "command",
+      "value": "pip install ubelt"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/python/cpython"
+    },
+    {
+      "type": "command",
+      "value": "pip install cpython"
+    },
+    {
+      "type": "command",
+      "value": "npm install @buckpkg/python"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/micropython/micropython"
+    },
+    {
+      "type": "command",
+      "value": "pip install micropython-_markupbase"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pygments/pygments"
+    },
+    {
+      "type": "command",
+      "value": "pip install pygments"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/GrahamDumpleton/wrapt"
+    },
+    {
+      "type": "command",
+      "value": "pip install wrapt"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pyparsing/pyparsing"
+    },
+    {
+      "type": "command",
+      "value": "pip install pyparsing"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/cookiecutter/cookiecutter"
+    },
+    {
+      "type": "command",
+      "value": "pip install cookiecutter"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pytest-dev/pluggy"
+    },
+    {
+      "type": "command",
+      "value": "pip install pluggy"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/micheles/decorator"
+    },
+    {
+      "type": "command",
+      "value": "pip install decorator"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/mingrammer/diagrams"
+    },
+    {
+      "type": "command",
+      "value": "pip install diagrams"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/fastai/fastcore"
+    },
+    {
+      "type": "command",
+      "value": "pip install fastcore"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/boppreh/keyboard"
+    },
+    {
+      "type": "command",
+      "value": "pip install keyboard"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/copier-org/copier"
+    },
+    {
+      "type": "command",
+      "value": "pip install copier"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/arsenetar/send2trash"
+    },
+    {
+      "type": "command",
+      "value": "pip install send2trash"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/BoboTiG/python-mss"
+    },
+    {
+      "type": "command",
+      "value": "pip install mss"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/explosion/catalogue"
+    },
+    {
+      "type": "command",
+      "value": "pip install catalogue"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/pyscaffold/pyscaffold"
+    },
+    {
+      "type": "command",
+      "value": "pip install pyscaffold"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83e\udd47\ud83e\udd48\ud83e\udd49&nbsp; Combined project",
+      "description": "quality score"
+    },
+    {
+      "type": "tool",
+      "name": "\u2b50\ufe0f&nbsp; Star count from GitHub",
+      "description": "\ud83d\udc23&nbsp; New project _(less than 6 months old)_"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\udca4&nbsp; Inactive project _(6 months no activity)_",
+      "description": "\ud83d\udc80&nbsp; Dead project _(12 months no activity)_"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\udcc8\ud83d\udcc9&nbsp; Project is trending up or down",
+      "description": "\u2795&nbsp; Project was recently added"
+    },
+    {
+      "type": "tool",
+      "name": "\u2757\ufe0f&nbsp; Warning _(e.g. missing/risky license)_",
+      "description": "\ud83d\udc68\u200d\ud83d\udcbb&nbsp; Contributors count from GitHub"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\udd00&nbsp; Fork count from GitHub",
+      "description": "\ud83d\udccb&nbsp; Issue count from GitHub"
+    },
+    {
+      "type": "tool",
+      "name": "\u23f1\ufe0f&nbsp; Last update timestamp on package manager",
+      "description": "\ud83d\udce5&nbsp; Download count from package manager"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\udce6&nbsp; Number of dependent projects",
+      "description": "<img src=\"https://git.io/JLy1S\" style=\"display:inline;\" width=\"13\" height=\"13\">&nbsp; Pandas related project"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/msgpack/msgpack",
+      "description": "python\">msgpack</a></b> (\ud83e\udd4929 \u00b7  \u2b50 2.1K) - MessagePack serializer implementation for Python.. <code>\u2757Unlicensed</code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/pandera",
+      "description": "dev/pandera\">pandera</a></b> (\ud83e\udd4827 \u00b7  \u2b50 4.4K) - A light-weight and flexible data validation and testing.. <code>\u2757Unlicensed</code> <code><img src=\"https://git.io/JLy1S\" style=\"display:inline;\" width=\"1"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/scikit",
+      "description": "learn-contrib/sklearn-pandas\">sklearn-pandas</a></b> (\ud83e\udd4924 \u00b7  \u2b50 2.8K \u00b7 \ud83d\udc80) - Pandas integration with sklearn. <code><a href=\"https://tldrlegal.com/search?q=Zlib\">\u2757\ufe0fZlib</a></code> <code>sklearn</code> <"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/man",
+      "description": "group/arctic\">Arctic</a></b> (\ud83e\udd4920 \u00b7  \u2b50 3.1K) - Arctic is a high performance datastore for numeric data. <code><a href=\"https://tldrlegal.com/search?q=LGPL-2.1\">\u2757\ufe0fLGPL-2.1</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/mouradmourafiq/pandas",
+      "description": "summary\">Pandas Summary</a></b> (\ud83e\udd4917 \u00b7  \u2b50 530 \u00b7 \ud83d\udc80) - An extension to pandas describe function. <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code> <code><img src=\"https://git.io/JLy1S\" style=\"display"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/RaRe",
+      "description": "Technologies/bounter\">Bounter</a></b> (\ud83e\udd4913 \u00b7  \u2b50 930 \u00b7 \ud83d\udc80) - Counter for large datasets. <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/grantjenks/python",
+      "description": "sortedcontainers\">python-sortedcontainers</a></b> (\ud83e\udd4728 \u00b7  \u2b50 3.9K \u00b7 \ud83d\udc80) - Python Sorted Container Types: Sorted List, Sorted.. <code><a href=\"http://bit.ly/3nYMfla\">Apache-2</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/rspeer/ordered",
+      "description": "set\">ordered-set</a></b> (\ud83e\udd4827 \u00b7  \u2b50 210 \u00b7 \ud83d\udc80) - A mutable set that remembers the order of its entries. One of.. <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://python",
+      "description": "validators.github.io/validators\">validators</a></b> (\ud83e\udd4829 \u00b7  \u2b50 1.1K \u00b7 \ud83d\udc80) - Python Data Validation for Humans. <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/PythonCharmers/python",
+      "description": "future\">future</a></b> (\ud83e\udd4831 \u00b7  \u2b50 1.2K \u00b7 \ud83d\udc80) - Easy, clean, reliable Python 2/3 compatibility. <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/sybrenstuvel/python",
+      "description": "rsa\">rsa</a></b> (\ud83e\udd4926 \u00b7  \u2b50 500 \u00b7 \ud83d\udc80) - Python-RSA is a pure-Python RSA implementation. <code><a href=\"http://bit.ly/3nYMfla\">Apache-2</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/ParallelSSH/parallel",
+      "description": "ssh\">parallel-ssh</a></b> (\ud83e\udd4922 \u00b7  \u2b50 1.3K \u00b7 \ud83d\udca4) - Asynchronous parallel SSH client library. <code><a href=\"https://tldrlegal.com/search?q=LGPL-2.1\">\u2757\ufe0fLGPL-2.1</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/grai",
+      "description": "io/grai-core\">Grai</a></b> (\ud83e\udd4911 \u00b7  \u2b50 310 \u00b7 \ud83d\udca4) - Platform to programmatically manage, test, and debug data.. <code><a href=\"https://tldrlegal.com/search?q=MIT-0\">\u2757\ufe0fMIT-0</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/python",
+      "description": "greenlet/greenlet\">greenlet</a></b> (\ud83e\udd4832 \u00b7  \u2b50 1.8K) - Lightweight in-process concurrent programming. <code>\u2757Unlicensed</code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/alex",
+      "description": "sherman/unsync\">unsync</a></b> (\ud83e\udd4920 \u00b7  \u2b50 900 \u00b7 \ud83d\udc80) - Unsynchronize asyncio. <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"http://github.com/henriquebastos/python",
+      "description": "decouple/\">python-decouple</a></b> (\ud83e\udd4827 \u00b7  \u2b50 3K \u00b7 \ud83d\udc80) - Strict separation of settings from code. <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/google/gin",
+      "description": "config\">gin-config</a></b> (\ud83e\udd4925 \u00b7  \u2b50 2.1K \u00b7 \ud83d\udc80) - Gin provides a lightweight configuration framework for Python. <code><a href=\"http://bit.ly/3nYMfla\">Apache-2</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/python",
+      "description": "poetry/cleo\">cleo</a></b> (\ud83e\udd4924 \u00b7  \u2b50 1.3K \u00b7 \ud83d\udc80) - Cleo allows you to create beautiful and testable command-line interfaces. <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/python",
+      "description": "cachier/cachier\">cachier</a></b> (\ud83e\udd4918 \u00b7  \u2b50 660) - Persistent, stale-free, local and cross-machine caching for.. <code>\u2757Unlicensed</code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/python",
+      "description": "eel/Eel\">Eel</a></b> (\ud83e\udd4920 \u00b7  \u2b50 6.8K \u00b7 \ud83d\udc80) - For little HTML GUI applications, with easy Python/JS interop. <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/pipeless",
+      "description": "ai/pipeless\">Pipeless</a></b> (\ud83e\udd4712 \u00b7  \u2b50 850 \u00b7 \ud83d\udc80) - An open-source framework to create and deploy computer vision.. <code><a href=\"http://bit.ly/3nYMfla\">Apache-2</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/voronind/awesome",
+      "description": "slugify\">awesome-slugify</a></b> (\ud83e\udd4919 \u00b7  \u2b50 480 \u00b7 \ud83d\udc80) - Python flexible slugify function. <code><a href=\"http://bit.ly/2M0xdwT\">\u2757\ufe0fGPL-3.0</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/kvesteri/sqlalchemy",
+      "description": "utils\">SQLAlchemy-Utils</a></b> (\ud83e\udd4828 \u00b7  \u2b50 1.3K) - Various utility functions and datatypes for SQLAlchemy. <code>\u2757Unlicensed</code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/elastic/elasticsearch",
+      "description": "dsl-py\">Elasticsearch DSL</a></b> (\ud83e\udd4925 \u00b7  \u2b50 3.9K \u00b7 \ud83d\udc80) - High level Python client for Elasticsearch. <code><a href=\"http://bit.ly/3nYMfla\">Apache-2</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/python",
+      "description": "gino/gino\">gino</a></b> (\ud83e\udd4923 \u00b7  \u2b50 2.7K \u00b7 \ud83d\udc80) - GINO Is Not ORM - a Python asyncio ORM on SQLAlchemy core. <code><a href=\"http://bit.ly/3aKzpTv\">BSD-3</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/yougov/mongo",
+      "description": "connector\">mongo-connector</a></b> (\ud83e\udd4922 \u00b7  \u2b50 1.9K \u00b7 \ud83d\udc80) - MongoDB data stream pipeline tools by YouGov (adopted.. <code><a href=\"http://bit.ly/3nYMfla\">Apache-2</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/RobertCraigie/prisma",
+      "description": "client-py\">prisma</a></b> (\ud83e\udd4921 \u00b7  \u2b50 1.9K \u00b7 \ud83d\udc80) - Prisma Client Python is an auto-generated and fully type-safe.. <code><a href=\"http://bit.ly/3nYMfla\">Apache-2</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/influxdata/influxdb",
+      "description": "python\">influxdb</a></b> (\ud83e\udd4921 \u00b7  \u2b50 1.7K \u00b7 \ud83d\udc80) - Python client for InfluxDB. <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/grokzen/redis",
+      "description": "py-cluster\">redis-py-cluster</a></b> (\ud83e\udd4918 \u00b7  \u2b50 1.1K \u00b7 \ud83d\udc80) - Python cluster client for the official redis cluster... <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/SAP",
+      "description": "archive/PyHDB\">pyhdb</a></b> (\ud83e\udd4915 \u00b7  \u2b50 320 \u00b7 \ud83d\udc80) - SAP HANA Connector in pure Python. <code><a href=\"http://bit.ly/3nYMfla\">Apache-2</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://py2neo.org/\">py2neo</a></b> (\ud83e\udd4915 \u00b7 \ud83d\udc80)",
+      "description": "Python client library and toolkit for Neo4j. <code><a href=\"http://bit.ly/3nYMfla\">Apache-2</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/betodealmeida/gsheets",
+      "description": "db-api\">gsheets-db-api</a></b> (\ud83e\udd4914 \u00b7  \u2b50 210 \u00b7 \ud83d\udc80) - A Python DB-API and SQLAlchemy dialect to Google Spreasheets. <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/pydata/pandas",
+      "description": "datareader\">pandas-datareader</a></b> (\ud83e\udd4827 \u00b7  \u2b50 3.2K) - Extract data from a wide range of Internet sources.. <code>\u2757Unlicensed</code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/sdv",
+      "description": "dev/SDV\">SDV</a></b> (\ud83e\udd4924 \u00b7  \u2b50 3.5K) - Synthetic data generation for tabular data. <code>\u2757Unlicensed</code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/frictionlessdata/tabulator",
+      "description": "py\">tabulator-py</a></b> (\ud83e\udd4922 \u00b7  \u2b50 240 \u00b7 \ud83d\udc80) - Python library for reading and writing tabular data via streams. <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/pyexcel/pyexcel",
+      "description": "xlsx\">pyexcel-xlsx</a></b> (\ud83e\udd4921 \u00b7  \u2b50 120 \u00b7 \ud83d\udc80) - A wrapper library to read, manipulate and write data in xlsx.. <code><a href=\"http://bit.ly/3aKzpTv\">BSD-3</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/uchicago",
+      "description": "cs/deepdish\">deepdish</a></b> (\ud83e\udd4920 \u00b7  \u2b50 270 \u00b7 \ud83d\udc80) - Flexible HDF5 saving/loading and other data science tools from the.. <code><a href=\"http://bit.ly/3aKzpTv\">BSD-3</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/camelot",
+      "description": "dev/excalibur\">excalibur</a></b> (\ud83e\udd4918 \u00b7  \u2b50 1.7K \u00b7 \ud83d\udc80) - A web interface to extract tabular data from PDFs. <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/jorisschellekens/ptext",
+      "description": "release\">borb</a></b> (\ud83e\udd4917 \u00b7  \u2b50 3.6K) - pText is a library for reading, creating and manipulating PDF files.. <code>\u2757Unlicensed</code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/simonw/csvs",
+      "description": "to-sqlite\">csvs-to-sqlite</a></b> (\ud83e\udd4913 \u00b7  \u2b50 900 \u00b7 \ud83d\udc80) - Convert CSV files into a SQLite database. <code><a href=\"http://bit.ly/3nYMfla\">Apache-2</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/merantix",
+      "description": "momentum/squirrel-core\">Squirrel</a></b> (\ud83e\udd4912 \u00b7  \u2b50 280 \u00b7 \ud83d\udc80) - A Python library that enables ML teams to share, load, and.. <code><a href=\"http://bit.ly/3nYMfla\">Apache-2</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/GeiserX/Wayback",
+      "description": "Archive\">Wayback-Archive</a></b> (\ud83e\udd494 \u00b7  \u2b50 8 \u00b7 \ud83d\udc23) - Download complete websites from the Wayback Machine with.. <code><a href=\"http://bit.ly/2M0xdwT\">\u2757\ufe0fGPL-3.0</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/python",
+      "description": "bonobo/bonobo\">bonobo</a></b> (\ud83e\udd4921 \u00b7  \u2b50 1.6K \u00b7 \ud83d\udc80) - Extract Transform Load for Python 3.5+. <code><a href=\"http://bit.ly/3nYMfla\">Apache-2</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/hi",
+      "description": "primus/optimus\">Optimus</a></b> (\ud83e\udd4917 \u00b7  \u2b50 1.5K \u00b7 \ud83d\udc80) - Agile Data Preparation Workflows madeeasy with Pandas,.. <code><a href=\"http://bit.ly/3nYMfla\">Apache-2</a></code> <code>spark</code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/databricks/spark",
+      "description": "deep-learning\">spark-deep-learning</a></b> (\ud83e\udd4914 \u00b7  \u2b50 2K \u00b7 \ud83d\udc80) - Deep Learning Pipelines for Apache Spark. <code><a href=\"http://bit.ly/3nYMfla\">Apache-2</a></code> <code>spark</code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/mara/mara",
+      "description": "pipelines\">Mara Pipelines</a></b> (\ud83e\udd4913 \u00b7  \u2b50 2.1K \u00b7 \ud83d\udc80) - A lightweight opinionated ETL framework, halfway between.. <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/bodywork",
+      "description": "ml/bodywork-core\">bodywork-core</a></b> (\ud83e\udd4912 \u00b7  \u2b50 430 \u00b7 \ud83d\udc80) - ML pipeline orchestration and model deployments on.. <code><a href=\"http://bit.ly/3pwmjO5\">\u2757\ufe0fAGPL-3.0</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/stackless",
+      "description": "dev/stackless\">stackless</a></b> (\ud83e\udd499 \u00b7  \u2b50 620 \u00b7 \ud83d\udc80) - The Stackless Python programming language. <code>\u2757Unlicensed</code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/metawilm/cl",
+      "description": "python\">cl-python</a></b> (\ud83e\udd497 \u00b7  \u2b50 240 \u00b7 \ud83d\udc80) - An implementation of Python in Common Lisp. <code>\u2757Unlicensed</code>"
+    },
+    {
+      "type": "tool",
+      "name": "<b><a href=\"https://github.com/b",
+      "description": "ryan/powerline-shell\">powerline-shell</a></b> (\ud83e\udd4921 \u00b7  \u2b50 5.9K \u00b7 \ud83d\udc80) - A beautiful and useful prompt for your shell. <code><a href=\"http://bit.ly/34MBwT8\">MIT</a></code>"
+    },
+    {
+      "type": "tool",
+      "name": "Modify the [projects.yaml](https://github.com/ml",
+      "description": "tooling/best-of-python/blob/main/projects.yaml) with your additions or changes, and submit a pull request. This can also be done directly via the [Github UI](https://github.com/ml-tooling/best-of-pyth"
+    },
+    {
+      "type": "pip_package",
+      "value": "protobuf"
+    },
+    {
+      "type": "pip_package",
+      "value": "flatbuffers"
+    },
+    {
+      "type": "pip_package",
+      "value": "orjson"
+    },
+    {
+      "type": "pip_package",
+      "value": "marshmallow"
+    },
+    {
+      "type": "pip_package",
+      "value": "dill"
+    },
+    {
+      "type": "pip_package",
+      "value": "cloudpickle"
+    },
+    {
+      "type": "pip_package",
+      "value": "pyasn1"
+    },
+    {
+      "type": "pip_package",
+      "value": "simplejson"
+    },
+    {
+      "type": "pip_package",
+      "value": "jsonpickle"
+    },
+    {
+      "type": "pip_package",
+      "value": "python-rapidjson"
+    },
+    {
+      "type": "pip_package",
+      "value": "srsly"
+    },
+    {
+      "type": "pip_package",
+      "value": "rtoml"
+    },
+    {
+      "type": "pip_package",
+      "value": "pandas"
+    },
+    {
+      "type": "pip_package",
+      "value": "polars"
+    },
+    {
+      "type": "pip_package",
+      "value": "h5py"
+    },
+    {
+      "type": "pip_package",
+      "value": "xarray"
+    },
+    {
+      "type": "pip_package",
+      "value": "numexpr"
+    },
+    {
+      "type": "pip_package",
+      "value": "zarr"
+    },
+    {
+      "type": "pip_package",
+      "value": "tinydb"
+    },
+    {
+      "type": "pip_package",
+      "value": "datasketch"
+    },
+    {
+      "type": "pip_package",
+      "value": "Bottleneck"
+    },
+    {
+      "type": "pip_package",
+      "value": "tables"
+    },
+    {
+      "type": "pip_package",
+      "value": "modin"
+    },
+    {
+      "type": "pip_package",
+      "value": "vaex"
+    },
+    {
+      "type": "pip_package",
+      "value": "pickledb"
+    },
+    {
+      "type": "pip_package",
+      "value": "static-frame"
+    },
+    {
+      "type": "pip_package",
+      "value": "pyrsistent"
+    },
+    {
+      "type": "pip_package",
+      "value": "bidict"
+    },
+    {
+      "type": "pip_package",
+      "value": "addict"
+    },
+    {
+      "type": "pip_package",
+      "value": "glom"
+    },
+    {
+      "type": "pip_package",
+      "value": "anytree"
+    },
+    {
+      "type": "pip_package",
+      "value": "multidict"
+    },
+    {
+      "type": "pip_package",
+      "value": "python-benedict"
+    },
+    {
+      "type": "pip_package",
+      "value": "immutables"
+    },
+    {
+      "type": "pip_package",
+      "value": "janus"
+    },
+    {
+      "type": "pip_package",
+      "value": "python-box"
+    },
+    {
+      "type": "pip_package",
+      "value": "pydantic"
+    },
+    {
+      "type": "pip_package",
+      "value": "jsonschema"
+    },
+    {
+      "type": "pip_package",
+      "value": "schema"
+    },
+    {
+      "type": "pip_package",
+      "value": "cerberus"
+    },
+    {
+      "type": "pip_package",
+      "value": "voluptuous"
+    },
+    {
+      "type": "pip_package",
+      "value": "email-validator"
+    },
+    {
+      "type": "pip_package",
+      "value": "param"
+    },
+    {
+      "type": "pip_package",
+      "value": "strictyaml"
+    },
+    {
+      "type": "pip_package",
+      "value": "dirty-equals"
+    },
+    {
+      "type": "pip_package",
+      "value": "algorithms"
+    },
+    {
+      "type": "pip_package",
+      "value": "arrow"
+    },
+    {
+      "type": "pip_package",
+      "value": "dateparser"
+    },
+    {
+      "type": "pip_package",
+      "value": "pytz"
+    },
+    {
+      "type": "pip_package",
+      "value": "holidays"
+    },
+    {
+      "type": "pip_package",
+      "value": "tzlocal"
+    },
+    {
+      "type": "pip_package",
+      "value": "python-dateutil"
+    },
+    {
+      "type": "pip_package",
+      "value": "pendulum"
+    },
+    {
+      "type": "pip_package",
+      "value": "fsspec"
+    },
+    {
+      "type": "pip_package",
+      "value": "watchdog"
+    },
+    {
+      "type": "pip_package",
+      "value": "filelock"
+    },
+    {
+      "type": "pip_package",
+      "value": "aiofiles"
+    },
+    {
+      "type": "pip_package",
+      "value": "scandir"
+    },
+    {
+      "type": "pip_package",
+      "value": "typing"
+    },
+    {
+      "type": "pip_package",
+      "value": "bcrypt"
+    },
+    {
+      "type": "pip_package",
+      "value": "pycryptodomex"
+    },
+    {
+      "type": "pip_package",
+      "value": "tink"
+    },
+    {
+      "type": "pip_package",
+      "value": "botocore"
+    },
+    {
+      "type": "pip_package",
+      "value": "ansible"
+    },
+    {
+      "type": "pip_package",
+      "value": "docker"
+    },
+    {
+      "type": "pip_package",
+      "value": "pulumi"
+    },
+    {
+      "type": "pip_package",
+      "value": "paramiko"
+    },
+    {
+      "type": "pip_package",
+      "value": "awscli"
+    },
+    {
+      "type": "pip_package",
+      "value": "kubernetes"
+    },
+    {
+      "type": "pip_package",
+      "value": "netmiko"
+    },
+    {
+      "type": "pip_package",
+      "value": "plumbum"
+    },
+    {
+      "type": "pip_package",
+      "value": "docker-compose"
+    },
+    {
+      "type": "pip_package",
+      "value": "fabric"
+    },
+    {
+      "type": "pip_package",
+      "value": "pyinfra"
+    },
+    {
+      "type": "pip_package",
+      "value": "storm"
+    },
+    {
+      "type": "pip_package",
+      "value": "sh"
+    },
+    {
+      "type": "pip_package",
+      "value": "supervisor"
+    },
+    {
+      "type": "pip_package",
+      "value": "anyio"
+    },
+    {
+      "type": "pip_package",
+      "value": "uvloop"
+    },
+    {
+      "type": "pip_package",
+      "value": "asyncer"
+    },
+    {
+      "type": "pip_package",
+      "value": "aiomisc"
+    },
+    {
+      "type": "pip_package",
+      "value": "python-dotenv"
+    },
+    {
+      "type": "pip_package",
+      "value": "traitlets"
+    },
+    {
+      "type": "pip_package",
+      "value": "omegaconf"
+    },
+    {
+      "type": "pip_package",
+      "value": "hydra"
+    },
+    {
+      "type": "pip_package",
+      "value": "dynaconf"
+    },
+    {
+      "type": "pip_package",
+      "value": "configobj"
+    },
+    {
+      "type": "pip_package",
+      "value": "everett"
+    },
+    {
+      "type": "pip_package",
+      "value": "click"
+    },
+    {
+      "type": "pip_package",
+      "value": "rich"
+    },
+    {
+      "type": "pip_package",
+      "value": "typer"
+    },
+    {
+      "type": "pip_package",
+      "value": "fire"
+    },
+    {
+      "type": "pip_package",
+      "value": "questionary"
+    },
+    {
+      "type": "pip_package",
+      "value": "argcomplete"
+    },
+    {
+      "type": "pip_package",
+      "value": "prompt_toolkit"
+    },
+    {
+      "type": "pip_package",
+      "value": "configargparse"
+    },
+    {
+      "type": "pip_package",
+      "value": "docopt-ng"
+    },
+    {
+      "type": "pip_package",
+      "value": "blessings"
+    },
+    {
+      "type": "pip_package",
+      "value": "click-extra"
+    },
+    {
+      "type": "pip_package",
+      "value": "cachetools"
+    },
+    {
+      "type": "pip_package",
+      "value": "aiocache"
+    },
+    {
+      "type": "pip_package",
+      "value": "cached-property"
+    },
+    {
+      "type": "pip_package",
+      "value": "beaker"
+    },
+    {
+      "type": "pip_package",
+      "value": "pylibmc"
+    },
+    {
+      "type": "pip_package",
+      "value": "kivy"
+    },
+    {
+      "type": "pip_package",
+      "value": "dearpygui"
+    },
+    {
+      "type": "pip_package",
+      "value": "gooey"
+    },
+    {
+      "type": "pip_package",
+      "value": "toga"
+    },
+    {
+      "type": "pip_package",
+      "value": "chardet"
+    },
+    {
+      "type": "pip_package",
+      "value": "phonenumbers"
+    },
+    {
+      "type": "pip_package",
+      "value": "humanize"
+    },
+    {
+      "type": "pip_package",
+      "value": "python-slugify"
+    },
+    {
+      "type": "pip_package",
+      "value": "pyahocorasick"
+    },
+    {
+      "type": "pip_package",
+      "value": "emoji"
+    },
+    {
+      "type": "pip_package",
+      "value": "coolname"
+    },
+    {
+      "type": "pip_package",
+      "value": "price-parser"
+    },
+    {
+      "type": "pip_package",
+      "value": "boto3"
+    },
+    {
+      "type": "pip_package",
+      "value": "alembic"
+    },
+    {
+      "type": "pip_package",
+      "value": "redis"
+    },
+    {
+      "type": "pip_package",
+      "value": "SQLAlchemy"
+    },
+    {
+      "type": "pip_package",
+      "value": "google-cloud-storage"
+    },
+    {
+      "type": "pip_package",
+      "value": "kafka-python"
+    },
+    {
+      "type": "pip_package",
+      "value": "azure-storage-blob"
+    },
+    {
+      "type": "pip_package",
+      "value": "elasticsearch"
+    },
+    {
+      "type": "pip_package",
+      "value": "s3transfer"
+    },
+    {
+      "type": "pip_package",
+      "value": "peewee"
+    },
+    {
+      "type": "pip_package",
+      "value": "PyMySQL"
+    },
+    {
+      "type": "pip_package",
+      "value": "s3fs"
+    },
+    {
+      "type": "pip_package",
+      "value": "pymongo"
+    },
+    {
+      "type": "pip_package",
+      "value": "sqlmodel"
+    },
+    {
+      "type": "pip_package",
+      "value": "google-cloud-bigquery"
+    },
+    {
+      "type": "pip_package",
+      "value": "ibis-framework"
+    },
+    {
+      "type": "pip_package",
+      "value": "tortoise-orm"
+    },
+    {
+      "type": "pip_package",
+      "value": "pandas-gbq"
+    },
+    {
+      "type": "pip_package",
+      "value": "awswrangler"
+    },
+    {
+      "type": "pip_package",
+      "value": "cassandra-driver"
+    },
+    {
+      "type": "pip_package",
+      "value": "google-cloud-bigtable"
+    },
+    {
+      "type": "pip_package",
+      "value": "mongoengine"
+    },
+    {
+      "type": "pip_package",
+      "value": "prometheus_client"
+    },
+    {
+      "type": "pip_package",
+      "value": "pony"
+    },
+    {
+      "type": "pip_package",
+      "value": "pypika"
+    },
+    {
+      "type": "pip_package",
+      "value": "mysqlclient"
+    },
+    {
+      "type": "pip_package",
+      "value": "dataset"
+    },
+    {
+      "type": "pip_package",
+      "value": "confluent-kafka"
+    },
+    {
+      "type": "pip_package",
+      "value": "pynamodb"
+    },
+    {
+      "type": "pip_package",
+      "value": "apache-libcloud"
+    },
+    {
+      "type": "pip_package",
+      "value": "piccolo"
+    },
+    {
+      "type": "pip_package",
+      "value": "cx-Oracle"
+    },
+    {
+      "type": "pip_package",
+      "value": "minio"
+    },
+    {
+      "type": "pip_package",
+      "value": "pysolr"
+    },
+    {
+      "type": "pip_package",
+      "value": "databases"
+    },
+    {
+      "type": "pip_package",
+      "value": "odmantic"
+    },
+    {
+      "type": "pip_package",
+      "value": "happybase"
+    },
+    {
+      "type": "pip_package",
+      "value": "neo4j-driver"
+    },
+    {
+      "type": "pip_package",
+      "value": "umongo"
+    },
+    {
+      "type": "pip_package",
+      "value": "filedepot"
+    },
+    {
+      "type": "pip_package",
+      "value": "pugsql"
+    },
+    {
+      "type": "pip_package",
+      "value": "cloudant"
+    },
+    {
+      "type": "pip_package",
+      "value": "datasets"
+    },
+    {
+      "type": "pip_package",
+      "value": "Faker"
+    },
+    {
+      "type": "pip_package",
+      "value": "tablib"
+    },
+    {
+      "type": "pip_package",
+      "value": "python-magic"
+    },
+    {
+      "type": "pip_package",
+      "value": "xmltodict"
+    },
+    {
+      "type": "pip_package",
+      "value": "xlrd"
+    },
+    {
+      "type": "pip_package",
+      "value": "gdown"
+    },
+    {
+      "type": "pip_package",
+      "value": "xlwings"
+    },
+    {
+      "type": "pip_package",
+      "value": "textract"
+    },
+    {
+      "type": "pip_package",
+      "value": "smart-open"
+    },
+    {
+      "type": "pip_package",
+      "value": "intake"
+    },
+    {
+      "type": "pip_package",
+      "value": "csvkit"
+    },
+    {
+      "type": "pip_package",
+      "value": "camelot"
+    },
+    {
+      "type": "pip_package",
+      "value": "snorkel"
+    },
+    {
+      "type": "pip_package",
+      "value": "img2dataset"
+    },
+    {
+      "type": "pip_package",
+      "value": "singer-python"
+    },
+    {
+      "type": "pip_package",
+      "value": "upgini"
+    },
+    {
+      "type": "pip_package",
+      "value": "rows"
+    },
+    {
+      "type": "pip_package",
+      "value": "apache-airflow"
+    },
+    {
+      "type": "pip_package",
+      "value": "celery"
+    },
+    {
+      "type": "pip_package",
+      "value": "rq"
+    },
+    {
+      "type": "pip_package",
+      "value": "apache-beam"
+    },
+    {
+      "type": "pip_package",
+      "value": "joblib"
+    },
+    {
+      "type": "pip_package",
+      "value": "prefect"
+    },
+    {
+      "type": "pip_package",
+      "value": "dagster"
+    },
+    {
+      "type": "pip_package",
+      "value": "luigi"
+    },
+    {
+      "type": "pip_package",
+      "value": "great_expectations"
+    },
+    {
+      "type": "pip_package",
+      "value": "dbt"
+    },
+    {
+      "type": "pip_package",
+      "value": "kedro"
+    },
+    {
+      "type": "pip_package",
+      "value": "petl"
+    },
+    {
+      "type": "pip_package",
+      "value": "zenml"
+    },
+    {
+      "type": "pip_package",
+      "value": "arq"
+    },
+    {
+      "type": "pip_package",
+      "value": "huey"
+    },
+    {
+      "type": "pip_package",
+      "value": "mleap"
+    },
+    {
+      "type": "pip_package",
+      "value": "cocoindex"
+    },
+    {
+      "type": "pip_package",
+      "value": "riko"
+    },
+    {
+      "type": "pip_package",
+      "value": "tasktiger"
+    },
+    {
+      "type": "pip_package",
+      "value": "dbnd"
+    },
+    {
+      "type": "pip_package",
+      "value": "pdpipe"
+    },
+    {
+      "type": "pip_package",
+      "value": "batchflow"
+    },
+    {
+      "type": "pip_package",
+      "value": "kubeflow-kale"
+    },
+    {
+      "type": "pip_package",
+      "value": "pyyaml"
+    },
+    {
+      "type": "pip_package",
+      "value": "xlsxwriter"
+    },
+    {
+      "type": "pip_package",
+      "value": "jmespath"
+    },
+    {
+      "type": "pip_package",
+      "value": "deepdiff"
+    },
+    {
+      "type": "pip_package",
+      "value": "attrs"
+    },
+    {
+      "type": "pip_package",
+      "value": "tenacity"
+    },
+    {
+      "type": "pip_package",
+      "value": "more-itertools"
+    },
+    {
+      "type": "pip_package",
+      "value": "boltons"
+    },
+    {
+      "type": "pip_package",
+      "value": "dependency-injector"
+    },
+    {
+      "type": "pip_package",
+      "value": "returns"
+    },
+    {
+      "type": "pip_package",
+      "value": "natsort"
+    },
+    {
+      "type": "pip_package",
+      "value": "retrying"
+    },
+    {
+      "type": "pip_package",
+      "value": "ubelt"
+    },
+    {
+      "type": "pip_package",
+      "value": "cpython"
+    },
+    {
+      "type": "pip_package",
+      "value": "micropython-_markupbase"
+    },
+    {
+      "type": "pip_package",
+      "value": "pygments"
+    },
+    {
+      "type": "pip_package",
+      "value": "wrapt"
+    },
+    {
+      "type": "pip_package",
+      "value": "pyparsing"
+    },
+    {
+      "type": "pip_package",
+      "value": "cookiecutter"
+    },
+    {
+      "type": "pip_package",
+      "value": "pluggy"
+    },
+    {
+      "type": "pip_package",
+      "value": "decorator"
+    },
+    {
+      "type": "pip_package",
+      "value": "diagrams"
+    },
+    {
+      "type": "pip_package",
+      "value": "fastcore"
+    },
+    {
+      "type": "pip_package",
+      "value": "keyboard"
+    },
+    {
+      "type": "pip_package",
+      "value": "copier"
+    },
+    {
+      "type": "pip_package",
+      "value": "send2trash"
+    },
+    {
+      "type": "pip_package",
+      "value": "mss"
+    },
+    {
+      "type": "pip_package",
+      "value": "catalogue"
+    },
+    {
+      "type": "pip_package",
+      "value": "pyscaffold"
+    },
+    {
+      "type": "npm_package",
+      "value": "google-protobuf"
+    },
+    {
+      "type": "npm_package",
+      "value": "flatbuffers"
+    },
+    {
+      "type": "npm_package",
+      "value": "tink-crypto"
+    },
+    {
+      "type": "npm_package",
+      "value": "@pulumi/pulumi"
+    },
+    {
+      "type": "npm_package",
+      "value": "@pybee/toga"
+    },
+    {
+      "type": "npm_package",
+      "value": "@pypi/chardet"
+    },
+    {
+      "type": "npm_package",
+      "value": "@buckpkg/python"
+    }
+  ],
+  "script_summary": "192 tools, 465 commands, 228 pip_packages, 7 npm_packages"
+}

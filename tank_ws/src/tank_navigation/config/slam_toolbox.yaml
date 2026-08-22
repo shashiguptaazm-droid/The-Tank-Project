@@ -1,0 +1,42 @@
+# slam_toolbox online-async config tuned for The Tank Project.
+#
+# Tweak `resolution` (m/cell) to match your LiDAR density — RPLidar A1/A2
+# do fine at 0.05 m. If you swap to a denser LiDAR (A3 / Velodyne), drop
+# to 0.03 m and increase `max_laser_range` accordingly.
+
+/**:
+  ros__parameters:
+    slam_toolbox_node:
+      plugin: "slam_toolbox::AsyncSlamToolbox"
+
+      # Map / frame parameters
+      odom_frame:        "odom"
+      map_frame:         "map"
+      base_frame:        "base_link"
+      transform_tolerance: 0.5
+
+      # Sensor
+      scan_topic:        "/scan"
+      use_scan_matching: true
+      use_covariance:    true
+      max_laser_range:   12.0
+      minimum_time_interval: 0.5
+      transform_timeout: 1.0
+
+      # Resolution & size
+      resolution:        0.05
+      minimum_travel_distance: 0.5
+      minimum_travel_heading:  0.5
+
+      # Loop closure
+      loop_search_maximum_distance: 5.0
+      do_loop_closing:    true
+      loop_match_minimum_chain_size: 5
+
+      # Memory
+      memory_map_radius:  20.0
+      map_file:           "/tmp/tank_map_saved.yaml"
+
+      # Performance
+      throttle_scans:     true
+      publish_voxel_map:  true

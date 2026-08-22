@@ -1,0 +1,10 @@
+[Unit]
+Description=The Tank — daily sleep-time memory consolidation. Promotes recurring episodes to semantic facts, applies Ebbinghaus decay, smooths skill proficiency via Bayesian Beta-binomial updates, extracts co-occurrence insight edges, and prunes stale rows. The "brain's slow-wave sleep" routine.
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/the tank project
+ExecStart=/usr/bin/python3 -m tank_learn.scripts.consolidate --ingest-then-consolidate
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7

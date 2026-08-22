@@ -1,0 +1,112 @@
+{
+  "timestamp": "2026-08-21T03:02:21.808845",
+  "topic": "soundcloud downloader CLI",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "suyashb95/soundcloud-dl",
+      "html_url": "https://github.com/suyashb95/soundcloud-dl",
+      "description": "A Python project that downloads tracks from soundcloud.com, complete with metadata and album art",
+      "stars": 133,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "lostdusty/cobalt-cli",
+      "html_url": "https://github.com/lostdusty/cobalt-cli",
+      "description": "Unofficial cobalt command line client made in go.",
+      "stars": 58,
+      "language": "Go",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "dmotz/soundscrape",
+      "html_url": "https://github.com/dmotz/soundscrape",
+      "description": "SoundCloud command line downloader in Node.js",
+      "stars": 28,
+      "language": "CoffeeScript",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 17,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "`pip install",
+      "description": "r \"requirements.txt\"`"
+    },
+    {
+      "type": "tool",
+      "name": "Use `sc",
+      "description": "dl --set-api-key <CLIENT_ID>` to set the API key"
+    },
+    {
+      "type": "tool",
+      "name": "Adding the",
+      "description": "-include option overrides the --exclude option"
+    },
+    {
+      "type": "tool",
+      "name": "Example : `sc",
+      "description": "dl https://soundcloud.com/aaasrith --dir D:\\Music`"
+    },
+    {
+      "type": "tool",
+      "name": "Example : `sc",
+      "description": "dl https://soundcloud.com/aaasrith --dir D:\\Music --exclude 1 2 3`"
+    },
+    {
+      "type": "tool",
+      "name": "Example : `sc",
+      "description": "dl https://soundcloud.com/aaasrith/closurewithaclause -s`"
+    },
+    {
+      "type": "pip_package",
+      "value": "soundcloud_dl`"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "tool",
+      "name": "Get directly link from the service cdn (if possible);",
+      "description": "More than 15 services supported;"
+    },
+    {
+      "type": "tool",
+      "name": "Option to check status of cobalt servers;",
+      "description": "Use custom cobalt instances (see https://instances.hyper.lol);"
+    },
+    {
+      "type": "tool",
+      "name": "Icon made by [me](https://lostdusty.com.br);",
+      "description": "You, for using my application!"
+    },
+    {
+      "type": "feature",
+      "value": "Get directly link from the service cdn (if possible);"
+    },
+    {
+      "type": "feature",
+      "value": "More than 15 services supported;"
+    },
+    {
+      "type": "feature",
+      "value": "Option to check status of cobalt servers;"
+    },
+    {
+      "type": "feature",
+      "value": "Use custom cobalt instances (see https://instances.hyper.lol);"
+    },
+    {
+      "type": "feature",
+      "value": "Download the file directly to your computer."
+    },
+    {
+      "type": "npm_package",
+      "value": "soundscrape"
+    }
+  ],
+  "script_summary": "9 tools, 2 pip_packages, 5 features, 1 npm_packages"
+}

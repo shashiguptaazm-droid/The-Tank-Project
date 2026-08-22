@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>tank_emotions</name>
+  <version>0.1.0</version>
+  <description>
+    The Tank Project — comprehensive catalog of human emotions as
+    Python modules.  One module per emotion (Plutchik primary, Ekman
+    basic, self-conscious, and complex / self-transcendent), with a
+    shared core library, signals, taxonomy, transitions, companion
+    responses, dialogue patterns, and an offline CLI.
+  </description>
+  <maintainer email="pilot@medigyaan.xyz">Tank Pilot</maintainer>
+  <license>TBD</license>
+
+  <depend>python3</depend>
+
+  <exec_depend>ament_index_python</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+    <architecture_marker>emotions/catalog</architecture_marker>
+  </export>
+</package>

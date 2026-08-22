@@ -1,0 +1,597 @@
+{
+  "timestamp": "2026-08-04T03:04:25.331212",
+  "topic": "firewall automation tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "Pixelworlds/opnsense-mcp-server",
+      "html_url": "https://github.com/Pixelworlds/opnsense-mcp-server",
+      "description": "Modular MCP server for OPNsense firewall management - 88 tools providing access to 2000+ methods through AI assistants",
+      "stars": 69,
+      "language": "JavaScript",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "andreesg/openclaw-terraform-hetzner",
+      "html_url": "https://github.com/andreesg/openclaw-terraform-hetzner",
+      "description": "Terraform modules for deploying OpenClaw on Hetzner Cloud. Includes VPS provisioning, firewall configuration, cloud-init automation, and deployment tooling.",
+      "stars": 62,
+      "language": "Shell",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "ramnezer/herodium",
+      "html_url": "https://github.com/ramnezer/herodium",
+      "description": "Herodium is a developer-oriented Linux security project designed as a seed framework for building and testing broader defensive tooling.",
+      "stars": 31,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 117,
+  "findings": [
+    {
+      "type": "command",
+      "value": "npm install -g @richard-stovall/opnsense-mcp-server"
+    },
+    {
+      "type": "tool",
+      "name": "Modular Architecture",
+      "description": "88 logical tools (one per module) instead of 2000+ individual tools"
+    },
+    {
+      "type": "tool",
+      "name": "Complete API Coverage",
+      "description": "Access to 752 core methods and 1271 plugin methods"
+    },
+    {
+      "type": "tool",
+      "name": "Type",
+      "description": "Safe** - Full TypeScript support with [@richard-stovall/opnsense-typescript-client](https://www.npmjs.com/package/@richard-stovall/opnsense-typescript-client) v0.5.3"
+    },
+    {
+      "type": "tool",
+      "name": "Plugin Support",
+      "description": "Optional support for 64 plugin modules"
+    },
+    {
+      "type": "tool",
+      "name": "Smart Organization",
+      "description": "Related operations grouped by module for easier discovery"
+    },
+    {
+      "type": "tool",
+      "name": "Node.js 18 or higher",
+      "description": "An OPNsense firewall with API access enabled"
+    },
+    {
+      "type": "tool",
+      "name": "\"What MCP tools are available?\"",
+      "description": "\"Use core_manage to get the system status\""
+    },
+    {
+      "type": "tool",
+      "name": "\"Use firewall_manage to search for all aliases\"",
+      "description": "\"Use interfaces_manage to list all network interfaces\""
+    },
+    {
+      "type": "tool",
+      "name": "OPNSENSE_URL",
+      "description": "OPNsense host URL (required)"
+    },
+    {
+      "type": "tool",
+      "name": "OPNSENSE_API_KEY",
+      "description": "API key for authentication (required)"
+    },
+    {
+      "type": "tool",
+      "name": "OPNSENSE_API_SECRET",
+      "description": "API secret for authentication (required)"
+    },
+    {
+      "type": "tool",
+      "name": "INCLUDE_PLUGINS",
+      "description": "Set to \"true\" to enable 64 plugin module tools (optional)"
+    },
+    {
+      "type": "tool",
+      "name": "OPNSENSE_VERIFY_SSL",
+      "description": "Set to \"false\" to disable SSL verification (development only)"
+    },
+    {
+      "type": "tool",
+      "name": "\"Use core_manage to check system status\"",
+      "description": "\"Use firewall_manage to list all firewall aliases\""
+    },
+    {
+      "type": "tool",
+      "name": "Complete type safety for all API calls",
+      "description": "Built-in error handling and retries"
+    },
+    {
+      "type": "tool",
+      "name": "Support for all 601 OPNsense API endpoints",
+      "description": "Modern Fetch API based implementation"
+    },
+    {
+      "type": "tool",
+      "name": "Inspired by the OPNsense community",
+      "description": "--"
+    },
+    {
+      "type": "npm_package",
+      "value": "@richard-stovall/opnsense-mcp-server"
+    },
+    {
+      "type": "feature",
+      "value": "**Modular Architecture** - 88 logical tools (one per module) instead of 2000+ individual tools"
+    },
+    {
+      "type": "feature",
+      "value": "**Complete API Coverage** - Access to 752 core methods and 1271 plugin methods"
+    },
+    {
+      "type": "feature",
+      "value": "**Type-Safe** - Full TypeScript support with [@richard-stovall/opnsense-typescript-client](https://www.npmjs.com/package/@richard-stovall/opnsense-typescript-client) v0.5.3"
+    },
+    {
+      "type": "feature",
+      "value": "**Plugin Support** - Optional support for 64 plugin modules"
+    },
+    {
+      "type": "feature",
+      "value": "**Smart Organization** - Related operations grouped by module for easier discovery"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/andreesg/openclaw-terraform-hetzner.git"
+    },
+    {
+      "type": "tool",
+      "name": "Modular Terraform structure with remote S3 state backend",
+      "description": "Automated server provisioning via cloud-init"
+    },
+    {
+      "type": "tool",
+      "name": "Firewall configuration (UFW + Hetzner Cloud Firewall)",
+      "description": "Deployment scripts for application lifecycle management"
+    },
+    {
+      "type": "tool",
+      "name": "Backup and restore functionality",
+      "description": "SSH tunneling for secure gateway access"
+    },
+    {
+      "type": "tool",
+      "name": "HCLOUD_TOKEN",
+      "description": "Hetzner Cloud API token"
+    },
+    {
+      "type": "tool",
+      "name": "TF_VAR_ssh_key_fingerprint",
+      "description": "SSH key fingerprint from Hetzner"
+    },
+    {
+      "type": "tool",
+      "name": "CONFIG_DIR",
+      "description": "Path to your openclaw-docker-config repository"
+    },
+    {
+      "type": "tool",
+      "name": "SERVER_IP",
+      "description": "Address that scripts use to SSH into the VPS. Set to `openclaw-prod` when using Tailscale (MagicDNS hostname, stable across rebuilds). Leave unset to auto-detect from Terraform output (only works when"
+    },
+    {
+      "type": "tool",
+      "name": "Anthropic Claude (Opus, Sonnet, Haiku)",
+      "description": "OpenAI (GPT-4, GPT-3.5, o1)"
+    },
+    {
+      "type": "tool",
+      "name": "DeepSeek (V3, R1)",
+      "description": "Local models (via Ollama or LM Studio)"
+    },
+    {
+      "type": "tool",
+      "name": "Missing environment variables in `.env`",
+      "description": "Invalid OpenClaw configuration"
+    },
+    {
+      "type": "tool",
+      "name": "Default allows SSH from anywhere (`0.0.0.0/0`)",
+      "description": "restrict before production"
+    },
+    {
+      "type": "tool",
+      "name": "Use SSH keys, not passwords",
+      "description": "Rotate keys regularly"
+    },
+    {
+      "type": "tool",
+      "name": "Never commit `config/inputs.sh` or `secrets/openclaw.env`",
+      "description": "Use environment variables for all credentials"
+    },
+    {
+      "type": "tool",
+      "name": "Rotate API tokens periodically",
+      "description": "Review `.gitignore` before committing"
+    },
+    {
+      "type": "tool",
+      "name": "Gateway binds to `127.0.0.1` (localhost only)",
+      "description": "never exposed directly"
+    },
+    {
+      "type": "tool",
+      "name": "Access via SSH tunnel or Tailscale Serve",
+      "description": "`TF_VAR_additional_tcp_ports` opens ports in both the Hetzner Cloud Firewall and UFW on the VPS"
+    },
+    {
+      "type": "tool",
+      "name": "Monitor API usage and costs",
+      "description": "Set spending limits at provider dashboards"
+    },
+    {
+      "type": "tool",
+      "name": "Prefer subscription auth over API keys when available",
+      "description": "Never expose keys in logs or errors"
+    },
+    {
+      "type": "tool",
+      "name": "Keep Terraform providers updated",
+      "description": "Update OpenClaw regularly for security patches"
+    },
+    {
+      "type": "tool",
+      "name": "Monitor security advisories for dependencies",
+      "description": "Review cloud-init script before changes"
+    },
+    {
+      "type": "tool",
+      "name": "Submit feature requests",
+      "description": "Improve documentation"
+    },
+    {
+      "type": "tool",
+      "name": "Submit pull requests",
+      "description": "Share your deployment experiences"
+    },
+    {
+      "type": "tool",
+      "name": "Iterates running processes and inspects:",
+      "description": "the executable path"
+    },
+    {
+      "type": "tool",
+      "name": "Uses ClamAV",
+      "description": "backed scanning logic to identify infected binaries or loaded files."
+    },
+    {
+      "type": "tool",
+      "name": "Connects to the local `clamd` Unix socket.",
+      "description": "Supports configurable actions for detected threats:"
+    },
+    {
+      "type": "tool",
+      "name": "Enforces size",
+      "description": "based prefiltering before stream scanning."
+    },
+    {
+      "type": "tool",
+      "name": "Integrates with local Maltrail logs.",
+      "description": "Can run in either:"
+    },
+    {
+      "type": "tool",
+      "name": "Optional ZRAM activation.",
+      "description": "Dynamic ClamAV resource throttling based on workload and thermal conditions."
+    },
+    {
+      "type": "tool",
+      "name": "Optional Fail2Ban activation for SSH brute",
+      "description": "force protection."
+    },
+    {
+      "type": "tool",
+      "name": "Supports scheduled ClamAV scanning.",
+      "description": "Supports optional Rkhunter checks and threat-data updates."
+    },
+    {
+      "type": "tool",
+      "name": "Never updates the local Rkhunter file",
+      "description": "properties baseline automatically."
+    },
+    {
+      "type": "tool",
+      "name": "apt",
+      "description": "`systemd`"
+    },
+    {
+      "type": "tool",
+      "name": "AppArmor",
+      "description": "ClamAV"
+    },
+    {
+      "type": "tool",
+      "name": "Debian",
+      "description": "Ubuntu"
+    },
+    {
+      "type": "tool",
+      "name": "Linux Mint",
+      "description": "Kali Linux"
+    },
+    {
+      "type": "tool",
+      "name": "Minimum recommended hardware:",
+      "description": "**4 CPU cores**"
+    },
+    {
+      "type": "tool",
+      "name": "CPU model and scaling driver",
+      "description": "CPU governor configuration"
+    },
+    {
+      "type": "tool",
+      "name": "cooling capacity",
+      "description": "battery or AC power state"
+    },
+    {
+      "type": "tool",
+      "name": "scan size and workload intensity",
+      "description": "other power-management services"
+    },
+    {
+      "type": "tool",
+      "name": "A Debian",
+      "description": "based Linux distribution"
+    },
+    {
+      "type": "tool",
+      "name": "Root access (`sudo`)",
+      "description": "Internet access for package installation and initial signatures / dependencies"
+    },
+    {
+      "type": "tool",
+      "name": "Timeshift snapshot creation",
+      "description": "ZRAM setup"
+    },
+    {
+      "type": "tool",
+      "name": "scheduled ClamAV scan preferences",
+      "description": "live monitoring enable/disable"
+    },
+    {
+      "type": "tool",
+      "name": "live threat action selection",
+      "description": "Maltrail installation and mode"
+    },
+    {
+      "type": "tool",
+      "name": "Fail2Ban installation",
+      "description": "AppArmor level selection"
+    },
+    {
+      "type": "tool",
+      "name": "optional kernel hardening",
+      "description": "optional Rkhunter setup"
+    },
+    {
+      "type": "tool",
+      "name": "application deployment under `/opt/herodium`",
+      "description": "Python virtual environment under `/opt/herodium/venv`"
+    },
+    {
+      "type": "tool",
+      "name": "main service:",
+      "description": "`herodium.service`"
+    },
+    {
+      "type": "tool",
+      "name": "optional Maltrail sensor service:",
+      "description": "`maltrail-sensor.service`"
+    },
+    {
+      "type": "tool",
+      "name": "scheduled ClamAV scan service and timer:",
+      "description": "`herodium-scheduled-scan.service`"
+    },
+    {
+      "type": "tool",
+      "name": "logs under:",
+      "description": "`/var/log/herodium`"
+    },
+    {
+      "type": "tool",
+      "name": "scheduled scan config under:",
+      "description": "`/etc/herodium/scheduled_scan.conf`"
+    },
+    {
+      "type": "tool",
+      "name": "live_monitor.enable",
+      "description": "`directories.watch_paths`"
+    },
+    {
+      "type": "tool",
+      "name": "directories.ignore_prefixes",
+      "description": "`directories.ignore_user_cache`"
+    },
+    {
+      "type": "tool",
+      "name": "clamav.socket_path",
+      "description": "`clamav.threat_action`"
+    },
+    {
+      "type": "tool",
+      "name": "memory_scan.interval_seconds",
+      "description": "`memory_scan.whitelist`"
+    },
+    {
+      "type": "tool",
+      "name": "maltrail.enable",
+      "description": "`maltrail.block_traffic`"
+    },
+    {
+      "type": "tool",
+      "name": "maltrail.log_path",
+      "description": "`maltrail.clean_interval_hours`"
+    },
+    {
+      "type": "tool",
+      "name": "performance.enable_zram",
+      "description": "`performance.cpu_limit_percent`"
+    },
+    {
+      "type": "tool",
+      "name": "hardening.enable",
+      "description": "`ips.enable`"
+    },
+    {
+      "type": "tool",
+      "name": "live monitoring enabled",
+      "description": "default watch paths:"
+    },
+    {
+      "type": "tool",
+      "name": "quarantine path:",
+      "description": "`/opt/herodium/quarantine`"
+    },
+    {
+      "type": "tool",
+      "name": "ClamAV action:",
+      "description": "`quarantine`"
+    },
+    {
+      "type": "tool",
+      "name": "Memory Hunter enabled with 1",
+      "description": "second loop interval"
+    },
+    {
+      "type": "tool",
+      "name": "optional network blocking controlled by configuration",
+      "description": "optional hardening controlled by configuration"
+    },
+    {
+      "type": "tool",
+      "name": "AppArmor default level:",
+      "description": "`1` \u2014 OS default / no Herodium AppArmor changes"
+    },
+    {
+      "type": "tool",
+      "name": "/var/log/herodium/herodium.log",
+      "description": "`/var/log/herodium/scheduled_scan.log`"
+    },
+    {
+      "type": "tool",
+      "name": "Herodium service units",
+      "description": "deployed application files"
+    },
+    {
+      "type": "tool",
+      "name": "log directories",
+      "description": "scheduled scan units"
+    },
+    {
+      "type": "tool",
+      "name": "local helper scripts",
+      "description": "optional Fail2Ban jail created by the installer"
+    },
+    {
+      "type": "tool",
+      "name": "Herodium",
+      "description": "specific IP sets and firewall rules where applicable"
+    },
+    {
+      "type": "tool",
+      "name": "Herodium is intentionally opinionated and root",
+      "description": "level."
+    },
+    {
+      "type": "tool",
+      "name": "It is meant for controlled development and research use.",
+      "description": "It can modify host security posture in ways that are inappropriate for unmanaged environments."
+    },
+    {
+      "type": "tool",
+      "name": "Linux endpoint defense experiments",
+      "description": "ClamAV orchestration logic"
+    },
+    {
+      "type": "tool",
+      "name": "removable media scanning workflows",
+      "description": "AppArmor automation prototypes"
+    },
+    {
+      "type": "tool",
+      "name": "host",
+      "description": "level response automation"
+    },
+    {
+      "type": "tool",
+      "name": "security monitoring research on Debian",
+      "description": "based systems"
+    },
+    {
+      "type": "feature",
+      "value": "application deployment under `/opt/herodium`"
+    },
+    {
+      "type": "feature",
+      "value": "Python virtual environment under `/opt/herodium/venv`"
+    },
+    {
+      "type": "feature",
+      "value": "main service:"
+    },
+    {
+      "type": "feature",
+      "value": "`herodium.service`"
+    },
+    {
+      "type": "feature",
+      "value": "optional Maltrail sensor service:"
+    },
+    {
+      "type": "feature",
+      "value": "`maltrail-sensor.service`"
+    },
+    {
+      "type": "feature",
+      "value": "code pinned by `installer/supply-chain-lock.json`"
+    },
+    {
+      "type": "feature",
+      "value": "upstream feed downloads disabled by default (`--offline`)"
+    },
+    {
+      "type": "feature",
+      "value": "scheduled ClamAV scan service and timer:"
+    },
+    {
+      "type": "feature",
+      "value": "`herodium-scheduled-scan.service`"
+    },
+    {
+      "type": "feature",
+      "value": "`herodium-scheduled-scan.timer`"
+    },
+    {
+      "type": "feature",
+      "value": "logs under:"
+    },
+    {
+      "type": "feature",
+      "value": "`/var/log/herodium`"
+    },
+    {
+      "type": "feature",
+      "value": "scheduled scan config under:"
+    },
+    {
+      "type": "feature",
+      "value": "`/etc/herodium/scheduled_scan.conf`"
+    }
+  ],
+  "script_summary": "2 commands, 94 tools, 1 npm_packages, 20 features"
+}

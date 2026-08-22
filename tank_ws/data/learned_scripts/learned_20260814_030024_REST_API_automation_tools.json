@@ -1,0 +1,68 @@
+{
+  "timestamp": "2026-08-14T03:00:24.794757",
+  "topic": "REST API automation tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "tinyfish-io/agentql",
+      "html_url": "https://github.com/tinyfish-io/agentql",
+      "description": "AgentQL is a suite of tools for connecting your AI to the web. Featuring a query language and Playwright integrations for interacting with elements and extracting data quickly, precisely, and at scale. Includes REST API, Python and JavaScript SDKs, browser debugger.",
+      "stars": 1446,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Fuzzapi/fuzzapi",
+      "html_url": "https://github.com/Fuzzapi/fuzzapi",
+      "description": "Fuzzapi is a tool used for REST API pentesting and uses API_Fuzzer gem",
+      "stars": 663,
+      "language": "Ruby",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "testingisdocumenting/webtau",
+      "html_url": "https://github.com/testingisdocumenting/webtau",
+      "description": "WebTau (web test automation) is a testing API, command line tool and a framework to write unit, integration and end-to-end tests. Test across REST-API, WebSocket, GraphQL, Browser, Database, CLI and Business Logic with a consistent set of matchers and concepts. REPL mode speeds-up tests development.",
+      "stars": 383,
+      "language": "Java",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 8,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Cross",
+      "description": "site compatibility** lets you use the same query across different sites with similar content."
+    },
+    {
+      "type": "feature",
+      "value": "**[Python SDK](https://docs.agentql.com/python-sdk/installation)** for running automation and scraping scripts with AgentQL queries in Python."
+    },
+    {
+      "type": "feature",
+      "value": "**[JavaScript SDK](https://docs.agentql.com/javascript-sdk/installation)** for running automation and scraping scripts with AgentQL queries in JavaScript."
+    },
+    {
+      "type": "feature",
+      "value": "**[REST API](https://docs.agentql.com/rest-api/api-reference)** for executing queries without an SDK."
+    },
+    {
+      "type": "feature",
+      "value": "**[Integrations](https://docs.agentql.com/integrations)** with agent frameworks and automation tools like Langchain and Zapier and our MCP server."
+    },
+    {
+      "type": "feature",
+      "value": "**[Debugger Browser Extension](https://chromewebstore.google.com/detail/agentql-debugger/idnejmodeepdobpinkkgpkeabkabhhej)** lets you debug and finesse queries in real-time on live sites."
+    },
+    {
+      "type": "feature",
+      "value": "**[AgentQL Query Language](https://docs.agentql.com/agentql-query/query-intro)** lets you define queries with natural language."
+    },
+    {
+      "type": "feature",
+      "value": "**[Playground](https://playground.agentql.com/)** for playing with AgentQL lets you export python scripts and optimize queries with prompts."
+    }
+  ],
+  "script_summary": "1 tools, 7 features"
+}

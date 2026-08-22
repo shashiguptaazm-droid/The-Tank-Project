@@ -1,0 +1,79 @@
+{
+  "timestamp": "2026-08-16T03:02:42.640368",
+  "topic": "linux utility scripts collection",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "ivandavidov/minimal",
+      "html_url": "https://github.com/ivandavidov/minimal",
+      "description": "Minimal Linux Live (MLL) is a tiny educational Linux distribution, which is designed to be built from scratch by using a collection of automated shell scripts. Minimal Linux Live offers a core environment with just the Linux kernel, GNU C library, and Busybox userland utilities.",
+      "stars": 1670,
+      "language": "HTML",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "zszszszsz/.config",
+      "html_url": "https://github.com/zszszszsz/.config",
+      "description": "# # Automatically generated file; DO NOT EDIT. # OpenWrt Configuration # CONFIG_MODULES=y CONFIG_HAVE_DOT_CONFIG=y # CONFIG_TARGET_sunxi is not set # CONFIG_TARGET_apm821xx is not set # CONFIG_TARGET_ath25 is not set CONFIG_TARGET_ar71xx=y # CONFIG_TARGET_ath79 is not set # CONFIG_TARGET_bcm27xx is ",
+      "stars": 351,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "N30nHaCkZ/linux",
+      "html_url": "https://github.com/N30nHaCkZ/linux",
+      "description": "  Linux kernel release 3.x <http://kernel.org/>  These are the release notes for Linux version 3.  Read them carefully, as they tell you what this is all about, explain how to install the kernel, and what to do if something goes wrong.   WHAT IS LINUX?    Linux is a clone of the operating system Uni",
+      "stars": 25,
+      "language": null,
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 10,
+  "findings": [
+    {
+      "type": "command",
+      "value": "./build_minimal_linux_live.sh"
+    },
+    {
+      "type": "command",
+      "value": "./build_minimal_linux_live.sh"
+    },
+    {
+      "type": "command",
+      "value": "./overlay_build.sh"
+    },
+    {
+      "type": "command",
+      "value": "./overlay_build.sh openjdk"
+    },
+    {
+      "type": "command",
+      "value": "docker import mll_image.tgz minimal-linux-live:latest"
+    },
+    {
+      "type": "command",
+      "value": "docker run -it minimal-linux-live /bin/sh"
+    },
+    {
+      "type": "tool",
+      "name": "Execute [qemu",
+      "description": "aarch64.sh](https://github.com/ivandavidov/minimal/blob/aarch64/src/qemu-aarch64.sh) and then switch to the QEMU serial console."
+    },
+    {
+      "type": "tool",
+      "name": "``bios``",
+      "description": "MLL will be bootable only on legacy BIOS based systems. This is the default build flavor."
+    },
+    {
+      "type": "tool",
+      "name": "``uefi``",
+      "description": "MLL will be bootable only on UEFI based systems."
+    },
+    {
+      "type": "tool",
+      "name": "``both``",
+      "description": "MLL will be bootable on both legacy BIOS and modern UEFI based systems."
+    }
+  ],
+  "script_summary": "6 commands, 4 tools"
+}

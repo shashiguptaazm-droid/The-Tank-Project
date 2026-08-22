@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "decisions": [
+    {
+      "id": "DEC-001",
+      "ts": 1731000000.0,
+      "problem": "Motor not moving under /cmd_vel commands during first bench test.",
+      "reason": "RPi.GPIO PWM default frequency is too high for the BTS7960 driver; 1 kHz creates audible whine but torque is unstable.",
+      "solution": "Set PWM frequency to 200 Hz (20 ms period) and use hardware PWM channel 0 for both motors.",
+      "result": "Smooth tracking of /cmd_vel at all duty cycles from 0.0 to 1.0. No overheating of H-bridge."
+    },
+    {
+      "id": "DEC-002",
+      "ts": 1731100000.0,
+      "problem": "openWakeWord false positives from fan noise near microphone.",
+      "reason": "Default threshold (0.5) too low; fan noise spikes pass as 'hey tank' sometimes.",
+      "solution": "Bump WakeLatch threshold to 0.7, add 1500 ms cooldown after first hit, and require a second confirmation within the 800 ms window.",
+      "result": "False positives dropped to < 1 per hour. True utterances still trigger within 250 ms."
+    },
+    {
+      "id": "DEC-003",
+      "ts": 1731200000.0,
+      "problem": "Pi 5 reboots under CPU load from YOLOv8n + llama.cpp + navigation simultaneously.",
+      "reason": "Power supply brown-out when CPU + GPU + USB all spike at once; 5V/5A supply was marginal.",
+      "solution": "Switch to official Pi 5 27W USB-C PD supply; add 0.01 µF decoupling on motor driver 5V rail; throttle llama.cpp to 4 threads.",
+      "result": "Stable 30 fps camera + 4 Hz nav at < 70% CPU + < 60°C on active cooler."
+    },
+    {
+      "id": "DEC-004",
+      "ts": 1731300000.0,
+      "problem": "RTAB-Map memory grew unbounded on long test runs.",
+      "reason": "Default WM size 30000 is fine for one floor; the robot added 3 floors worth of data and the workspace ran out of RAM.",
+      "solution": "Cap with `Rtabmap/DetectionRate=2.0` + `Rtabmap/MaxRetained=20000` and bound map size at 1 GB on disk.",
+      "result": "Long-duration SLAM runs now finish cleanly; map handover via /rtabmap/cloud_map is reliable."
+    },
+    {
+      "id": "DEC-005",
+      "ts": 1731400000.0,
+      "problem": "sqlite-vec extension sometimes fails to load on dev laptops; CI breaks.",
+      "reason": "sqlite-vec requires SQLite >= 3.45; macOS system sqlite is 3.43.",
+      "solution": "Store vector as a BLOB in the events table for portability; build the vec0 virtual table only when extension loads successfully; expose cosine numpy fallback.",
+      "result": "Single .db file is portable everywhere. Recall is slower on hosts without sqlite-vec but correct."
+    },
+    {
+      "id": "DEC-006",
+      "ts": 1731500000.0,
+      "problem": "ESP32-S3 firmware reported 'unknown module' for valid expressions.",
+      "reason": "Two boards were flashed with different baud (9600 vs 115200); JSON framing was breaking.",
+      "solution": "Pin both boards to 115200 and add a JSON banner message at boot; AliExpress boards reject anything else.",
+      "result": "Pi → ESP32 JSON control is deterministic on first byte; both eyes show same expression within 30 ms."
+    }
+  ]
+}

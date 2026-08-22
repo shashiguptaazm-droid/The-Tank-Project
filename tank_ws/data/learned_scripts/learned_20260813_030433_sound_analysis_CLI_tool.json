@@ -1,0 +1,505 @@
+{
+  "timestamp": "2026-08-13T03:04:33.690192",
+  "topic": "sound analysis CLI tool",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "ManojKumarPatnaik/Major-project-list",
+      "html_url": "https://github.com/ManojKumarPatnaik/Major-project-list",
+      "description": "A list of practical projects that anyone can solve in any programming language (See solutions). These projects are divided into multiple categories, and each category has its own folder.  To get started, simply fork this repo.  CONTRIBUTING See ways of contributing to this repo. You can contribute s",
+      "stars": 242,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "catfact/dowser",
+      "html_url": "https://github.com/catfact/dowser",
+      "description": "straightforward CLI tool for spectral analysis of sound files",
+      "stars": 16,
+      "language": "C++",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "AbstergoSweden/HQE-Workbench",
+      "html_url": "https://github.com/AbstergoSweden/HQE-Workbench",
+      "description": "The High Quality Engineering (HQE) Workbench aims to democratize access to elite engineering leadership tools. By combining local static analysis with the reasoning capabilities of Large Language Models (LLMs), we empower developers to maintain cleaner, safer, and more architecturally sound codebase",
+      "stars": 3,
+      "language": "TypeScript",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 94,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Find PI to the Nth Digit",
+      "description": "Enter a number and have the program generate PI up to that many decimal places. Keep a limit to how far the program will go."
+    },
+    {
+      "type": "tool",
+      "name": "Find e to the Nth Digit",
+      "description": "Just like the previous problem, but with e instead of PI. Enter a number and have the program generate e up to that many decimal places. Keep a limit to how far the program will go."
+    },
+    {
+      "type": "tool",
+      "name": "Fibonacci Sequence",
+      "description": "Enter a number and have the program generate the Fibonacci sequence to that number or to the Nth number."
+    },
+    {
+      "type": "tool",
+      "name": "Prime Factorization",
+      "description": "Have the user enter a number and find all Prime Factors (if there are any) and display them."
+    },
+    {
+      "type": "tool",
+      "name": "Next Prime Number",
+      "description": "Have the program find prime numbers until the user chooses to stop asking for the next one."
+    },
+    {
+      "type": "tool",
+      "name": "Mortgage Calculator",
+      "description": "Calculate the monthly payments of a fixed-term mortgage over given Nth terms at a given interest rate. Also, figure out how long it will take the user to pay back the loan. For added complexity, add a"
+    },
+    {
+      "type": "tool",
+      "name": "Change Return Program",
+      "description": "The user enters a cost and then the amount of money given. The program will figure out the change and the number of quarters, dimes, nickels, pennies needed for the change."
+    },
+    {
+      "type": "tool",
+      "name": "Binary to Decimal and Back Converter",
+      "description": "Develop a converter to convert a decimal number to binary or a binary number to its decimal equivalent."
+    },
+    {
+      "type": "tool",
+      "name": "Calculator",
+      "description": "A simple calculator to do basic operators. Make it a scientific calculator for added complexity."
+    },
+    {
+      "type": "tool",
+      "name": "Alarm Clock",
+      "description": "A simple clock where it plays a sound after X number of minutes/seconds or at a particular time."
+    },
+    {
+      "type": "tool",
+      "name": "Distance Between Two Cities",
+      "description": "Calculates the distance between two cities and allows the user to specify a unit of distance. This program may require finding coordinates for the cities like latitude and longitude."
+    },
+    {
+      "type": "tool",
+      "name": "Credit Card Validator",
+      "description": "Takes in a credit card number from a common credit card vendor (Visa, MasterCard, American Express, Discoverer) and validates it to make sure that it is a valid number (look into how credit cards use "
+    },
+    {
+      "type": "tool",
+      "name": "Tax Calculator",
+      "description": "Asks the user to enter a cost and either a country or state tax. It then returns the tax plus the total cost with tax."
+    },
+    {
+      "type": "tool",
+      "name": "Factorial Finder",
+      "description": "The Factorial of a positive integer, n, is defined as the product of the sequence n, n-1, n-2, ...1, and the factorial of zero, 0, is defined as being 1. Solve this using both loops and recursion."
+    },
+    {
+      "type": "tool",
+      "name": "Complex Number Algebra",
+      "description": "Show addition, multiplication, negation, and inversion of complex numbers in separate functions. (Subtraction and division operations can be made with pairs of these operations.) Print the results for"
+    },
+    {
+      "type": "tool",
+      "name": "Happy Numbers",
+      "description": "A happy number is defined by the following process. Starting with any positive integer, replace the number by the sum of the squares of its digits, and repeat the process until the number equals 1 (wh"
+    },
+    {
+      "type": "tool",
+      "name": "Number Names",
+      "description": "Show how to spell out a number in English. You can use a preexisting implementation or roll your own, but you should support inputs up to at least one million (or the maximum value of your language's "
+    },
+    {
+      "type": "tool",
+      "name": "Coin Flip Simulation",
+      "description": "Write some code that simulates flipping a single coin however many times the user decides. The code should record the outcomes and count the number of tails and heads."
+    },
+    {
+      "type": "tool",
+      "name": "Limit Calculator",
+      "description": "Ask the user to enter f(x) and the limit value, then return the value of the limit statement. Optional: Make the calculator capable of supporting infinite limits."
+    },
+    {
+      "type": "tool",
+      "name": "Fast Exponentiation",
+      "description": "Ask the user to enter 2 integers a and b and output a^b (i.e. pow(a,b)) in O(LG n) time complexity."
+    },
+    {
+      "type": "tool",
+      "name": "Collatz Conjecture",
+      "description": "Start with a number n > 1. Find the number of steps it takes to reach one using the following process: If n is even, divide it by 2. If n is odd, multiply it by 3 and add 1."
+    },
+    {
+      "type": "tool",
+      "name": "Sorting",
+      "description": "Implement two types of sorting algorithms: Merge sort and bubble sort."
+    },
+    {
+      "type": "tool",
+      "name": "Closest pair problem",
+      "description": "The closest pair of points problem or closest pair problem is a problem of computational geometry: given n points in metric space, find a pair of points with the smallest distance between them."
+    },
+    {
+      "type": "tool",
+      "name": "Sieve of Eratosthenes",
+      "description": "The sieve of Eratosthenes is one of the most efficient ways to find all of the smaller primes (below 10 million or so)."
+    },
+    {
+      "type": "tool",
+      "name": "Graph from links",
+      "description": "Create a program that will create a graph or network from a series of links."
+    },
+    {
+      "type": "tool",
+      "name": "Eulerian Path",
+      "description": "Create a program that will take as an input a graph and output either an Eulerian path or an Eulerian cycle, or state that it is not possible. An Eulerian path starts at one node and traverses every e"
+    },
+    {
+      "type": "tool",
+      "name": "Connected Graph",
+      "description": "Create a program that takes a graph as an input and outputs whether every node is connected or not."
+    },
+    {
+      "type": "tool",
+      "name": "Dijkstra\u2019s Algorithm",
+      "description": "Create a program that finds the shortest path through a graph using its edges."
+    },
+    {
+      "type": "tool",
+      "name": "Minimum Spanning Tree",
+      "description": "Create a program that takes a connected, undirected graph with weights and outputs the minimum spanning tree of the graph i.e., a subgraph that is a tree, contains all the vertices, and the sum of its"
+    },
+    {
+      "type": "tool",
+      "name": "Inverted index",
+      "description": "An Inverted Index is a data structure used to create full-text search. Given a set of text files, implement a program to create an inverted index. Also, create a user interface to do a search using th"
+    },
+    {
+      "type": "tool",
+      "name": "Fizz Buzz",
+      "description": "Write a program that prints the numbers from 1 to 100. But for multiples of three print \u201cFizz\u201d instead of the number and for the multiples of five print \u201cBuzz\u201d. For numbers which are multiples of both"
+    },
+    {
+      "type": "tool",
+      "name": "Reverse a String",
+      "description": "Enter a string and the program will reverse it and print it out."
+    },
+    {
+      "type": "tool",
+      "name": "Pig Latin",
+      "description": "Pig Latin is a game of alterations played in the English language game. To create the Pig Latin form of an English word the initial consonant sound is transposed to the end of the word and an ay is af"
+    },
+    {
+      "type": "tool",
+      "name": "Count Vowels",
+      "description": "Enter a string and the program counts the number of vowels in the text. For added complexity have it report a sum of each vowel found."
+    },
+    {
+      "type": "tool",
+      "name": "Check if Palindrome",
+      "description": "Checks if the string entered by the user is a palindrome. That is that it reads the same forwards as backward like \u201crace car\u201d"
+    },
+    {
+      "type": "tool",
+      "name": "Count Words in a String",
+      "description": "Counts the number of individual words in a string. For added complexity read these strings in from a text file and generate a summary."
+    },
+    {
+      "type": "tool",
+      "name": "Text Editor",
+      "description": "Notepad-style application that can open, edit, and save text documents. Optional: Add syntax highlighting and other features."
+    },
+    {
+      "type": "tool",
+      "name": "RSS Feed Creator",
+      "description": "Given a link to RSS/Atom Feed, get all posts and display them."
+    },
+    {
+      "type": "tool",
+      "name": "Guestbook / Journal",
+      "description": "A simple application that allows people to add comments or write journal entries. It can allow comments or not and timestamps for all entries. Could also be made into a shout box. Optional: Deploy it "
+    },
+    {
+      "type": "tool",
+      "name": "Vigenere / Vernam / Ceasar Ciphers",
+      "description": "Functions for encrypting and decrypting data messages. Then send them to a friend."
+    },
+    {
+      "type": "tool",
+      "name": "Regex Query Tool",
+      "description": "A tool that allows the user to enter a text string and then in a separate control enter a regex pattern. It will run the regular expression against the source text and return any matches or flag error"
+    },
+    {
+      "type": "tool",
+      "name": "FTP Program",
+      "description": "A file transfer program that can transfer files back and forth from a remote web sever."
+    },
+    {
+      "type": "tool",
+      "name": "Bandwidth Monitor",
+      "description": "A small utility program that tracks how much data you have uploaded and downloaded from the net during the course of your current online session. See if you can find out what periods of the day you us"
+    },
+    {
+      "type": "tool",
+      "name": "Port Scanner",
+      "description": "Enter an IP address and a port range where the program will then attempt to find open ports on the given computer by connecting to each of them. On any successful connections mark the port as open."
+    },
+    {
+      "type": "tool",
+      "name": "Country from IP Lookup",
+      "description": "Enter an IP address and find the country that IP is registered in. Optional: Find the Ip automatically."
+    },
+    {
+      "type": "tool",
+      "name": "Whois Search Tool",
+      "description": "Enter an IP or host address and have it look it up through whois and return the results to you."
+    },
+    {
+      "type": "tool",
+      "name": "Site Checker with Time Scheduling",
+      "description": "An application that attempts to connect to a website or server every so many minute or a given time and check if it is up. If it is down, it will notify you by email or by posting a notice on the scre"
+    },
+    {
+      "type": "tool",
+      "name": "Product Inventory Project",
+      "description": "Create an application that manages an inventory of products. Create a product class that has a price, id, and quantity on hand. Then create an inventory class that keeps track of various products and "
+    },
+    {
+      "type": "tool",
+      "name": "Airline / Hotel Reservation System",
+      "description": "Create a reservation system that books airline seats or hotel rooms. It charges various rates for particular sections of the plane or hotel. For example, first class is going to cost more than a coach"
+    },
+    {
+      "type": "tool",
+      "name": "Company Manager",
+      "description": "Create a hierarchy of classes - abstract class Employee and subclasses HourlyEmployee, SalariedEmployee, Manager, and Executive. Everyone's pay is calculated differently, research a bit about it. Afte"
+    },
+    {
+      "type": "tool",
+      "name": "Bank Account Manager",
+      "description": "Create a class called Account which will be an abstract class for three other classes called CheckingAccount, SavingsAccount, and BusinessAccount. Manage credits and debits from these accounts through"
+    },
+    {
+      "type": "tool",
+      "name": "Patient / Doctor Scheduler",
+      "description": "Create a patient class and a doctor class. Have a doctor that can handle multiple patients and set up a scheduling program where a doctor can only handle 16 patients during an 8 hr workday."
+    },
+    {
+      "type": "tool",
+      "name": "Recipe Creator and Manager",
+      "description": "Create a recipe class with ingredients and put them in a recipe manager program that organizes them into categories like desserts, main courses, or by ingredients like chicken, beef, soups, pies, etc."
+    },
+    {
+      "type": "tool",
+      "name": "Image Gallery",
+      "description": "Create an image abstract class and then a class that inherits from it for each image type. Put them in a program that displays them in a gallery-style format for viewing."
+    },
+    {
+      "type": "tool",
+      "name": "Shape Area and Perimeter Classes",
+      "description": "Create an abstract class called Shape and then inherit from it other shapes like diamond, rectangle, circle, triangle, etc. Then have each class override the area and perimeter functionality to handle"
+    },
+    {
+      "type": "tool",
+      "name": "Flower Shop Ordering To Go",
+      "description": "Create a flower shop application that deals in flower objects and use those flower objects in a bouquet object which can then be sold. Keep track of the number of objects and when you may need to orde"
+    },
+    {
+      "type": "tool",
+      "name": "Family Tree Creator",
+      "description": "Create a class called Person which will have a name, when they were born, and when (and if) they died. Allow the user to create these Person classes and put them into a family tree structure. Print ou"
+    },
+    {
+      "type": "tool",
+      "name": "Create A Progress Bar for Downloads",
+      "description": "Create a progress bar for applications that can keep track of a download in progress. The progress bar will be on a separate thread and will communicate with the main thread using delegates."
+    },
+    {
+      "type": "tool",
+      "name": "Bulk Thumbnail Creator",
+      "description": "Picture processing can take a bit of time for some transformations. Especially if the image is large. Create an image program that can take hundreds of images and converts them to a specified size in "
+    },
+    {
+      "type": "tool",
+      "name": "Web Page Scraper",
+      "description": "Create an application that connects to a site and pulls out all links, or images, and saves them to a list. Optional: Organize the indexed content and don\u2019t allow duplicates. Have it put the results i"
+    },
+    {
+      "type": "tool",
+      "name": "Online White Board",
+      "description": "Create an application that allows you to draw pictures, write notes and use various colors to flesh out ideas for projects. Optional: Add a feature to invite friends to collaborate on a whiteboard onl"
+    },
+    {
+      "type": "tool",
+      "name": "Get Atomic Time from Internet Clock",
+      "description": "This program will get the true atomic time from an atomic time clock on the Internet. Use any one of the atomic clocks returned by a simple Google search."
+    },
+    {
+      "type": "tool",
+      "name": "Fetch Current Weather",
+      "description": "Get the current weather for a given zip/postal code. Optional: Try locating the user automatically."
+    },
+    {
+      "type": "tool",
+      "name": "Scheduled Auto Login and Action",
+      "description": "Make an application that logs into a given site on a schedule and invokes a certain action and then logs out. This can be useful for checking webmail, posting regular content, or getting info for othe"
+    },
+    {
+      "type": "tool",
+      "name": "CAPTCHA Maker",
+      "description": "Ever see those images with letters numbers when you signup for a service and then ask you to enter what you see? It keeps web bots from automatically signing up and spamming. Try creating one yourself"
+    },
+    {
+      "type": "tool",
+      "name": "Quiz Maker",
+      "description": "Make an application that takes various questions from a file, picked randomly, and puts together a quiz for students. Each quiz can be different and then reads a key to grade the quizzes."
+    },
+    {
+      "type": "tool",
+      "name": "Sort Excel/CSV File Utility",
+      "description": "Reads a file of records, sorts them, and then writes them back to the file. Allow the user to choose various sort style and sorting based on a particular field."
+    },
+    {
+      "type": "tool",
+      "name": "Create Zip File Maker",
+      "description": "The user enters various files from different directories and the program zips them up into a zip file. Optional: Apply actual compression to the files. Start with Huffman Algorithm."
+    },
+    {
+      "type": "tool",
+      "name": "PDF Generator",
+      "description": "An application that can read in a text file, HTML file, or some other file and generates a PDF file out of it. Great for a web-based service where the user uploads the file and the program returns a P"
+    },
+    {
+      "type": "tool",
+      "name": "Mp3 Tagger",
+      "description": "Modify and add ID3v1 tags to MP3 files. See if you can also add in the album art into the MP3 file\u2019s header as well as other ID3v2 tags."
+    },
+    {
+      "type": "tool",
+      "name": "Code Snippet Manager",
+      "description": "Another utility program that allows coders to put in functions, classes, or other tidbits to save for use later. Organized by the type of snippet or language the coder can quickly lookup code. Optiona"
+    },
+    {
+      "type": "tool",
+      "name": "SQL Query Analyzer",
+      "description": "A utility application in which a user can enter a query and have it run against a local database and look for ways to make it more efficient."
+    },
+    {
+      "type": "tool",
+      "name": "Remote SQL Tool",
+      "description": "A utility that can execute queries on remote servers from your local computer across the Internet. It should take in a remote host, user name, and password, run the query and return the results."
+    },
+    {
+      "type": "tool",
+      "name": "Report Generator",
+      "description": "Create a utility that generates a report based on some tables in a database. Generates sales reports based on the order/order details tables or sums up the day's current database activity."
+    },
+    {
+      "type": "tool",
+      "name": "Event Scheduler and Calendar",
+      "description": "Make an application that allows the user to enter a date and time of an event, event notes, and then schedule those events on a calendar. The user can then browse the calendar or search the calendar f"
+    },
+    {
+      "type": "tool",
+      "name": "Budget Tracker",
+      "description": "Write an application that keeps track of a household\u2019s budget. The user can add expenses, income, and recurring costs to find out how much they are saving or losing over a period of time. Optional: Al"
+    },
+    {
+      "type": "tool",
+      "name": "TV Show Tracker",
+      "description": "Got a favorite show you don\u2019t want to miss? Don\u2019t have a PVR or want to be able to find the show to then PVR it later? Make an application that can search various online TV Guide sites, locate the sho"
+    },
+    {
+      "type": "tool",
+      "name": "Travel Planner System",
+      "description": "Make a system that allows users to put together their own little travel itinerary and keep track of the airline/hotel arrangements, points of interest, budget, and schedule."
+    },
+    {
+      "type": "tool",
+      "name": "Caesar cipher",
+      "description": "Implement a Caesar cipher, both encoding, and decoding. The key is an integer from 1 to 25. This cipher rotates the letters of the alphabet (A to Z). The encoding replaces each letter with the 1st to "
+    },
+    {
+      "type": "tool",
+      "name": "`fluxPositive`: spectral flux, in a positive direction",
+      "description": "`fluxNegative`: spectral flux, in a negative direction"
+    },
+    {
+      "type": "tool",
+      "name": "other output formats (csv, python, etc)",
+      "description": "expose more parameters (hz range, max peaks per frame, FFT config)"
+    },
+    {
+      "type": "tool",
+      "name": "more analyses? (crest factor? autocorrelation peaks?)",
+      "description": "drag/drop GUI option"
+    },
+    {
+      "type": "tool",
+      "name": "maybe some higher",
+      "description": "level analysis (e.g. clustering)"
+    },
+    {
+      "type": "tool",
+      "name": "Local",
+      "description": "Only Mode**: Privacy-first operation without external API calls"
+    },
+    {
+      "type": "tool",
+      "name": "Local",
+      "description": "Only Mode**: Privacy-first operation without external API calls"
+    },
+    {
+      "type": "tool",
+      "name": "Provider",
+      "description": "agnostic LLM mode**: Any OpenAI-compatible chat completion API (text models only)"
+    },
+    {
+      "type": "tool",
+      "name": "`hqe",
+      "description": "core` runs the scan pipeline and manages encrypted chat storage."
+    },
+    {
+      "type": "tool",
+      "name": "`hqe",
+      "description": "openai` provides an OpenAI-compatible chat client (used for optional LLM analysis and Thinktank prompts)."
+    },
+    {
+      "type": "tool",
+      "name": "`hqe",
+      "description": "artifacts` writes `run-manifest.json`, `report.json`, and `report.md`."
+    },
+    {
+      "type": "tool",
+      "name": "`hqe",
+      "description": "mcp` provides the Thinktank prompt library with rich metadata."
+    },
+    {
+      "type": "tool",
+      "name": "Supported versions",
+      "description": "Vulnerability reporting process"
+    },
+    {
+      "type": "tool",
+      "name": "Reporting bugs and requesting features",
+      "description": "Development setup and workflow"
+    },
+    {
+      "type": "tool",
+      "name": "Code style and testing requirements",
+      "description": "Pull request process"
+    },
+    {
+      "type": "tool",
+      "name": "Venice.ai integration is supported via its OpenAI",
+      "description": "compatible API interface. See `CREDITS.md` for details."
+    }
+  ],
+  "script_summary": "94 tools"
+}

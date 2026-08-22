@@ -1,0 +1,456 @@
+{
+  "timestamp": "2026-08-05T03:05:32.658495",
+  "topic": "devops automation tools python",
+  "repos_scanned": 5,
+  "repos": [
+    {
+      "full_name": "errbotio/errbot",
+      "html_url": "https://github.com/errbotio/errbot",
+      "description": "Errbot is a chatbot, a daemon that connects to your favorite chat service and bring your tools and some fun into the conversation.",
+      "stars": 3293,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "0x4D31/burpa",
+      "html_url": "https://github.com/0x4D31/burpa",
+      "description": "Burp-Automator: A Burp Suite Automation Tool with Slack Integration. It can be used with Jenkins and Selenium to automate Dynamic Application Security Testing (DAST).",
+      "stars": 535,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "initMAX/zabbix-mcp-server",
+      "html_url": "https://github.com/initMAX/zabbix-mcp-server",
+      "description": "MCP server for the complete Zabbix API - 237 tools, multi-server, OAuth 2.1 + bearer auth, PDF reports, systemd ready. Works with ChatGPT, Claude, VS Code, Codex, JetBrains and any MCP client.",
+      "stars": 168,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "tg12/script-toolbox",
+      "html_url": "https://github.com/tg12/script-toolbox",
+      "description": "This repository contains a collection of scripts and tools that I have written to solve various problems that I have come across.",
+      "stars": 75,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "call518/MCP-OpenStack-Ops",
+      "html_url": "https://github.com/call518/MCP-OpenStack-Ops",
+      "description": "90+ production-safe OpenStack tools for AI agents via MCP. Project-scoped & read-only by default. Works with Claude, Open WebUI & any MCP client. FastMCP + OpenStack SDK. Available on PyPI, Docker Hub & Smithery.",
+      "stars": 39,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 85,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone https://github.com/initMAX/zabbix-mcp-server.git"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/initMAX/zabbix-mcp-server.git"
+    },
+    {
+      "type": "command",
+      "value": "./deploy/install-user.sh              # install"
+    },
+    {
+      "type": "command",
+      "value": "./deploy/install-user.sh update       # git pull + pip + restart"
+    },
+    {
+      "type": "command",
+      "value": "./deploy/install-user.sh uninstall"
+    },
+    {
+      "type": "tool",
+      "name": "Complete API coverage",
+      "description": "All 58 Zabbix API groups (223 tools): hosts, problems, triggers, templates, users, dashboards, and more"
+    },
+    {
+      "type": "tool",
+      "name": "Admin web portal",
+      "description": "Full web UI on port 9090 for managing tokens, users, servers, templates, settings, and audit log; dark/light mode; point-and-click **Client MCP Wizard (beta)** that generates copy-paste-ready config s"
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "token authentication** - Named tokens with scopes, IP restrictions, server binding, expiry; managed via admin portal, CLI (`generate-token`), or config.toml"
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "server support** - Connect to multiple Zabbix instances (production, staging, ...) with separate tokens"
+    },
+    {
+      "type": "tool",
+      "name": "HTTP + SSE transports",
+      "description": "Streamable HTTP (recommended) and SSE for clients like n8n that lack session management"
+    },
+    {
+      "type": "tool",
+      "name": "Tool filtering",
+      "description": "Limit exposed tools by category (`monitoring`, `alerts`, `users`, `extensions`, etc.) or individual API prefix to reduce the tool catalog size and stay under LLM context limits (see [Token Budget](#to"
+    },
+    {
+      "type": "tool",
+      "name": "Compact output mode",
+      "description": "Get methods return only key fields by default, reducing response token usage; LLM can request `extend` for full details"
+    },
+    {
+      "type": "tool",
+      "name": "LLM",
+      "description": "friendly normalizations** - Symbolic enum names, auto-fill defaults, preprocessing cleanup, timestamp conversion"
+    },
+    {
+      "type": "tool",
+      "name": "Single config file",
+      "description": "One TOML file, no scattered environment variables"
+    },
+    {
+      "type": "tool",
+      "name": "Read",
+      "description": "only mode** - Per-server and per-token write protection to prevent accidental changes"
+    },
+    {
+      "type": "tool",
+      "name": "Rate limiting",
+      "description": "Per-client call budget (300/min default) to protect Zabbix from flooding"
+    },
+    {
+      "type": "tool",
+      "name": "Auto",
+      "description": "reconnect** - Transparent re-authentication on session expiry"
+    },
+    {
+      "type": "tool",
+      "name": "Production",
+      "description": "ready** - systemd service, logrotate, Docker support, security hardening"
+    },
+    {
+      "type": "tool",
+      "name": "Generic fallback",
+      "description": "`zabbix_raw_api_call` tool for any API method not explicitly defined"
+    },
+    {
+      "type": "tool",
+      "name": "Linux server with Python 3.10+",
+      "description": "Network access to your Zabbix server(s)"
+    },
+    {
+      "type": "tool",
+      "name": "macOS",
+      "description": "LaunchAgent at `~/Library/LaunchAgents/com.initmax.zabbix-mcp-server.plist` (auto-restart via `KeepAlive`)"
+    },
+    {
+      "type": "tool",
+      "name": "Linux",
+      "description": "systemd `--user` unit at `~/.config/systemd/user/zabbix-mcp-server.service` with `loginctl enable-linger` so the service survives logout"
+    },
+    {
+      "type": "tool",
+      "name": "/etc/zabbix-mcp/config.toml",
+      "description": "your Zabbix URL, API token, MCP tokens, scopes, TLS settings, etc."
+    },
+    {
+      "type": "tool",
+      "name": "Discovery",
+      "description": "RFC 8414 `/.well-known/oauth-authorization-server`, RFC 9728 `/.well-known/oauth-protected-resource`, `WWW-Authenticate: Bearer ... resource_metadata=\"...\"` on 401."
+    },
+    {
+      "type": "tool",
+      "name": "Dynamic client registration",
+      "description": "RFC 7591 `/register`. ChatGPT's \"Advanced OAuth settings\" auto-detects everything from the discovery documents."
+    },
+    {
+      "type": "tool",
+      "name": "Two",
+      "description": "step consent screen** (v1.29) - operator credentials check, then per-scope checkbox grant. Wildcard `*` and concrete groups are mutually exclusive. Role caps the grant: `admin` may grant any scope, `o"
+    },
+    {
+      "type": "tool",
+      "name": "Refresh",
+      "description": "token reuse detection** (RFC 6819 \u00a75.2.2.3) - replaying an already-rotated refresh token revokes the entire token family and writes an audit row."
+    },
+    {
+      "type": "tool",
+      "name": "Per",
+      "description": "client IP allowlist + TTL override** in `[oauth_clients.<id>]`, editable from the OAuth Clients page in the admin portal."
+    },
+    {
+      "type": "tool",
+      "name": "Login uses the existing admin",
+      "description": "portal users** ([admin.users.*], scrypt-hashed) - operators do not maintain a second identity store. Login + consent UI mirrors the admin portal theme."
+    },
+    {
+      "type": "tool",
+      "name": "Audit log integration",
+      "description": "every OAuth event (login_success, consent_granted, token_revoked, ...) lands in `audit.log` for forensic reconstruction."
+    },
+    {
+      "type": "tool",
+      "name": "Legacy bearer mode keeps working alongside OAuth",
+      "description": "existing `[tokens.X]` clients need no migration."
+    },
+    {
+      "type": "tool",
+      "name": "Must start with `http://` or `https://`.",
+      "description": "Must be `https://` when `tls_cert_file` is set."
+    },
+    {
+      "type": "tool",
+      "name": "No path / query / fragment",
+      "description": "the `/mcp` or `/sse` suffix is appended automatically."
+    },
+    {
+      "type": "tool",
+      "name": "Admin portal",
+      "description": "`Settings -> MCP Server -> Public URL`. Validation errors surface as a toast in red. Saving requires a server restart (the banner appears automatically)."
+    },
+    {
+      "type": "tool",
+      "name": "Startup banner",
+      "description": "the `--- Security status ---` block in the application log shows a `Public URL: NOT SET` warning when `host` is a wildcard and no override is configured."
+    },
+    {
+      "type": "tool",
+      "name": "Admin portal",
+      "description": "every page (Dashboard, Tokens, Settings, ...) shows a yellow banner until the override is set, with a one-click \"Configure\" button that scrolls to the field."
+    },
+    {
+      "type": "tool",
+      "name": "`Mcp",
+      "description": "Method` / `Mcp-Name` request headers** - the revision requires them on Streamable HTTP POSTs, which means an L7 firewall or reverse proxy can allow or deny individual MCP methods and tool names **with"
+    },
+    {
+      "type": "pip_package",
+      "value": "/path/to/zabbix-mcp-server"
+    },
+    {
+      "type": "pip_package",
+      "value": "zabbix-mcp-server[reporting]"
+    },
+    {
+      "type": "pip_package",
+      "value": "weasyprint"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "tool",
+      "name": "Black Hole",
+      "description": "Arcade-Style Python Game**"
+    },
+    {
+      "type": "tool",
+      "name": "`OS_AUTH_PROTOCOL=http`: Use for local development or HTTP",
+      "description": "only OpenStack deployments"
+    },
+    {
+      "type": "tool",
+      "name": "mcp",
+      "description": "server**: OpenStack MCP server with tools"
+    },
+    {
+      "type": "tool",
+      "name": "mcpo",
+      "description": "proxy**: OpenAPI (REST-API)"
+    },
+    {
+      "type": "tool",
+      "name": "open",
+      "description": "webui**: Web interface for testing and interaction"
+    },
+    {
+      "type": "tool",
+      "name": "MCP Server: `localhost:8080` (HTTP transport)",
+      "description": "MCPO Proxy: `localhost:8000` (OpenStack API proxy)"
+    },
+    {
+      "type": "tool",
+      "name": "MCP Server: `host.docker.internal:18005` (HTTP transport)",
+      "description": "MCPO Proxy: `host.docker.internal:8005` (OpenStack API proxy)"
+    },
+    {
+      "type": "tool",
+      "name": "Zero Cross",
+      "description": "tenant Data Leakage**: Advanced project ownership validation prevents access to resources from other projects"
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "layer Security Filtering**: Each service implements intelligent resource filtering by current project ID with additional validation"
+    },
+    {
+      "type": "tool",
+      "name": "Cross",
+      "description": "Project Access Prevention**: Enhanced protection against accidental operations on similarly-named resources in other projects"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 Project ID verification and matching",
+      "description": "\u2705 Resource ownership validation for all services"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 Service",
+      "description": "level project filtering"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 Secure resource lookup with cross",
+      "description": "project protection"
+    },
+    {
+      "type": "tool",
+      "name": "Instance management (start, stop, restart, pause, unpause)",
+      "description": "Volume operations (create, delete, attach, detach)"
+    },
+    {
+      "type": "tool",
+      "name": "Keypair management (create, delete, import)",
+      "description": "Floating IP operations (create, delete, associate, disassociate)"
+    },
+    {
+      "type": "tool",
+      "name": "Snapshot management (create, delete)",
+      "description": "Image management (create, delete, update)"
+    },
+    {
+      "type": "tool",
+      "name": "Cluster status and monitoring",
+      "description": "Resource listings (instances, volumes, networks, etc.)"
+    },
+    {
+      "type": "tool",
+      "name": "Service status checks",
+      "description": "Usage and quota information"
+    },
+    {
+      "type": "tool",
+      "name": "When `ALLOW_MODIFY_OPERATIONS=false`: Only read",
+      "description": "only tools are registered with the MCP server"
+    },
+    {
+      "type": "tool",
+      "name": "When `ALLOW_MODIFY_OPERATIONS=true`: All tools (read",
+      "description": "only + modify operations) are registered"
+    },
+    {
+      "type": "tool",
+      "name": "Tool availability is determined at server startup",
+      "description": "restart required after changing this setting"
+    },
+    {
+      "type": "tool",
+      "name": "Use separate configurations for different environments",
+      "description": "Review operations before enabling modify capabilities"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83c\udfaf Cluster overview and status queries",
+      "description": "\ufffd\ufe0f Instance management operations"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83c\udf10 Network configuration tasks",
+      "description": "\ufffd Storage management workflows"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83d\udd25 Heat orchestration examples",
+      "description": "\u2696\ufe0f Load balancer operations"
+    },
+    {
+      "type": "tool",
+      "name": "\ufffd Advanced search patterns",
+      "description": "\ud83d\udcca Monitoring and troubleshooting"
+    },
+    {
+      "type": "tool",
+      "name": "\ud83e\udde0 Complex multi",
+      "description": "tool query combinations"
+    },
+    {
+      "type": "tool",
+      "name": "Offset",
+      "description": "based pagination for browsing large datasets"
+    },
+    {
+      "type": "tool",
+      "name": "Intelligent caching with connection reuse",
+      "description": "Selective API calls to minimize overhead"
+    },
+    {
+      "type": "tool",
+      "name": "Case",
+      "description": "sensitive search options for precise filtering"
+    },
+    {
+      "type": "tool",
+      "name": "Global connection caching with validity testing",
+      "description": "Automatic retry mechanisms for transient failures"
+    },
+    {
+      "type": "tool",
+      "name": "Connection pooling for high",
+      "description": "throughput scenarios"
+    },
+    {
+      "type": "tool",
+      "name": "Read",
+      "description": "only tools**: Use `@mcp.tool()` - always available"
+    },
+    {
+      "type": "pip_package",
+      "value": "\\"
+    },
+    {
+      "type": "feature",
+      "value": "\u2705 **Project-Scoped Operations**: Every tool enforces the configured `OS_PROJECT_NAME`, validating resource ownership so actions stay inside a single tenant."
+    },
+    {
+      "type": "feature",
+      "value": "\u2705 **Safety-Gated Writes**: Modify (`set_*`) tooling only registers when `ALLOW_MODIFY_OPERATIONS=true`, keeping default deployments read-only and auditable."
+    },
+    {
+      "type": "feature",
+      "value": "\u2705 **90+ Purpose-Built Tools**: Broad coverage across compute, networking, storage, images, identity, Heat, and Octavia load balancing tasks\u2014all constrained to the current project."
+    },
+    {
+      "type": "feature",
+      "value": "\u2705 **Bulk & Filtered Actions**: Instance, volume, network, image, snapshot, and keypair managers accept comma-delimited targets or filter criteria to orchestrate bulk changes intentionally."
+    },
+    {
+      "type": "feature",
+      "value": "\u2705 **Post-Action Feedback & Async Guidance**: Mutating tools reuse a shared result handler that adds emoji status checks, asynchronous timing notes, and follow-up verification commands."
+    },
+    {
+      "type": "feature",
+      "value": "\u2705 **Monitoring & Usage Insights**: `get_service_status`, `get_resource_monitoring`, `get_usage_statistics`, and quota tools surface service availability, utilization, and capacity for the active proje"
+    },
+    {
+      "type": "feature",
+      "value": "\u2705 **Unified Instance Queries**: The `get_instance` tool consolidates name, ID, status, and free-form search paths with pagination plus summary/detailed modes."
+    },
+    {
+      "type": "feature",
+      "value": "\u2705 **Server Insight & Audit Trail**: Dedicated tools expose server events, hypervisor details, availability zones, quotas, and resource ownership to speed diagnostics."
+    },
+    {
+      "type": "feature",
+      "value": "\u2705 **Load Balancer Management**: Octavia tools cover listeners, pools, members, health monitors, flavors, quotas, and amphora operations with the same safety gates."
+    },
+    {
+      "type": "feature",
+      "value": "\u2705 **Connection & Deployment Flexibility**: Connection caching, configurable service endpoints, Docker packaging, and both `stdio`/`streamable-http` transports support proxy/bastion and multi-project s"
+    }
+  ],
+  "script_summary": "5 commands, 65 tools, 5 pip_packages, 10 features"
+}

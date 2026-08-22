@@ -1,0 +1,170 @@
+{
+  "timestamp": "2026-08-04T03:04:31.652350",
+  "topic": "linux automation tools CLI",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "kellyjonbrazil/jc",
+      "html_url": "https://github.com/kellyjonbrazil/jc",
+      "description": "CLI tool and python library that converts the output of popular command-line tools, file-types, and common strings to JSON, YAML, or Dictionaries. This allows piping of output to tools like jq and simplifying automation scripts.",
+      "stars": 8655,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "tio/tio",
+      "html_url": "https://github.com/tio/tio",
+      "description": "A serial device I/O tool",
+      "stars": 3100,
+      "language": "C",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "sebastiancarlos/beachpatrol",
+      "html_url": "https://github.com/sebastiancarlos/beachpatrol",
+      "description": "\ud83c\udfdd\ufe0f A CLI Tool to Automate Your Everyday Web Browser.",
+      "stars": 915,
+      "language": "JavaScript",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 29,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Linux/unix: `$HOME/.local/share/jc/jcparsers`",
+      "description": "macOS: `$HOME/Library/Application Support/jc/jcparsers`"
+    },
+    {
+      "type": "tool",
+      "name": "Centos 7.7",
+      "description": "Ubuntu 18.04"
+    },
+    {
+      "type": "tool",
+      "name": "Ubuntu 20.04",
+      "description": "Fedora32"
+    },
+    {
+      "type": "tool",
+      "name": "macOS 10.11.6",
+      "description": "macOS 10.14.6"
+    },
+    {
+      "type": "tool",
+      "name": "NixOS",
+      "description": "FreeBSD12"
+    },
+    {
+      "type": "tool",
+      "name": "Windows 10",
+      "description": "Windows 2016 Server"
+    },
+    {
+      "type": "pip_package",
+      "value": "jc"
+    },
+    {
+      "type": "tool",
+      "name": "Check your email.",
+      "description": "Check your bank transactions."
+    },
+    {
+      "type": "tool",
+      "name": "Download a file from a website.",
+      "description": "Dump the text from the current tab into a file."
+    },
+    {
+      "type": "tool",
+      "name": "Fill an online form.",
+      "description": "Check for messages in your social media or work communication platform."
+    },
+    {
+      "type": "tool",
+      "name": "Linux (Wayland or X11), macOS or Windows",
+      "description": "Node.js LTS (v22)"
+    },
+    {
+      "type": "tool",
+      "name": "Run `npm install` to install dependencies.",
+      "description": "Run `make` to install symlinks to the executables (in `/usr/local/bin` by"
+    },
+    {
+      "type": "tool",
+      "name": "Launch a browser with `beachpatrol`",
+      "description": "Optionally launch it in the background with `beachpatrol &`"
+    },
+    {
+      "type": "tool",
+      "name": "Use it as your regular browser.",
+      "description": "Install browser extensions if you want."
+    },
+    {
+      "type": "tool",
+      "name": "Run `beachmsg smoke",
+      "description": "test` to run the pre-installed test command, which"
+    },
+    {
+      "type": "tool",
+      "name": "If it reads \"Form submitted\", it worked correctly.",
+      "description": "Now create your own automation commands!"
+    },
+    {
+      "type": "tool",
+      "name": "Launches a browser with the specified profile.",
+      "description": "Opens a socket to listen for commands. Commands can be sent with the"
+    },
+    {
+      "type": "tool",
+      "name": "The API is subject to change.",
+      "description": "Currently only Chromium and Firefox are supported."
+    },
+    {
+      "type": "tool",
+      "name": "The `beachpatrol",
+      "description": "browser-extension` is in early-testing and **not publicly"
+    },
+    {
+      "type": "tool",
+      "name": "The state",
+      "description": "of-the-art stealth plugins are currently only available for"
+    },
+    {
+      "type": "npm_package",
+      "value": ".`"
+    },
+    {
+      "type": "feature",
+      "value": "Check your email."
+    },
+    {
+      "type": "feature",
+      "value": "Check your bank transactions."
+    },
+    {
+      "type": "feature",
+      "value": "Download a file from a website."
+    },
+    {
+      "type": "feature",
+      "value": "Dump the text from the current tab into a file."
+    },
+    {
+      "type": "feature",
+      "value": "Fill an online form."
+    },
+    {
+      "type": "feature",
+      "value": "Check for messages in your social media or work communication platform."
+    },
+    {
+      "type": "feature",
+      "value": "Integrate with your OS: Add browser task to your Bash/Python scripts."
+    },
+    {
+      "type": "feature",
+      "value": "**All of this right there on your everyday browser!**"
+    }
+  ],
+  "script_summary": "19 tools, 1 pip_packages, 1 npm_packages, 8 features"
+}

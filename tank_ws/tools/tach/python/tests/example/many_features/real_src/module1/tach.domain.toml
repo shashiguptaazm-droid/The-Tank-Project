@@ -1,0 +1,40 @@
+[root]
+depends_on = ["api", "//module5"]
+depends_on_external = ["git", "yaml"]
+layer = "mid"
+
+[[modules]]
+path = "*"
+depends_on = []
+layer = "hightest"
+
+[[modules]]
+path = "api"
+depends_on = ["**"]
+visibility = ["<domain_root>", "//module5"]
+layer = "mid"
+
+[[interfaces]]
+expose = ["something"]
+from = ["api"]
+
+[[interfaces]]
+expose = ["MyAPI"]
+from = ["api"]
+visibility = ["//module5"]
+exclusive = true
+
+[[modules]]
+path = "submodule1"
+depends_on = []
+layer = "mid"
+
+[[modules]]
+path = "submodule2"
+depends_on = []
+layer = "mid"
+
+[[modules]]
+path = "submodule3"
+depends_on = []
+layer = "mid"

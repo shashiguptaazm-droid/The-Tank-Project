@@ -1,0 +1,44 @@
+{
+  "timestamp": "2026-08-15T03:00:40.109410",
+  "topic": "cloud deployment python scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "GoogleCloudPlatform/rad-lab",
+      "html_url": "https://github.com/GoogleCloudPlatform/rad-lab",
+      "description": "RAD Lab enables users to deploy infrastructure on Google Cloud Platform (GCP) to support specific use cases. Infrastructure is created and managed through Terraform in conjunction with support scripts written in Python. The templates, code, and documentation for each use case are bundled into module",
+      "stars": 112,
+      "language": "HCL",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "libersoft/proxmox-init",
+      "html_url": "https://github.com/libersoft/proxmox-init",
+      "description": "Python script to deploy GNU/Linux cloud images, cloud-style, on Proxmox KVM. This is only a proof of concept, check https://github.com/LordGaav/proxmox-deploy or https://github.com/lgaggini/spartacus.",
+      "stars": 53,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "BabyJ723/blast-ON",
+      "html_url": "https://github.com/BabyJ723/blast-ON",
+      "description": "# Awesome Keycloak [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)  # [<img src=\"https://www.keycloak.org/resources/images/keycloak_logo_480x108.png\">](https://github.com/thomasdarimont/awesom",
+      "stars": 46,
+      "language": null,
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 2,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Ansible",
+      "description": "pull launch on instance customization."
+    },
+    {
+      "type": "pip_package",
+      "value": "requirements.txt"
+    }
+  ],
+  "script_summary": "1 tools, 1 pip_packages"
+}

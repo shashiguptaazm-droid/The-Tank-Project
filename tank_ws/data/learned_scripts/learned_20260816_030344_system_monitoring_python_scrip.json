@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-08-16T03:03:44.084322",
+  "topic": "system monitoring python script",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "C0nw0nk/Nginx-Lua-Anti-DDoS",
+      "html_url": "https://github.com/C0nw0nk/Nginx-Lua-Anti-DDoS",
+      "description": "A Anti-DDoS script to protect Nginx web servers using Lua with a HTML Javascript based authentication puzzle inspired by Cloudflare I am under attack mode an Anti-DDoS authentication page protect yourself from every attack type All Layer 7 Attacks Mitigating Historic Attacks DoS DoS Implications DDo",
+      "stars": 1623,
+      "language": "Lua",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "zszszszsz/.config",
+      "html_url": "https://github.com/zszszszsz/.config",
+      "description": "# # Automatically generated file; DO NOT EDIT. # OpenWrt Configuration # CONFIG_MODULES=y CONFIG_HAVE_DOT_CONFIG=y # CONFIG_TARGET_sunxi is not set # CONFIG_TARGET_apm821xx is not set # CONFIG_TARGET_ath25 is not set CONFIG_TARGET_ar71xx=y # CONFIG_TARGET_ath79 is not set # CONFIG_TARGET_bcm27xx is ",
+      "stars": 351,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "rjsears/chia_plot_manager",
+      "html_url": "https://github.com/rjsears/chia_plot_manager",
+      "description": "Python scripts to manage Chia plots and drive space, providing full reports. Also monitors the number of chia coins you have. Auto Drive helps to automate the addition of new hard drives to your system and to the chia config.",
+      "stars": 326,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 0,
+  "findings": [],
+  "script_summary": "no findings"
+}

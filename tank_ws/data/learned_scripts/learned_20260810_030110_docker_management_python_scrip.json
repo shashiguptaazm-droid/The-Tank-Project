@@ -1,0 +1,146 @@
+{
+  "timestamp": "2026-08-10T03:01:10.488406",
+  "topic": "docker management python script",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "StefanoFrusone/kafka-zero-to-production",
+      "html_url": "https://github.com/StefanoFrusone/kafka-zero-to-production",
+      "description": "Complete Apache Kafka learning journey from zero to production. Includes comprehensive guide, Docker Compose cluster setup, multi-language examples (Python/Java/Node.js/Go), and production-ready management scripts.",
+      "stars": 114,
+      "language": "Shell",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "BabyJ723/blast-ON",
+      "html_url": "https://github.com/BabyJ723/blast-ON",
+      "description": "# Awesome Keycloak [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)  # [<img src=\"https://www.keycloak.org/resources/images/keycloak_logo_480x108.png\">](https://github.com/thomasdarimont/awesom",
+      "stars": 46,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Cyrof/RemoteWakeServer",
+      "html_url": "https://github.com/Cyrof/RemoteWakeServer",
+      "description": "This project provides a Wake-on-LAN (WoL) HTTP server with two scripts: main.py to send WoL packets and server.py to handle HTTP requests. The server can be deployed using Docker, with environment variables for the MAC address and broadcast IP specified in the Docker run command or Docker Compose. I",
+      "stars": 3,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 24,
+  "findings": [
+    {
+      "type": "command",
+      "value": "docker --version"
+    },
+    {
+      "type": "command",
+      "value": "docker-compose --version"
+    },
+    {
+      "type": "tool",
+      "name": "Persistent data volumes",
+      "description": "**JMX monitoring** capabilities"
+    },
+    {
+      "type": "tool",
+      "name": "Auto",
+      "description": "topic creation** enabled"
+    },
+    {
+      "type": "tool",
+      "name": "Min In",
+      "description": "Sync Replicas**: `2` (data consistency)"
+    },
+    {
+      "type": "tool",
+      "name": "Broker 1: `localhost:9101`",
+      "description": "Broker 2: `localhost:9102`"
+    },
+    {
+      "type": "tool",
+      "name": "a simple web UI (button click)",
+      "description": "HTTP API requests"
+    },
+    {
+      "type": "tool",
+      "name": "FastAPI",
+      "description": "based HTTP API"
+    },
+    {
+      "type": "tool",
+      "name": "Simple built",
+      "description": "in web UI"
+    },
+    {
+      "type": "tool",
+      "name": "Token",
+      "description": "based authentication (optional but recommended)"
+    },
+    {
+      "type": "tool",
+      "name": "Multiple devices support (by name or MAC)",
+      "description": "Docker & Kubernetes friendly"
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "arch images (amd64 / arm64)"
+    },
+    {
+      "type": "tool",
+      "name": "Works great behind VPN (WireGuard / Pi",
+      "description": "hole DNS)"
+    },
+    {
+      "type": "tool",
+      "name": "Token input",
+      "description": "One \"Wake\" button per configured device"
+    },
+    {
+      "type": "tool",
+      "name": "Run with `hostNetwork: true`",
+      "description": "Expose via ingress or internal Service"
+    },
+    {
+      "type": "tool",
+      "name": "Store `WOL_TOKEN` in a Secret",
+      "description": "Map a friendly domain via Pi-hole DNS (e.g., `wol.home.arpa`)"
+    },
+    {
+      "type": "tool",
+      "name": "Designed for internal / VPN use",
+      "description": "Token auth prevent accidental or unauthorised wake requests"
+    },
+    {
+      "type": "feature",
+      "value": "FastAPI-based HTTP API"
+    },
+    {
+      "type": "feature",
+      "value": "Simple built-in web UI"
+    },
+    {
+      "type": "feature",
+      "value": "Token-based authentication (optional but recommended)"
+    },
+    {
+      "type": "feature",
+      "value": "Multiple devices support (by name or MAC)"
+    },
+    {
+      "type": "feature",
+      "value": "Docker & Kubernetes friendly"
+    },
+    {
+      "type": "feature",
+      "value": "Multi-arch images (amd64 / arm64)"
+    },
+    {
+      "type": "feature",
+      "value": "Works great behind VPN (WireGuard / Pi-hole DNS)"
+    }
+  ],
+  "script_summary": "2 commands, 15 tools, 7 features"
+}

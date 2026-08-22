@@ -1,0 +1,143 @@
+{
+  "timestamp": "2026-08-06T03:01:13.328901",
+  "topic": "code generation tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "GrapesJS/grapesjs",
+      "html_url": "https://github.com/GrapesJS/grapesjs",
+      "description": "Free and Open source Web Builder Framework. Next generation tool for building templates without coding",
+      "stars": 26109,
+      "language": "TypeScript",
+      "default_branch": "dev"
+    },
+    {
+      "full_name": "zai-org/CodeGeeX",
+      "html_url": "https://github.com/zai-org/CodeGeeX",
+      "description": "CodeGeeX: An Open Multilingual Code Generation Model (KDD 2023)",
+      "stars": 8810,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "qodo-ai/qodo-cover",
+      "html_url": "https://github.com/qodo-ai/qodo-cover",
+      "description": "Qodo-Cover: An AI-Powered Tool for Automated Test Generation and Code Coverage Enhancement! \ud83d\udcbb\ud83e\udd16\ud83e\uddea\ud83d\udc1e",
+      "stars": 5576,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 24,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone git@github.com:THUDM/CodeGeeX.git"
+    },
+    {
+      "type": "command",
+      "value": "pip install -e ."
+    },
+    {
+      "type": "command",
+      "value": "docker pull codegeex/codegeex:latest"
+    },
+    {
+      "type": "command",
+      "value": "docker run --gpus '\"device=0,1\"' -it --ipc=host --name=codegeex codegeex/codegeex"
+    },
+    {
+      "type": "command",
+      "value": "bash ./scripts/test_inference.sh <GPU_ID> ./tests/test_prompt.txt"
+    },
+    {
+      "type": "command",
+      "value": "bash ./scripts/test_inference_quantized.sh <GPU_ID> ./tests/test_prompt.txt"
+    },
+    {
+      "type": "command",
+      "value": "bash ./scripts/convert_ckpt_parallel.sh <LOAD_CKPT_PATH> <SAVE_CKPT_PATH> <MP_SIZE>"
+    },
+    {
+      "type": "command",
+      "value": "bash ./scripts/test_inference_parallel.sh <MP_SIZE> ./tests/test_prompt.txt"
+    },
+    {
+      "type": "tool",
+      "name": "Open",
+      "description": "Source and Cross-Platform**: All codes and model weights are publicly available for research purposes. CodeGeeX supports both Ascend and NVIDIA platforms. It supports inference in a single Ascend 910,"
+    },
+    {
+      "type": "tool",
+      "name": "2023",
+      "description": "5-16**: CodeGeeX paper has been accepted by [KDD 2023, Long Beach](https://kdd.org/kdd2023/) and will be represented during the conference."
+    },
+    {
+      "type": "tool",
+      "name": "2023",
+      "description": "03-30**: CodeGeeX paper is now available at [arxiv](https://arxiv.org/abs/2303.17568)."
+    },
+    {
+      "type": "tool",
+      "name": "2023",
+      "description": "02-14**: CodeGeeX now supports [Cloud Studio](https://cloudstudio.net/), a fantastic web IDE from Tencent. Click on the badge on top of this page to quickly launch an environment to test CodeGeeX."
+    },
+    {
+      "type": "tool",
+      "name": "2023",
+      "description": "02-13**: Thanks a lot to [OneFlow](https://github.com/Oneflow-Inc/oneflow) team for adding oneflow backend for CodeGeeX's inference (Even faster than FasterTransformer under FP16!). Check more details"
+    },
+    {
+      "type": "tool",
+      "name": "2023",
+      "description": "02**: We are hosting [CodeGeeX \"Coding With AI\" Hackathon](https://dorahacks.io/hackathon/codegeex/), design cool applications based on CodeGeeX and win prizes (RTX 4090, DJI drone, etc)!"
+    },
+    {
+      "type": "tool",
+      "name": "2022",
+      "description": "12-31**: We release the FasterTransformer version of CodeGeeX in [codegeex-fastertransformer](https://github.com/CodeGeeX/codegeex-fastertransformer). The INT8 accelerated version reaches an a verage "
+    },
+    {
+      "type": "tool",
+      "name": "2022",
+      "description": "12-13**: We release the source code of CodeGeeX VS Code extension in [codegeex-vscode-extension](https://github.com/CodeGeeX/codegeex-vscode-extension). Follow [QuickStart](https://github.com/CodeGeeX"
+    },
+    {
+      "type": "tool",
+      "name": "2022",
+      "description": "12-11**: CodeGeeX is now available for Jetbrains IDEs (IntelliJ IDEA, PyCharm, GoLand, CLion, etc), download it [here](https://plugins.jetbrains.com/plugin/20587-codegeex)."
+    },
+    {
+      "type": "tool",
+      "name": "2022",
+      "description": "12-04**: We release source code of quantization (requires less GPU RAM: 27GB -> 15GB) and model parallelism (possible to run on multiple GPUs with <8G RAM)."
+    },
+    {
+      "type": "tool",
+      "name": "2022",
+      "description": "09-30**: We release the cross-platform source code and models weights for both Ascend and NVIDIA platforms."
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "command",
+      "value": "pip install git+https://github.com/qodo-ai/qodo-cover.git"
+    },
+    {
+      "type": "command",
+      "value": "python_fastapi_responses_a9d9de927a82a7d776889738d2880bec7166c5f69d3518837183a20ef48b2a37.yml"
+    },
+    {
+      "type": "tool",
+      "name": "Python installed on your system.",
+      "description": "Poetry installed for managing Python package dependencies. Installation instructions for Poetry can be found at [https://python-poetry.org/docs/](https://python-poetry.org/docs/)."
+    },
+    {
+      "type": "pip_package",
+      "value": "git+https://github.com/qodo-ai/qodo-cover.git"
+    }
+  ],
+  "script_summary": "10 commands, 12 tools, 2 pip_packages"
+}

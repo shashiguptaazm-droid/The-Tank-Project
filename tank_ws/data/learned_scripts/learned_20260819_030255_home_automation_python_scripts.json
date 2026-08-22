@@ -1,0 +1,56 @@
+{
+  "timestamp": "2026-08-19T03:02:55.649466",
+  "topic": "home automation python scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "luizbizzio/power-alert",
+      "html_url": "https://github.com/luizbizzio/power-alert",
+      "description": "\u26a1 A Python script to detect power outages and restorations by monitoring home devices. It sends automated email alerts when power status changes, providing quick notifications for any disruptions in power supply.",
+      "stars": 23,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "defaultroot1/Python-Scripts",
+      "html_url": "https://github.com/defaultroot1/Python-Scripts",
+      "description": "Small python scripts, mostly work and home automation",
+      "stars": 11,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "3dpinta/smartthingspeak",
+      "html_url": "https://github.com/3dpinta/smartthingspeak",
+      "description": "Example Python script to read data from a SmartThings home automation system.",
+      "stars": 8,
+      "language": null,
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 5,
+  "findings": [
+    {
+      "type": "command",
+      "value": "python power_alert.py"
+    },
+    {
+      "type": "tool",
+      "name": "Python 3.x",
+      "description": "Modules: `smtplib`, `email`, `locale` (included with Python)"
+    },
+    {
+      "type": "feature",
+      "value": "**Network Monitoring:** Checks the status of your modem, router, and other specified devices."
+    },
+    {
+      "type": "feature",
+      "value": "**Email Alerts:** Sends email notifications when a power outage is detected or when power is restored."
+    },
+    {
+      "type": "feature",
+      "value": "**Locale Support:** Configurable to use different locales for date and time formatting."
+    }
+  ],
+  "script_summary": "1 commands, 1 tools, 3 features"
+}

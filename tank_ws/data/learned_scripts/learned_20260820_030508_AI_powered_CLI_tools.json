@@ -1,0 +1,410 @@
+{
+  "timestamp": "2026-08-20T03:05:08.644505",
+  "topic": "AI powered CLI tools",
+  "repos_scanned": 5,
+  "repos": [
+    {
+      "full_name": "TheR1D/shell_gpt",
+      "html_url": "https://github.com/TheR1D/shell_gpt",
+      "description": "A command-line productivity tool powered by AI large language models like GPT-5, will help you accomplish your tasks faster and more efficiently.",
+      "stars": 12247,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "krillinai/KrillinAI",
+      "html_url": "https://github.com/krillinai/KrillinAI",
+      "description": "AI video translation & dubbing tool for humans and AI Agents, powered by LLMs. Full pipeline: download, transcribe, translate, TTS dub, reformat, cover generation. 100+ languages, optimized for YouTube, TikTok, Bilibili, Douyin, and more.AI\u89c6\u9891\u7ffb\u8bd1\u914d\u97f3\u5de5\u5177\uff0c\u9762\u5411\u4eba\u7c7b\u4e0eAI Agent\uff0c100+\u8bed\u8a00\u5168\u94fe\u8def\uff0cCLI\u5206\u9636\u6bb5\u8c03\u7528\uff0c\u9002\u914d\u6296\u97f3\u3001\u5c0f\u7ea2\u4e66\u3001\u54d4\u54e9\u54d4\u54e9\u3001\u89c6\u9891\u53f7\u3001",
+      "stars": 11210,
+      "language": "Go",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "nashsu/AutoCLI",
+      "html_url": "https://github.com/nashsu/AutoCLI",
+      "description": "AutoCLI is a  Blazing fast, memory-safe command-line tool \u2014 Fetch information from any website with a single command. Covers Twitter/X, Reddit, YouTube, HackerNews, Bilibili, Zhihu, Xiaohongshu, and 55+ sites, with support for controlling Electron desktop apps, integrating local CLI tools (gh, docke",
+      "stars": 2936,
+      "language": "Rust",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "zakirkun/guardian-cli",
+      "html_url": "https://github.com/zakirkun/guardian-cli",
+      "description": "Guardian is a production-ready AI-powered penetration testing automation CLI tool that leverages Google Gemini and LangChain to orchestrate intelligent, step-by-step penetration testing workflows while maintaining ethical hacking standards.",
+      "stars": 1855,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "MicrosoftDocs/mcp",
+      "html_url": "https://github.com/MicrosoftDocs/mcp",
+      "description": "Official Microsoft Learn MCP Server and CLI tool \u2013 powering LLMs and AI agents with real-time, trusted Microsoft docs & code samples.",
+      "stars": 1844,
+      "language": "TypeScript",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 79,
+  "findings": [
+    {
+      "type": "command",
+      "value": "pip install shell-gpt"
+    },
+    {
+      "type": "command",
+      "value": "git diff | sgpt \"Generate git commit message, for my changes\""
+    },
+    {
+      "type": "command",
+      "value": "docker logs -n 20 my_app | sgpt \"check logs, find errors, provide possible solutions\""
+    },
+    {
+      "type": "pip_package",
+      "value": "shell-gpt"
+    },
+    {
+      "type": "command",
+      "value": "./KrillinAI_1.0.0_desktop_macOS_arm64"
+    },
+    {
+      "type": "command",
+      "value": "./KrillinAI_1.0.0_macOS_arm64"
+    },
+    {
+      "type": "command",
+      "value": "./build/krillinai-cli subtitle \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\" \\"
+    },
+    {
+      "type": "command",
+      "value": "./build/krillinai-cli tts \\"
+    },
+    {
+      "type": "command",
+      "value": "./build/krillinai-cli render-horizontal \\"
+    },
+    {
+      "type": "command",
+      "value": "./build/krillinai-cli render-vertical \\"
+    },
+    {
+      "type": "tool",
+      "name": "OpenAI",
+      "description": "Gemini"
+    },
+    {
+      "type": "tool",
+      "name": "DeepSeek",
+      "description": "Tongyi Qianwen"
+    },
+    {
+      "type": "tool",
+      "name": "Locally deployed open",
+      "description": "source models"
+    },
+    {
+      "type": "tool",
+      "name": "Alibaba Cloud Voice Service",
+      "description": "OpenAI TTS"
+    },
+    {
+      "type": "tool",
+      "name": "Supports `",
+      "description": "-dry-run` to validate parameters and generate a manifest without downloading video or calling external AI services."
+    },
+    {
+      "type": "tool",
+      "name": "Set `transcribe.fasterwhisper.model` to `large",
+      "description": "v2`."
+    },
+    {
+      "type": "command",
+      "value": "curl -fsSL https://raw.githubusercontent.com/nashsu/autocli/main/scripts/install.sh | sh"
+    },
+    {
+      "type": "tool",
+      "name": "Chrome Extension Selector Tool",
+      "description": "Just select the core data you need, visually pick elements from any page and build precise CSS selectors to target specific content"
+    },
+    {
+      "type": "tool",
+      "name": "Seamless Local + Cloud Sync",
+      "description": "Generated adapters are saved locally and synced to AutoCLI.ai, ready to use immediately"
+    },
+    {
+      "type": "tool",
+      "name": "55 sites, 333 commands",
+      "description": "Covers Bilibili, Twitter, Reddit, Zhihu, Xiaohongshu, YouTube, Hacker News, and more"
+    },
+    {
+      "type": "tool",
+      "name": "Browser session reuse",
+      "description": "Reuse logged-in sessions via Chrome extension, no need to manage tokens"
+    },
+    {
+      "type": "tool",
+      "name": "Declarative YAML Pipeline",
+      "description": "Describe data scraping workflows in YAML, add new adapters with zero code"
+    },
+    {
+      "type": "tool",
+      "name": "Download media & articles",
+      "description": "Download videos (via yt-dlp), articles as Markdown with images localized"
+    },
+    {
+      "type": "tool",
+      "name": "External CLI passthrough",
+      "description": "Integrate GitHub CLI, Docker, Kubernetes, and other tools"
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "format output** \u2014 table, JSON, YAML, CSV, Markdown"
+    },
+    {
+      "type": "tool",
+      "name": "Single binary",
+      "description": "Compiles to a 4MB static binary with zero runtime dependencies"
+    },
+    {
+      "type": "tool",
+      "name": "`.json` suffix probing (Reddit",
+      "description": "style REST discovery)"
+    },
+    {
+      "type": "tool",
+      "name": "Auto search endpoint discovery with `",
+      "description": "-goal search`"
+    },
+    {
+      "type": "tool",
+      "name": "Videos via yt",
+      "description": "dlp (cookies extracted from browser automatically, no Keychain prompt)"
+    },
+    {
+      "type": "npm_package",
+      "value": "(~100MB)"
+    },
+    {
+      "type": "feature",
+      "value": "**55 sites, 333 commands** \u2014 Covers Bilibili, Twitter, Reddit, Zhihu, Xiaohongshu, YouTube, Hacker News, and more"
+    },
+    {
+      "type": "feature",
+      "value": "**Browser session reuse** \u2014 Reuse logged-in sessions via Chrome extension, no need to manage tokens"
+    },
+    {
+      "type": "feature",
+      "value": "**Declarative YAML Pipeline** \u2014 Describe data scraping workflows in YAML, add new adapters with zero code"
+    },
+    {
+      "type": "feature",
+      "value": "**AI-native discovery** \u2014 `explore` analyzes website APIs, `generate` auto-creates adapters with one command, `cascade` probes authentication strategies"
+    },
+    {
+      "type": "feature",
+      "value": "**AI-powered generation** \u2014 `generate --ai` uses LLM to analyze any website and create working adapters automatically, with cloud sharing via [autocli.ai](https://autocli.ai)"
+    },
+    {
+      "type": "feature",
+      "value": "**Download media & articles** \u2014 Download videos (via yt-dlp), articles as Markdown with images localized"
+    },
+    {
+      "type": "feature",
+      "value": "**External CLI passthrough** \u2014 Integrate GitHub CLI, Docker, Kubernetes, and other tools"
+    },
+    {
+      "type": "feature",
+      "value": "**Multi-format output** \u2014 table, JSON, YAML, CSV, Markdown"
+    },
+    {
+      "type": "feature",
+      "value": "**Single binary** \u2014 Compiles to a 4MB static binary with zero runtime dependencies"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/zakirkun/guardian-cli.git"
+    },
+    {
+      "type": "command",
+      "value": "python3 -m venv venv"
+    },
+    {
+      "type": "command",
+      "value": "pip install -e ."
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "Agent Architecture**: Specialized AI agents (Planner, Tool Selector, Analyst, Reporter) plus debate triage roles (Red Advocate, Blue Advocate, Judge) and Visual Triage"
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "Agent Debate Triage**: Three-role red/blue/judge debate on ambiguous findings \u2014 F1 \u2265 single-agent baseline +5pp"
+    },
+    {
+      "type": "tool",
+      "name": "Vision",
+      "description": "LLM Visual Triage**: Headless screenshot capture + image-grounded analyst enrichment via gpt-4o / Claude 3.5+ / Gemini 1.5+"
+    },
+    {
+      "type": "tool",
+      "name": "DNS",
+      "description": "Resolve Scope Validation**: Closes SSRF-class bypass; private RFC1918 ranges blacklisted"
+    },
+    {
+      "type": "tool",
+      "name": "Prompt",
+      "description": "Injection Defense**: All tool output wrapped via `<UNTRUSTED_TOOL_OUTPUT>` delimiters + ANSI strip"
+    },
+    {
+      "type": "tool",
+      "name": "Technical Deep",
+      "description": "Dives**: Findings with evidence, CVSS, CWE, CVE, MITRE technique"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 HTTP discovery with httpx",
+      "description": "\u2705 Vulnerability scan with nuclei"
+    },
+    {
+      "type": "tool",
+      "name": "\u2705 Full evidence linking (commands + outputs)",
+      "description": "\u2705 Markdown report with findings"
+    },
+    {
+      "type": "tool",
+      "name": "Self",
+      "description": "contained, reusable workflows"
+    },
+    {
+      "type": "tool",
+      "name": "296 tests pass (+93% from v3 baseline of 153)",
+      "description": "All v3 hardening preserved: prompt-injection delimiters, key scrub, DNS-resolve scope, atomic checkpoints, log rotation, lazy tool loading"
+    },
+    {
+      "type": "tool",
+      "name": "`guardian",
+      "description": "-help` startup time stays <500ms despite 50 tools"
+    },
+    {
+      "type": "tool",
+      "name": "New CLI surfaces: `guardian kb`, `guardian telemetry`",
+      "description": "8 new shipped workflows: `web_pentest_with_debate`, `web_visual_pentest`, `ad_assessment`, `mobile_android`, `llm_redteam`, `sast_review`, `api_pentest_v2`, plus existing v3 workflows"
+    },
+    {
+      "type": "tool",
+      "name": "Prompt",
+      "description": "injection delimiters (`<UNTRUSTED_TOOL_OUTPUT>`) on all tool output"
+    },
+    {
+      "type": "tool",
+      "name": "DAG scheduler, Pydantic schemas, atomic checkpoints, `",
+      "description": "-resume`"
+    },
+    {
+      "type": "tool",
+      "name": "11 new wrappers (cloud/container/SBOM/GraphQL/JWT/OSINT)",
+      "description": "CVSS v3.1 recomputation + drift detection"
+    },
+    {
+      "type": "tool",
+      "name": "Log rotation, key scrub at write time",
+      "description": "Confirmation gate wired for active+ tools"
+    },
+    {
+      "type": "tool",
+      "name": "Multi",
+      "description": "provider AI (OpenAI, Claude, Gemini, OpenRouter, Requesty)"
+    },
+    {
+      "type": "tool",
+      "name": "Evidence linking via `execution_id`",
+      "description": "Workflow parameter priority system"
+    },
+    {
+      "type": "tool",
+      "name": "OpenAI",
+      "description": "GPT-4 capabilities"
+    },
+    {
+      "type": "tool",
+      "name": "Anthropic",
+      "description": "Claude AI"
+    },
+    {
+      "type": "tool",
+      "name": "Google",
+      "description": "Gemini AI"
+    },
+    {
+      "type": "tool",
+      "name": "LangChain",
+      "description": "AI orchestration framework"
+    },
+    {
+      "type": "tool",
+      "name": "ProjectDiscovery",
+      "description": "Open-source security tools (httpx, subfinder, nuclei)"
+    },
+    {
+      "type": "tool",
+      "name": "Nmap",
+      "description": "Network exploration and security auditing"
+    },
+    {
+      "type": "tool",
+      "name": "The Security Community",
+      "description": "Tool developers and researchers"
+    },
+    {
+      "type": "pip_package",
+      "value": "wafw00f`"
+    },
+    {
+      "type": "pip_package",
+      "value": "sqlmap`"
+    },
+    {
+      "type": "pip_package",
+      "value": "sslyze`"
+    },
+    {
+      "type": "pip_package",
+      "value": "arjun`"
+    },
+    {
+      "type": "pip_package",
+      "value": "cmseek`"
+    },
+    {
+      "type": "pip_package",
+      "value": "dnsrecon`"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "pip_package",
+      "value": "playwright"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "npm_package",
+      "value": "@microsoft/learn-cli"
+    }
+  ],
+  "script_summary": "13 commands, 12 pip_packages, 43 tools, 2 npm_packages, 9 features"
+}

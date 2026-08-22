@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-08-16T03:00:31.215753",
+  "topic": "sensor calibration python script",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "michaelwro/accelerometer-calibration",
+      "html_url": "https://github.com/michaelwro/accelerometer-calibration",
+      "description": "A general method (with Python scripts) for calibrating accelerometer sensors.",
+      "stars": 70,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "andrewgmanning/sensor-calibration",
+      "html_url": "https://github.com/andrewgmanning/sensor-calibration",
+      "description": "Python script to perform calibration of Lake Shore 336/340 and Oxford Mercury iTC temperature controllers",
+      "stars": 1,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "josh2242/SensorCalibrationADS_ACS",
+      "html_url": "https://github.com/josh2242/SensorCalibrationADS_ACS",
+      "description": "This repo contains python scripts for Raspberry Pi interfacing with the ADS1115 ADC.",
+      "stars": 0,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 2,
+  "findings": [
+    {
+      "type": "pip_package",
+      "value": "Python3"
+    },
+    {
+      "type": "pip_package",
+      "value": "numpy"
+    }
+  ],
+  "script_summary": "2 pip_packages"
+}

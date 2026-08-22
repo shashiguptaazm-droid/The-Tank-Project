@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>The Tank — Emotion Dashboard</title>
+<style>
+  :root {
+    --bg: #0a0d12;
+    --panel: #11161d;
+    --accent: #44a4ff;
+    --text: #dfe7f0;
+    --muted: #6f7d8c;
+    --happy: #fd20;  --sad: #3f4f;
+    --angry: #c800; --scared:#fff;
+    --neutral: #44a4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 16px;
+    padding: 24px 18px;
+  }
+  h1 {
+    margin: 0; font-size: 22px; letter-spacing: .04em;
+    color: var(--accent);
+  }
+  .face {
+    width: 240px; height: 240px;
+    background: radial-gradient(circle at 30% 25%, #1b2230, #0a0d12 70%);
+    border-radius: 50%;
+    display: grid; place-items: center;
+    box-shadow: 0 0 60px 8px rgba(68,164,255,.15);
+    transition: background 250ms ease, box-shadow 250ms ease;
+  }
+  .face[data-mood="happy"]   { box-shadow: 0 0 60px 12px #fd2080; }
+  .face[data-mood="sad"]     { box-shadow: 0 0 60px 12px #3f4fff; }
+  .face[data-mood="alert"]   { box-shadow: 0 0 70px 14px #c80030;
+                               animation: pulse 0.8s infinite alternate; }
+  .face[data-mood="curious"] { box-shadow: 0 0 60px 12px #44a4ff; }
+  .face[data-mood="neutral"] { box-shadow: 0 0 50px 6px #44a480; }
+  @keyframes pulse {
+    from { transform: scale(1.0); }
+    to   { transform: scale(1.04); }
+  }
+  .face svg { width: 70%; height: 70%; }
+  .label {
+    font-size: 13px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .14em;
+  }
+  .row {
+    display: flex; gap: 28px;
+    background: var(--panel);
+    border-radius: 12px; padding: 12px 18px;
+    border: 1px solid #1c2531;
+  }
+  .row span:first-child { color: var(--muted); }
+  .row span:last-child  { color: var(--accent); font-weight: 600; }
+  .log {
+    width: min(640px, 100%);
+    max-height: 280px; overflow: auto;
+    background: var(--panel); border-radius: 12px;
+    padding: 12px 16px; border: 1px solid #1c2531;
+    font-size: 14px; line-height: 1.5;
+  }
+  .log .entry {
+    display: flex; gap: 12px;
+    color: var(--text);
+    padding: 4px 0;
+    border-bottom: 1px dashed #1c2531;
+  }
+  .log .ts   { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .log .mood { color: var(--accent); font-weight: 600; min-width: 80px; }
+  .log .entry.alert  { color: #ffa0a0; }
+  .log .entry.sad    { color: #92a7ff; }
+  .log .entry.happy  { color: #ffd770; }
+  .log .entry.curious{ color: #88ddff; }
+  .stat { font-size: 12px; color: var(--muted); margin-top: 4px; }
+</style>
+</head>
+<body>
+  <h1>The Tank — Emotion Dashboard</h1>
+  <div class="face" id="face" data-mood="neutral">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" id="svg-face">
+      <circle cx="50" cy="50" r="44" fill="none" stroke="#dfe7f0" stroke-width="2" />
+      <g id="face-eyes"></g>
+      <g id="face-brows"></g>
+      <path id="face-mouth" d="" fill="none" stroke="#dfe7f0" stroke-width="3" />
+    </svg>
+  </div>
+  <div class="row">
+    <span>current</span> <span id="cur">neutral</span>
+    <span>·</span>
+    <span>last update</span> <span id="ts">—</span>
+  </div>
+  <div class="log" id="log">
+    <div class="label">history</div>
+    <div id="entries"></div>
+  </div>
+  <div class="stat" id="stat">connecting…</div>
+
+<script>
+const faceSvg   = document.getElementById('svg-face');
+const eyesG     = document.getElementById('face-eyes');
+const browsG    = document.getElementById('face-brows');
+const mouthPath = document.getElementById('face-mouth');
+const label     = document.getElementById('cur');
+const tsLabel   = document.getElementById('ts');
+const faceEl    = document.getElementById('face');
+const entriesEl = document.getElementById('entries');
+const statEl    = document.getElementById('stat');
+
+function setFace(mood) {
+  faceEl.setAttribute('data-mood', mood);
+  label.textContent = mood;
+  // pre-computed simple faces — mirror tank_display/faces.py mappings
+  if (mood === 'happy') {
+    eyesG.innerHTML  = '<circle cx="35" cy="42" r="4" fill="#dfe7f0"/><circle cx="65" cy="42" r="4" fill="#dfe7f0"/>';
+    browsG.innerHTML = '<line x1="22" y1="28" x2="42" y2="34" stroke="#dfe7f0" stroke-width="2"/>' +
+                       '<line x1="58" y1="34" x2="78" y2="28" stroke="#dfe7f0" stroke-width="2"/>';
+    mouthPath.setAttribute('d', 'M30,70 Q50,84 70,70');
+  } else if (mood === 'sad') {
+    eyesG.innerHTML  = '<circle cx="35" cy="42" r="4" fill="#dfe7f0"/><circle cx="65" cy="42" r="4" fill="#dfe7f0"/>';
+    browsG.innerHTML = '<line x1="22" y1="32" x2="42" y2="28" stroke="#dfe7f0" stroke-width="2"/>' +
+                       '<line x1="58" y1="28" x2="78" y2="32" stroke="#dfe7f0" stroke-width="2"/>';
+    mouthPath.setAttribute('d', 'M30,76 Q50,62 70,76');
+  } else if (mood === 'alert') {
+    eyesG.innerHTML  = '<circle cx="35" cy="42" r="7" fill="#dfe7f0"/><circle cx="65" cy="42" r="7" fill="#dfe7f0"/>';
+    browsG.innerHTML = '<line x1="22" y1="22" x2="42" y2="36" stroke="#dfe7f0" stroke-width="3"/>' +
+                       '<line x1="58" y1="36" x2="78" y2="22" stroke="#dfe7f0" stroke-width="3"/>';
+    mouthPath.setAttribute('d', 'M30,74 L70,74');
+  } else if (mood === 'curious') {
+    eyesG.innerHTML  = '<circle cx="35" cy="42" r="4" fill="#dfe7f0"/><circle cx="65" cy="42" r="4" fill="#dfe7f0"/>';
+    browsG.innerHTML = '<line x1="22" y1="28" x2="42" y2="32" stroke="#dfe7f0" stroke-width="2"/>' +
+                       '<line x1="58" y1="30" x2="78" y2="22" stroke="#dfe7f0" stroke-width="2"/>';
+    mouthPath.setAttribute('d', 'M36,72 Q50,66 64,72');
+  } else {
+    eyesG.innerHTML  = '<circle cx="35" cy="42" r="4" fill="#dfe7f0"/><circle cx="65" cy="42" r="4" fill="#dfe7f0"/>';
+    browsG.innerHTML = '<line x1="22" y1="30" x2="42" y2="30" stroke="#dfe7f0" stroke-width="2"/>' +
+                       '<line x1="58" y1="30" x2="78" y2="30" stroke="#dfe7f0" stroke-width="2"/>';
+    mouthPath.setAttribute('d', 'M32,72 L68,72');
+  }
+}
+
+function pushHistory(mood, ts) {
+  const row = document.createElement('div');
+  row.className = 'entry ' + mood;
+  const t = new Date(ts * 1000);
+  row.innerHTML =
+    '<span class="ts">' + t.toLocaleTimeString() + '</span>' +
+    '<span class="mood">' + mood + '</span>';
+  entriesEl.prepend(row);
+  // cap browser-side history at 50 entries
+  while (entriesEl.children.length > 50) {
+    entriesEl.removeChild(entriesEl.lastChild);
+  }
+}
+
+function setTs(ts) {
+  if (!ts) { tsLabel.textContent = '—'; return; }
+  tsLabel.textContent = new Date(ts * 1000).toLocaleTimeString();
+}
+
+let ws;
+function connect() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  ws = new WebSocket(proto + '://' + location.host + '/ws/emotion');
+  ws.onopen = () => { statEl.textContent = 'connected'; };
+  ws.onclose = () => { statEl.textContent = 'reconnecting…';
+                       setTimeout(connect, 1500); };
+  ws.onerror = () => { statEl.textContent = 'error'; };
+  ws.onmessage = (ev) => {
+    try {
+      const j = JSON.parse(ev.data);
+      setFace(j.mood);
+      setTs(j.ts);
+      if (j.ts) pushHistory(j.mood, j.ts);
+    } catch (_) { /* ignore */ }
+  };
+}
+connect();
+setFace('neutral');
+</script>
+</body>
+</html>

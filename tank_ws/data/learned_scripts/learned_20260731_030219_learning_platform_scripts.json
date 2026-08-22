@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-07-31T03:02:19.614459",
+  "topic": "learning platform scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "Sfedfcv/redesigned-pancake",
+      "html_url": "https://github.com/Sfedfcv/redesigned-pancake",
+      "description": "Skip to content github / docs Code Issues 80 Pull requests 35 Discussions Actions Projects 2 Security Insights Merge branch 'main' into 1862-Add-Travis-CI-migration-table  1862-Add-Travis-CI-migration-table (#1869, Iixixi/ZachryTylerWood#102, THEBOLCK79/docs#1, sbnbhk/docs#1) @martin389 martin389 co",
+      "stars": 251,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "swati1024/torrents",
+      "html_url": "https://github.com/swati1024/torrents",
+      "description": "Skip to content   Search\u2026 All gists Back to GitHub Sign in Sign up Instantly share code, notes, and snippets.  @giansalex giansalex/torrent-courses-download-list.md forked from M-Younus/torrent courses download-list Last active 2 days ago 15188  Code Revisions 15 Stars 151 Forks 88 <script src=\"http",
+      "stars": 104,
+      "language": null,
+      "default_branch": "master"
+    },
+    {
+      "full_name": "SiliconLabs/mltk",
+      "html_url": "https://github.com/SiliconLabs/mltk",
+      "description": "A Python package with command-line utilities and scripts to aid the development  of machine learning models for Silicon Lab's embedded platforms",
+      "stars": 62,
+      "language": "C",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 4,
+  "findings": [
+    {
+      "type": "pip_package",
+      "value": "silabs-mltk"
+    },
+    {
+      "type": "pip_package",
+      "value": "silabs-mltk"
+    },
+    {
+      "type": "pip_package",
+      "value": "git+https://github.com/siliconlabs/mltk.git"
+    },
+    {
+      "type": "pip_package",
+      "value": "git+https://github.com/siliconlabs/mltk.git"
+    }
+  ],
+  "script_summary": "4 pip_packages"
+}

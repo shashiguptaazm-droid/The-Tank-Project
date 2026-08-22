@@ -1,0 +1,82 @@
+{
+  "timestamp": "2026-07-31T03:02:49.620966",
+  "topic": "useful python CLI scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "yukondude/Scripnix",
+      "html_url": "https://github.com/yukondude/Scripnix",
+      "description": "Useful Python3 and bash shell scripts for macOS/BSD and *NIX. Useful to me, at any rate. YMMV.",
+      "stars": 136,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "2cz5/Python-Image-Clicker",
+      "html_url": "https://github.com/2cz5/Python-Image-Clicker",
+      "description": "This Python script searches for specific images on the screen and clicks on them if found. It can be useful for automating tasks where specific images need to be located and interacted with on the screen, such as in game automation or UI testing.",
+      "stars": 10,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "kobaltcore/renutil",
+      "html_url": "https://github.com/kobaltcore/renutil",
+      "description": "A collection of scripts to help you organise and use Ren'Py instances from the command line. Especially useful for headless servers.",
+      "stars": 10,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 11,
+  "findings": [
+    {
+      "type": "pip_package",
+      "value": "scripnix"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "tool",
+      "name": "Python 3.x",
+      "description": "OpenCV (`cv2`)"
+    },
+    {
+      "type": "tool",
+      "name": "NumPy",
+      "description": "PyAutoGUI"
+    },
+    {
+      "type": "tool",
+      "name": "win32gui",
+      "description": "keyboard"
+    },
+    {
+      "type": "pip_package",
+      "value": "opencv-python"
+    },
+    {
+      "type": "feature",
+      "value": "**Image Recognition**: Uses template matching to locate images on the screen."
+    },
+    {
+      "type": "feature",
+      "value": "**Killswitch**: Implements a killswitch functionality to stop the script execution."
+    },
+    {
+      "type": "feature",
+      "value": "**Logging**: Logs events and errors to a file for debugging and monitoring."
+    },
+    {
+      "type": "feature",
+      "value": "**Customizable**: Allows customization of parameters such as threshold, click delay, and killswitch key."
+    },
+    {
+      "type": "pip_package",
+      "value": "renutil"
+    }
+  ],
+  "script_summary": "4 pip_packages, 3 tools, 4 features"
+}

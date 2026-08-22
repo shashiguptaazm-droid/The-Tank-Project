@@ -1,0 +1,3 @@
+[submodule "skills/openclaw"]
+	path = skills/openclaw
+	url = https://github.com/QVerisAI/open-qveris-skills.git

@@ -1,0 +1,185 @@
+{
+  "timestamp": "2026-08-17T03:03:08.101220",
+  "topic": "maker DIY python scripts",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "SolderedElectronics/Inkplate-Maker-Faire-Wall",
+      "html_url": "https://github.com/SolderedElectronics/Inkplate-Maker-Faire-Wall",
+      "description": "This repository contains the Firmware, Python scripts and instructions on how to create a wall of Inkplate 10's to display a single image.",
+      "stars": 1,
+      "language": "C",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Gheris-579/python-arduino-led",
+      "html_url": "https://github.com/Gheris-579/python-arduino-led",
+      "description": "A project to control LEDs on an Arduino UNO R3 using Python. Includes an Arduino sketch (.ino) and a Python script (.py) that allows the user to turn two LEDs on and off via input",
+      "stars": 1,
+      "language": "C++",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "miotronic/raspberry-pi-teleprompter",
+      "html_url": "https://github.com/miotronic/raspberry-pi-teleprompter",
+      "description": "Dedicated teleprompter built on Raspberry Pi Zero 2 W with a custom Python/Pygame app. Runs on an 8\" display mounted in an Ulanzi RT02 frame. Auto-boots, script selection menu, multilingual UI, Bluetooth control.",
+      "stars": 0,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 33,
+  "findings": [
+    {
+      "type": "command",
+      "value": "pip install pyserial"
+    },
+    {
+      "type": "command",
+      "value": "python led_control.py"
+    },
+    {
+      "type": "tool",
+      "name": "Arduino UNO R3",
+      "description": "2 LEDs"
+    },
+    {
+      "type": "tool",
+      "name": "2 resistors (220\u03a9 recommended)",
+      "description": "Breadboard and jumper wires"
+    },
+    {
+      "type": "tool",
+      "name": "Arduino IDE",
+      "description": "Python 3.x"
+    },
+    {
+      "type": "tool",
+      "name": "`pyserial` library (`pip install pyserial`)",
+      "description": "--"
+    },
+    {
+      "type": "pip_package",
+      "value": "pyserial`)"
+    },
+    {
+      "type": "pip_package",
+      "value": "pyserial"
+    },
+    {
+      "type": "tool",
+      "name": "Auto",
+      "description": "boots straight into the script selection menu"
+    },
+    {
+      "type": "tool",
+      "name": "Adjustable scroll speed (1",
+      "description": "10)"
+    },
+    {
+      "type": "tool",
+      "name": "Play/Pause, rewind, speed control",
+      "description": "Beam splitter glass correction (horizontal flip)"
+    },
+    {
+      "type": "tool",
+      "name": "Top fade effect",
+      "description": "text fades out as it reaches the top"
+    },
+    {
+      "type": "tool",
+      "name": "Multilingual UI: Serbian, English, German, Spanish, French",
+      "description": "Language preference saved to `config.json`"
+    },
+    {
+      "type": "tool",
+      "name": "Shutdown option directly from the menu",
+      "description": "Exit to terminal option for maintenance"
+    },
+    {
+      "type": "tool",
+      "name": "Preview script content with color",
+      "description": "coded stage directions"
+    },
+    {
+      "type": "tool",
+      "name": "Edit Settings:",
+      "description": "Hostname: `teleprompter`"
+    },
+    {
+      "type": "tool",
+      "name": "`teleprompter.py` \u2192 `/home/zero/teleprompter/`",
+      "description": "`webserver.py` \u2192 `/home/zero/teleprompter/`"
+    },
+    {
+      "type": "tool",
+      "name": "`start.sh` \u2192 `/home/zero/teleprompter/`",
+      "description": "Your `.txt` script files \u2192 `/home/zero/teleprompter/scripts/`"
+    },
+    {
+      "type": "tool",
+      "name": "Teleprompter app appears on display automatically",
+      "description": "Web interface available at `http://teleprompter.local:5000`"
+    },
+    {
+      "type": "tool",
+      "name": "Normal lines \u2192 large white text (speech)",
+      "description": "Lines wrapped in `[ ]` \u2192 smaller red text (stage directions)"
+    },
+    {
+      "type": "tool",
+      "name": "Empty lines \u2192 paragraph spacer",
+      "description": "--"
+    },
+    {
+      "type": "tool",
+      "name": "5 onboard buttons (Play/Pause, Speed+, Speed\u2212, ESC, Enter)",
+      "description": "3 avionic plug outputs for external foot pedals"
+    },
+    {
+      "type": "feature",
+      "value": "Auto-boots straight into the script selection menu"
+    },
+    {
+      "type": "feature",
+      "value": "**White text** for speech, **red text** for stage directions in `[ ]` brackets"
+    },
+    {
+      "type": "feature",
+      "value": "Adjustable scroll speed (1\u201310)"
+    },
+    {
+      "type": "feature",
+      "value": "Play/Pause, rewind, speed control"
+    },
+    {
+      "type": "feature",
+      "value": "Beam splitter glass correction (horizontal flip)"
+    },
+    {
+      "type": "feature",
+      "value": "Top fade effect \u2014 text fades out as it reaches the top"
+    },
+    {
+      "type": "feature",
+      "value": "Multilingual UI: Serbian, English, German, Spanish, French"
+    },
+    {
+      "type": "feature",
+      "value": "Language preference saved to `config.json`"
+    },
+    {
+      "type": "feature",
+      "value": "Shutdown option directly from the menu"
+    },
+    {
+      "type": "feature",
+      "value": "Exit to terminal option for maintenance"
+    },
+    {
+      "type": "feature",
+      "value": "**Web interface** for wireless script management \u2014 no WinSCP needed"
+    }
+  ],
+  "script_summary": "2 commands, 18 tools, 2 pip_packages, 11 features"
+}

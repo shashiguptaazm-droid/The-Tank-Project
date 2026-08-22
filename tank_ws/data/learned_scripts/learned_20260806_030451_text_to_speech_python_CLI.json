@@ -1,0 +1,323 @@
+{
+  "timestamp": "2026-08-06T03:04:51.406133",
+  "topic": "text to speech python CLI",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "readbeyond/aeneas",
+      "html_url": "https://github.com/readbeyond/aeneas",
+      "description": "aeneas is a Python/C library and a set of tools to automagically synchronize audio and text (aka forced alignment)",
+      "stars": 2859,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "pndurette/gTTS",
+      "html_url": "https://github.com/pndurette/gTTS",
+      "description": "Python library and CLI tool to interface with Google Translate's text-to-speech API",
+      "stars": 2625,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "nazdridoy/kokoro-tts",
+      "html_url": "https://github.com/nazdridoy/kokoro-tts",
+      "description": "A CLI text-to-speech tool using the Kokoro model, supporting multiple languages, voices (with blending), and various input formats including EPUB books and PDF documents.",
+      "stars": 1760,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 66,
+  "findings": [
+    {
+      "type": "command",
+      "value": "pip install numpy"
+    },
+    {
+      "type": "command",
+      "value": "pip install aeneas"
+    },
+    {
+      "type": "command",
+      "value": "python -m aeneas.diagnostics"
+    },
+    {
+      "type": "command",
+      "value": "python -m aeneas.tools.execute_task"
+    },
+    {
+      "type": "command",
+      "value": "python -m aeneas.tools.execute_job"
+    },
+    {
+      "type": "command",
+      "value": "python -m aeneas.tools.execute_task --examples"
+    },
+    {
+      "type": "command",
+      "value": "python -m aeneas.tools.execute_task --examples-all"
+    },
+    {
+      "type": "command",
+      "value": "python -m aeneas.tools.execute_task \\"
+    },
+    {
+      "type": "command",
+      "value": "python -m aeneas.tools.execute_task \\"
+    },
+    {
+      "type": "command",
+      "value": "python -m aeneas.tools.execute_job job.zip output_directory"
+    },
+    {
+      "type": "tool",
+      "name": "Date: 2017",
+      "description": "03-15"
+    },
+    {
+      "type": "tool",
+      "name": "Quick Links: [Home](http://www.readbeyond.it/aeneas/)",
+      "description": "[GitHub](https://github.com/readbeyond/aeneas/) - [PyPI](https://pypi.python.org/pypi/aeneas/) - [Docs](http://www.readbeyond.it/aeneas/docs/) - [Tutorial](http://www.readbeyond.it/aeneas/docs/clituto"
+    },
+    {
+      "type": "tool",
+      "name": "Several built",
+      "description": "in TTS engine wrappers: AWS Polly TTS API, eSpeak (default), eSpeak-ng, Festival, MacOS (via say), Nuance TTS API"
+    },
+    {
+      "type": "tool",
+      "name": "Possibility of running a custom, user",
+      "description": "provided TTS engine Python wrapper (e.g., included example for speect)"
+    },
+    {
+      "type": "tool",
+      "name": "Code suitable for Web app deployment (e.g., on",
+      "description": "demand cloud computing instances)"
+    },
+    {
+      "type": "pip_package",
+      "value": "numpy"
+    },
+    {
+      "type": "pip_package",
+      "value": "aeneas"
+    },
+    {
+      "type": "tool",
+      "name": "Customizable speech",
+      "description": "specific sentence tokenizer that allows for unlimited lengths of text to be read, all while keeping proper intonation, abbreviations, decimals and more;"
+    },
+    {
+      "type": "tool",
+      "name": "Customizable text pre",
+      "description": "processors which can, for example, provide pronunciation corrections;"
+    },
+    {
+      "type": "pip_package",
+      "value": "gTTS"
+    },
+    {
+      "type": "feature",
+      "value": "Customizable speech-specific sentence tokenizer that allows for unlimited lengths of text to be read, all while keeping proper intonation, abbreviations, decimals and more;"
+    },
+    {
+      "type": "feature",
+      "value": "Customizable text pre-processors which can, for example, provide pronunciation corrections;"
+    },
+    {
+      "type": "command",
+      "value": "pip install kokoro-tts"
+    },
+    {
+      "type": "command",
+      "value": "pip install git+https://github.com/nazdridoy/kokoro-tts"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/nazdridoy/kokoro-tts.git"
+    },
+    {
+      "type": "command",
+      "value": "python -m venv .venv"
+    },
+    {
+      "type": "command",
+      "value": "pip install -e ."
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/nazdridoy/kokoro-tts.git"
+    },
+    {
+      "type": "command",
+      "value": "python -m venv .venv"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "command",
+      "value": "python -m kokoro_tts --help"
+    },
+    {
+      "type": "command",
+      "value": "wget https://github.com/nazdridoy/kokoro-tts/releases/download/v1.0.0/voices-v1.0.bin"
+    },
+    {
+      "type": "command",
+      "value": "wget https://github.com/nazdridoy/kokoro-tts/releases/download/v1.0.0/kokoro-v1.0.onnx"
+    },
+    {
+      "type": "tool",
+      "name": "Multiple language and voice support",
+      "description": "Voice blending with customizable weights"
+    },
+    {
+      "type": "tool",
+      "name": "EPUB, PDF and TXT file input support",
+      "description": "Standard input (stdin) and `|` piping from other programs"
+    },
+    {
+      "type": "tool",
+      "name": "Streaming audio playback",
+      "description": "Split output into chapters"
+    },
+    {
+      "type": "tool",
+      "name": "Adjustable speech speed",
+      "description": "WAV and MP3 output formats"
+    },
+    {
+      "type": "tool",
+      "name": "Chapter merging capability",
+      "description": "Detailed debug output option"
+    },
+    {
+      "type": "tool",
+      "name": "Python 3.11",
+      "description": "3.12 (Python 3.13+ is not currently supported)"
+    },
+    {
+      "type": "tool",
+      "name": "`.txt`: Text file input",
+      "description": "`.epub`: EPUB book input (will process chapters)"
+    },
+    {
+      "type": "tool",
+      "name": "Automatically extracts chapters from EPUB files",
+      "description": "Preserves chapter titles and structure"
+    },
+    {
+      "type": "tool",
+      "name": "Creates organized output for each chapter",
+      "description": "Detailed debug output available for troubleshooting"
+    },
+    {
+      "type": "tool",
+      "name": "Chunks long text into manageable segments",
+      "description": "Supports streaming for immediate playback"
+    },
+    {
+      "type": "tool",
+      "name": "Voice blending with customizable mix ratios",
+      "description": "Progress indicators for long processes"
+    },
+    {
+      "type": "tool",
+      "name": "Single file output",
+      "description": "Split output with chapter organization"
+    },
+    {
+      "type": "tool",
+      "name": "Chunk merging capability",
+      "description": "Multiple audio format support"
+    },
+    {
+      "type": "tool",
+      "name": "Shows detailed information about file processing",
+      "description": "Displays NCX parsing details for EPUB files"
+    },
+    {
+      "type": "tool",
+      "name": "Lists all found chapters and their metadata",
+      "description": "Helps troubleshoot processing issues"
+    },
+    {
+      "type": "tool",
+      "name": "Text file input (.txt)",
+      "description": "EPUB book input (.epub)"
+    },
+    {
+      "type": "tool",
+      "name": "Standard input (stdin)",
+      "description": "Supports piping from other programs"
+    },
+    {
+      "type": "pip_package",
+      "value": "kokoro-tts"
+    },
+    {
+      "type": "pip_package",
+      "value": "git+https://github.com/nazdridoy/kokoro-tts"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "feature",
+      "value": "Multiple language and voice support"
+    },
+    {
+      "type": "feature",
+      "value": "Voice blending with customizable weights"
+    },
+    {
+      "type": "feature",
+      "value": "EPUB, PDF and TXT file input support"
+    },
+    {
+      "type": "feature",
+      "value": "Standard input (stdin) and `|` piping from other programs"
+    },
+    {
+      "type": "feature",
+      "value": "Streaming audio playback"
+    },
+    {
+      "type": "feature",
+      "value": "Split output into chapters"
+    },
+    {
+      "type": "feature",
+      "value": "Adjustable speech speed"
+    },
+    {
+      "type": "feature",
+      "value": "WAV and MP3 output formats"
+    },
+    {
+      "type": "feature",
+      "value": "Chapter merging capability"
+    },
+    {
+      "type": "feature",
+      "value": "Detailed debug output option"
+    },
+    {
+      "type": "feature",
+      "value": "GPU Support"
+    }
+  ],
+  "script_summary": "21 commands, 24 tools, 8 pip_packages, 13 features"
+}

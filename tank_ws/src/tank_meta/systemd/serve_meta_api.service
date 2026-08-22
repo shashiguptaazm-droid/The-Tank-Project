@@ -1,0 +1,19 @@
+[Unit]
+Description=The Tank — tank_meta structured-memory API on :8083
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# NOTE: This project runs as root under /root/the tank project/...
+# Don't pin a User= / Group= here unless you've added a `tank` user
+# to scripts/provision_pi5.sh — otherwise systemd fails with
+# status=217/USER on first start.
+WorkingDirectory=/root/the tank project/tank_ws/src/tank_meta
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 -m uvicorn scripts.serve_meta_api:app --host 0.0.0.0 --port 8083 --workers 1
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

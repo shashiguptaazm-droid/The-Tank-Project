@@ -1,0 +1,203 @@
+{
+  "timestamp": "2026-08-14T03:01:12.895601",
+  "topic": "diagnostic scripts python",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "zszszszsz/.config",
+      "html_url": "https://github.com/zszszszsz/.config",
+      "description": "# # Automatically generated file; DO NOT EDIT. # OpenWrt Configuration # CONFIG_MODULES=y CONFIG_HAVE_DOT_CONFIG=y # CONFIG_TARGET_sunxi is not set # CONFIG_TARGET_apm821xx is not set # CONFIG_TARGET_ath25 is not set CONFIG_TARGET_ar71xx=y # CONFIG_TARGET_ath79 is not set # CONFIG_TARGET_bcm27xx is ",
+      "stars": 351,
+      "language": "Shell",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "shabir-mp/WiFi-Password-Cracker",
+      "html_url": "https://github.com/shabir-mp/WiFi-Password-Cracker",
+      "description": "WiFi Security & Router Diagnostics is a cross-platform Python script that retrieves saved WiFi profiles and their details including passwords, authentication type, encryption, and radio band on Windows, Linux, and macOS.",
+      "stars": 37,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "nizarmojab/Implementation_UDS_CAN",
+      "html_url": "https://github.com/nizarmojab/Implementation_UDS_CAN",
+      "description": "Project implementing the UDS protocol on an STM32 microcontroller, with CAN communication for diagnostics and UART for testing and debugging. Key services: session control, ECU reset, and security access, enabling fault detection, configuration, and reprogramming of ECUs. Python scripts automate tes",
+      "stars": 34,
+      "language": "C",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 36,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone https://github.com/shabir-mp/WiFi-Password-Cracker.git"
+    },
+    {
+      "type": "command",
+      "value": "python main.py"
+    },
+    {
+      "type": "tool",
+      "name": "Cross",
+      "description": "platform support: Windows, Linux, and macOS."
+    },
+    {
+      "type": "tool",
+      "name": "Retrieves all saved WiFi profiles on the device.",
+      "description": "Displays WiFi name, password, authentication type, encryption cipher, and radio band."
+    },
+    {
+      "type": "tool",
+      "name": "Colorized terminal output",
+      "description": "green for profiles with a password, red for those without."
+    },
+    {
+      "type": "tool",
+      "name": "Auto",
+      "description": "installs `colorama` if not already present."
+    },
+    {
+      "type": "tool",
+      "name": "Python 3.x",
+      "description": "`colorama` (auto-installed on first run)"
+    },
+    {
+      "type": "tool",
+      "name": "CSV",
+      "description": "spreadsheet-compatible, one row per profile"
+    },
+    {
+      "type": "tool",
+      "name": "TXT",
+      "description": "human-readable, one block per profile"
+    },
+    {
+      "type": "tool",
+      "name": "JSON",
+      "description": "structured data, array of profile objects"
+    },
+    {
+      "type": "feature",
+      "value": "Cross-platform support: Windows, Linux, and macOS."
+    },
+    {
+      "type": "feature",
+      "value": "Retrieves all saved WiFi profiles on the device."
+    },
+    {
+      "type": "feature",
+      "value": "Displays WiFi name, password, authentication type, encryption cipher, and radio band."
+    },
+    {
+      "type": "feature",
+      "value": "Colorized terminal output \u2014 green for profiles with a password, red for those without."
+    },
+    {
+      "type": "feature",
+      "value": "Interactive menu with options to browse, search, filter, and export data."
+    },
+    {
+      "type": "feature",
+      "value": "Search profiles by name keyword."
+    },
+    {
+      "type": "feature",
+      "value": "Filter to show only profiles that have a saved password."
+    },
+    {
+      "type": "feature",
+      "value": "Export results to CSV, TXT, or JSON (auto-timestamped filenames)."
+    },
+    {
+      "type": "feature",
+      "value": "Re-scan profiles without restarting the program."
+    },
+    {
+      "type": "feature",
+      "value": "Auto-installs `colorama` if not already present."
+    },
+    {
+      "type": "tool",
+      "name": "Diagnostic Session Control (0x10)",
+      "description": "ECU Reset (0x11)"
+    },
+    {
+      "type": "tool",
+      "name": "Security Access (0x27)",
+      "description": "Communication Control (0x28)"
+    },
+    {
+      "type": "tool",
+      "name": "Tester Present (0x3E)",
+      "description": "Access Timing Parameter (0x83)"
+    },
+    {
+      "type": "tool",
+      "name": "Secured Data Transmission (0x84)",
+      "description": "Control DTC Setting (0x85)"
+    },
+    {
+      "type": "tool",
+      "name": "Response on Event (0x86)",
+      "description": "Link Control (0x87)"
+    },
+    {
+      "type": "tool",
+      "name": "Read Data by Identifier (0x22)",
+      "description": "Read Memory by Address (0x23)"
+    },
+    {
+      "type": "tool",
+      "name": "Read Data by Periodic Identifier (0x2A)",
+      "description": "Dynamically Define Data Identifier (0x2C)"
+    },
+    {
+      "type": "tool",
+      "name": "Clear Diagnostic Information (0x14)",
+      "description": "Read DTC Information Service (0x19)"
+    },
+    {
+      "type": "tool",
+      "name": "Request Download (0x34)",
+      "description": "Request Upload (0x35)"
+    },
+    {
+      "type": "tool",
+      "name": "Transfer Data (0x36)",
+      "description": "Request Transfer Exit (0x37)"
+    },
+    {
+      "type": "tool",
+      "name": "Data_Transmission_functional_unit.h",
+      "description": "`Diagnostic_Communication_Management_functional_unit.h`"
+    },
+    {
+      "type": "tool",
+      "name": "InputOutput_Control_functional_unit.h",
+      "description": "`Routine_functional_unit.h`"
+    },
+    {
+      "type": "tool",
+      "name": "Stored_Data_Transmission_functional_unit.h",
+      "description": "`Upload_Download_functional_unit.h`"
+    },
+    {
+      "type": "tool",
+      "name": "Data_Transmission_functional_unit.c",
+      "description": "`Diagnostic_Communication_Management_functional_unit.c`"
+    },
+    {
+      "type": "tool",
+      "name": "InputOutput_Control_functional_unit.c",
+      "description": "`Routine_functional_unit.c`"
+    },
+    {
+      "type": "tool",
+      "name": "Stored_Data_Transmission_functional_unit.c",
+      "description": "`Upload_Download_functional_unit.c`"
+    }
+  ],
+  "script_summary": "2 commands, 24 tools, 10 features"
+}

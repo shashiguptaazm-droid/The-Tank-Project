@@ -1,0 +1,36 @@
+# RTAB-Map config for monocular 3D mapping (RGB + LIDAR + wheel odom).
+#
+# These parameters mirror the recommended minimum for "RGB + LIDAR +
+# odometry" mode in RTAB-Map 0.21+.  Flip `subscribe_depth` and run the
+# launch with `depth:=true` for an Intel RealSense / OAK-D rig.
+
+/**:
+  ros__parameters:
+    rtabmap:
+      # Memory management
+      Rtabmap/DetectionRate:        "1.0"
+      Rtabmap/MemoryThr:            "200"
+      Mem/IncrementalMemory:        "true"
+
+      # Loop-closure
+      Rtabmap/LoopThr:              "0.11"
+      Rtabmap/LoopRatioThreshold:   "0.7"
+
+      # Visual words (BoW)
+      Kp/DetectorStrategy:          "6"
+      Kp/NNStrategy:                "1"
+      Vis/MaxFeatures:              "200"
+
+      # Sensor fusion
+      Rtabmap/OptimizeFromGraphEnd: "true"
+      Rtabmap/OptimizationMaxIterations: "20"
+
+      # 3D mode
+      Grid/FromDepth:               "false"
+      Grid/3DGroundIsObstacle:      "true"
+      Grid/MaxGroundHeight:         "0.05"
+      Grid/MaxObstacleHeight:       "1.5"
+
+      # I/O
+      DatabasePath:                 "/tmp/tank_rtabmap.db"
+      %s/db_path:                   "Default"

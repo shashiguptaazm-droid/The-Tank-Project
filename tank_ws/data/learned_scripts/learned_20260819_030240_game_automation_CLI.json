@@ -1,0 +1,139 @@
+{
+  "timestamp": "2026-08-19T03:02:40.642255",
+  "topic": "game automation CLI",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "RageAgainstThePixel/unity-cli",
+      "html_url": "https://github.com/RageAgainstThePixel/unity-cli",
+      "description": "An all-in-one command line utility for the Unity Game Engine",
+      "stars": 72,
+      "language": "TypeScript",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "0xmoei/pi2-auto-clicker",
+      "html_url": "https://github.com/0xmoei/pi2-auto-clicker",
+      "description": "Pi\u00b2 game console-based automation scripts optimized for 20 TPS peak performance.",
+      "stars": 45,
+      "language": "JavaScript",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "sqdnoises/infinite-craft",
+      "html_url": "https://github.com/sqdnoises/infinite-craft",
+      "description": "An API Wrapper of Neal's Infinite Craft game in Python for people to implement in their programs.",
+      "stars": 18,
+      "language": "Python",
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 23,
+  "findings": [
+    {
+      "type": "command",
+      "value": "npm install -g @rage-against-the-pixel/unity-cli"
+    },
+    {
+      "type": "tool",
+      "name": "Install and manage Unity Hub and Unity Editors (multi",
+      "description": "platform)"
+    },
+    {
+      "type": "tool",
+      "name": "Run Unity Editor commands and builds from the CLI",
+      "description": "Supports all modules, architectures, and build targets"
+    },
+    {
+      "type": "tool",
+      "name": "Works on Windows, macOS, and Linux",
+      "description": "Designed for automation and CI/CD"
+    },
+    {
+      "type": "tool",
+      "name": "`unity",
+      "description": "cli --help` for a full list of commands and options."
+    },
+    {
+      "type": "tool",
+      "name": "`unity",
+      "description": "cli [command] --help` for details on a specific command."
+    },
+    {
+      "type": "tool",
+      "name": "`unity",
+      "description": "cli [command] --json` to get the output in JSON format (if supported)."
+    },
+    {
+      "type": "tool",
+      "name": "`unity",
+      "description": "cli [command] --verbose <args...>` to enable verbose logging for debugging."
+    },
+    {
+      "type": "tool",
+      "name": "Defaults to `info` level; add `",
+      "description": "-verbose` (or temporarily set `ACTIONS_STEP_DEBUG=true`) to surface `debug` lines."
+    },
+    {
+      "type": "tool",
+      "name": "Job summary (`GITHUB_STEP_SUMMARY`) is opt",
+      "description": "in:** set `UNITY_CLI_WORKFLOW_SUMMARY` to `1`, `true`, `yes`, or `on` (case-insensitive) so `CI_appendWorkflowSummary` can append the rich markdown block from Unity log / UTP parsing. If unset, summar"
+    },
+    {
+      "type": "npm_package",
+      "value": "@rage-against-the-pixel/unity-cli"
+    },
+    {
+      "type": "feature",
+      "value": "Install and manage Unity Hub and Unity Editors (multi-platform)"
+    },
+    {
+      "type": "feature",
+      "value": "Activate and return Unity licenses (personal, professional, floating)"
+    },
+    {
+      "type": "feature",
+      "value": "Create new Unity projects from templates"
+    },
+    {
+      "type": "feature",
+      "value": "Run Unity Editor commands and builds from the CLI"
+    },
+    {
+      "type": "feature",
+      "value": "Supports all modules, architectures, and build targets"
+    },
+    {
+      "type": "feature",
+      "value": "Works on Windows, macOS, and Linux"
+    },
+    {
+      "type": "feature",
+      "value": "Designed for automation and CI/CD"
+    },
+    {
+      "type": "command",
+      "value": "pip install -U infinite-craft"
+    },
+    {
+      "type": "tool",
+      "name": "Stores elements in a neatly indented JSON file",
+      "description": "Starts with the four main elements: Water, Fire, Wind, Earth"
+    },
+    {
+      "type": "tool",
+      "name": "Built",
+      "description": "in ratelimiting handler"
+    },
+    {
+      "type": "tool",
+      "name": "Custom API support",
+      "description": "Asynchronous library"
+    },
+    {
+      "type": "pip_package",
+      "value": "-U"
+    }
+  ],
+  "script_summary": "2 commands, 12 tools, 1 npm_packages, 7 features, 1 pip_packages"
+}

@@ -1,0 +1,59 @@
+name: OpenAPI generated types
+
+# Issue #37 phase 2: the checked-in generated artifacts must be reproducible
+# from docs/openapi/qveris-public-api.openapi.json. Regenerate with the pinned
+# generators and fail if the working tree differs (contract / generator drift).
+
+on:
+  pull_request:
+    paths:
+      - "docs/openapi/**"
+      - "packages/mcp/src/generated/**"
+      - "packages/python-sdk/qveris/generated/**"
+      - "packages/mcp/package.json"
+      - "packages/python-sdk/pyproject.toml"
+      - "scripts/regenerate-openapi-artifacts.sh"
+      - ".github/workflows/openapi-types.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/openapi/**"
+      - "packages/mcp/src/generated/**"
+      - "packages/python-sdk/qveris/generated/**"
+      - "packages/mcp/package.json"
+      - "packages/python-sdk/pyproject.toml"
+      - "scripts/regenerate-openapi-artifacts.sh"
+      - ".github/workflows/openapi-types.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  regen-and-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Regenerate OpenAPI artifacts
+        run: bash scripts/regenerate-openapi-artifacts.sh
+
+      - name: Fail on drift
+        run: |
+          if ! git diff --exit-code -- \
+              packages/mcp/src/generated/openapi.d.ts \
+              packages/python-sdk/qveris/generated/openapi_models.py; then
+            echo "::error::Generated OpenAPI artifacts are out of date. Run 'bash scripts/regenerate-openapi-artifacts.sh' or 'npm --prefix packages/mcp run gen:openapi', then commit."
+            exit 1
+          fi

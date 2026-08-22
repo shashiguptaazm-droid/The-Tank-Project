@@ -1,0 +1,369 @@
+import { validateTaskSet } from './harness.mjs';
+
+export function scoreRecords(tasks, records, { taskSetSha256 } = {}) {
+  validateTaskSet(tasks);
+  if (!Array.isArray(records) || records.length === 0) throw new Error('At least one run record is required');
+  if (taskSetSha256 !== undefined) {
+    if (typeof taskSetSha256 !== 'string' || !/^[a-f0-9]{64}$/.test(taskSetSha256)) {
+      throw new Error('Scoring taskSetSha256 must be a SHA-256 digest');
+    }
+    for (const record of records) {
+      const declaredTaskSetSha256 = record?.metadata?.task_set_sha256;
+      if (
+        (declaredTaskSetSha256 !== undefined && declaredTaskSetSha256 !== taskSetSha256) ||
+        (record?.benchmark_version === 'v2' && declaredTaskSetSha256 !== taskSetSha256)
+      ) {
+        throw new Error(`Run record task-set digest does not match ${record?.task_id ?? '<missing>'}`);
+      }
+    }
+  }
+  const benchmarkVersions = new Set(records.map((record) => record?.benchmark_version ?? 'v1'));
+  if (benchmarkVersions.size !== 1) {
+    throw new Error('Benchmark summary cannot mix benchmark versions');
+  }
+  const benchmarkVersion = [...benchmarkVersions][0];
+  if (!['v1', 'v2'].includes(benchmarkVersion)) {
+    throw new Error(`Unsupported benchmark version: ${benchmarkVersion}`);
+  }
+  const taskById = new Map(tasks.map((task) => [task.id, task]));
+  const runIds = new Set();
+  for (const record of records) {
+    if (typeof record?.run_id !== 'string' || !record.run_id.trim()) throw new Error('Run record run_id is required');
+    if (runIds.has(record.run_id)) throw new Error(`Duplicate run_id: ${record.run_id}`);
+    runIds.add(record.run_id);
+  }
+  const scored = records.map((record) => scoreRecord(taskById.get(record.task_id), record));
+  const byModel = new Map();
+  const rawByModel = new Map();
+  for (const [index, result] of scored.entries()) {
+    const group = byModel.get(result.model) || [];
+    group.push(result);
+    byModel.set(result.model, group);
+    const rawGroup = rawByModel.get(result.model) || [];
+    rawGroup.push(records[index]);
+    rawByModel.set(result.model, rawGroup);
+  }
+  for (const [model] of byModel) validateCompleteModelRun(model, tasks, rawByModel.get(model));
+
+  return {
+    schema_version: 1,
+    methodology: `discover-call-${benchmarkVersion}`,
+    generated_at: new Date().toISOString(),
+    models: [...byModel.entries()].map(([model, results]) => aggregateModel(model, results)),
+    records: scored,
+  };
+}
+
+function validateCompleteModelRun(model, tasks, records) {
+  const expectedTaskIds = new Set(tasks.map((task) => task.id));
+  const trialsByTask = new Map();
+  for (const record of records) {
+    if (!expectedTaskIds.has(record.task_id)) throw new Error(`Model ${model} includes unknown task ${record.task_id}`);
+    const trials = trialsByTask.get(record.task_id) || [];
+    trials.push(record.trial);
+    trialsByTask.set(record.task_id, trials);
+  }
+  for (const taskId of expectedTaskIds) {
+    if (!trialsByTask.has(taskId)) throw new Error(`Model ${model} is missing task ${taskId}`);
+  }
+  const expectedCount = trialsByTask.get(tasks[0].id).length;
+  for (const [taskId, trials] of trialsByTask) {
+    if (trials.length !== expectedCount) throw new Error(`Model ${model} has inconsistent trial counts for ${taskId}`);
+    const sorted = [...trials].sort((a, b) => a - b);
+    for (let index = 0; index < sorted.length; index++) {
+      if (sorted[index] !== index + 1) {
+        throw new Error(`Model ${model} must have unique, consecutive trials for ${taskId}`);
+      }
+    }
+  }
+
+  // Never aggregate records collected under different benchmark conditions.
+  // Undefined is a valid shared value for old/synthetic fixtures, but mixing
+  // it with runner metadata is rejected.
+  for (const field of ['schema_version', 'benchmark_version']) {
+    const values = new Set(records.map((record) => JSON.stringify(record[field])));
+    if (values.size > 1) throw new Error(`Model ${model} mixes different ${field} values`);
+  }
+  const comparableMetadata = [
+    'lane',
+    'model_revision',
+    'adapter_revision',
+    'toolkit_revision',
+    'task_set_sha256',
+    'api_base_url',
+    'api_revision',
+    'catalog_revision',
+    'catalog_observation_sha256',
+    'runtime',
+    'discovery_limit',
+    'execute',
+  ];
+  for (const field of comparableMetadata) {
+    const values = new Set(records.map((record) => JSON.stringify(record.metadata?.[field])));
+    if (values.size > 1) throw new Error(`Model ${model} mixes different ${field} values`);
+  }
+}
+
+export function scoreRecord(task, record) {
+  if (!task) throw new Error(`Run record references unknown task: ${record?.task_id ?? '<missing>'}`);
+  if (!record || typeof record !== 'object') throw new Error('Run record must be an object');
+  if (typeof record.model !== 'string' || !record.model.trim()) throw new Error('Run record model is required');
+  if (!Number.isInteger(record.trial) || record.trial < 1)
+    throw new Error('Run record trial must be a positive integer');
+
+  const selected = record.selection?.tool_id;
+  const discovered = array(record.discovery?.result_tool_ids);
+  const inspected = array(record.inspection?.returned_tool_ids);
+  const required = array(record.inspection?.required_parameters);
+  const parameters = plainObject(record.parameters) ? record.parameters : {};
+  const parameterization = record.parameters === undefined ? parameterizationMetrics(record.parameterization) : null;
+  const completed = record.status === 'completed';
+  const selectionGrounded =
+    typeof record.discovery?.selection_grounded === 'boolean'
+      ? record.discovery.selection_grounded
+      : selected
+        ? discovered.includes(selected)
+        : false;
+  const inspectionGrounded =
+    typeof record.inspection?.selection_grounded === 'boolean'
+      ? record.inspection.selection_grounded
+      : selected
+        ? inspected.includes(selected)
+        : false;
+  const requiredParameterAccuracy =
+    parameterization?.required_parameter_accuracy ??
+    (required.length === 0
+      ? 1
+      : mean(
+          required.map((requirement) =>
+            Array.isArray(requirement)
+              ? requirement.some((name) => hasOwnValue(parameters, name))
+              : hasOwnValue(parameters, requirement),
+          ),
+        ));
+  const constraintAccuracy =
+    parameterization?.constraint_accuracy ??
+    mean(task.constraints.map((constraint) => constraintSatisfied(parameters, constraint, task.constraints)));
+  const executed = record.call?.attempted === true;
+  const callSuccess = executed ? record.call?.success === true : null;
+  const resultNonempty =
+    executed && callSuccess
+      ? booleanOrNull(record.call?.result_nonempty ?? record.call?.result_valid)
+      : executed
+        ? false
+        : null;
+  const preResultGateWorkflowSuccess =
+    completed &&
+    selectionGrounded &&
+    inspectionGrounded &&
+    requiredParameterAccuracy === 1 &&
+    constraintAccuracy === 1 &&
+    callSuccess === true;
+  const workflowSuccess = preResultGateWorkflowSuccess
+    ? resultNonempty === null
+      ? null
+      : resultNonempty === true
+    : false;
+
+  return {
+    run_id: record.run_id,
+    task_id: record.task_id,
+    model: record.model,
+    trial: record.trial,
+    completed,
+    executed,
+    selection_grounded: selectionGrounded,
+    inspection_grounded: inspectionGrounded,
+    required_parameter_accuracy: round(requiredParameterAccuracy),
+    constraint_accuracy: round(constraintAccuracy),
+    call_success: callSuccess,
+    result_nonempty: resultNonempty,
+    pre_result_gate_workflow_success: preResultGateWorkflowSuccess,
+    workflow_success: workflowSuccess,
+    error_stage: record.error?.stage ?? null,
+    error_reason: record.error?.reason_code ?? null,
+    metadata: record.metadata,
+  };
+}
+
+function aggregateModel(model, records) {
+  const executed = records.filter((record) => record.executed);
+  const resultEvidenceComplete = executed.every((record) => record.result_nonempty !== null);
+  const workflowEvidenceComplete = records.every((record) => record.workflow_success !== null);
+  const workflowWins = records.filter((record) => record.workflow_success === true).length;
+  const interval = workflowEvidenceComplete ? taskClusterBootstrapInterval(records) : null;
+  const taskCount = new Set(records.map((record) => record.task_id)).size;
+  const failuresByStage = {};
+  const failuresByReason = {};
+  for (const record of records) {
+    const failure = strictFailure(record);
+    if (failure?.stage) failuresByStage[failure.stage] = (failuresByStage[failure.stage] || 0) + 1;
+    if (failure?.reason) failuresByReason[failure.reason] = (failuresByReason[failure.reason] || 0) + 1;
+  }
+  return {
+    model,
+    lane: records[0]?.metadata?.lane ?? 'model',
+    tasks: taskCount,
+    trials_per_task: records.length / taskCount,
+    runs: records.length,
+    completed: records.filter((record) => record.completed).length,
+    executed: executed.length,
+    selection_grounded_rate: round(mean(records.map((record) => record.selection_grounded))),
+    inspection_grounded_rate: round(mean(records.map((record) => record.inspection_grounded))),
+    required_parameter_accuracy: round(mean(records.map((record) => record.required_parameter_accuracy))),
+    constraint_accuracy: round(mean(records.map((record) => record.constraint_accuracy))),
+    call_success_rate: executed.length ? round(mean(executed.map((record) => record.call_success))) : null,
+    result_nonempty_rate:
+      executed.length && resultEvidenceComplete ? round(mean(executed.map((record) => record.result_nonempty))) : null,
+    pre_result_gate_workflow_success_rate: round(
+      mean(records.map((record) => record.pre_result_gate_workflow_success)),
+    ),
+    workflow_success_rate: workflowEvidenceComplete ? round(workflowWins / records.length) : null,
+    workflow_success_task_cluster_bootstrap_95: interval?.map(round) ?? null,
+    failures_by_stage: failuresByStage,
+    failures_by_reason: failuresByReason,
+  };
+}
+
+function strictFailure(record) {
+  if (record.error_stage) return { stage: record.error_stage, reason: record.error_reason };
+  if (!record.completed) return { stage: 'unknown', reason: 'incomplete_trial' };
+  if (!record.selection_grounded) return { stage: 'select', reason: 'ungrounded_selection' };
+  if (!record.inspection_grounded) return { stage: 'inspect', reason: 'ungrounded_inspection' };
+  if (record.required_parameter_accuracy < 1) {
+    return { stage: 'parameterize', reason: 'incomplete_required_parameters' };
+  }
+  if (record.constraint_accuracy < 1) return { stage: 'parameterize', reason: 'constraint_mismatch' };
+  if (record.call_success === false) return { stage: 'call', reason: 'tool_returned_failure' };
+  if (record.result_nonempty === false) return { stage: 'result', reason: 'empty_result' };
+  return null;
+}
+
+function constraintSatisfied(parameters, constraint, constraints) {
+  for (const alias of constraint.aliases) {
+    if (!hasOwnValue(parameters, alias)) continue;
+    const actual = parameters[alias];
+    if (constraint.match === 'contains') {
+      if (normalize(actual, constraint).includes(normalize(constraint.value, constraint))) return 1;
+    } else if (normalize(actual, constraint) === normalize(constraint.value, constraint)) {
+      return 1;
+    }
+    for (const expected of array(constraint.alias_values?.[alias])) {
+      if (normalize(actual, constraint) === normalize(expected, constraint)) return 1;
+    }
+  }
+  for (const alias of array(constraint.composite_aliases)) {
+    if (!hasOwnValue(parameters, alias)) continue;
+    const compositeConstraints = constraints.filter((candidate) => array(candidate.composite_aliases).includes(alias));
+    const values = compositeConstraints.map((candidate) => normalize(candidate.value, candidate));
+    const representations = new Set([
+      values.join(''),
+      values.join('/'),
+      values.join('-'),
+      values.join('_'),
+      values.join(':'),
+      values.join(' '),
+    ]);
+    if (representations.has(normalize(parameters[alias], constraint))) return 1;
+  }
+  return 0;
+}
+
+function normalize(value, constraint = {}) {
+  if (typeof value === 'string') {
+    let normalized = value.trim().toLowerCase();
+    for (const normalizer of array(constraint.normalizers)) {
+      if (normalizer === 'url_decode') normalized = safeUrlDecode(normalized);
+    }
+    return normalized;
+  }
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  return JSON.stringify(value);
+}
+
+function safeUrlDecode(value) {
+  let decoded = value.replace(/\+/g, ' ');
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const next = decodeURIComponent(decoded);
+      if (next === decoded) break;
+      decoded = next;
+    } catch {
+      break;
+    }
+  }
+  return decoded;
+}
+
+function hasValue(value) {
+  return value !== undefined && value !== null && value !== '';
+}
+
+function hasOwnValue(parameters, name) {
+  return Object.hasOwn(parameters, name) && hasValue(parameters[name]);
+}
+
+function mean(values) {
+  if (values.length === 0) return 1;
+  return values.reduce((sum, value) => sum + Number(value), 0) / values.length;
+}
+
+function taskClusterBootstrapInterval(records, iterations = 20_000) {
+  const byTask = new Map();
+  for (const record of records) {
+    const values = byTask.get(record.task_id) || [];
+    values.push(Number(record.workflow_success));
+    byTask.set(record.task_id, values);
+  }
+  const taskRates = [...byTask.values()].map(mean);
+  if (taskRates.length <= 1) {
+    const value = taskRates[0] ?? 0;
+    return [value, value];
+  }
+
+  let state = 0x51f15e;
+  const randomIndex = () => {
+    state = (Math.imul(state, 1_664_525) + 1_013_904_223) >>> 0;
+    return Math.floor((state / 2 ** 32) * taskRates.length);
+  };
+  const estimates = [];
+  for (let iteration = 0; iteration < iterations; iteration++) {
+    let total = 0;
+    for (let task = 0; task < taskRates.length; task++) total += taskRates[randomIndex()];
+    estimates.push(total / taskRates.length);
+  }
+  estimates.sort((left, right) => left - right);
+  return [percentile(estimates, 0.025), percentile(estimates, 0.975)];
+}
+
+function percentile(sorted, probability) {
+  return sorted[Math.min(sorted.length - 1, Math.max(0, Math.floor(probability * sorted.length)))];
+}
+
+function round(value) {
+  return Math.round(value * 10000) / 10000;
+}
+
+function array(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function plainObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function booleanOrNull(value) {
+  return typeof value === 'boolean' ? value : null;
+}
+
+function parameterizationMetrics(value) {
+  if (value === undefined) return null;
+  if (!plainObject(value) || !metric(value.required_parameter_accuracy) || !metric(value.constraint_accuracy)) {
+    throw new Error('Run record parameterization metrics must be between 0 and 1');
+  }
+  return value;
+}
+
+function metric(value) {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1;
+}

@@ -1,0 +1,649 @@
+"""
+Recommendation Automation for executing recommendation jobs.
+Processes user watch history and finds similar content via TMDb.
+"""
+import traceback
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
+
+from api_service.config.logger_manager import LoggerManager
+from api_service.services.config_service import ConfigService
+from api_service.db.database_manager import DatabaseManager
+from api_service.db.job_repository import JobRepository
+from api_service.handler.jellyfin_handler import JellyfinHandler
+from api_service.handler.plex_handler import PlexHandler
+from api_service.services.trakt.media_user_augmentor import MediaUserTraktAugmentor
+from api_service.services.filter_normalization import normalize_filters
+from api_service.services.jellyfin.jellyfin_client import JellyfinClient
+from api_service.services.seer.seer_client import SeerClient
+from api_service.services.plex.plex_client import PlexClient
+from api_service.services.tmdb.tmdb_client import TMDbClient
+
+
+def _extract_year_from_filter_value(value: Any) -> Optional[int]:
+    """Parse a year from int/float/numeric string/date string filter values."""
+    if value is None or isinstance(value, bool):
+        return None
+
+    if isinstance(value, (int, float)):
+        year = int(value)
+        return year if year > 0 else None
+
+    if isinstance(value, str):
+        raw = value.strip()
+        if not raw:
+            return None
+        if raw.isdigit():
+            year = int(raw)
+            return year if year > 0 else None
+        # Accept date-like strings such as YYYY-MM-DD.
+        if len(raw) >= 4 and raw[:4].isdigit():
+            year = int(raw[:4])
+            return year if year > 0 else None
+
+    return None
+
+
+def _resolve_year_range_filters(job_filters: Dict[str, Any], env_vars: Dict[str, Any]) -> tuple[int, Optional[int]]:
+    """Resolve recommendation year bounds from job filters (and global fallback)."""
+    from_year = None
+    to_year = None
+
+    from_candidates = [
+        'release_year_gte',
+        'year_from',
+        'primary_release_date_gte',
+        'first_air_date_gte',
+    ]
+    to_candidates = [
+        'release_year_lte',
+        'year_to',
+        'primary_release_date_lte',
+        'first_air_date_lte',
+    ]
+
+    for key in from_candidates:
+        parsed = _extract_year_from_filter_value(job_filters.get(key))
+        if parsed is not None:
+            from_year = parsed
+            break
+
+    for key in to_candidates:
+        parsed = _extract_year_from_filter_value(job_filters.get(key))
+        if parsed is not None:
+            to_year = parsed
+            break
+
+    if from_year is None:
+        from_year = _extract_year_from_filter_value(env_vars.get('FILTER_RELEASE_YEAR')) or 0
+
+    return from_year, to_year
+
+
+def _resolve_honor_seer_discovery(job_filters: Dict[str, Any], env_vars: Dict[str, Any]) -> bool:
+    """Resolve whether Seer-discovered items should be excluded at runtime."""
+    # Prefer the new per-job key, fall back to legacy alias for backward compatibility.
+    if 'honor_seer_discovery' in job_filters:
+        return bool(job_filters.get('honor_seer_discovery'))
+    if 'honor_jellyseer_discovery' in job_filters:
+        return bool(job_filters.get('honor_jellyseer_discovery'))
+
+    # If no per-job setting is present, prefer the new env var, then fall back to the legacy one.
+    if 'HONOR_SEER_DISCOVERY' in env_vars:
+        return bool(env_vars.get('HONOR_SEER_DISCOVERY', False))
+    return bool(env_vars.get('HONOR_JELLYSEER_DISCOVERY', False))
+
+
+@dataclass
+class ExecutionResult:
+    """Result of a job execution."""
+    success: bool
+    results_count: int
+    requested_count: int
+    error_message: Optional[str] = None
+    dry_run_items: Optional[List[Dict[str, Any]]] = None
+
+
+class RecommendationAutomation:
+    """
+    Automates the process of retrieving watched content from Jellyfin/Plex,
+    finding similar content via TMDb, and requesting it via Seer.
+
+    This is similar to ContentAutomation but configured per-job with:
+    - Specific user IDs to monitor
+    - Custom filters
+    - Scheduled execution via JobManager
+    """
+
+    def __init__(self):
+        """Initialize with logger only. Use create() for full initialization."""
+        self.logger = LoggerManager.get_logger(self.__class__.__name__)
+        self.job_id: Optional[int] = None
+        self.job_data: Optional[Dict[str, Any]] = None
+        self.repository: Optional[JobRepository] = None
+        self.db_manager: Optional[DatabaseManager] = None
+        self.media_handler = None
+        self.env_vars: Optional[Dict[str, Any]] = None
+
+    def _get_seer_discovered_tmdb_ids(self) -> set[str]:
+        """Return TMDb IDs discovered/requested directly in Seer (non-SuggestArr source)."""
+        discovered_ids: set[str] = set()
+        query = "SELECT DISTINCT tmdb_request_id FROM requests WHERE requested_by = 'Seer'"
+
+        try:
+            with self.db_manager.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(query)
+                discovered_ids = {str(row[0]) for row in cursor.fetchall()}
+        except Exception as exc:
+            self.logger.warning("Could not load Seer discovery IDs: %s", exc)
+
+        return discovered_ids
+
+    @classmethod
+    async def create(cls, job_id: int, dry_run: bool = False, overrides=None) -> 'RecommendationAutomation':
+        """
+        Async factory method to create and initialize RecommendationAutomation.
+
+        Args:
+            job_id: ID of the recommendation job to execute.
+            dry_run: If True, initialize handlers in dry-run mode (no actual requests).
+
+        Returns:
+            Initialized RecommendationAutomation instance.
+
+        Raises:
+            ValueError: If job not found.
+        """
+        instance = cls()
+        instance.job_id = job_id
+        instance.repository = JobRepository()
+        instance.db_manager = DatabaseManager()
+        instance.dry_run = dry_run
+
+        # Load job data
+        instance.job_data = instance.repository.get_job(job_id)
+        if not instance.job_data:
+            raise ValueError(f"Job not found: {job_id}")
+        if overrides:
+            instance.job_data.update(overrides)
+
+        if instance.job_data.get('job_type') != 'recommendation':
+            raise ValueError(f"Job {job_id} is not a recommendation job")
+
+        instance.logger.info(f"Initializing RecommendationAutomation for job: {instance.job_data['name']}")
+
+        # Load environment variables (merges DB integration keys on top of YAML)
+        instance.env_vars = ConfigService.get_runtime_config()
+
+        # Initialize components based on job configuration
+        await instance._initialize_components(dry_run=dry_run)
+
+        instance.logger.info("RecommendationAutomation initialized successfully")
+        return instance
+
+    async def _initialize_components(self, dry_run: bool = False):
+        """Initialize all required components for the recommendation job."""
+        job_filters = self.job_data.get('filters', {})
+        normalized_filters = normalize_filters(job_filters)
+        job_user_ids = self.job_data.get('user_ids', [])
+        media_type = self.job_data.get('media_type', 'both')
+        max_results = self.job_data.get('max_results', 20)
+
+        # Get global settings but allow job to override some
+        selected_service = self.env_vars['SELECTED_SERVICE']
+
+        # Number of seasons filter - job setting overrides global
+        number_of_seasons = job_filters.get('min_seasons')
+        if number_of_seasons is None:
+            number_of_seasons = self.env_vars.get('FILTER_NUM_SEASONS') or "all"
+        request_first_season_only = job_filters.get('request_first_season_only')
+        if request_first_season_only is None:
+            request_first_season_only = self.env_vars.get('REQUEST_FIRST_SEASON_ONLY', False)
+
+        # Exclusion settings - job overrides global
+        exclude_downloaded = job_filters.get('exclude_downloaded')
+        if exclude_downloaded is None:
+            exclude_downloaded = self.env_vars.get('EXCLUDE_DOWNLOADED', True)
+
+        exclude_requested = job_filters.get('exclude_requested')
+        if exclude_requested is None:
+            exclude_requested = self.env_vars.get('EXCLUDE_REQUESTED', True)
+
+        # Get similar content limits from job filters or use defaults
+        max_similar_movie = job_filters.get('max_similar_movie', int(self.env_vars.get('MAX_SIMILAR_MOVIE', '3')))
+        max_similar_tv = job_filters.get('max_similar_tv', int(self.env_vars.get('MAX_SIMILAR_TV', '2')))
+        max_content = job_filters.get('max_content', int(self.env_vars.get('MAX_CONTENT_CHECKS', '10')))
+
+        # Enforce media_type restriction: zero out the unwanted type
+        if media_type == 'movie':
+            max_similar_tv = 0
+        elif media_type == 'tv':
+            max_similar_movie = 0
+        search_size = job_filters.get('search_size', int(self.env_vars.get('SEARCH_SIZE', '20')))
+
+        # TMDB filters from job configuration
+        tmdb_threshold = normalized_filters.get('min_rating')
+        if tmdb_threshold is None:
+            tmdb_threshold = int(self.env_vars.get('FILTER_TMDB_THRESHOLD') or 60)
+        # Convert 0-10 scale to 0-100 if needed
+        if tmdb_threshold <= 10:
+            tmdb_threshold = int(tmdb_threshold * 10)
+        tmdb_min_votes = job_filters.get('vote_count_gte', int(self.env_vars.get('FILTER_TMDB_MIN_VOTES') or 20))
+
+        # Include no rating - job overrides global
+        include_no_ratings = job_filters.get('include_no_rating')
+        if include_no_ratings is None:
+            include_no_ratings = self.env_vars.get('FILTER_INCLUDE_NO_RATING', True) == True
+
+        filter_release_year, filter_release_year_to = _resolve_year_range_filters(
+            {**job_filters, **normalized_filters}, self.env_vars
+        )
+        honor_seer_discovery = _resolve_honor_seer_discovery(job_filters, self.env_vars)
+        seer_discovered_ids = self._get_seer_discovered_tmdb_ids() if honor_seer_discovery else set()
+
+        # Trakt seed / exclusion flags — job overrides env, default True
+        _resolve_bool = lambda key, env_key, default=True: (
+            bool(job_filters[key]) if key in job_filters
+            else bool(self.env_vars.get(env_key, default))
+        )
+        trakt_use_as_seed = _resolve_bool('use_trakt_as_seed', 'TRAKT_USE_AS_SEED')
+        trakt_use_as_exclusion = _resolve_bool('use_trakt_as_exclusion', 'TRAKT_USE_AS_EXCLUSION')
+
+        # Language filter
+        filter_language = []
+        if 'with_original_language' in job_filters:
+            filter_language = ([normalized_filters['language']]
+                               if normalized_filters.get('language') else [])
+        elif normalized_filters.get('language'):
+            filter_language = [normalized_filters['language']]
+        elif self.env_vars.get('FILTER_LANGUAGE'):
+            filter_language = self.env_vars.get('FILTER_LANGUAGE', [])
+            if not isinstance(filter_language, list):
+                filter_language = []
+
+        # Genre exclude filter
+        filter_genre = job_filters.get('without_genres', [])
+        if not filter_genre:
+            filter_genre_raw = self.env_vars.get('FILTER_GENRES_EXCLUDE', [])
+            filter_genre = filter_genre_raw if isinstance(filter_genre_raw, list) else []
+
+        # Streaming provider region - job overrides global
+        filter_region_provider = job_filters.get('watch_region')
+        if not filter_region_provider:
+            filter_region_provider = self.env_vars.get('FILTER_REGION_PROVIDER', None)
+
+        # Streaming services - job overrides global
+        filter_streaming_services = job_filters.get('with_watch_providers')
+        if not filter_streaming_services:
+            filter_streaming_raw = self.env_vars.get('FILTER_STREAMING_SERVICES', [])
+            filter_streaming_services = filter_streaming_raw if isinstance(filter_streaming_raw, list) else []
+
+        # Minimum runtime filter - job overrides global
+        filter_min_runtime = job_filters.get('min_runtime')
+        if filter_min_runtime is None:
+            filter_min_runtime = self.env_vars.get('FILTER_MIN_RUNTIME', None)
+
+        # TVOD filter — job filter overrides global config
+        job_include_tvod = job_filters.get('include_tvod')
+        filter_include_tvod = bool(job_include_tvod) if job_include_tvod is not None \
+            else (self.env_vars.get('FILTER_INCLUDE_TVOD', False) is True)
+
+        # IMDB / OMDb rating filter settings — job filter overrides global config
+        rating_source = job_filters.get('rating_source', self.env_vars.get('FILTER_RATING_SOURCE', 'tmdb'))
+
+        # imdb_rating_gte from job filter is 0–10 scale; TMDbClient expects 0–100
+        job_imdb_rating = job_filters.get('imdb_rating_gte')
+        if job_imdb_rating is not None:
+            imdb_threshold = int(float(job_imdb_rating) * 10)
+        else:
+            raw = self.env_vars.get('FILTER_IMDB_THRESHOLD')
+            imdb_threshold = int(raw) if raw is not None else None
+
+        job_imdb_min_votes = job_filters.get('imdb_min_votes')
+        imdb_min_votes = int(job_imdb_min_votes) if job_imdb_min_votes is not None \
+            else (int(self.env_vars.get('FILTER_IMDB_MIN_VOTES'))
+                  if self.env_vars.get('FILTER_IMDB_MIN_VOTES') is not None else None)
+
+        omdb_api_key = self.env_vars.get('OMDB_API_KEY', '')
+        omdb_client = None
+        if rating_source in ('imdb', 'both'):
+            if omdb_api_key:
+                from api_service.services.omdb.omdb_client import OmdbClient
+                omdb_client = OmdbClient(omdb_api_key)
+                self.logger.info("OmdbClient initialized for per-job IMDB filtering (source: %s)", rating_source)
+            else:
+                self.logger.warning(
+                    "Job '%s' has rating_source='%s' but OMDB_API_KEY is not configured. "
+                    "IMDB filtering will be skipped.",
+                    self.job_data.get('name', '?'), rating_source
+                )
+
+        # LLM enhancement - job setting overrides global; verify LLM is actually configured
+        job_use_llm = job_filters.get('use_llm', None)
+        if job_use_llm:
+            from api_service.services.llm.llm_service import is_llm_configured
+            if not is_llm_configured(self.env_vars):
+                self.logger.warning("Job has AI enhancement enabled but LLM is not configured. Falling back to standard algorithm.")
+                job_use_llm = False
+
+        # Anime profile configuration
+        anime_profile_config_raw = self.env_vars.get('SEER_ANIME_PROFILE_CONFIG', {})
+        anime_profile_config = anime_profile_config_raw if isinstance(anime_profile_config_raw, dict) else {}
+
+        # Initialize Seer service client
+        self.logger.info("Initializing Seer service client")
+        seer_client = SeerClient(
+            self.env_vars['SEER_API_URL'],
+            self.env_vars['SEER_TOKEN'],
+            self.env_vars['SEER_USER_NAME'],
+            self.env_vars['SEER_USER_PSW'],
+            self.env_vars['SEER_SESSION_TOKEN'],
+            number_of_seasons,
+            exclude_downloaded,
+            exclude_requested,
+            anime_profile_config,
+            request_first_season_only,
+            queue_context={**self.job_data, 'job_id': self.job_data['id']}
+        )
+        if dry_run:
+            self.logger.info("Dry-run mode: skipping Seer request cache sync.")
+        else:
+            await seer_client.init()
+
+        # Initialize TMDb client with job-specific filters
+        self.logger.info("Initializing TMDb client with job filters")
+        tmdb_client = TMDbClient(
+            self.env_vars['TMDB_API_KEY'],
+            search_size,
+            tmdb_threshold,
+            tmdb_min_votes,
+            include_no_ratings,
+            filter_release_year,
+            filter_language,
+            filter_genre,
+            filter_region_provider,
+            filter_streaming_services,
+            filter_min_runtime,
+            rating_source=rating_source,
+            imdb_threshold=imdb_threshold,
+            imdb_min_votes=imdb_min_votes,
+            omdb_client=omdb_client,
+            include_tvod=filter_include_tvod,
+            filter_release_year_to=filter_release_year_to,
+            filter_genres_include=normalized_filters.get('genres'),
+            only_first_movie_in_collection=bool(job_filters.get('only_first_movie_in_collection', False)),
+        )
+
+        # Determine which users to process
+        selected_users = self._get_selected_users(job_user_ids)
+
+        # Initialize media service handler
+        if selected_service in ('jellyfin', 'emby'):
+            await self._init_jellyfin_handler(
+                seer_client, tmdb_client, max_similar_movie, max_similar_tv,
+                selected_users, max_content, job_use_llm,
+                max_total_requests=max_results,
+                honor_seer_discovery=honor_seer_discovery,
+                seer_discovered_ids=seer_discovered_ids,
+                dry_run=dry_run,
+                trakt_use_as_seed=trakt_use_as_seed,
+                trakt_use_as_exclusion=trakt_use_as_exclusion,
+            )
+        elif selected_service == 'plex':
+            await self._init_plex_handler(
+                seer_client, tmdb_client, max_similar_movie, max_similar_tv,
+                selected_users, max_content, job_use_llm,
+                max_total_requests=max_results,
+                honor_seer_discovery=honor_seer_discovery,
+                seer_discovered_ids=seer_discovered_ids,
+                dry_run=dry_run,
+                trakt_use_as_seed=trakt_use_as_seed,
+                trakt_use_as_exclusion=trakt_use_as_exclusion,
+            )
+        else:
+            raise ValueError(f"Unsupported service: {selected_service}")
+
+    def _get_selected_users(self, job_user_ids: List) -> List[Dict]:
+        """
+        Get the list of users to process based on job configuration.
+
+        Args:
+            job_user_ids: User IDs configured for this job (empty = all users)
+
+        Returns:
+            List of user dicts to process
+        """
+        # Get global selected users from config
+        selected_users_raw = self.env_vars.get('SELECTED_USERS') or []
+        if not isinstance(selected_users_raw, list):
+            selected_users_raw = []
+
+        # Normalize users to dict format
+        all_users = []
+        for user in selected_users_raw:
+            if isinstance(user, dict) and 'id' in user:
+                all_users.append(user)
+            elif isinstance(user, str):
+                all_users.append({'id': user, 'name': user})
+
+        # If job specifies specific users, filter to only those
+        if job_user_ids:
+            job_user_id_set = set(str(uid) for uid in job_user_ids)
+            return [u for u in all_users if str(u['id']) in job_user_id_set]
+
+        # Otherwise return all users
+        return all_users
+
+    async def _init_jellyfin_handler(
+        self, seer_client, tmdb_client, max_similar_movie, max_similar_tv,
+        selected_users, max_content, use_llm=None,
+        max_total_requests=None,
+        honor_seer_discovery: bool = False,
+        seer_discovered_ids: Optional[set[str]] = None,
+        dry_run=False,
+        trakt_use_as_seed=True,
+        trakt_use_as_exclusion=True,
+    ):
+        """Initialize Jellyfin handler."""
+        self.logger.info("Initializing Jellyfin client")
+
+        jellyfin_libraries_raw = self.env_vars.get('JELLYFIN_LIBRARIES')
+        jellyfin_libraries = jellyfin_libraries_raw if isinstance(jellyfin_libraries_raw, list) else []
+
+        jellyfin_client = JellyfinClient(
+            self.env_vars['JELLYFIN_API_URL'],
+            self.env_vars['JELLYFIN_TOKEN'],
+            max_content,
+            jellyfin_libraries
+        )
+        await jellyfin_client.init_existing_content()
+
+        # Build library anime map
+        jellyfin_anime_map = {}
+        for lib in jellyfin_libraries:
+            if isinstance(lib, dict) and lib.get('name'):
+                jellyfin_anime_map[lib['name']] = lib.get('is_anime', False)
+
+        self.media_handler = JellyfinHandler(
+            jellyfin_client, seer_client, tmdb_client, self.logger,
+            max_similar_movie, max_similar_tv,
+            selected_users, jellyfin_anime_map, use_llm=use_llm,
+            honor_seer_discovery=honor_seer_discovery,
+            seer_discovered_ids=seer_discovered_ids,
+            dry_run=dry_run,
+            max_total_requests=max_total_requests,
+            trakt_augmentor=MediaUserTraktAugmentor.from_env(
+                self.env_vars, max_content,
+                use_as_seed=trakt_use_as_seed,
+                use_as_exclusion=trakt_use_as_exclusion,
+            ),
+            max_content=max_content,
+        )
+        self.logger.info("Jellyfin handler initialized")
+
+    async def _init_plex_handler(
+        self, seer_client, tmdb_client, max_similar_movie, max_similar_tv,
+        selected_users, max_content, use_llm=None,
+        max_total_requests=None,
+        honor_seer_discovery: bool = False,
+        seer_discovered_ids: Optional[set[str]] = None,
+        dry_run=False,
+        trakt_use_as_seed=True,
+        trakt_use_as_exclusion=True,
+    ):
+        """Initialize Plex handler."""
+        self.logger.info("Initializing Plex client")
+
+        plex_libraries_raw = self.env_vars.get('PLEX_LIBRARIES')
+        plex_libraries = plex_libraries_raw if isinstance(plex_libraries_raw, list) else []
+
+        plex_client = PlexClient(
+            api_url=self.env_vars['PLEX_API_URL'],
+            token=self.env_vars['PLEX_TOKEN'],
+            max_content=max_content,
+            library_ids=plex_libraries,
+            user_ids=selected_users
+        )
+        await plex_client.init_existing_content()
+
+        # Build library anime map
+        plex_anime_map = {}
+        for lib in plex_libraries:
+            if isinstance(lib, dict) and lib.get('id'):
+                plex_anime_map[str(lib['id'])] = lib.get('is_anime', False)
+
+        self.media_handler = PlexHandler(
+            plex_client, seer_client, tmdb_client, self.logger,
+            max_similar_movie, max_similar_tv,
+            plex_anime_map, use_llm=use_llm,
+            honor_seer_discovery=honor_seer_discovery,
+            seer_discovered_ids=seer_discovered_ids,
+            dry_run=dry_run,
+            max_total_requests=max_total_requests,
+            trakt_augmentor=MediaUserTraktAugmentor.from_env(
+                self.env_vars, max_content,
+                use_as_seed=trakt_use_as_seed,
+                use_as_exclusion=trakt_use_as_exclusion,
+            ),
+            selected_users=selected_users,
+            max_content=max_content,
+        )
+        self.logger.info("Plex handler initialized")
+
+    async def run(self, dry_run: bool = False, execution_id=None) -> ExecutionResult:
+        """
+        Execute the recommendation job.
+
+        Args:
+            dry_run: If True, simulate execution without making actual requests.
+                     Returns items that would be queued without touching download clients.
+
+        Returns:
+            ExecutionResult with execution details. When dry_run=True, dry_run_items
+            contains the list of media that would have been requested.
+        """
+        if not self.job_data:
+            return ExecutionResult(
+                success=False,
+                results_count=0,
+                requested_count=0,
+                error_message="Job not initialized"
+            )
+
+        self.logger.info(
+            f"{'[DRY RUN] ' if dry_run else ''}Starting recommendation job: {self.job_data['name']}"
+        )
+        exec_id = None if dry_run else (execution_id or self.repository.log_execution_start(self.job_id))
+
+        try:
+            # Process recent items (this is the main recommendation logic)
+            from contextlib import AsyncExitStack
+            async with AsyncExitStack() as stack:
+                if hasattr(self.media_handler, 'seer_client'):
+                    await stack.enter_async_context(self.media_handler.seer_client)
+
+                if hasattr(self.media_handler, 'tmdb_client'):
+                    await stack.enter_async_context(self.media_handler.tmdb_client)
+                    if self.media_handler.tmdb_client.omdb_client:
+                        await stack.enter_async_context(self.media_handler.tmdb_client.omdb_client)
+
+                if hasattr(self.media_handler, 'jellyfin_client'):
+                    await stack.enter_async_context(self.media_handler.jellyfin_client)
+                elif hasattr(self.media_handler, 'plex_client'):
+                    await stack.enter_async_context(self.media_handler.plex_client)
+
+                await self.media_handler.process_recent_items()
+
+            requested_count = getattr(self.media_handler, 'request_count', 0)
+            results_count = requested_count
+            dry_run_items = getattr(self.media_handler, 'dry_run_items', None) if dry_run else None
+
+            self.logger.info(
+                f"{'[DRY RUN] ' if dry_run else ''}Job completed: "
+                f"{requested_count} {'would be ' if dry_run else ''}requested"
+            )
+
+            if not dry_run:
+                self.repository.log_execution_end(
+                    exec_id=exec_id,
+                    status='completed',
+                    results_count=results_count,
+                    requested_count=requested_count
+                )
+
+            return ExecutionResult(
+                success=True,
+                results_count=results_count,
+                requested_count=requested_count,
+                dry_run_items=dry_run_items
+            )
+
+        except Exception as e:
+            error_msg = str(e) if str(e) else type(e).__name__
+            self.logger.error(f"Job failed: {error_msg}")
+            self.logger.error(f"Traceback: {traceback.format_exc()}")
+
+            if not dry_run and exec_id is not None:
+                self.repository.log_execution_end(
+                    exec_id=exec_id,
+                    status='failed',
+                    results_count=0,
+                    requested_count=0,
+                    error_message=error_msg
+                )
+
+            return ExecutionResult(
+                success=False,
+                results_count=0,
+                requested_count=0,
+                error_message=error_msg
+            )
+
+async def execute_recommendation_job(job_id: int, overrides=None, execution_id=None) -> ExecutionResult:
+    """
+    Execute a recommendation job by ID.
+    This is the function to be called by JobManager.
+
+    Args:
+        job_id: ID of the job to execute.
+
+    Returns:
+        ExecutionResult with execution details.
+    """
+    logger = LoggerManager.get_logger("RecommendationJobExecutor")
+    logger.info(f"Starting execution of recommendation job: {job_id}")
+
+    try:
+        automation = await RecommendationAutomation.create(job_id, overrides=overrides)
+        result = await automation.run(execution_id=execution_id)
+        return result
+    except Exception as e:
+        logger.error(f"Failed to execute job {job_id}: {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return ExecutionResult(
+            success=False,
+            results_count=0,
+            requested_count=0,
+            error_message=str(e)
+        )

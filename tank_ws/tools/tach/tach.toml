@@ -1,0 +1,277 @@
+layers = [
+    "ui",
+    "commands",
+    "core",
+]
+exclude = [
+    "**/__pycache__",
+    "**/tests",
+    "build",
+    "dist",
+    "docs",
+    "tach.egg-info",
+]
+source_roots = ["python"]
+exact = true
+forbid_circular_dependencies = true
+
+[rules]
+unused_ignore_directives = "error"
+require_ignore_directive_reasons = "error"
+
+[[modules]]
+path = "*"
+depends_on = []
+depends_on_external = []
+
+[[modules]]
+path = "tach.__main__"
+depends_on = ["tach.start"]
+layer = "ui"
+
+
+[[modules]]
+path = "tach.init"
+depends_on = ["tach.show", "tach.mod"]
+layer = "commands"
+
+[[modules]]
+path = "tach.console"
+depends_on = []
+utility = true
+
+[[modules]]
+path = "tach.cache"
+depends_on = ["tach"]
+layer = "core"
+
+[[modules]]
+path = "tach.check_external"
+depends_on = []
+layer = "commands"
+
+[[modules]]
+path = "tach.cli"
+depends_on = [
+    "tach",
+]
+layer = "ui"
+
+[[modules]]
+path = "tach.constants"
+depends_on = []
+layer = "core"
+utility = true
+
+[[modules]]
+path = "tach.errors"
+depends_on = []
+layer = "core"
+utility = true
+
+[[modules]]
+path = "tach.extension"
+depends_on = []
+layer = "core"
+
+[[modules]]
+path = "tach.hooks"
+depends_on = []
+layer = "core"
+
+[[modules]]
+path = "tach.icons"
+depends_on = []
+layer = "core"
+
+[[modules]]
+path = "tach.interactive"
+depends_on = [
+    "tach.filesystem",
+]
+layer = "core"
+
+[[modules]]
+path = "tach.logging"
+depends_on = [
+]
+layer = "core"
+
+[[modules]]
+path = "tach.parsing"
+depends_on = [
+    "tach.extension",
+    "tach.filesystem",
+]
+layer = "core"
+
+[[modules]]
+path = "tach.pytest_plugin"
+depends_on = [
+    "tach.extension",
+    "tach.filesystem.**",
+    "tach.parsing",
+]
+layer = "core"
+
+[[modules]]
+path = "tach.start"
+depends_on = [
+    "tach.cli",
+]
+layer = "ui"
+
+[[modules]]
+paths = ["tach.test", "tach.report", "tach.modularity", "tach.mod"]
+depends_on = []
+layer = "commands"
+
+[[modules]] 
+path = "tach.show"
+depends_on = ["tach.modularity"]
+layer = "commands"
+
+[[modules]]
+path = "tach.utils"
+depends_on = []
+layer = "core"
+utility = true
+
+[[interfaces]]
+expose = [
+    "export_report",
+    "upload_report_to_gauge",
+    "Module",
+    "Usage",
+    "build_.*",
+    "serialize_.*",
+]
+from = [
+    "tach.modularity",
+]
+
+[[interfaces]]
+expose = [
+    "__version__",
+]
+from = [
+    "tach",
+]
+data_types = "primitive"
+
+[[interfaces]]
+expose = [
+    "main",
+]
+from = [
+    "tach.cli",
+]
+
+[[interfaces]]
+expose = [
+    "PACKAGE_NAME",
+    "TOOL_NAME",
+    "CONFIG_FILE_NAME",
+    "PACKAGE_FILE_NAME",
+    "ROOT_MODULE_SENTINEL_TAG",
+    "DEFAULT_EXCLUDE_PATHS",
+    "GAUGE_API_BASE_URL",
+]
+from = [
+    "tach.constants",
+]
+data_types = "primitive"
+
+[[interfaces]]
+expose = [
+    "build_pre_commit_hook_content",
+]
+from = [
+    "tach.hooks",
+]
+
+[[interfaces]]
+expose = [
+    "get_selected_modules_interactive",
+    "InteractiveModuleConfiguration",
+]
+from = [
+    "tach.interactive",
+]
+
+[[interfaces]]
+expose = [
+    "logger",
+    "CallInfo",
+    "init_logging",
+]
+from = [
+    "tach.logging",
+]
+
+[[interfaces]]
+expose = [
+    "mod_edit_interactive",
+]
+from = [
+    "tach.mod",
+]
+
+[[interfaces]]
+expose = [
+    "parse_project_config",
+    "dump_project_config_to_toml",
+    "combine_exclude_paths",
+]
+from = [
+    "tach.parsing",
+]
+
+[[interfaces]]
+expose = [
+    "report",
+    "external_dependency_report",
+]
+from = [
+    "tach.report",
+]
+
+[[interfaces]]
+expose = [
+    "upload_show_report",
+    "generate_module_graph_.*"
+]
+from = [
+    "tach.show",
+]
+
+[[interfaces]]
+expose = [
+    "start",
+]
+from = [
+    "tach.start",
+]
+
+
+[[interfaces]]
+expose = [
+    "run_affected_tests",
+]
+from = [
+    "tach.test",
+]
+
+[cache]
+file_dependencies = [
+    "python/tests/**",
+    "src/*.rs",
+]
+
+[external]
+exclude = [
+    "pytest",
+    "pydot",
+    "eval_type_backport",
+]
+

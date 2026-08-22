@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-07-30T14:57:04.541873",
+  "topic": "infrastructure automation tools",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "vividus-framework/vividus",
+      "html_url": "https://github.com/vividus-framework/vividus",
+      "description": "VIVIDUS is all in one test automation tool",
+      "stars": 415,
+      "language": "Java",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "NotHarshhaa/devops-cheatsheet",
+      "html_url": "https://github.com/NotHarshhaa/devops-cheatsheet",
+      "description": "A comprehensive collection of quick-reference cheatsheets for DevOps tools, covering CI/CD, containerization, monitoring, security, cloud infrastructure, and networking. Perfect for DevOps engineers, sysadmins, developers, and newcomers looking for essential commands and best practices. Contribution",
+      "stars": 331,
+      "language": "TypeScript",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "Sfedfcv/redesigned-pancake",
+      "html_url": "https://github.com/Sfedfcv/redesigned-pancake",
+      "description": "Skip to content github / docs Code Issues 80 Pull requests 35 Discussions Actions Projects 2 Security Insights Merge branch 'main' into 1862-Add-Travis-CI-migration-table  1862-Add-Travis-CI-migration-table (#1869, Iixixi/ZachryTylerWood#102, THEBOLCK79/docs#1, sbnbhk/docs#1) @martin389 martin389 co",
+      "stars": 251,
+      "language": null,
+      "default_branch": "main"
+    }
+  ],
+  "total_findings": 5,
+  "findings": [
+    {
+      "type": "command",
+      "value": "git clone --recursive https://github.com/vividus-framework/vividus.git"
+    },
+    {
+      "type": "command",
+      "value": "./gradlew build"
+    },
+    {
+      "type": "tool",
+      "name": "Next.js",
+      "description": "React framework for production"
+    },
+    {
+      "type": "tool",
+      "name": "TypeScript",
+      "description": "Type-safe JavaScript"
+    },
+    {
+      "type": "tool",
+      "name": "Tailwind CSS",
+      "description": "Utility-first CSS framework"
+    }
+  ],
+  "script_summary": "2 commands, 3 tools"
+}

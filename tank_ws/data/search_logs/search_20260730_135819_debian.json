@@ -1,0 +1,52 @@
+{
+  "timestamp": "2026-07-30T13:58:19.393199",
+  "query": "debian",
+  "duration_ms": 7180.5,
+  "total_results": 3,
+  "results_by_source": {
+    "torrent": {
+      "count": 3,
+      "items": [
+        {
+          "title": "debian 8 0 0 amd64 DVD 1 iso",
+          "link": "http://itorrents.net/torrent/57E159A58261C8D2F42A64980D2B808E3901FCF6.torrent?title=debian-8-0-0-amd64-DVD-1-iso",
+          "seeds": 818,
+          "peers": 54,
+          "time": "1 Year+",
+          "size": "3.7 GB",
+          "desc": "https://www.limetorrents.info/debian-8-0-0-amd64-DVD-1-iso-torrent-6164389.html",
+          "provider": "Limetorrents",
+          "_provider": "Limetorrents",
+          "magnet": "",
+          "source": "torrent"
+        },
+        {
+          "title": "Clojure Stack for Developers (Debian based)",
+          "link": "http://itorrents.net/torrent/5D0C6941189AABA096C16510A0A34D6B48AA106A.torrent?title=Clojure-Stack-for-Developers-(Debian-based)",
+          "seeds": 569,
+          "peers": 377,
+          "time": "1 Year+",
+          "size": "7.32 MB",
+          "desc": "https://www.limetorrents.info/Clojure-Stack-for-Developers-(Debian-based)-torrent-9996237.html",
+          "provider": "Limetorrents",
+          "_provider": "Limetorrents",
+          "magnet": "",
+          "source": "torrent"
+        },
+        {
+          "title": "debian-live-500-i386-kde-desktop iso",
+          "link": "http://itorrents.net/torrent/811F2F24BD6056114F7F2E0154479E1E5F81D357.torrent?title=debian-live-500-i386-kde-desktop-iso",
+          "seeds": 162,
+          "peers": 82,
+          "time": "1 Year+",
+          "size": "661.12 MB",
+          "desc": "https://www.limetorrents.info/debian-live-500-i386-kde-desktop-iso-torrent-492477.html",
+          "provider": "Limetorrents",
+          "_provider": "Limetorrents",
+          "magnet": "",
+          "source": "torrent"
+        }
+      ]
+    }
+  }
+}

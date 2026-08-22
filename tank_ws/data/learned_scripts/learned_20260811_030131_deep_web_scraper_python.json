@@ -1,0 +1,71 @@
+{
+  "timestamp": "2026-08-11T03:01:31.832212",
+  "topic": "deep web scraper python",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "techenthusiast167/DeepWebHarvester",
+      "html_url": "https://github.com/techenthusiast167/DeepWebHarvester",
+      "description": "A stealthy Python dark web scraper using Tor. Crawl .onion sites anonymously, with retries, rate-limiting, and automatic Tor circuit renewal. Created for ethical OSINT with a hacker vibe. Handle pages, extract links, save data safely.",
+      "stars": 80,
+      "language": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "absingh31/Tor_Spider",
+      "html_url": "https://github.com/absingh31/Tor_Spider",
+      "description": "Python project to crawl and scrap the lesser known deep web or one can say dark web. Just provide the onion link and get started.",
+      "stars": 70,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "lsubotic/captcha-solve-scraper",
+      "html_url": "https://github.com/lsubotic/captcha-solve-scraper",
+      "description": "Utilizing Deep Learning with Web Scraping to solve Amazon CAPTCHA and extract product details into an SQL database",
+      "stars": 8,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 8,
+  "findings": [
+    {
+      "type": "tool",
+      "name": "Keep system time accurate (sudo timedatectl set",
+      "description": "ntp true) for Tor to work correctly."
+    },
+    {
+      "type": "tool",
+      "name": "If it's not running, you can start it with:",
+      "description": "**sudo systemctl start tor**"
+    },
+    {
+      "type": "pip_package",
+      "value": "requests"
+    },
+    {
+      "type": "tool",
+      "name": "Striping out IOCs and other related data (On To",
+      "description": "Do list)."
+    },
+    {
+      "type": "tool",
+      "name": "Go to /etc/tor/torrc and uncomment",
+      "description": "_**ControlPort 9051**_"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "virtualenv"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    }
+  ],
+  "script_summary": "4 tools, 4 pip_packages"
+}

@@ -1,0 +1,171 @@
+{
+  "timestamp": "2026-08-08T03:00:05.636131",
+  "topic": "AI automation scripts python",
+  "repos_scanned": 3,
+  "repos": [
+    {
+      "full_name": "rushindrasinha/youtube-shorts-pipeline",
+      "html_url": "https://github.com/rushindrasinha/youtube-shorts-pipeline",
+      "description": "Automated YouTube Shorts pipeline: news \u2192 script \u2192 AI visuals \u2192 voiceover \u2192 captions \u2192 upload",
+      "stars": 2168,
+      "language": "Python",
+      "default_branch": "main"
+    },
+    {
+      "full_name": "awekrx/AutoDoc-ChatGPT",
+      "html_url": "https://github.com/awekrx/AutoDoc-ChatGPT",
+      "description": "AutoDoc-ChatGPT is a Python script that leverages the power of ChatGPT model to automatically generate documentation for any programming language. With AutoDoc-ChatGPT, you can easily generate comprehensive documentation for your codebase.",
+      "stars": 393,
+      "language": "Python",
+      "default_branch": "master"
+    },
+    {
+      "full_name": "ok-oldking/ok-script-app",
+      "html_url": "https://github.com/ok-oldking/ok-script-app",
+      "description": "Python\u7248\u6309\u952e\u7cbe\u7075\u57fa\u4e8eok-script\u5f00\u53d1",
+      "stars": 178,
+      "language": "Python",
+      "default_branch": "master"
+    }
+  ],
+  "total_findings": 29,
+  "findings": [
+    {
+      "type": "command",
+      "value": "python -m verticals run --topic \"Sam Altman just mass-fired 200 safety researchers\" --niche tech"
+    },
+    {
+      "type": "tool",
+      "name": "research with DuckDuckGo plus optional source scraping",
+      "description": "script and metadata generation through Claude, Gemini, GPT, Ollama, MiniMax, LiteLLM, or Claude CLI"
+    },
+    {
+      "type": "tool",
+      "name": "Whisper captions with ASS burn",
+      "description": "in plus SRT export, niche-configurable fonts"
+    },
+    {
+      "type": "tool",
+      "name": "news explainers",
+      "description": "niche trend breakdowns"
+    },
+    {
+      "type": "tool",
+      "name": "list",
+      "description": "style educational Shorts"
+    },
+    {
+      "type": "tool",
+      "name": "cinematic storytelling",
+      "description": "creator personality pieces"
+    },
+    {
+      "type": "tool",
+      "name": "Pick a niche with existing short",
+      "description": "form demand."
+    },
+    {
+      "type": "tool",
+      "name": "Generate and review a small batch of Shorts.",
+      "description": "Publish consistently on the platforms where that niche already moves."
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "pip_package",
+      "value": "-e"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/awekrx/AutoDoc-ChatGPT.git"
+    },
+    {
+      "type": "command",
+      "value": "pip install -r requirements.txt"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    },
+    {
+      "type": "command",
+      "value": "git clone https://github.com/<\u4f60\u7684 GitHub \u7528\u6237\u540d>/<\u4f60\u7684\u4ed3\u5e93\u540d>.git"
+    },
+    {
+      "type": "tool",
+      "name": "\u53ef\u76f4\u63a5\u542f\u52a8\u7684 ok",
+      "description": "script GUI \u5e94\u7528\u5165\u53e3\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "`MyOneTimeTask` \u793a\u4f8b\u4efb\u52a1\uff0c\u6f14\u793a\u5e38\u7528\u4efb\u52a1 API \u548c\u914d\u7f6e\u63a7\u4ef6\u3002",
+      "description": "\u914d\u7f6e\u63a7\u4ef6\u793a\u4f8b\uff1a\u4e0b\u62c9\u6846\u3001\u5e03\u5c14\u503c\u3001\u6574\u6570\u3001\u6d6e\u70b9\u6570\u3001\u5b57\u7b26\u4e32\u3001\u591a\u884c\u6587\u672c\u3001\u5217\u8868\u3001\u591a\u9009\u3001\u6587\u4ef6\u9009\u62e9\u3001\u6587\u4ef6\u5939\u9009\u62e9\u3001\u5168\u5c40\u914d\u7f6e\u548c\u6309\u94ae\u7ec4\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "OCR\u3001\u76f8\u5bf9\u533a\u57df\u8bc6\u522b\u548c\u6a21\u677f\u5339\u914d\u793a\u4f8b\u3002",
+      "description": "`ConfigOption` \u5168\u5c40\u914d\u7f6e\u793a\u4f8b\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "`TaskTestCase` \u81ea\u52a8\u5316\u6d4b\u8bd5\u793a\u4f8b\u3002",
+      "description": "i18n \u7ffb\u8bd1\u6587\u4ef6\u548c `.mo` \u7f16\u8bd1\u4ea7\u7269\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "`gui_title`\uff1a\u5e94\u7528\u7a97\u53e3\u540d\u79f0\u3002",
+      "description": "`windows`\uff1aWindows \u539f\u751f\u6e38\u620f\u7684 exe\u3001\u7a97\u53e3\u7c7b\u540d\u3001\u4ea4\u4e92\u65b9\u5f0f\u548c\u622a\u56fe\u65b9\u5f0f\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "`adb.packages`\uff1a\u6a21\u62df\u5668\u6216 Android \u8bbe\u5907\u4e0a\u7684\u6e38\u620f\u5305\u540d\u3002",
+      "description": "`browser`\uff1a\u6d4f\u89c8\u5668\u6e38\u620f\u7684 URL\u3001\u663e\u793a\u540d\u79f0\u548c\u6d4f\u89c8\u5668\u5206\u8fa8\u7387\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "`supported_resolution`\uff1a\u652f\u6301\u7684\u753b\u9762\u6bd4\u4f8b\u548c\u6700\u4f4e\u5206\u8fa8\u7387\u3002",
+      "description": "`links`\uff1a\u9879\u76ee\u4e3b\u9875\u3001\u53cd\u9988\u6e20\u9053\u548c\u793e\u533a\u94fe\u63a5\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "\u6b63\u5f0f\u53d1\u5e03\u65f6\uff0c\u5efa\u8bae\u8ba9 `git_url` \u6307\u5411\u5355\u72ec\u7684\u8f7b\u91cf\u66f4\u65b0\u4ed3\u5e93\u3002",
+      "description": "\u524d\u671f\u6d4b\u8bd5\u65f6\uff0c\u53ef\u4ee5\u76f4\u63a5\u6307\u5411\u7b2c 1 \u6b65\u521b\u5efa\u7684\u6e90\u7801\u4ed3\u5e93\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "\u4fee\u6539 `default_config` \u589e\u52a0\u4efb\u52a1\u914d\u7f6e\u9ed8\u8ba4\u503c\u3002",
+      "description": "\u4fee\u6539 `config_type` \u9009\u62e9\u914d\u7f6e\u63a7\u4ef6\u7c7b\u578b\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "\u5728 `run()` \u4e2d\u7f16\u5199\u81ea\u52a8\u5316\u903b\u8f91\u3002",
+      "description": "\u4f7f\u7528 `self.ocr()` \u505a\u6587\u5b57\u8bc6\u522b\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "\u4f7f\u7528 `self.find_one()` \u6216 `self.find_feature()` \u505a\u6a21\u677f\u5339\u914d\u3002",
+      "description": "\u4f7f\u7528 `self.info_set()` \u5728 UI \u4e2d\u5c55\u793a\u4efb\u52a1\u72b6\u6001\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "`pyappify.yml`\uff1a\u5b9a\u4e49\u5e94\u7528\u540d\u79f0\u3001\u5165\u53e3\u3001\u56fe\u6807\u3001Python \u7248\u672c\u548c\u66f4\u65b0\u4ed3\u5e93\u3002",
+      "description": "`deploy.txt`\uff1a\u5b9a\u4e49\u9700\u8981\u540c\u6b65\u5230\u72ec\u7acb\u66f4\u65b0\u4ed3\u5e93\u7684\u6587\u4ef6\u3002"
+    },
+    {
+      "type": "tool",
+      "name": "\u7528\u6237\u7fa4\uff1a`1097603920`",
+      "description": "\u5f00\u53d1\u8005\u7fa4\uff1a`938132715`"
+    },
+    {
+      "type": "pip_package",
+      "value": "--upgrade"
+    },
+    {
+      "type": "pip_package",
+      "value": "-r"
+    }
+  ],
+  "script_summary": "4 commands, 20 tools, 5 pip_packages"
+}
