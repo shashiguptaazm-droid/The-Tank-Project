@@ -1,9 +1,38 @@
-# The Tank Project
+# 🪖 The Tank Project
 
-> A tracked AI robot — Raspberry Pi 5 + ROS2 Humble + Python + **TankOS GUI**.
+<p align="center">
+  <b>A self-evolving, emotionally-aware, track-driven AI companion robot</b><br>
+  <sub>Raspberry Pi 5 · ROS2 Humble · Python · PySide6 · ESP32-S3</sub>
+</p>
 
-An emotionally-aware, always-on, voice-operated AI-companion robot with a complete
-graphical operating environment (**TankOS**) that replaces the Raspberry Pi desktop.
+<p align="center">
+  <img src="https://img.shields.io/badge/hardware-Raspberry_Pi_5-C51A4A?logo=raspberrypi&logoColor=white" alt="Pi 5">
+  <img src="https://img.shields.io/badge/ros-ROS2_Humble-22314E?logo=ros&logoColor=white" alt="ROS2">
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
+  <img src="https://img.shields.io/badge/python-3.10+-blue?logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/status-Phase_11_active-brightgreen" alt="Status">
+  <img src="https://img.shields.io/badge/CLI_commands-400+-informational" alt="Features">
+  <img src="https://img.shields.io/badge/ROS2_packages-16-orange" alt="Packages">
+</p>
+
+> **TankOS** — a complete graphical AI operating environment that replaces the Raspberry Pi desktop with a PySide6/Qt6 shell, 35 AI-powered managers, 400+ CLI utilities, and a 22-system cognitive architecture. All AI runs **fully offline** (llama.cpp, Whisper, Piper TTS, YOLOv8n).
+
+---
+
+## ⚡ At a Glance
+
+| | |
+|---|---|
+| 🧠 **Cognitive Architecture** | 22 systems (Perception → Attention → Reasoning → Planning → Decision → Learning → Memory → Emotion → Metacognition) |
+| 🤖 **AI Managers** | 35 (Event Bus, Vision, Memory, Emotion, Security, Voice, Recovery, Internet, Evolution Bridge, Local LLM, Preload, etc.) |
+| 🖥️ **TankOS GUI Apps** | 13 (Home, AI Chat, Camera, Navigation, Memory, Security, Patrol, Files, Diagnostics, Developer, Settings, Power, Updates) |
+| 🔧 **Host CLIs** | 400+ subcommands across 60+ scripts (diagnostics, calibration, OTA, fleet, SLAM, vision, security, power, etc.) |
+| 📦 **ROS2 Packages** | 16 (motion, vision, navigation, speech, memory, assistant, security, health, dashboard, meta, etc.) |
+| 🛠️ **Hardware** | Raspberry Pi 5, RPLidar A1, BNO055 IMU, Pi Cam v3, PCA9685 servos, ESP32-S3 OLED eyes, L298N motor driver |
+| 🔒 **Privacy-first** | Fully offline AI. No cloud dependency for core functions. All inference runs locally. |
+| 📐 **CAD** | 3D-printable chassis with OpenSCAD sources, STL exports, BOM, assembly guide |
+
+---
 
 ```
 the tank project/
@@ -39,15 +68,7 @@ the tank project/
 └── cad/                        # 3D-printable chassis CAD files
 ````
 
-## TankOS — Graphical AI Operating Environment
-
-## Documentation
-
-Companion docs in `docs/`:
-
-- [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md) - canonical software & Python dependency manifest for the Simple Internet application layer (apt + brew + pip + Raspberry Pi add-ons).
-- [`docs/SIMPLE_INTERNET_ARCH.md`](docs/SIMPLE_INTERNET_ARCH.md) - module-by-module architecture write-up: User Interfaces, Core Service, Download Engine, Media Resolver, Post-Processing, Search & Discovery, Scheduler, Security/Privacy, Storage, Plugin System, Cloud/Remote.
-
+## 🧠 TankOS — Graphical AI Operating Environment
 
 TankOS is a **complete PySide6/Qt6 graphical operating environment** that:
 - Boots automatically via `tank-init.service` — no Pi desktop ever appears
