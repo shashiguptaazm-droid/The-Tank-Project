@@ -74,7 +74,7 @@ class LumaOledHal:
         except ImportError as exc:
             raise RuntimeError(
                 "luma.oled is not installed but use_luma=True. "
-                "Run `pip install luma.oled` on the Pi 5, or set "
+                "Run `pip install luma.oled` on the Jetson, or set "
                 "`use_luma: false` in tank_display.yaml for bench mode."
             ) from exc
         self.width = width

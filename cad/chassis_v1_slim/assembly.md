@@ -1,7 +1,7 @@
 # Assembly Guide — Chassis v1 Slim
 
 > **Goal:** from filament + fasteners → fully mobile, attachable tank
-> chassis with a Raspberry Pi 5 underneath, ready for `ros2 launch
+> chassis with a NVIDIA Jetson Orin Nano underneath, ready for `ros2 launch
 > tank_bringup robot.launch.py`.
 
 ---
@@ -36,7 +36,7 @@ A `BOM.csv` line-by-line machine-readable copy ships in this folder.
 
 ```
    ┌──────────────────────┐  ← Pi Camera Module 3 (ribbon toward the front)
-   │  Pi 5 + M.2 HAT+     │
+   │  NVIDIA Jetson + M.2 HAT+     │
    │  + Active Cooler     │
    └─────────┬────────────┘
              │ 4× M2.5 × 12 mm standoff (sets pi_stack_max_h = 22 mm)
@@ -47,7 +47,7 @@ A `BOM.csv` line-by-line machine-readable copy ships in this folder.
 
 1. Drop the four Nylon 12 mm standoffs through the M2.5 holes in the Pi PCB.
 2. Place the M.2 HAT+ on top, screw down (4× M2.5).
-3. Plug the **active cooler** fan header into the Pi 5's J5 fan header.
+3. Plug the **active cooler** fan header into the NVIDIA Jetson's J5 fan header.
 4. Slide the assembled Pi+stack into the chassis recess, USB-A ports
    facing the rear (gives access from the back).
 5. Drive **4× M2.5 × 6 mm pan-head screws** through the chassis bosses
@@ -110,7 +110,7 @@ latches).  Print separately:
 ## 7. First boot
 
 ```bash
-# Pi 5 side
+# NVIDIA Jetson side
 ssh pilot@tank.lan
 sudo systemctl status tank_bringup
 ros2 topic list | grep -E 'cmd_vel|odom|pan_tilt'

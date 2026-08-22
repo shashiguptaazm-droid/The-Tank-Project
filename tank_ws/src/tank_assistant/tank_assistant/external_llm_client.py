@@ -520,7 +520,7 @@ class ExternalLlmClientNode(Node):  # type: ignore[no-redef]
         if not text:
             return
         # Submit through the bounded pool so /assistant/uncertain
-        # bursts can't spawn unbounded threads on the Pi 5.
+        # bursts can't spawn unbounded threads on the Jetson.
         ExternalLlmClientNode._EXECUTOR.submit(
             self._call_external, text, context,
         )
@@ -529,7 +529,7 @@ class ExternalLlmClientNode(Node):  # type: ignore[no-redef]
         try:
             system = (
                 "You are a concise assistant for The Tank (a ROS 2 "
-                "Pi 5 robot). Keep replies under 80 words. Don't "
+                "Jetson robot). Keep replies under 80 words. Don't "
                 "speculate about hardware you don't know."
             )
             result = self._provider.prompt(
@@ -567,7 +567,7 @@ class ExternalLlmClientNode(Node):  # type: ignore[no-redef]
 def main(args=None) -> None:
     if not _RCLPY_AVAILABLE:
         print("external_llm_client CLI: rclpy not installed; "
-              "set env keys and rerun on the Pi 5", flush=True)
+              "set env keys and rerun on the Jetson", flush=True)
         return
     rclpy.init(args=args)
     node = ExternalLlmClientNode()

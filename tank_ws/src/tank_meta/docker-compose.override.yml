@@ -1,6 +1,6 @@
 version: "3.9"
 
-# Drop this next to your existing docker-compose.yml on the Pi 5 and
+# Drop this next to your existing docker-compose.yml on the Jetson and
 # run `docker compose up -d` to spin up the tank_meta API alongside
 # Home Assistant + Prometheus + Grafana. Only overrides — never replaces
 # the upstream compose.

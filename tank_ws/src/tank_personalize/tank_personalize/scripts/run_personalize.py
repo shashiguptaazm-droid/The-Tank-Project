@@ -7,7 +7,7 @@ Examples
 --------
 ::
 
-    # local Pi 5, with full auth + ROS bridge thread
+    # local Jetson, with full auth + ROS bridge thread
     TANK_API_KEY=wJALw9x...
     python3 -m tank_personalize.scripts.run_personalize
 

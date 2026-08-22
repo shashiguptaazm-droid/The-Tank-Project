@@ -546,7 +546,7 @@ class MemoryStore:
         Implemented in Python (not SQL) because core SQLite (before 3.35 +
         the math extension) does not ship :func:`math.exp`. The Python loop
         is bounded by the active fact count (<=5000 per dashboard tile)
-        so the round-trip cost is negligible on Pi 5.
+        so the round-trip cost is negligible on Jetson.
         """
         import math as _math
         tau = float(tau_days if tau_days is not None else self.FORGET_DECAY_TAU_DAYS)

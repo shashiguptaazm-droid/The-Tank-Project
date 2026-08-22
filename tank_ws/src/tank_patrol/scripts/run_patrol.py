@@ -2,7 +2,7 @@
 """Stand-alone CLI for planning a patrol trajectory without spinning up ROS.
 
 Useful when you want to verify a waypoints file or tune random-walk bounds
-without booting the whole Pi 5 stack.
+without booting the whole Jetson stack.
 
 Usage::
 

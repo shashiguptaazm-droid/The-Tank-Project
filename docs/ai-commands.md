@@ -5,7 +5,7 @@ Cody, etc.) that wants to drive The Tank over HTTP.
 
 The Pi exposes a JSON command bridge on **port 8082**. Every request
 **must** include `Authorization: Bearer <TANK_API_KEY>` (the key lives
-in `/root/the tank project/secrets/tank_api_key` on the Pi 5) and a
+in `/root/the tank project/secrets/tank_api_key` on the Jetson) and a
 server-generated `audit_id` (uuidv4).
 
 ---
@@ -237,4 +237,4 @@ The new scripts fall into the following domains (full mapping in README.md):
 - Productivity: `comm_networking.py`, `maintenance.py`, `education.py`, `gaming.py`, `energy_home.py`, `maker_misc.py`
 - Simple Internet (F717-F1166): `download_*.py`, `download_*_2.py`, `download_*_3.py`
 
-For a complete dependency manifest (apt + brew + pip + Pi 5 add-ons), see [`docs/DEPENDENCIES.md`](DEPENDENCIES.md).
+For a complete dependency manifest (apt + brew + pip + Jetson add-ons), see [`docs/DEPENDENCIES.md`](DEPENDENCIES.md).

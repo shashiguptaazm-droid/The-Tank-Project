@@ -1,6 +1,6 @@
 # 🚀 The Tank Project — Complete Definition for ChatGPT
 
-> **What this is:** A comprehensive, single-document definition of the entire Tank Project — a tracked AI robot built on Raspberry Pi 5 + ROS 2 Humble + Python. Share this with any AI assistant (ChatGPT, Claude, Freebuff, Codex) to give it full context on the codebase it's working with.
+> **What this is:** A comprehensive, single-document definition of the entire Tank Project — a tracked AI robot built on NVIDIA Jetson Orin Nano + ROS 2 Humble + Python. Share this with any AI assistant (ChatGPT, Claude, Freebuff, Codex) to give it full context on the codebase it's working with.
 
 ---
 
@@ -8,7 +8,7 @@
 
 **Name:** The Tank Project
 **Type:** Tracked AI-companion robot
-**Hardware:** Raspberry Pi 5 (8 GB) + ESP32-S3 + custom chassis
+**Hardware:** NVIDIA Jetson Orin Nano (8 GB) + ESP32-S3 + custom chassis
 **Software:** ROS 2 Humble colcon workspace (pure Python, no C++)
 **AI Stack:** Local LLM (llama.cpp), Whisper STT, Piper TTS, openWakeWord, YOLOv8n
 **Repo Root:** `/root/the tank project/`
@@ -460,10 +460,10 @@ Every 30s, the learner analyzes patterns and flags anomalies by priority:
 ### Compute & Brains (~₹17,200)
 | Component | Spec | Role |
 |-----------|------|------|
-| Raspberry Pi 5 8GB | 85×56mm, USB-C PD | Master controller, ROS 2 Humble |
-| MicroSD 64GB A2 | Boot drive | Pi 5 OS |
+| NVIDIA Jetson Orin Nano 8GB | 85×56mm, USB-C PD | Master controller, ROS 2 Humble |
+| MicroSD 64GB A2 | Boot drive | Jetson OS |
 | M.2 NVMe 256GB | Samsung/WD/Crucial | `/var/lib/tank` for DBs, bags, recordings |
-| Pi 5 M.2 HAT+ | PCIe-Gen2-x1 | Houses NVMe |
+| Jetson M.2 HAT+ | PCIe-Gen2-x1 | Houses NVMe |
 | ESP32-S3 DevKitC-1 N16R8 | Dual-core Xtensa LX7 | Eye display driver over SPI |
 
 ### Vision & Display (~₹8,400)
@@ -501,12 +501,12 @@ Every 30s, the learner analyzes patterns and flags anomalies by priority:
 | Mini amplified USB speaker | Dashboard audio |
 
 ### Power (Dual Rail)
-- **Pi Rail:** USB-C PD power bank ≥ 27W → Pi 5 (5V/5A)
+- **Jetson Rail:** USB-C PD power bank ≥ 27W → Jetson (5V/5A)
 - **Motor Rail:** 12V SLA/3S Li-ion → BTS7960 drivers → motors
 - **Key Principle:** Isolated grounds to prevent motor spikes from resetting Pi
 
 ### Networking
-- Pi 5 onboard Wi-Fi + USB Wi-Fi 6 adapter
+- Jetson onboard Wi-Fi + USB Wi-Fi 6 adapter
 - Quectel EC25/SIM7600E LTE modem (cellular failover)
 - USB Ethernet adapter (wired backhaul preferred)
 - WireGuard + Tailscale VPN (installed by provision_pi5.sh)
@@ -596,7 +596,7 @@ These rules were enforced across all phases and must be maintained:
 
 ```
 ├── scripts/                          # 60+ host-level CLIs (206+ subcommands)
-│   ├── setup_pi5.sh                  # One-shot Pi 5 installer
+│   ├── setup_pi5.sh                  # One-shot Jetson installer
 │   ├── provision_pi5.sh              # Idempotent master installer
 │   ├── diagnostics.py                # Battery, IMU, LiDAR, camera, Wi-Fi, audio
 │   ├── calibrate.py                  # IMU, camera, pan-tilt, LiDAR, battery, track
@@ -701,7 +701,7 @@ PYTHONPATH=. python3 -m tank_os.shell.main
 # Run TankOS with Qt GUI (requires PySide6)
 TANKOS_QT=1 PYTHONPATH=. python3 -m tank_os.shell.main
 
-# Install TankOS on Raspberry Pi 5
+# Install TankOS on NVIDIA Jetson Orin Nano
 bash tank_os/install.sh --apply
 
 # Start TankOS as a system service
@@ -754,9 +754,9 @@ curl -s -X POST http://localhost:8082/api/cmd/telemetry \
 
 ## 16. 🖥️ TankOS — Graphical AI Operating Environment
 
-> **TankOS is not a replacement Linux kernel.** It is a complete operating environment that boots automatically on Raspberry Pi 5 and becomes the only interface the user sees. Linux exists only as the hardware abstraction layer.
+> **TankOS is not a replacement Linux kernel.** It is a complete operating environment that boots automatically on NVIDIA Jetson Orin Nano and becomes the only interface the user sees. Linux exists only as the hardware abstraction layer.
 
-TankOS is a full PySide6/Qt6 graphical environment replacing the Raspberry Pi desktop, designed to be:
+TankOS is a full PySide6/Qt6 graphical environment replacing the Jetson desktop, designed to be:
 - **AI-first**: Every subsystem is AI-aware and AI-coordinated
 - **Voice-first**: Wake word → STT → AI → TTS pipeline as primary interaction
 - **Touch-first**: Optimized for 7-inch DSI touchscreen
@@ -767,7 +767,7 @@ TankOS is a full PySide6/Qt6 graphical environment replacing the Raspberry Pi de
 
 | Layer | Name | Contents |
 |-------|------|----------|
-| **Layer 1** | Linux | Drivers, networking, audio, USB, Bluetooth, power, Pi 5 hardware |
+| **Layer 1** | Linux | Drivers, networking, audio, USB, Bluetooth, power, Jetson hardware |
 | **Layer 2** | ROS2 | Existing 16 packages unchanged: tank_motion, tank_vision, tank_assistant, tank_navigation, tank_security, tank_health, tank_dashboard, tank_meta, tank_display, tank_patrol, tank_task, tank_personalize, tank_command_bridge, etc. |
 | **Layer 3** | TankOS Core | Application Manager, Plugin Manager, Notification Manager, Permission Manager, Display Manager, Theme Manager, Voice Manager, Window Manager, Settings Manager, Update Manager, Power Manager, Hardware Manager, Event Bus, AI Manager |
 | **Layer 4** | Tank Shell | The full-screen Qt6 GUI — Home, AI Chat, Camera, Navigation, Memory, Security, Patrol, Files, Diagnostics, Developer Mode, Settings, Power, Updates screens |
@@ -777,7 +777,7 @@ TankOS is a full PySide6/Qt6 graphical environment replacing the Raspberry Pi de
 Power On → Pi Firmware → Linux Kernel → systemd → tank-init.service
 → Hardware Detection → ROS2 Core → TankOS Core → Tank Shell → Dashboard
 ```
-No Raspberry Pi desktop should ever appear.
+No Jetson desktop should ever appear.
 
 ### Tank Shell Screens
 

@@ -215,7 +215,7 @@ def classify_ability(repo_name: str, description: str) -> Optional[str]:
         "security-hardening": ["security", "firewall", "harden", "vpn"],
         "backup-restore": ["backup", "restore", "rsync", "snapshot"],
         "iot-home": ["iot", "mqtt", "home assistant", "sensor"],
-        "raspberry-pi": ["raspberry pi", "gpio", "pico"],
+        "raspberry-pi": ["NVIDIA Jetson", "gpio", "pico"],
         "gaming-tools": ["game", "gaming", "emulator"],
         "productivity": ["productivity", "todo", "note", "task"],
         "dev-tools": ["developer tool", "git ", "code generation", "ide"],

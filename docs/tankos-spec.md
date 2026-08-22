@@ -4,11 +4,11 @@
 
 Build TankOS, a graphical AI operating environment for The Tank Project.
 
-TankOS is not a replacement Linux kernel. It is a complete operating environment that boots automatically on Raspberry Pi 5 and becomes the only interface the user sees.
+TankOS is not a replacement Linux kernel. It is a complete operating environment that boots automatically on NVIDIA Jetson Orin Nano and becomes the only interface the user sees.
 
 Linux exists only as the hardware abstraction layer.
 
-The user should never interact with the Raspberry Pi desktop.
+The user should never interact with the Jetson desktop.
 
 ---
 
@@ -32,7 +32,7 @@ TankOS must be:
 ## Base Platform
 
 **Operating System:**
-- Raspberry Pi OS Lite (64-bit)
+- Jetson OS Lite (64-bit)
 
 **Middleware:**
 - ROS2 Humble
@@ -75,7 +75,7 @@ Tank Shell
 Dashboard
 ```
 
-No Raspberry Pi desktop should ever appear.
+No Jetson desktop should ever appear.
 
 ---
 
@@ -515,7 +515,7 @@ tank_os/
 
 ## Final Objective
 
-TankOS should feel like a commercial AI operating system rather than a Raspberry Pi application.
+TankOS should feel like a commercial AI operating system rather than a Jetson application.
 
 The user should believe they are interacting with an intelligent robotic operating system.
 

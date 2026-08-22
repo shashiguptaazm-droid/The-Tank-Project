@@ -181,8 +181,8 @@ sudo bash tank_os/install.sh --apply
 sudo bash tank_os/install.sh --apply --skip-models
 
 # Legacy scripts still work (they delegate)
-sudo bash scripts/setup_pi5.sh --apply
-sudo bash scripts/provision_pi5.sh --apply
+sudo bash scripts/legacy installer --apply
+sudo bash scripts/legacy installer --apply
 ```
 
 The unified installer (`tank_os/install.sh`) does it all in 12 steps:
@@ -225,7 +225,7 @@ source install/setup.bash
 ros2 launch tank_bringup robot.launch.py
 ```
 
-> **Legacy scripts** `scripts/setup_pi5.sh` and `scripts/provision_pi5.sh` still work — they now delegate to the unified `tank_os/install.sh`.
+> **Legacy scripts** `scripts/legacy installer` and `scripts/legacy installer` still work — they now delegate to the unified `tank_os/install.sh`.
 
 ## Phase 1 scope
 

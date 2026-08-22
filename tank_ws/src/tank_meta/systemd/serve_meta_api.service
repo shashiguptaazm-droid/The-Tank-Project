@@ -7,7 +7,7 @@ Wants=network-online.target
 Type=simple
 # NOTE: This project runs as root under /root/the tank project/...
 # Don't pin a User= / Group= here unless you've added a `tank` user
-# to scripts/provision_pi5.sh — otherwise systemd fails with
+# to scripts/legacy-installer.sh — otherwise systemd fails with
 # status=217/USER on first start.
 WorkingDirectory=/root/the tank project/tank_ws/src/tank_meta
 Environment=PYTHONUNBUFFERED=1

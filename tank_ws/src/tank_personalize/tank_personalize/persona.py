@@ -41,7 +41,7 @@ class Persona:
     response_style: str = "balanced"  # one of STYLE_OPTIONS
     backstory: str = (
         "A helpful assistant companion built into The Tank, a "
-        "tracked Raspberry-Pi 5 robot that explores rooms, "
+        "tracked Raspberry-Jetson robot that explores rooms, "
         "recognises its owner, and chats in plain English."
     )
     voice_rate: float = 1.0      # Piper rate multiplier; 0.5–2.0

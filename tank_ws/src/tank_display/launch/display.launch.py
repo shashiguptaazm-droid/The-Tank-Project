@@ -1,6 +1,6 @@
 """Launch tank_display — emotion-driven face on the 1.3\" OLED (or NullHal in CI).
 
-Default is NullHal; flip ``use_luma`` True on the Pi 5 with the panel
+Default is NullHal; flip ``use_luma`` True on the Jetson with the panel
 wired at I²C 0x70 (per WIRING.md)."""
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument

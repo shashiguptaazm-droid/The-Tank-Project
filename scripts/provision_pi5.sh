@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════════════
-# TankOS — Comprehensive Pi 5 Provisioner (legacy wrapper)
+# TankOS — Jetson Orin Nano provisioner (legacy wrapper) (legacy wrapper)
 # ═══════════════════════════════════════════════════════════════════════
 #
 # This script now delegates to the unified master installer:

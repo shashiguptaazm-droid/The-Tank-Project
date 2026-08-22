@@ -561,7 +561,7 @@ _register(PreloadItem(
     id="camera-driver-libcamera",
     category="drivers",
     name="libcamera (Camera Stack)",
-    description="Camera stack for Raspberry Pi — includes libcamera, libcamera-apps",
+    description="Camera stack for Jetson Orin Nano — includes libcamera, libcamera-apps",
     url="",
     filename="",
     install_path="",

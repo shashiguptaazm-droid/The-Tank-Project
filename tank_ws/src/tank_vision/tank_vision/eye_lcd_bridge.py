@@ -57,7 +57,7 @@ except ImportError:
         def __init__(self, *a, **k):
             raise ImportError(
                 "rclpy is not installed; EyeLcdBridgeNode requires ROS 2 Humble. "
-                "Run scripts/provision_pi5.sh --apply on the Pi 5."
+                "Run scripts/provision_pi5.sh --apply on the Jetson."
             )
 
     Node = _StubNode           # type: ignore[assignment]

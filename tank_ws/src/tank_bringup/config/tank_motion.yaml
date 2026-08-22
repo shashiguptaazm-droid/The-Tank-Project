@@ -6,7 +6,7 @@
       max_linear_velocity: 0.8
       max_angular_velocity: 1.5
       max_rpm: 220.0
-      # Standard "safe" Pi 5 GPIO pins. Override here per-robot.
+      # Standard "safe" Jetson GPIO pins. Override here per-robot.
       dir_left_pin: 17
       pwm_left_pin: 18
       dir_right_pin: 27

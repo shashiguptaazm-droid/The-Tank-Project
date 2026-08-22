@@ -1,6 +1,6 @@
 """Launch file for ``meta_node`` — the structured coding-agent memory layer.
 
-Default args match a Pi 5 install under ``/root/the tank project/``.
+Default args match a Jetson install under ``/root/the tank project/``.
 """
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument

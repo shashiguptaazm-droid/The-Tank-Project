@@ -13,7 +13,7 @@
 //
 //  4-PIECE LAYOUT (each prints flat-on-bed, no supports):
 //    1. BODY          185 × 100 × 40 mm    (14 hardware pockets)
-//    2. TOP_DECK      185 × 100 ×  5 mm    Pi 5 + HAT + ESP32 + PCA9685 + fan + VESA
+//    2. TOP_DECK      185 × 100 ×  5 mm    NVIDIA Jetson + ESP32 + PCA9685 + fan + VESA
 //    3. FRONT_SHIELD  80 ×  95 ×  4 mm    ReSpeaker + OLED + camera + 2× HC-SR04
 //    4. LIDAR_RISER   100 × 100 × 45 mm    RPLidar A1 mount ring
 //
@@ -87,7 +87,7 @@ RENDER_OFFSET_X     = 220;
 // SECTION B — PER-HARDWARE PARAMETERS  (grouped per device, datasheet cited)
 // ============================================================================
 
-// -------- B.1 Raspberry Pi 5  (Pi 5 mechanical drawing, Rev 1.0) --------
+// -------- B.1 NVIDIA Jetson Orin Nano  (Jetson mechanical drawing, Rev 1.0) --------
 pi_l            = 85.0;
 pi_w            = 56.0;
 pi_hole_x       = 58.0;
@@ -198,11 +198,11 @@ estop_z      = 34.0;
 
 // -------- B.14 PCA9685 16-chan servo HAT (I²C 0x40) --------
 
-// -------- B.18 DSI 7-inch Touch Display  (RPi Foundation, official) ----
+// -------- B.18 DSI 7-inch Touch Display  (NVIDIA, official) ----
 //   Active LCD area : 154 x 86 mm
 //   PCBA outline     : 165 x 100 mm  (mounts INSIDE the body footprint)
 //   Touch overlay    : +2 mm above the LCD glass  — project total height
-//   Connector        : 15-pin FFC to Pi 5 CAM/DISP1 port (DSI ribbon)
+//   Connector        : 15-pin FFC to Jetson CAM/DISP1 port (DSI ribbon)
 //   Power            : +5 V via 2-pin JST on the rear-left wall (or USB)
 //   Mounting         : 4 x M2.5 stand-offs through top_deck
 dsi_l          = 165.0;
@@ -559,7 +559,7 @@ module piece_dsi_display() {
                 -1
             ]) thru(d = dsi_hole_d, h = dsi_h + 1);
         // DSI ribbon slit on the rear edge (15 mm wide ribbon routes down
-        //  through the rear top-deck slit to Pi 5 CAM/DISP1 port)
+        //  through the rear top-deck slit to Jetson CAM/DISP1 port)
         translate([dsi_x, dsi_y + dsi_w / 2 - 6, dsi_h - 0.5])
             cube([15, 1.6, 4], center = true);
         // Power cable pass-through on the rear-left (2-pin JST)
@@ -581,7 +581,7 @@ module pocket_dsi_ribbon_slit() {
     }
 }
 
-// D.20 FFC drop slit through BODY wall (chassis → Pi 5 DISP1 port):
+// D.20 FFC drop slit through BODY wall (chassis → Jetson DISP1 port):
 //   top_deck slit alone is insufficient; the 50 mm FFC travel requires
 //   the body wall to also have a slit at the rear edge so the cable can
 //   drop from z=body_total_h+5+8+4=61 down to z=4 (Pi CAM/DISP1 connector).

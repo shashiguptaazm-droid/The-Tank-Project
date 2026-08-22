@@ -2,7 +2,7 @@
 
 Why SQLite in WAL mode?
 ~~~~~~~~~~~~~~~~~~~~~~~
-* RAM footprint on Pi 5 stays low (no Postgres, no daemon to manage).
+* RAM footprint on Jetson stays low (no Postgres, no daemon to manage).
 * ``PRAGMA journal_mode=WAL`` allows concurrent readers + one writer,
   so the dashboard uvicorn pool can read while the ROS node writes.
 
@@ -202,7 +202,7 @@ class FeedbackStore:
         # Per-connection pragmas. busy_timeout handles cross-process
         # contention; journal_mode=WAL enables concurrent readers +
         # 1 writer; synchronous=NORMAL is the WAL-recommended
-        # durability setting (avoids fsync-per-commit on Pi 5 SD).
+        # durability setting (avoids fsync-per-commit on Jetson SD).
         self._conn.execute("PRAGMA busy_timeout=5000")
         self._conn.execute("PRAGMA journal_mode=WAL")
         self._conn.execute("PRAGMA synchronous=NORMAL")

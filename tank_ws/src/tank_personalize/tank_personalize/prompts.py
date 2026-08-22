@@ -114,7 +114,7 @@ def build_system_prompt(
 
     block = (
         f"You are {name}, a helpful, friendly assistant companion built "
-        f"into The Tank — a tracked Raspberry-Pi 5 robot that explores "
+        f"into The Tank — a tracked Raspberry-Jetson robot that explores "
         f"rooms, recognises its owner, greets them with warmth, and "
         f"chats in plain English.\n\n"
         f"PERSONA\n"

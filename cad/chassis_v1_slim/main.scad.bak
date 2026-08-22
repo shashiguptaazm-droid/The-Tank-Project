@@ -84,7 +84,7 @@ RENDER_OFFSET_X     = 220;
 // SECTION B — PER-HARDWARE PARAMETERS  (grouped per device, datasheet cited)
 // ============================================================================
 
-// -------- B.1 Raspberry Pi 5  (Pi 5 mechanical drawing, Rev 1.0) --------
+// -------- B.1 NVIDIA Jetson Orin Nano  (Pi 5 mechanical drawing, Rev 1.0) --------
 pi_l            = 85.0;
 pi_w            = 56.0;
 pi_hole_x       = 58.0;

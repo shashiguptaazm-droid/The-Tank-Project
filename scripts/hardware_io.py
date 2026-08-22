@@ -49,7 +49,7 @@ def cmd_servo_sweep(args: argparse.Namespace) -> int:
         import board  # type: ignore
         import busio  # type: ignore
     except ImportError:
-        _err("adafruit_pca9685 missing — install via setup_pi5.sh")
+        _err("adafruit_pca9685 missing — install via legacy installer")
         if args.dry_run:
             _log(f"DRY: would sweep channel {args.channel} "
                  f"({args.sweep_min}° → {args.sweep_max}°)")
@@ -120,7 +120,7 @@ def _run_gpio_sysfs(pins: list) -> int:
 def cmd_i2c_pullup(args: argparse.Namespace) -> int:
     """F061 — I²C pull-up sniff."""
     if not shutil.which("i2cdetect"):
-        _err("i2cdetect missing — install via setup_pi5.sh")
+        _err("i2cdetect missing — install via legacy installer")
         return 1
     out = subprocess.run(
         ["i2cdetect", "-y", str(args.bus)],

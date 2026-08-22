@@ -324,7 +324,7 @@ These were enforced after code-review in earlier phases and should be upheld:
 | Decision DEC-007 smoke-test via the new `/meta/decision_append`    | ✅ done — `tank_meta/scripts/smoke_test_dec007.py` |
 | `tank_meta` → `tank_assistant.emotion_node` link (a successful decision-append injects a 'satisfied' valence spike) | ✅ done — see `tank_assistant.emotion_node.EmotionNode._on_decision_result` (feel-good loop) |
 | rclone cron template (`tank_nas/scripts/auto_backup.py`) — systemd timer | P3 carryover                                                  |
-| Real-hardware bring-up on Jetson + Arduino (boot, run `provision_pi5.sh --apply`, flash Arduino firmware, launch `tank_bringup/launch/robot.launch.py`) | P7 |
+| Real-hardware bring-up on Jetson + Arduino (boot, run `legacy installer`, flash Arduino firmware, launch `tank_bringup/launch/robot.launch.py`) | P7 |
 
 ---
 
@@ -706,7 +706,7 @@ Plus: **files (Files/Storage) ✅ — NEW**, **terminal (AI Terminal REPL) ✅**
 
 | Item | Priority | Notes |
 |------|----------|-------|
-| Real hardware bring-up on Jetson + Arduino | 🔴 High | P8 — boot, provision_pi5.sh, flash Arduino, launch |
+| Real hardware bring-up on Jetson + Arduino | 🔴 High | P8 — boot, install Arduino, launch |
 | Unit tests for TankOS managers | Medium | 9/35 covered — expand coverage |
 | Fix DeepSeek API key | External | HTTP 401 |
 | Top up OpenRouter credits | External | HTTP 402 |

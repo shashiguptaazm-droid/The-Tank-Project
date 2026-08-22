@@ -2,7 +2,7 @@
 Tank Shell — Complete Graphical AI Operating Environment.
 
 This is Layer 4 of TankOS. It provides the full-screen graphical
-environment that replaces the Raspberry Pi desktop.
+environment that replaces the desktop.
 
 To run::
 

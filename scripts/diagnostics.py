@@ -145,7 +145,7 @@ def cmd_lidar(args: argparse.Namespace) -> int:
         from rplidar import RPLidar  # type: ignore
     except ImportError:
         _err(f"rplidar not installed; would scan {port} -- "
-             "run scripts/setup_pi5.sh --apply first")
+             "run scripts/legacy installer --apply first")
         return 1
     try:
         lidar = RPLidar(port)

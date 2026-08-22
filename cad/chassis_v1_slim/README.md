@@ -1,6 +1,6 @@
 # Ultra-Slim Portable & Attachable Chassis — v1
 
-> **For:** Raspberry Pi 5 (drop-in)
+> **For:** NVIDIA Jetson Orin Nano (drop-in)
 > **Butt of:** `probots.co.in` tank-chassis shock-absorber pattern
 > **Goal:** keep the bog-standard tracking footprint, shed 50 % of the body
 > height, and turn the chassis into a portable, attachable platform you can
@@ -14,7 +14,7 @@
 | Height | 50 mm | **24 mm** *(52 % slimmer)* |
 | Wall thickness | ~1.6 mm ABS | **2.4 mm PETG/ASA** |
 | Print volume required | ≤ 200 mm³ | **185 × 100 × 24 mm** |
-| Pi 5 mounting | none | **4 × M2.5 at 58 × 49 mm** |
+| NVIDIA Jetson mounting | none | **4 × M2.5 at 58 × 49 mm** |
 | Battery | 18650 × 2 | configurable (18650 × 2 · 14500 × 1 · AA × 4) |
 | Motors | TT × 2 | **drop-in bracket, M3 countersink** |
 | Attachment | none | **belt clip + VESA + 4-corner magnet + shock pivots** |
@@ -34,7 +34,7 @@ axial room. The slim chassis flattens that envelope by:
 3. **Side-loading the battery** so it lives in a horizontal bay that does
    not require a removable lid (the user's battery cap sits in a side rail).
 
-Net result: 24 mm body height with the Pi 5 *fully populated with the
+Net result: 24 mm body height with the NVIDIA Jetson *fully populated with the
 M.2 HAT+* still inside the chassis outline.
 
 ---
@@ -164,10 +164,10 @@ without re-modelling.
 |---|---|
 | probots TT motors (yellow) | ✅ — drop-in the bracket cavity |
 | probots shock-absorbers + tracks | ✅ — `include_shock = true` |
-| Raspberry Pi 5 + M.2 HAT+ + Active Cooler | ✅ — `pi_stack_max_h = 22 mm` |
-| Raspberry Pi Camera Module 3 (IMX708) | ✅ — front clearance > 6 mm |
+| NVIDIA Jetson Orin Nano + M.2 HAT+ + Active Cooler | ✅ — `pi_stack_max_h = 22 mm` |
+| USB Camera (IMX219) | ✅ — front clearance > 6 mm |
 | ESP32-S3 eyes (UART) | ✅ — wiring routed through rear slot |
-| ReSpeaker 4-Mic array | ✅ — front slot above Pi recess |
+| ReSpeaker 4-Mic array | ✅ — front slot above Jetson recess |
 | 18650 × 2 (any chemistry) | ✅ — `battery_type = 0` |
 | 14500 × 1 (in series 3.7 V sources) | ✅ — `battery_type = 1` |
 | AA × 4 (Ni-MH) | ✅ — `battery_type = 2` |

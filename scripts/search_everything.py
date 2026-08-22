@@ -8,7 +8,7 @@ Usage:
   python3 scripts/search_everything.py "game of thrones"          # search all sources
   python3 scripts/search_everything.py --torrent "ubuntu iso"     # torrent only
   python3 scripts/search_everything.py --youtube "tutorial"       # YouTube only
-  python3 scripts/search_everything.py --web "raspberry pi"       # web search only
+  python3 scripts/search_everything.py --web "NVIDIA Jetson"       # web search only
   python3 scripts/search_everything.py --github "aria2"           # GitHub repos
   python3 scripts/search_everything.py --interactive "debian"     # picker mode
   python3 scripts/search_everything.py --history                  # view search log
@@ -437,7 +437,7 @@ Examples:
   search-everything "game of thrones"           # search all sources
   search-everything --torrent "ubuntu iso"      # torrent only
   search-everything --youtube "python tutorial" # YouTube only
-  search-everything --web "raspberry pi 5"      # web only
+  search-everything --web "NVIDIA Jetson 5"      # web only
   search-everything --github "aria2 downloader" # GitHub repos
   search-everything --interactive "debian"      # picker mode
   search-everything --history                   # view search log

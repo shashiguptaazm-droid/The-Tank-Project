@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """iot_home.py - IoT & home automation tools (33 features, F1333-F1365).
-Smart home, sensors, MQTT, Home Assistant, Raspberry Pi GPIO, ESP32, Zigbee."""
+Smart home, sensors, MQTT, Home Assistant, Arduino GPIO, ESP32, Zigbee."""
 from __future__ import annotations
 import argparse, json, sys, subprocess
 from pathlib import Path
@@ -71,11 +71,11 @@ def cmd_esp32_monitor(args) -> int:
     return _ok(json.dumps({"feature":"esp32-monitor","fid":1346,"src":"tank_os/iot"}))
 
 def cmd_gpio_read(args) -> int:
-    """F1347 - Read value from a Raspberry Pi GPIO pin."""
+    """F1347 - Read value from a Arduino GPIO pin."""
     return _ok(json.dumps({"feature":"gpio-read","fid":1347,"src":"tank_os/iot"}))
 
 def cmd_gpio_write(args) -> int:
-    """F1348 - Write HIGH/LOW to a Raspberry Pi GPIO pin."""
+    """F1348 - Write HIGH/LOW to a Arduino GPIO pin."""
     return _ok(json.dumps({"feature":"gpio-write","fid":1348,"src":"tank_os/iot"}))
 
 def cmd_gpio_pwm(args) -> int:

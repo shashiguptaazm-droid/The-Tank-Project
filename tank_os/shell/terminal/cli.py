@@ -1980,7 +1980,7 @@ def _read_temps() -> list:
                     pass
     except Exception:
         pass
-    # GPU temp (Raspberry Pi)
+    # GPU temp (Jetson Orin Nano)
     try:
         gpu_path = Path("/sys/class/thermal/thermal_zone0/temp")
         if gpu_path.exists():

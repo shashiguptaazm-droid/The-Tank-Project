@@ -6,7 +6,7 @@ When the ROS speech bridge asks "What do I know about RAG?", the recaller:
   2. Tokenises both query and corpus with the same lowercase+stop-word
      filter used by :mod:`tank_learn.consolidation`.
   3. Builds an in-memory TF-IDF matrix (no torch / sklearn; this runs on
-     Pi 5 SD card with sub-millisecond warm-up).
+     Jetson SD card with sub-millisecond warm-up).
   4. Scores each candidate with::
 
         final = 0.50 * cosine(query, candidate)

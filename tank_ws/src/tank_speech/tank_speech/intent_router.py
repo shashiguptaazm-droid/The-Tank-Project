@@ -8,7 +8,7 @@ Sits between ``stt_node`` (Whisper) and the rest of the bridge:
 Why pure-Python instead of Vosk
 -------------------------------
 * No competing ASR engine — Whisper is already pinned to ``tiny.en`` on
-  the Pi 5 and adding a second would compete for CPU.
+  the Jetson and adding a second would compete for CPU.
 * Latency is microseconds — a regex + difflib.SequenceMatcher beat a
   50 MB model.
 * Local hits ride the *existing* ``voice.*`` plugin manifest, so the

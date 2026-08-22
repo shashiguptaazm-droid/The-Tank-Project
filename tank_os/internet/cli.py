@@ -439,7 +439,7 @@ def build_parser() -> argparse.ArgumentParser:
             Examples:
               simple-internet download "magnet:?xt=urn:btih:..."
               simple-internet search "ubuntu 24.04" --source=torrent
-              simple-internet search "raspberry pi tutorial" --source=youtube
+              simple-internet search "NVIDIA Jetson tutorial" --source=youtube
               simple-internet queue
               simple-internet active
               simple-internet history

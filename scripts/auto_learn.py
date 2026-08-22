@@ -228,11 +228,11 @@ ABILITY_LEARNING_MAP: Dict[str, Dict[str, Any]] = {
 
     # ── Hardware / IoT ──
     "raspberry-pi": {
-        "description": "Raspberry Pi tools",
+        "description": "Jetson tools",
         "topics": [
-            "raspberry pi automation scripts",
+            "NVIDIA Jetson automation scripts",
             "pi gpio python tools",
-            "raspberry pi home server",
+            "NVIDIA Jetson home server",
         ],
         "shell_commands": [],
     },
@@ -397,7 +397,7 @@ ABILITY_LEARNING_MAP: Dict[str, Dict[str, Any]] = {
         "description": "Maker & DIY tools",
         "topics": [
             "maker DIY python scripts",
-            "arduino raspberry pi projects",
+            "arduino NVIDIA Jetson projects",
         ],
         "shell_commands": [],
     },

@@ -1,7 +1,7 @@
 // The Tank Project — AI eyes
 // ESP32-S3 drives two Waveshare 1.28-inch round GC9A01 LCDs (240x240,
 // SPI), one per eye, and receives high-level commands from the Raspberry
-// Pi 5 over UART2 in line-delimited JSON.
+// Jetson over UART2 in line-delimited JSON.
 //
 // Wiring (ESP32-S3 DevKitC-1 reference):
 //   SCK  -> GPIO12    MOSI -> GPIO11     DC -> GPIO17     RST -> GPIO16
@@ -148,7 +148,7 @@ void setup() {
   Serial.begin(115200);                       // logs over USB CDC
 
   Serial2.begin(UART_BAUD, SERIAL_8N1,
-                PIN_UART_RX, PIN_UART_TX);    // Pi5 ↔ ESP32-S3 UART2
+                PIN_UART_RX, PIN_UART_TX);    // Jetson ↔ ESP32-S3 UART2
 
   hspi.begin(PIN_SCK, -1, PIN_MOSI, -1);
 

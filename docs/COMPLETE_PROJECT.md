@@ -8,9 +8,9 @@
 
 - **Project name:** The Tank Project — marketed as **TankOS** at the user-facing layer.
 - **One-line description:** A tracked Raspberry-Pi-5 AI-companion robot with a full graphical operating environment (TankOS) that replaces the Pi desktop.
-- **Goal:** Always-on emotional/tracked-AI + voice + vision + navigation + persistent memory + structured coding-agent memory + home security + a unified universal-downloader stack, all running on a single Pi 5.
+- **Goal:** Always-on emotional/tracked-AI + voice + vision + navigation + persistent memory + structured coding-agent memory + home security + a unified universal-downloader stack, all running on a single Jetson.
 - **Target users:** Solo makers, hobbyist home-automation tinkerers; a single owner-operator who wants a "robot friend" instead of a smart speaker or hub.
-- **Platform / hardware:** Raspberry Pi 5 (8 GB), Ubuntu 22.04 / Raspberry Pi OS 64-bit. Out-of-tree ESP32-S3 for the round-GC9A101 eyes (UART). Optional: RPLiDAR A1, IMU, pan-tilt servos, USB speaker + mic, contactor for charging.
+- **Platform / hardware:** NVIDIA Jetson Orin Nano (8 GB), Ubuntu 22.04 / Jetson OS 64-bit. Out-of-tree ESP32-S3 for the round-GC9A101 eyes (UART). Optional: RPLiDAR A1, IMU, pan-tilt servos, USB speaker + mic, contactor for charging.
 
 ---
 
@@ -102,7 +102,7 @@ A consolidated pip manifest lives at [`/root/the tank project/requirements.txt`]
 
 ### Pending / next-session candidates
 - Real-download pipeline behind the host-level CLI stubs (currently each handler writes a JSON record and exits; need aria2 / yt-dlp / libtorrent integration in `tank_os/internet/downloader.py`).
-- P8 — Real-hardware bring-up checklist (boot Pi 5, run `tank_os/install.sh --apply`, launch `tank_bringup robot.launch.py`).
+- P8 — Real-hardware bring-up checklist (boot Jetson, run `tank_os/install.sh --apply`, launch `tank_bringup robot.launch.py`).
 - P4 carryover — contact-charging wiring harness (GPIO 21 + interlock).
 - Cross-doc unification (single source-of-truth for the "Recent expansion (post F206)" snippet).
 - Exit-code propagation sweep across all 40 host-level CLIs (`_ok` returns 0; matching `_err(1)` paths in handlers).
@@ -135,7 +135,7 @@ A consolidated pip manifest lives at [`/root/the tank project/requirements.txt`]
 │   ├── ai_vision.py, personality.py, …        ← F207–F406 wave
 │   ├── ai_voice.py, vision_ar.py, …           ← F407–F716 wave
 │   ├── diagnostics.py, notify.py, …          ← baseline (F001–F206)
-│   └── tankos_setup.sh                        ← Pi 5 auto-setup
+│   └── tankos_setup.sh                        ← Jetson auto-setup
 ├── tank_ws/src/                               ← ROS 2 colcon workspace
 │   └── 20 ament_python packages:
 │       tank_bringup, tank_motion, tank_sensors, tank_vision, tank_navigation,
@@ -147,7 +147,7 @@ A consolidated pip manifest lives at [`/root/the tank project/requirements.txt`]
 │   ├── shell/        PySide6 Tank Shell (13 apps)
 │   ├── internet/     Simple Internet (server, downloader, search, cli)
 │   ├── startup/      boot orchestrator
-│   └── install.sh    single-command Pi 5 installer
+│   └── install.sh    single-command Jetson installer
 ├── firmware/        ESP32-S3 eyes sketch (Arduino)
 ├── hardware.md      GPIO + I²C + SPI + UART map
 ├── WIRING.md        wiring diagram + safety notes
@@ -289,7 +289,7 @@ The robot also persists a layered config:
 ## 8. Current State & Pain Points
 
 ### What works perfectly
-- ROS 2 workspace parses + builds clean on Pi 5 (`colcon build --symlink-install`).
+- ROS 2 workspace parses + builds clean on Jetson (`colcon build --symlink-install`).
 - All 87 → 126 pytest cases pass where `rclpy` is present.
 - 16 ROS2 packages run end-to-end with documented topics; FastAPI services bind successfully.
 - 1,166 host-level CLI subcommands (`python3 scripts/<name>.py <sub>`) exit 0 cleanly with synthetic JSON.
@@ -342,7 +342,7 @@ Be very specific. The next 5 tasks are ranked highest-leverage.
 
 - **Must work offline:** Yes for all robot features (wake-word, STT/TTS, LLM, vision, navigation, memory). The only online piece is the optional freebuff/external LLM plugin on `tank_command_bridge` (:8082). Simple Internet downloads obviously need network.
 - **Privacy important:** Local processing whenever possible. No telemetry by default. `tank_personalize` exposes a privacy preferences section (settings.json + dashboard on :8084).
-- **Performance target:** Smooth on a Raspberry Pi 5 with 8 GB RAM. Models kept under 2 GB. The CLI scripts are stdlib-only so they don't tax the memory budget.
+- **Performance target:** Smooth on a NVIDIA Jetson Orin Nano with 8 GB RAM. Models kept under 2 GB. The CLI scripts are stdlib-only so they don't tax the memory budget.
 - **Coding style:** Type hints throughout (Python 3.11); prefer dataclasses for structured data; SOLID-ish layering per ARCHITECTURE.md; CLI-first (every Python module should have a `scripts/` wrapper that demos the logic without ROS).
 
 Recurring engineering rules (from code-review carry-overs in `STATUS.md` §9):
@@ -358,16 +358,16 @@ Recurring engineering rules (from code-review carry-overs in `STATUS.md` §9):
 ## 11. Additional Context
 
 - **[`STATUS.md`](STATUS.md)** — per-session handoff; latest work + last-run commands + per-package key files.
-- **[`ARCHITECTURE.md`](ARCHITECTURE.md)** — 5-layer table + Phase tracker + Simple Internet section + provisioning (Pi 5 single-command installer with 12 steps).
+- **[`ARCHITECTURE.md`](ARCHITECTURE.md)** — 5-layer table + Phase tracker + Simple Internet section + provisioning (Jetson single-command installer with 12 steps).
 - **[`PHASES.md`](PHASES.md)** — historical phase-by-phase checklist from Phase 1 (Foundation, motion, vision) through Phase 14½ (Massive CLI Expansion).
-- **[`docs/DEPENDENCIES.md`](DEPENDENCIES.md)** — canonical apt + brew + pip + Pi 5 codec/HW-accel dependency manifest.
+- **[`docs/DEPENDENCIES.md`](DEPENDENCIES.md)** — canonical apt + brew + pip + Jetson codec/HW-accel dependency manifest.
 - **[`docs/ai-commands.md`](docs/ai-commands.md)** — AI↔Pi bridge cheat-sheet for any coding assistant to drive the robot via the bridge without reading the code.
 - **[`docs/tankos-spec.md`](docs/tankos-spec.md)** — 4-layer TankOS GUI build specification.
 - **[`docs/tankos-cognitive-architecture.md`](docs/tankos-cognitive-architecture.md)** — 22-brain-system breakdown (perception / attention / working memory / long-term memory / etc.).
 - **[`README.md`](README.md)** — tour + 1,166 F-IDs feature index across 40 host-level CLIs.
 
 ### Decisions worth knowing
-- ROS 2 Humble (not Iron/Jazzy) — Pi 5 LTS alignment.
+- ROS 2 Humble (not Iron/Jazzy) — Jetson LTS alignment.
 - `ament_python` everywhere (no C++) for faster iteration.
 - llama.cpp quantization **Q4_K_M** is the local default; **Phi-3-mini (3.8B)** primary, **TinyLlama (1.1B)** fallback.
 - Wake-word is `openWakeWord`, STT is `openai-whisper`, TTS is `piper-tts` (not Coqui TTS due to license).

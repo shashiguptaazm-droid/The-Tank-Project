@@ -4,7 +4,7 @@ These exercise the pure-Python helpers (EmotionStateMachine + classify)
 plus the ROS handlers' decision-append JSON contract without spinning up
 a ROS executor. The ROS-node glue is exercised in tank_meta's
 ``test_rag_meta_context_block_calls_meta_handles`` against a live
-``rclpy`` instance on the Pi 5.
+``rclpy`` instance on the Jetson.
 """
 from __future__ import annotations
 

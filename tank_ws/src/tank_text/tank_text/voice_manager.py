@@ -2,7 +2,7 @@
 
 Curated catalogue of 8 Piper voices (en / accents, F/M, calm/expressive).
 Each entry has a HuggingFace URL for both ``*.onnx`` and ``*.onnx.json``
-files so a fresh Pi 5 can `import` and start using new voices without
+files so a fresh Jetson can `import` and start using new voices without
 manual pip-install ceremony.
 
 Cache layout

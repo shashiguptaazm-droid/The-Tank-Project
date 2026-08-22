@@ -1,12 +1,12 @@
 """CLI first-pass for tank_command_bridge (per STATUS.md design rule 8).
 
 Spins up the FastAPI app with a given port + auth. ``--bench`` flag
-forces the no-rclpy path so we can test on a Pi 5 dev machine or in a
+forces the no-rclpy path so we can test on a Jetson dev machine or in a
 CI sandbox without ROS installed.
 
 Usage::
 
-    # production (Pi 5)
+    # production (Jetson)
     TANK_API_KEY=sk-live-... python3 -m tank_command_bridge.scripts.run_bridge --port 8082
 
     # bench (no rclpy, no real publishers)

@@ -59,7 +59,7 @@ class WhisperEngine:
         result = self._model.transcribe(
             audio_float32,
             language=self._language,
-            fp16=False,        # Pi 5 CPU path
+            fp16=False,        # Jetson CPU path
         )
         return (result.get("text") or "").strip()
 

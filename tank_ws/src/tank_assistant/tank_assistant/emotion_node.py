@@ -47,7 +47,7 @@ except ImportError:
         def __init__(self, *a, **k):
             raise ImportError(
                 "rclpy is not installed; EmotionNode requires ROS 2 Humble. "
-                "Run scripts/provision_pi5.sh --apply on the Pi 5."
+                "Run scripts/provision_pi5.sh --apply on the Jetson."
             )
 
     class _StubString:                                 # type: ignore[no-redef]

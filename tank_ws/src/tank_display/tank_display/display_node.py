@@ -5,7 +5,7 @@ Subscribes
                                             "curious"|"neutral")
 
 Parameters
-    use_luma      bool  default False  (set True on Pi 5 with panel wired)
+    use_luma      bool  default False  (set True on Jetson with panel wired)
     i2c_port      int   default 1
     i2c_address   int   default 0x70   (matches WIRING.md)
     width         int   default 128

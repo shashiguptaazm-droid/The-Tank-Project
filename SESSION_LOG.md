@@ -312,7 +312,7 @@ the current namespace — preserving the test's ability to patch
 | Dependency | Status |
 |------------|--------|
 | `llama-cpp-python` v0.3.34 | ✅ Already installed (x86_64 via pip) |
-| ARM64 wheel at `/var/cache/tank_os/preload/` | ⚠️ For Pi 5 only (tag: cp312-linux_aarch64) |
+| ARM64 wheel at `/var/cache/tank_os/preload/` | ⚠️ For Jetson only (tag: cp312-linux_aarch64) |
 | LLM models on disk | ✅ 5 models at `/var/lib/tank_os/models/llm/` |
 | GGUF models in preload cache | ✅ 4 models at `/var/cache/tank_os/preload/` |
 
@@ -336,7 +336,7 @@ the current namespace — preserving the test's ability to patch
 | Fix DeepSeek API key | Low | HTTP 401 — key may have expired |
 | Top up OpenRouter credits | Low | HTTP 402 — needs billing |
 | Wire model discovery into RotationOrchestrator | Medium | Auto-refresh on startup |
-| Real hardware bring-up on Pi 5 | High | Boot, run provision_pi5.sh, launch robot.launch.py |
+| Real hardware bring-up on Jetson | High | Boot, run provision_pi5.sh, launch robot.launch.py |
 | [DONE] Install llama-cpp-python | — | v0.3.34 already installed on x86_64 |
 | [DONE] Add `do_providers` REPL command | — | Already exists in cli.py (from July 28 session) |
 | [DONE] Fix `test_serve_meta_api_endpoints_or_skip` | — | Fixed this session |
@@ -770,10 +770,10 @@ groq: default model "llama-3.3-70b-versatile" → HTTP 429
 
 | Item | Priority | Notes |
 |------|----------|-------|
-| Real hardware bring-up on Pi 5 | 🔴 High | Boot, provision_pi5.sh, launch robot.launch.py |
+| Real hardware bring-up on Jetson | 🔴 High | Boot, provision_pi5.sh, launch robot.launch.py |
 | Fix DeepSeek API key | External | HTTP 401 — contact DeepSeek support |
 | Top up OpenRouter credits | External | HTTP 402 — billing issue |
-| [DONE] Install llama-cpp-python | — | v0.3.34 on x86_64, ARM64 wheel for Pi 5 |
+| [DONE] Install llama-cpp-python | — | v0.3.34 on x86_64, ARM64 wheel for Jetson |
 | [DONE] Add `do_providers` REPL command | — | Already in cli.py |
 | [DONE] Wire model discovery into rotation | — | Done this session |
 | [DONE] TCP terminal | — | Verified running |
@@ -806,5 +806,5 @@ print(f'Chat: {a.chat(\"Reply: ok\", max_tokens=10).text}')
 # 4. Connect to TCP terminal
 nc localhost 2223
 
-# 5. Next major milestone: Pi 5 hardware bring-up (P8)
+# 5. Next major milestone: Jetson hardware bring-up (P8)
 ```

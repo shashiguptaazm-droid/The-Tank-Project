@@ -59,7 +59,7 @@ def cmd_imu(args: argparse.Namespace) -> int:
         import board  # type: ignore
         import busio  # type: ignore
     except ImportError:
-        _err("adafruit_bno055 missing — install via scripts/setup_pi5.sh")
+        _err("adafruit_bno055 missing — install via scripts/legacy installer")
         return _run_imu_placeholder()
     i2c = busio.I2C(board.SCL, board.SDA)
     bno = BNO055_I2C(i2c)
@@ -182,7 +182,7 @@ def cmd_lidar(args: argparse.Namespace) -> int:
     try:
         from rplidar import RPLidar  # type: ignore
     except ImportError:
-        _err("rplidar missing — install via setup_pi5.sh")
+        _err("rplidar missing — install via legacy installer")
         return 1
     lidar = RPLidar(port)
     info = lidar.get_info()

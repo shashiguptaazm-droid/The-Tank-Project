@@ -29,7 +29,7 @@ If any of these files are missing, the named subsystem fails or strips back to a
 - `tank_os/preload/manifest.py:155-167` — `id="llm-fallback", name="Fallback LLM (GGUF), description="Lightweight model for when primary is too slow"`
 - `tank_os/ai/reasoning_engine.py:258` — `models = list(llm_dir.glob("*.gguf"))` (TinyLlama is also a `.gguf`, so it's a valid first-match if Phi-3 is missing)
 
-**Why it's required**: on the 8 GB Raspberry Pi 5, Phi-3 (3.8B params, 2.3 GB on disk) plus the OS + Python + Chromium + ~30 browser tabs pins RAM near saturation. `docs/COMPLETE_PROJECT.md:308` records that `llama.cpp Phi-3 Q4 at 8 GB competes with the robot's other subsystems`. TinyLlama is the always-on graceful-degradation path.
+**Why it's required**: on the 8 GB NVIDIA Jetson Orin Nano, Phi-3 (3.8B params, 2.3 GB on disk) plus the OS + Python + Chromium + ~30 browser tabs pins RAM near saturation. `docs/COMPLETE_PROJECT.md:308` records that `llama.cpp Phi-3 Q4 at 8 GB competes with the robot's other subsystems`. TinyLlama is the always-on graceful-degradation path.
 
 ### 1.3 Piper `en_US-amy-medium.onnx` (~60 MB) + companion `.onnx.json`
 
@@ -112,7 +112,7 @@ These are called by name in the code; if missing, the named feature silently fal
 
 ## Storage Budget
 
-Disk usage at the **Pi 5 default 32 GB SD card**:
+Disk usage at the **Jetson default 32 GB SD card**:
 
 | Tier | Models | Disk |
 |---|---|---|

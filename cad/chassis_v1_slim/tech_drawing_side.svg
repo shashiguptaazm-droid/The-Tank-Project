@@ -48,7 +48,7 @@
   <g transform="translate(60 230) scale(1)">
     <text x="0" y="0" font-size="9" fill="#0f172a" font-weight="bold">SECTION NOTES</text>
     <text x="0" y="14" font-size="9" fill="#0f172a">Body slab = 24 mm (4 mm floor + 16 mm mid + 4 mm top ceiling of Pi pocket)</text>
-    <text x="0" y="26" font-size="9" fill="#0f172a">Pi recess depth 18 mm — accommodates Pi 5 + M.2 HAT+ stack (22 mm max, just fits)</text>
+    <text x="0" y="26" font-size="9" fill="#0f172a">Jetson recess depth 18 mm — accommodates Jetson + NVMe stack (22 mm max, just fits)</text>
     <text x="0" y="38" font-size="9" fill="#0f172a">Battery bay = base_floor_h (4 mm) clearance only; cells sit laterally (Ø 18.4 mm × 65 mm)</text>
     <text x="0" y="50" font-size="9" fill="#0f172a">Motor bay extends 14 mm beyond body — drops in any TT / N20 motor of similar envelope</text>
     <text x="0" y="62" font-size="9" fill="#0f172a">Belt-clip latches 6 mm below the top deck — keeps the silhouette under 30 mm</text>

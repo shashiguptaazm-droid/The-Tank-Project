@@ -2,7 +2,7 @@
 # ═══════════════════════════════════════════════════════════════════════════
 # TankOS — Unified Master Installer
 # ═══════════════════════════════════════════════════════════════════════════
-# SINGLE COMMAND for complete Pi 5 setup:
+# SINGLE COMMAND for Jetson Orin Nano + Arduino setup:
 #
 #     bash tank_os/install.sh --apply
 #
@@ -87,9 +87,9 @@ step "1/12 — Platform & System Detection"
 
 IS_PI=false
 PI_MODEL="unknown"
-if [[ -f /proc/device-tree/model ]] && grep -qi "raspberry pi" /proc/device-tree/model 2>/dev/null; then
+if [[ -f /proc/device-tree/model ]] && grep -qi "NVIDIA Jetson" /proc/device-tree/model 2>/dev/null; then
     IS_PI=true
-    PI_MODEL=$(cat /proc/device-tree/model 2>/dev/null || echo "Raspberry Pi")
+    PI_MODEL=$(cat /proc/device-tree/model 2>/dev/null || echo "Unknown board")
     info "Platform: $PI_MODEL"
 else
     info "Platform: $(uname -m) Linux (not Pi — some hardware features unavailable)"

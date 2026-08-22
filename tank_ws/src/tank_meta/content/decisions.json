@@ -20,9 +20,9 @@
     {
       "id": "DEC-003",
       "ts": 1731200000.0,
-      "problem": "Pi 5 reboots under CPU load from YOLOv8n + llama.cpp + navigation simultaneously.",
+      "problem": "Jetson reboots under CPU load from YOLOv8n + llama.cpp + navigation simultaneously.",
       "reason": "Power supply brown-out when CPU + GPU + USB all spike at once; 5V/5A supply was marginal.",
-      "solution": "Switch to official Pi 5 27W USB-C PD supply; add 0.01 µF decoupling on motor driver 5V rail; throttle llama.cpp to 4 threads.",
+      "solution": "Switch to official Jetson 27W USB-C PD supply; add 0.01 µF decoupling on motor driver 5V rail; throttle llama.cpp to 4 threads.",
       "result": "Stable 30 fps camera + 4 Hz nav at < 70% CPU + < 60°C on active cooler."
     },
     {

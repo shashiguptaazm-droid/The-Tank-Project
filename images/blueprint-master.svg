@@ -44,7 +44,7 @@
       <text x="6" y="86" fill="#334155">5. MLX90640 Thermal Camera Module (32×24 px)</text>
       <text x="6" y="100" fill="#334155">6. Waveshare 2Ω Speaker Module</text>
       <text x="6" y="114" fill="#334155">7. MPU6050 6-Axis Gyro+Accel Sensor</text>
-      <text x="6" y="128" fill="#334155">8. RPi Hub Module — USB-C (I²C/SPI expander)</text>
+      <text x="6" y="128" fill="#334155">8. USB-C Hub Module — USB-C (I²C/SPI expander)</text>
     </g>
 
     <!-- Right-side notes -->
@@ -357,7 +357,7 @@
       <text x="16" y="65" fill="#334155">• NVIDIA Jetson Orin Nano (×1)</text>
       <text x="16" y="78" fill="#334155">• ESP32-S3 DevKit (×6)</text>
       <text x="16" y="91" fill="#334155">• Arduino UNO R4 WiFi (×1)</text>
-      <text x="16" y="104" fill="#334155">• RPi Hub Module (×1)</text>
+      <text x="16" y="104" fill="#334155">• USB-C Hub Module (×1)</text>
 
       <text x="10" y="122" font-weight="700" fill="#059669">👁️ Sensors</text>
       <text x="16" y="137" fill="#334155">• DFRobot AI Camera</text>

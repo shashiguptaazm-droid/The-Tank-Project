@@ -172,7 +172,7 @@ sudo bash scripts/tankos_setup.sh --status
 **SINGLE COMMAND: `sudo bash tank_os/install.sh --apply`**
 
 The unified installer (`tank_os/install.sh`) is now the single master installer
-that supersedes `scripts/setup_pi5.sh` and `scripts/provision_pi5.sh` (both now
+that supersedes the legacy `setup_pi5.sh` and `provision_pi5.sh` scripts (both now
 wrapper scripts that delegate to the unified installer).
 
 **Hardware split:** Jetson Orin Nano runs ROS2 + TankOS + all AI inference.
@@ -208,8 +208,7 @@ sudo bash tank_os/install.sh --apply
 sudo bash tank_os/install.sh --apply --skip-models
 
 # Legacy scripts (delegate to unified installer)
-bash scripts/setup_pi5.sh --apply
-bash scripts/provision_pi5.sh --apply
+bash tank_os/install.sh --apply    # same effect
 ```
 
 PreloadManager downloads 95 dependencies across 15 categories:

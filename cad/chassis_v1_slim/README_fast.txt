@@ -3,7 +3,7 @@ CHASSIS v1 SLIM   ·   185 × 100 × 24 mm
 • 52 % slimmer than the probots stock chassis (50 → 24 mm)
 • Drop-in footprint + 4 shock pivots → works with the probots wheels
 • 4-way attachment: belt clip · VESA 75×75 / M3 · 4× N52 magnet · shock pivots
-• Pi 5 recess @ 22 mm  → fits  Pi 5 + M.2 HAT+ + Active Cooler
+• NVIDIA Jetson recess @ 22 mm  → fits  NVIDIA Jetson + M.2 HAT+ + Active Cooler
 • 2× 18650 / 1× 14500 / 4× AA (toggle battery_type in main.scad)
 • 2× TT motor bays (drop-in) + countersink screw holes
 • 4× VESA bosses → stack extra payload

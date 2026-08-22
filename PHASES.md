@@ -63,7 +63,7 @@
 * **Advanced Simple Internet downloader (450 tasks across 3 rounds):** F717-F916 (200 tasks × 6 scripts in `scripts/download_*.py`), F917-F1116 (200 tasks × 10 scripts in `scripts/download_*_2.py`), F1117-F1166 (50 high-impact features × 4 scripts in `scripts/download_*_3.py`).
 * **Architecture Integrity:** All 1,166 features ship as host-level CLI subcommands below the core ROS 2 workspace (`tank_ws/`) and TankOS GUI (`tank_os/`) layers. No changes to `tank_ws/src/*` runtime, no ROS topic additions, no firmware changes. The CLI surface is the feature surface.
 
-## Provisioned Services (Single-Pi 5 install)
+## Provisioned Services (Single-board install)
 
 Captured in `scripts/provision_pi5.sh`:
 
@@ -144,7 +144,7 @@ Captured in `scripts/provision_pi5.sh`:
 - [x] `run_patrol.py` CLI: waypoint or random mode with --pretty ASCII trail rendering for bench validation.
 - [x] `surveillance_review.py` CLI: list / summary / export with --day --severity --label filters.
 - [x] pytest: 11/11 (7 modes + 4 classifier/journal).
-- [x] ROS 2 launch (patrol_node + surveillance_node) + Pi 5 YAML params.
+- [x] ROS 2 launch (patrol_node + surveillance_node) + Jetson YAML params.
 - [x] Reuses tank_security for unified logging — no duplication.
 
 ## Phase 11 — TankOS Graphical AI Operating Environment ✅ DONE
@@ -159,7 +159,7 @@ Captured in `scripts/provision_pi5.sh`:
 - [x] 5 stub managers ready for expansion: Voice, AI, Update, Application, Permission
 - [x] **Tank Shell** — PySide6 entry point with Cmd-based simulation fallback
 - [x] **Boot sequence** — 11-step orchestrator (init logging → load config → init hardware → start ROS → verify services → init plugins → init GUI → start AI → start voice → open dashboard → accept input)
-- [x] **systemd service** — `tank-init.service` replaces Raspberry Pi desktop
+- [x] **systemd service** — `tank-init.service` replaces desktop
 - [x] **All Python imports verified** — `from tank_os.core import *` passes clean
 - [x] **Architecture specs documented** — 5 specification documents in `docs/tankos-*.md`:
   - Build Specification: 4-layer architecture, boot process, shell screens, plugins

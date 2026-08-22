@@ -70,9 +70,9 @@ INR_PER_USD = 85         # July 2026 estimate
 
 ENRICH_TABLE: list[tuple[str, dict]] = [
     # (substring-of-item, mapping)
-    ("raspberry pi 5, 8 gb", {
+    ("nvidia jetson orin nano dev kit, 8 gb", {
         "Supplier": "Mouser",
-        "Manufacturer_Part": "Raspberry Pi SC1112",
+        "Manufacturer_Part": "NVIDIA Jetson",
         "SKU": "358-SC1112",
         "Unit_Cost_USD": 80.00,
         "Lifecycle": "Active",
@@ -208,7 +208,7 @@ ENRICH_TABLE: list[tuple[str, dict]] = [
     }),
     ("pi camera module 3", {
         "Supplier": "Mouser",
-        "Manufacturer_Part": "Raspberry Pi Camera Module 3 (IMX708)",
+        "Manufacturer_Part": "USB Camera (IMX219)",
         "SKU": "356-SC0023",
         "Unit_Cost_USD": 30.00,
         "Lifecycle": "Active",
@@ -364,7 +364,7 @@ def generate_dxfs(stl_dir: pathlib.Path) -> int:
 
 POCKETS = [
     # (display_label, x_mm, y_mm, z_mm, color_hex, brief)
-    ("Pi 5",                  0,   0,   10, "#ffa500", "Raspberry Pi 5, M.2 HAT+, Active Cooler"),
+    ("Jetson,                  0,   0,   10, "#ffa500", "Jetson Orin Nano, NVMe SSD"),
     ("ESP32-S3",              0, -28,   10, "#22ddaa", "ESP32-S3 DevKitC-1 N16R8 (USB)"),
     ("BNO055",               -35,  25,    4, "#cc66ff", "9-DOF IMU (i²c 0x29)"),
     ("INA219 #1",            -65,  30,    4, "#ff6699", "Pi-rail current/voltage monitor"),

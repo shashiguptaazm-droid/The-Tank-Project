@@ -7,7 +7,7 @@ Two units gate the daily off-site rclone backup loop (P3 carry-over):
 | `tank-nas-backup.service` | one-shot service — runs the Python backup. |
 | `tank-nas-backup.timer`   | daily timer at 03:30 with 0–600 s jitter. |
 
-## Install on the Pi 5
+## Install on the Jetson
 
 ```bash
 sudo cp tank-nas-backup.{service,timer} /etc/systemd/system/

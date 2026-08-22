@@ -17,7 +17,7 @@ setup(
     maintainer_email="you@example.com",
     description=(
         "tank_task — voice-commandable task framework for The Tank "
-        "(Raspberry Pi 5 ROS 2 Humble robot). Each task is a small "
+        "(Raspberry Jetson ROS 2 Humble robot). Each task is a small "
         "Python module that supports regex + LLM-fallback intent "
         "matching and runs in a separate process/thread so /cmd_vel "
         "and other ROS topics keep flowing."

@@ -11,7 +11,7 @@ Note on lifespan: the tests disable the ROS thread entirely via
 
 TestClient itself depends on ``httpx``; the entire module is skipped
 via ``pytest.importorskip`` if httpx isn't installed in the dev
-sandbox (Pi 5 production has it via ``scripts/provision_pi5.sh``).
+sandbox (Jetson production has it via ``scripts/legacy-installer.sh``).
 """
 from __future__ import annotations
 

@@ -19,7 +19,7 @@ These must be installed via your OS package manager (`apt`, `brew`, etc.) before
 | sqlite3 | Default database (pre-installed on most systems) |
 | redis | Optional message broker for task queues |
 
-### Install on Debian/Ubuntu (Raspberry Pi)
+### Install on Debian/Ubuntu (Jetson)
 
 ```bash
 sudo apt update
@@ -197,14 +197,14 @@ pip install PySide6
 pip install jinja2
 ```
 
-## Raspberry Pi / TankOS add-ons
+## Jetson / TankOS add-ons
 
 ```bash
 # Codecs FFmpeg may need on a Pi
 sudo apt install libmp3lame-dev libx264-dev libx265-dev libvpx-dev \
                  libfdk-aac-dev libopus-dev libvorbis-dev libass-dev
 
-# Hardware acceleration (H.265 hw decode on Pi 5)
+# Hardware acceleration (H.265 hw decode on Jetson)
 sudo apt install ffmpeg rpi-eeprom
 ```
 

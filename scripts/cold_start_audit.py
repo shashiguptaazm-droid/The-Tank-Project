@@ -130,7 +130,7 @@ def check_battery_sysfs() -> Tuple[str, str]:
             return ("INA219", f"{mv} mV @ {p}")
         except (OSError, ValueError):
             return ("INA219", f"read-error @ {p}")
-    return ("INA219", "sysfs missing — re-run setup_pi5.sh")
+    return ("INA219", "sysfs missing — re-run legacy installer")
 
 
 CHECKS = [check_apt, check_python_pkgs, check_i2c, check_workspace,

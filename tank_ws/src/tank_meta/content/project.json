@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "project": "The Tank Project",
-  "tagline": "Tracked Raspberry Pi 5 AI-companion robot with eyes + GPU vision + persistent memory + RAG + voice",
-  "controller": "Raspberry Pi 5 (8 GB)",
+  "tagline": "Tracked NVIDIA Jetson Orin Nano AI-companion robot with eyes + GPU vision + persistent memory + RAG + voice",
+  "controller": "NVIDIA Jetson Orin Nano (8 GB)",
   "ros_distro": "humble",
   "build_system": "colcon + ament_python",
   "workspace": "the tank project/tank_ws",
@@ -14,13 +14,13 @@
     "tank_dashboard", "tank_nas", "tank_meta"
   ],
   "top_level_dirs": {
-    "scripts/": "host-side provisioning + offline CLIs (provision_pi5.sh, replay_memory.py, search_meta.py, index_workspace.py)",
+    "scripts/": "host-side provisioning + offline CLIs (legacy-installer.sh, replay_memory.py, search_meta.py, index_workspace.py)",
     "firmware/": "out-of-tree Arduino sketches (esp32-s3 eyes)",
     "docs/": "user-facing deployment notes"
   },
   "key_decisions": "see content/decisions.json",
   "key_hardware": "see content/hardware.json",
-  "provision_cmd": "bash scripts/provision_pi5.sh --apply",
+  "provision_cmd": "bash scripts/legacy-installer.sh --apply",
   "launch_orchestrator": "ros2 launch tank_bringup robot.launch.py",
   "dashboard_url": "https://tank.local/dashboard (via nginx reverse-proxy)",
   "external_links": {

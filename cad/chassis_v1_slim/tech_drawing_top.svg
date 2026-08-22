@@ -30,7 +30,7 @@
     <g fill="#fef3c7" stroke="#b45309" stroke-width="0.8">
       <rect x="-100" y="-55" width="200" height="110" rx="4"/>
     </g>
-    <text x="0" y="-44" font-size="9" fill="#b45309">Pi 5 recess · 85 × 56 mm · M2.5 @ 58 × 49 mm</text>
+    <text x="0" y="-44" font-size="9" fill="#b45309">Jetson recess · 85 × 56 mm · M2.5 @ 58 × 49 mm</text>
     <!-- Pi mounting holes -->
     <g fill="none" stroke="#b45309" stroke-width="0.9">
       <circle cx="-29" cy="-24.5" r="2.8"/>
@@ -113,7 +113,7 @@
     <g font-size="9" transform="translate(-260 -150)">
       <text x="0" y="0" font-weight="bold" fill="#0f172a">LEGEND</text>
       <rect x="0" y="6" width="10" height="6" fill="#fef3c7" stroke="#b45309"/>
-      <text x="14" y="11" fill="#0f172a">Pi 5 mounting pocket</text>
+      <text x="14" y="11" fill="#0f172a">Jetson mounting pocket</text>
       <rect x="0" y="16" width="10" height="6" fill="#bbf7d0" stroke="#15803d"/>
       <text x="14" y="21" fill="#0f172a">TT motor bay (drop-in)</text>
       <rect x="0" y="26" width="10" height="6" fill="url(#hatch)" stroke="#7c2d12"/>

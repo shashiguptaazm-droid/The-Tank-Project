@@ -2,7 +2,7 @@
   "schema_version": 1,
   "generated_by": "tank_meta/hardware_indexer.py",
   "robot": "The Tank Project",
-  "controller": "Raspberry Pi 5 (8 GB)",
+  "controller": "NVIDIA Jetson Orin Nano (8 GB)",
   "components": [
     {
       "component": "pan_servo",
@@ -50,7 +50,7 @@
       "bus": "SPI",
       "pin": "SPI0 MOSI=GPIO10, SCK=GPIO11, CS=GPIO8, DC=GPIO25, RST=GPIO24; UART2 RX=GPIO9 TX=GPIO11 (Pi -> ESP32-S3)",
       "driver": "tank_vision.eye_lcd_bridge.py + firmware/eyes_esp32/eyes_esp32.ino (GC9A101, 240x240 round)",
-      "notes": "Waveshare 1.28 inch round LCD. JSON over UART2 from Pi 5."
+      "notes": "Waveshare 1.28 inch round LCD. JSON over UART2 from Jetson."
     },
     {
       "component": "esp32_eyes_right",
@@ -136,7 +136,7 @@
       "component": "nvme_ssd",
       "kind": "storage",
       "bus": "PCIe",
-      "pin": "M.2 NVMe slot on Pi 5 HAT (Gen 2 x1)",
+      "pin": "M.2 NVMe slot on Jetson HAT (Gen 2 x1)",
       "driver": "kernel nvme module; ext4 partition /dev/nvme0n1p1 mounted at /var/lib/tank",
       "notes": "Rclone + tank_nas store their data here for speed"
     }

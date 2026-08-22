@@ -18,7 +18,7 @@ import re, sys, pathlib
 EXPECTED = [
     # chassis
     "body_l", "body_w", "body_total_h", "floor_h", "wall_t", "corner_r",
-    # Pi 5
+    # NVIDIA Jetson Orin Nano
     "pi_l", "pi_w", "pi_hole_x", "pi_hole_y", "pi_hole_d", "pi_stack_h",
     # ESP32-S3
     "esp32_l", "esp32_w", "esp32_usb_bend_z",
@@ -74,11 +74,11 @@ def RULES(p):
         ("wall_t",         "ge",1.6,"err", "Walls under 1.6 mm don't survive FDM"),
         ("corner_r",       "ge",  2,"warn","PETG corner curl"),
 
-        # Pi 5 PCB (per official mechanical drawing)
-        ("pi_l",           "ge", 84,"err", "Pi 5 PCB ~85 mm won't fit"),
-        ("pi_w",           "ge", 55,"err", "Pi 5 PCB ~56 mm won't fit"),
-        ("pi_hole_x",      "ge", 57,"err", "Pi 5 hole span 58 mm — won't line up"),
-        ("pi_hole_y",      "ge", 48,"err", "Pi 5 hole span 49 mm — won't line up"),
+        # NVIDIA Jetson Orin Nano PCB (per official mechanical drawing)
+        ("pi_l",           "ge", 84,"err", "Jetson PCB ~85 mm won't fit"),
+        ("pi_w",           "ge", 55,"err", "Jetson PCB ~56 mm won't fit"),
+        ("pi_hole_x",      "ge", 57,"err", "Jetson hole span 58 mm — won't line up"),
+        ("pi_hole_y",      "ge", 48,"err", "Jetson hole span 49 mm — won't line up"),
         ("pi_hole_d",      "ge",2.4,"err", "M2.5 (2.5 mm) hole too tight"),
         ("pi_hole_d",      "le",2.8,"err", "M2.5 hole tolerance blown"),
         ("pi_stack_h",     "ge", 21,"err", "Pi+M.2 HAT+ ~22 mm stack won't fit"),

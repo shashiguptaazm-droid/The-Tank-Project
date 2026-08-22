@@ -13,14 +13,14 @@
 
 | # | Hardware | TankOS Module(s) | Driver / Library | Interface | Status |
 |---|----------|-----------------|-------------------|-----------|--------|
-| 1 | **Raspberry Pi 5 (8 GB)** | All — Core OS, AIManager, Tank Shell | Linux kernel, rpi-config, GPU drivers | Native | ✅ Core |
+| 1 | **NVIDIA Jetson Orin Nano (8 GB)** | All — Core OS, AIManager, Tank Shell | Linux kernel, rpi-config, GPU drivers | Native | ✅ Core |
 | 2 | **7" DSI Touchscreen (800×480)** | TankShell (Qt GUI), TopBar, BottomDock | `vc4-kms-v3d` overlay, PySide6/Qt6 | DSI (15-pin FPC) | 🟡 Planned |
 | 3 | **ESP32-S3 (Round Eye Display)** | `tank_vision.eye_lcd_bridge`, EmotionManager | `pyserial`, ESP32-S3 Arduino firmware | UART2 (GPIO8/9) @ 115200 | ✅ Done |
 | 4 | **Waveshare 1.28" Round LCD × 2** | Eye expressions, Emotion animations | ESP32 firmware (GC9A101 SPI driver) | SPI → ESP32 → UART | ✅ Done |
 | 5 | **1.3" SH1106 OLED (I²C)** | `tank_display` (status face) | `luma.oled`, I²C on GPIO2/3 | I²C (addr 0x3C) | ✅ Done |
 | 6 | **DFRobot AI Camera** | `tank_vision` — object detection, YOLO | `ultralytics`, OpenCV, `picamera2` | USB or CSI | 🟡 Planned |
-| 7 | **RPi Camera Module 3 (IMX708)** | `tank_vision.camera_publisher` | `libcamera`, `picamera2`, OpenCV | CSI (15-pin FPC) | ✅ Done |
-| 8 | **ProBots Tank Chassis Kit** | `tank_motion` — motor_controller | `gpiozero`, `RPi.GPIO` or `pigpio` | GPIO (wired) | ✅ Done |
+| 7 | **Jetson Camera Module 3 (IMX708)** | `tank_vision.camera_publisher` | `libcamera`, `picamera2`, OpenCV | CSI (15-pin FPC) | ✅ Done |
+| 8 | **ProBots Tank Chassis Kit** | `tank_motion` — motor_controller | `gpiozero`, `Jetson.GPIO` or `pigpio` | GPIO (wired) | ✅ Done |
 | 9 | **BTS7960 Motor Driver (×2)** | `tank_motion.motor_controller` | PWM + DIR via GPIO (level-shifted) | GPIO 12/13/18/19 | ✅ Done |
 | 10 | **PCA9685 Servo Controller** | `tank_motion.pan_tilt_controller` | `adafruit-circuitpython-servokit` | I²C (addr 0x40) | 🟡 Planned |
 | 11 | **SG90 Micro Servo (×2, pan/tilt)** | `tank_motion.pan_tilt_controller` | PCA9685 or direct PWM via `pigpio` | PWM (50 Hz) | 🟡 Planned |
@@ -41,7 +41,7 @@
 | 26 | **4S Li-ion Battery Pack** | Motor power — `tank_health.battery` | INA219 voltage divider | XT60 connector | 🟡 Planned |
 | 27 | **ESP32 Boards (extra)** | Wireless sensor bridge, motor controller | `pyserial`, `esptool` | UART / WiFi | 🟡 Planned |
 | 28 | **USB TTL CH341A** | Debug / programming interface | `ch341` kernel module | USB → UART | ✅ Done |
-| 29 | **GPIO Expansion Board** | Hardware prototyping | `RPi.GPIO` / `gpiozero` | 40-pin GPIO | ✅ Done |
+| 29 | **GPIO Expansion Board** | Hardware prototyping | `Jetson.GPIO` / `gpiozero` | 40-pin GPIO | ✅ Done |
 
 ---
 
@@ -63,7 +63,7 @@ TankOS Layer 3 (Core Managers)
 │   └── tank_motion/motor_controller.py
 │   └── tank_motion/pan_tilt_controller.py
 │
-├── VisionManager          ← RPi Camera, DFRobot AI Cam, AMG8833
+├── VisionManager          ← Jetson Camera, DFRobot AI Cam, AMG8833
 │   └── tank_vision/camera_publisher.py
 │   └── tank_vision/object_tracker.py (YOLO)
 │   └── tank_vision/eye_lcd_bridge.py → ESP32-S3
@@ -90,9 +90,9 @@ TankOS Layer 3 (Core Managers)
 
 | Package | For Hardware | Module |
 |---------|-------------|--------|
-| `libraspberrypi-bin` | RPi Camera | `tank_vision` |
-| `libcamera-apps` | RPi Camera | `tank_vision` |
-| `python3-picamera2` | RPi Camera | `tank_vision` |
+| `libraspberrypi-bin` | Jetson Camera | `tank_vision` |
+| `libcamera-apps` | Jetson Camera | `tank_vision` |
+| `python3-picamera2` | Jetson Camera | `tank_vision` |
 | `i2c-tools` | I²C sensors (MPU6050, BNO055, PCA9685, AMG8833) | All I²C |
 | `python3-smbus` | I²C bus access | `tank_sensors` |
 | `python3-gpiozero` | GPIO sensors (HC-SR04, BTS7960) | `tank_motion`, `tank_sensors` |
@@ -108,9 +108,9 @@ TankOS Layer 3 (Core Managers)
 | Package | For Hardware | Module |
 |---------|-------------|--------|
 | `PySide6` | 7" DSI Screen | Tank Shell (Qt GUI) |
-| `opencv-python` | RPi Camera, DFRobot Camera | `tank_vision` |
+| `opencv-python` | Jetson Camera, DFRobot Camera | `tank_vision` |
 | `ultralytics` | DFRobot Camera (YOLO) | `tank_vision` |
-| `picamera2` | RPi Camera Module 3 | `tank_vision` |
+| `picamera2` | Jetson Camera Module 3 | `tank_vision` |
 | `Adafruit_MPU6050` | MPU6050 IMU | `tank_sensors` |
 | `Adafruit_BNO055` | BNO055 IMU | `tank_sensors` |
 | `adafruit-circuitpython-servokit` | PCA9685 | `tank_motion` |
@@ -138,7 +138,7 @@ TankOS Layer 3 (Core Managers)
 
 | Status | Count | Items |
 |--------|-------|-------|
-| ✅ **Owned + Working** | 10 | RPi 5, NVMe, ESP32-S3 Eyes, Round LCDs, OLED, Camera Module 3, Chassis, BTS7960, USB Hub, CH341 |
+| ✅ **Owned + Working** | 10 | RJetson, NVMe, ESP32-S3 Eyes, Round LCDs, OLED, Camera Module 3, Chassis, BTS7960, USB Hub, CH341 |
 | 🟡 **Owned — Not Integrated** | 12 | DSI Screen, DFRobot Cam, PCA9685, SG90 Servos, MPU6050, HC-SR04, Fingerprint, ReSpeaker, Power Bank, GPIO Expansion, Extra ESP32 |
 | 🟡 **Planned Purchase** | 5 | BNO055, RPLidar, MAX98357A, 4S Li-ion, TF-Luna |
 | 🔴 **Experimental** | 2 | AMG8833, SIM800L |
@@ -157,7 +157,7 @@ TankOS Layer 3 (Core Managers)
 | GPIO23/24 | HC-SR04 (Front) | Trigger + Echo |
 | GPIO25/26 | HC-SR04 (Rear) | Trigger + Echo |
 | GPIO18-21 (I²S) | MAX98357A Amplifier | Audio output |
-| CSI (15-pin) | RPi Camera Module 3 | Video input |
+| CSI (15-pin) | Jetson Camera Module 3 | Video input |
 | DSI (15-pin) | 7" Touchscreen | Display output |
 | USB | Hub → ReSpeaker, LTE Modem, LiDAR, DFRobot Cam | Data + Power |
 | PCIe (M.2 HAT) | NVMe SSD | Storage |

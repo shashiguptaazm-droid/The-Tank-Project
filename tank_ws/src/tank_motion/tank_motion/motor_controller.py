@@ -12,7 +12,7 @@ Publishes (50 Hz):
                    ``track_right_joint``)
 
 Hardware: motor driver H-bridge on GPIO (DIR + PWM per motor) via
-``gpiozero``, which works on the Pi 5 (the legacy ``RPi.GPIO`` does not).
+``gpiozero``, which works on the Jetson (the legacy ``RPi.GPIO`` does not).
 
 A 0.5 s watchdog on ``/cmd_vel`` halts the motors if no Twist arrives.
 Recovery is automatic; the latched ``/estop`` from ``safety_watchdog``
@@ -56,7 +56,7 @@ class MotorHalInterface:
 
 
 class GpioZeroMotorHAL:
-    """gpiozero-backed HAL — works on Pi 5 via ``libgpio``."""
+    """gpiozero-backed HAL — works on Jetson via ``libgpio``."""
     def __init__(self, dir_left: int, pwm_left: int,
                  dir_right: int, pwm_right: int,
                  pwm_frequency: int = 1000) -> None:
@@ -121,7 +121,7 @@ class MotorControllerNode(Node):
             pwm_frequency=int(self.get_parameter("pwm_frequency").value),
         )
         if not hal_provided:
-            self.get_logger().info("Using GpioZeroMotorHAL on the Pi 5 GPIO header.")
+            self.get_logger().info("Using GpioZeroMotorHAL on the Jetson GPIO header.")
 
         self._lock           = threading.Lock()
         self._last_twist     = (0.0, 0.0)

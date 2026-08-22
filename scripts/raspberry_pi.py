@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""raspberry_pi.py - Raspberry Pi & hardware tools (34 features, F1566-F1599).
+"""raspberry_pi.py - Jetson & hardware tools (34 features, F1566-F1599).
 Pi config, GPIO advanced, camera, display, HATs, USB devices, overclocking."""
 from __future__ import annotations
 import argparse, json, sys, subprocess
@@ -15,7 +15,7 @@ def _run(cmd: list) -> dict:
     except Exception as e: return {"ok": False, "error": str(e)}
 
 def cmd_pi_model(args) -> int:
-    """F1566 - Detect Raspberry Pi model, revision, and RAM."""
+    """F1566 - Detect Jetson model, revision, and RAM."""
     r = _run(["cat","/proc/device-tree/model"])
     return _ok(json.dumps({"feature":"pi-model","fid":1566,"result":r,"src":"tank_os/pi"}))
 
@@ -156,7 +156,7 @@ def cmd_pi_setup_wizard(args) -> int:
 
 CMDS = {"pi-model":"F1566","pi-temperature":"F1567","pi-clock-speed":"F1568","pi-voltage":"F1569","pi-overclock":"F1570","pi-config-backup":"F1571","camera-capture":"F1572","camera-stream":"F1573","camera-timelapse":"F1574","camera-settings":"F1575","display-setup":"F1576","display-brightness":"F1577","display-rotate":"F1578","hat-detect":"F1579","hat-configure":"F1580","sense-hat-sensors":"F1581","sense-hat-led":"F1582","pi-audio-output":"F1583","usb-device-list":"F1584","usb-storage-mount":"F1585","spi-loopback-test":"F1586","i2c-detect":"F1587","one-wire-temp":"F1588","uart-test":"F1589","pi-boot-time":"F1590","pi-power-save":"F1591","pi-eeprom-update":"F1592","pi-gpio-mem-test":"F1593","pi-fan-control":"F1594","pi-ups-monitor":"F1595","pi-kiosk-mode":"F1596","pi-cluster-setup":"F1597","pi-sd-health":"F1598","pi-setup-wizard":"F1599"}
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(description="Raspberry Pi tools (F1566-F1599).")
+    p = argparse.ArgumentParser(description="Jetson tools (F1566-F1599).")
     sub = p.add_subparsers(dest="cmd", required=True)
     for n,fid in CMDS.items(): sub.add_parser(n, help=fid)
     return p

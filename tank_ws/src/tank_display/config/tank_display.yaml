@@ -1,6 +1,6 @@
 display_node:
   ros__parameters:
-    use_luma: false          # flip to true on Pi 5 production
+    use_luma: false          # flip to true on Jetson production
     i2c_port: 1
     i2c_address: 0x70        # SH1106 — matches WIRING.md §I²C
     width: 128

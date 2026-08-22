@@ -39,7 +39,7 @@
 
 > **Money saved vs. earlier draft: ~₹ 9,550** (the 4 removed power items +
 > a generic Cytron MDD10A that was already covered by the BTS7960 in hand).
-> **Jetson + Arduino upgrade** adds ~₹ 24,000 over the Pi 5 baseline but
+> **Jetson + Arduino upgrade** adds ~₹ 24,000 over the Jetson baseline but
 > provides hardware-accelerated CUDA AI inference and real-time motor control.
 >
 > Add **≈ ₹ 4,500** for a basic toolbox (soldering iron, heat gun, snips,
@@ -188,7 +188,7 @@
 
 | # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Amazon Link |
 |---|------|--------------------------------------|--------------|----------:|-------------|
-| 32 | **USB Wi-Fi 6 adapter (e.g. TP-Link Archer T2U)** | Small USB-A dongle ~30 × 15 mm with a tiny antenna | Backup Wi-Fi link if Pi 5's onboard Wi-Fi fails on Pi 5 metal-shielded chassis | 550 – 900 | [amazon.in/s?k=usb+wifi+6+adapter](https://www.amazon.in/s?k=usb+wifi+6+adapter) |
+| 32 | **USB Wi-Fi 6 adapter (e.g. TP-Link Archer T2U)** | Small USB-A dongle ~30 × 15 mm with a tiny antenna | Backup Wi-Fi link if Jetson Wi-Fi fails on Jetson metal-shielded chassis | 550 – 900 | [amazon.in/s?k=usb+wifi+6+adapter](https://www.amazon.in/s?k=usb+wifi+6+adapter) |
 | 33 | **Quectel EC25** *or* **SIM7600E LTE modem (USB)** | Small black stick ~85 × 30 mm with two SMA antenna ports, USIM slot | Cellular failover when Wi-Fi drops (`tank_scripts/lte_handoff.py`) | 2,800 – 4,500 | [amazon.in/s?k=quectel+ec25+lte](https://www.amazon.in/s?k=quectel+ec25+lte) |
 | 34 | **LTE SMA antenna (4G/LTE puck, 5 dBi)** | Small black rubber puck ~50 × 50 mm with a short coaxial lead + SMA male | Antenna for the LTE modem | 250 – 450 | [amazon.in/s?k=lte+4g+antenna+sma](https://www.amazon.in/s?k=lte+4g+antenna+sma) |
 | 35 | **Ethernet USB adapter (10/100)** | Tiny white USB-A dongle, RJ45 jack on the other end | Wired backhaul into the home router (preferred over fragile Wi-Fi) | 350 – 600 | [amazon.in/s?k=usb+ethernet+adapter+10](https://www.amazon.in/s?k=usb+ethernet+adapter+10) |
@@ -325,7 +325,7 @@ don't already own one — that brings a *first-time builder* total to **₹ 68,9
 6. **BTS7960 wiring**: the 2 × BTS7960 inputs are 12 V; the modules will
    happily run on 5 V logic for PWM/DIR but the motor rail is fixed at
    whatever the battery delivers. Don't try to drive BTS7960 from a
-   Pi 5 GPIO line WITHOUT level shifting (3.3 V ↔ 5 V). Use a logic
+   Jetson GPIO line WITHOUT level shifting (3.3 V ↔ 5 V). Use a logic
    level shifter or a small transistor buffer.
 7. **Prices fluctuate**: every row is a band; treat the mid-band as the
    realistic planning number, the high-band as the worst-case if every
@@ -388,8 +388,8 @@ Amazon-IN replaces a SKU.*
 | Library | For |
 |---------|-----|
 | PySide6 / Qt6 | Tank Shell GUI + DSI screen |
-| OpenCV + ultralytics (YOLO) | Camera vision (RPi + DFRobot) |
-| picamera2 + libcamera | RPi Camera Module 3 |
+| OpenCV + ultralytics (YOLO) | Camera vision (Jetson + DFRobot) |
+| picamera2 + libcamera | USB Camera |
 | luma.oled | SH1106 OLED face |
 | adafruit-circuitpython-servokit | PCA9685 servo control |
 | openWakeWord | Wake word detection via ReSpeaker |

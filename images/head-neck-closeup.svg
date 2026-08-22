@@ -67,7 +67,7 @@
 
   <!-- USB-C Hub -->
   <rect x="135" y="340" width="170" height="35" rx="6" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1.5" filter="url(#sh)"/>
-  <text x="220" y="355" text-anchor="middle" font-size="9" font-weight="600" fill="#334155">RPi USB-C Hub Module</text>
+  <text x="220" y="355" text-anchor="middle" font-size="9" font-weight="600" fill="#334155">USB-C Hub Module</text>
   <text x="220" y="368" text-anchor="middle" font-size="6" fill="#64748B">I²C/SPI/UART Expander · All sensors ⇄</text>
 
   <!-- Data bus lines from hub to sensors -->
