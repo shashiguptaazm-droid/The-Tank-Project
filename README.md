@@ -61,6 +61,94 @@
 
 ---
 
+## 🧬 Evolution System
+
+The Tank is designed to **get smarter every day**. The evolution system is the engine that drives continuous self-improvement — it's not a metaphor, it's actual code that runs on a daily cycle.
+
+### How it works
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    DAILY EVOLUTION CYCLE                      │
+│                                                              │
+│  1. LEARN     →  auto_learn scans TankOS abilities,          │
+│                    discovers new tools via GitHub trending,   │
+│                    updates the live abilities map              │
+│  2. DISCOVER  →  queries provider APIs to find new models,   │
+│                    tests availability + latency + cost         │
+│  3. EXPAND    →  adds new abilities to abilities_live.json,  │
+│                    new providers to the evolution registry     │
+│  4. APPLY     →  evolves persona, tone, response patterns    │
+│                    based on interaction feedback               │
+│  5. REPORT    →  generates daily changelog + health summary  │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### Multi-Provider AI Brain
+
+The robot doesn't depend on a single AI provider. The **Evolution Bridge** connects **14+ LLM providers** with automatic circuit-breaker fallback:
+
+| Priority | Provider | Why | Status |
+|----------|----------|-----|--------|
+| 1 | **Local GGUF** (llama.cpp) | Offline, fastest, free | ✅ Always |
+| 2 | **Groq** | Fast + free tier | ✅ |
+| 3 | **Cerebras** | Ultra-fast inference | ✅ |
+| 4 | **Mistral** | High quality, cheap | ✅ |
+| 5 | **Cohere** | Good embeddings + chat | ✅ |
+| 6 | **OpenRouter** | Broad model access | ✅ |
+| 7 | **Cloudflare Workers AI** | Free | ✅ |
+| 8 | **Gemini** | Google's latest | ✅ |
+| 9 | **Replicate** | Rate-limited free tier | ✅ |
+| 10 | **DeepSeek** | Strong reasoning | ✅ |
+| 11 | **Rotation Adapter** | Auto-fallback umbrella | ✅ |
+
+### 4 Evolution Modes
+
+| Mode | What it does |
+|------|-------------|
+| **🔄 Rotation** | Default — picks cheapest/fastest available provider, auto-falls back on failure (circuit breaker) |
+| **🔀 Ensemble** | Queries multiple providers in parallel, merges responses for higher accuracy |
+| **🔬 Refinement** | Iterates on a response — first draft → critique → improved version |
+| **🤖 Auto-Train** | Self-evaluates outputs, feeds good responses back into the local model fine-tuning pipeline |
+
+### Self-Healing Infrastructure
+
+- **Circuit Breaker**: Each provider has a health state (CLOSED → OPEN → HALF_OPEN). Three consecutive failures open the circuit; periodic probes test recovery.
+- **Token Bucket**: Rate-limits requests per provider to avoid hitting quotas.
+- **Model Discovery**: Auto-discovers available models from each provider's API (`/v1/models` endpoint). New models are tested and added to the rotation automatically.
+- **Health Monitor**: Tracks latency, error rates, and availability across all providers in real-time.
+
+### Key metrics
+
+| Metric | Value |
+|--------|-------|
+| Providers registered | 14+ |
+| Models auto-discovered | 9 provider APIs |
+| Circuit breaker states | CLOSED / OPEN / HALF_OPEN |
+| Daily evolution cycles | 1 (configurable cron) |
+| Fallback latency | <200ms (auto-switch) |
+| Offline capability | Full (GGUF local inference) |
+
+### Try it
+
+```bash
+# Run the daily evolution cycle
+python3 scripts/daily_evolution.py
+
+# Discover available models from all providers
+python3 scripts/model_auto_finder.py
+
+# Test provider rotation with circuit breaker
+python3 scripts/model_rotation.py --discover-first
+
+# Show evolution history
+python3 scripts/daily_evolution.py --report
+```
+
+> The evolution system is the core differentiator: the robot doesn't just execute commands — it **learns from them, discovers new capabilities, and improves its own responses** over time. Every interaction makes it smarter.
+
+---
+
 ```
 the tank project/
 ├── tank_ws/src/                # the ROS2 colcon workspace (16 packages)
