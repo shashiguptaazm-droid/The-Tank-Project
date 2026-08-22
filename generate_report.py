@@ -349,15 +349,21 @@ doc.add_page_break()
 # ═══════════════════════════════════════════════════════════════
 doc.add_heading('8. Declaration', level=1)
 doc.add_paragraph(
-    'We confirm this is our original, unpublished work. The Arduino® UNO™ Q is the primary board '
-    'in this project. All team members have reviewed and agree with this submission.'
+    'This is our original, unpublished work. The Arduino\u00ae UNO\u2122 Q is the primary board. '
+    'All team members are aware of and consent to this submission. '
+    'We agree to the Terms & Conditions, including granting Robu.in and Arduino\u00ae '
+    'the right to showcase this project for promotional and educational purposes.'
 )
 
 # Declaration table
-table = doc.add_table(rows=2, cols=2)
+table = doc.add_table(rows=3, cols=2)
 table.style = 'Table Grid'
 table.rows[0].cells[0].text = 'Date'
-table.rows[0].cells[1].text = '23 August 2026'
+table.rows[0].cells[1].text = '22 August 2026'
+table.rows[1].cells[0].text = 'Registration ID'
+table.rows[1].cells[1].text = 'APC-2026-RJ-75818'
+table.rows[2].cells[0].text = 'Team Size'
+table.rows[2].cells[1].text = '1'
 
 doc.add_paragraph()
 

@@ -145,3 +145,13 @@ the tank project/
 8. 🟡 Add automated tests
 9. 🟢 Optimize performance
 10. 🟢 Polish + documentation
+
+
+---
+
+## Declaration
+
+> **This is our original, unpublished work.** The Arduino® UNO™ Q is the primary board. All team members are aware of and consent to this submission. We agree to the Terms & Conditions, including granting Robu.in and Arduino® the right to showcase this project for promotional and educational purposes.
+
+- **Registration ID:** APC-2026-RJ-75818
+- **Date:** 22 August 2026
