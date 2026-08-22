@@ -35,6 +35,18 @@
 
 ---
 
+## 🖼️ System Diagrams
+
+<p align="center">
+  <img src="images/architecture.svg" alt="Architecture" width="32%">
+  <img src="images/wiring.svg" alt="Wiring" width="32%">
+  <img src="images/cognitive.svg" alt="Cognitive" width="32%">
+</p>
+
+> Full-resolution SVGs in [`images/`](images/) — Architecture, Wiring Schematic, and 22-system Cognitive Architecture.
+
+---
+
 ```
 the tank project/
 ├── tank_ws/src/                # the ROS2 colcon workspace (16 packages)

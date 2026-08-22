@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="gpu" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#76B900"/>
+      <stop offset="100%" stop-color="#4a8f00"/>
+    </linearGradient>
+    <linearGradient id="arduino" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00979D"/>
+      <stop offset="100%" stop-color="#006468"/>
+    </linearGradient>
+    <linearGradient id="ros" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22314E"/>
+      <stop offset="100%" stop-color="#1a2740"/>
+    </linearGradient>
+    <linearGradient id="core" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#4F46E5"/>
+    </linearGradient>
+    <linearGradient id="shell" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#DB2777"/>
+    </linearGradient>
+    <linearGradient id="internet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <linearGradient id="hw" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#64748B"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Title -->
+  <text x="450" y="38" text-anchor="middle" font-size="22" font-weight="800" fill="#0F172A">The Tank Project — System Architecture</text>
+  <text x="450" y="58" text-anchor="middle" font-size="12" fill="#64748B">6-Layer Stack: Jetson Orin Nano + Arduino UNO R4</text>
+
+  <!-- ===== LEFT: Layers ===== -->
+
+  <!-- Layer 6 — Simple Internet -->
+  <rect x="50" y="85" width="240" height="70" rx="8" fill="url(#internet)" filter="url(#shadow)"/>
+  <text x="170" y="112" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">🌐 Simple Internet</text>
+  <text x="170" y="130" text-anchor="middle" font-size="11" fill="#fff">REST API · Downloader · Search · CLI</text>
+  <text x="170" y="146" text-anchor="middle" font-size="9" fill="#FEF3C7">Port :8900 · 15 commands</text>
+
+  <!-- Layer 5 — Tank Shell -->
+  <rect x="50" y="168" width="240" height="70" rx="8" fill="url(#shell)" filter="url(#shadow)"/>
+  <text x="170" y="195" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">🖥️ Tank Shell (GUI)</text>
+  <text x="170" y="213" text-anchor="middle" font-size="11" fill="#fff">PySide6/Qt6 · 13 full-screen apps</text>
+  <text x="170" y="229" text-anchor="middle" font-size="9" fill="#FCE7F3">Home · Chat · Camera · Nav · Security · Patrol · Dev · AI</text>
+
+  <!-- Layer 4 — TankOS Core -->
+  <rect x="50" y="251" width="240" height="70" rx="8" fill="url(#core)" filter="url(#shadow)"/>
+  <text x="170" y="278" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">🧠 TankOS Core</text>
+  <text x="170" y="296" text-anchor="middle" font-size="11" fill="#fff">35 AI-powered managers · EventBus</text>
+  <text x="170" y="312" text-anchor="middle" font-size="9" fill="#E0E7FF">Evolution Bridge · Local LLM · Vision · Voice · Memory</text>
+
+  <!-- Layer 3 — ROS2 -->
+  <rect x="50" y="334" width="240" height="70" rx="8" fill="url(#ros)" filter="url(#shadow)"/>
+  <text x="170" y="361" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">🤖 ROS 2 Humble</text>
+  <text x="170" y="379" text-anchor="middle" font-size="11" fill="#fff">16 ament_python packages</text>
+  <text x="170" y="395" text-anchor="middle" font-size="9" fill="#93C5FD">Motion · Vision · Nav · Speech · Memory · Security · Health</text>
+
+  <!-- Layer 2 — Arduino Controller -->
+  <rect x="50" y="417" width="240" height="70" rx="8" fill="url(#arduino)" filter="url(#shadow)"/>
+  <text x="170" y="444" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">⚡ Arduino UNO R4 WiFi</text>
+  <text x="170" y="462" text-anchor="middle" font-size="11" fill="#fff">Real-time motor/sensor I/O</text>
+  <text x="170" y="478" text-anchor="middle" font-size="9" fill="#CCFBF1">PWM · Encoder INT · I²C · Serial bridge 115200 baud</text>
+
+  <!-- Layer 1 — Jetson Hardware -->
+  <rect x="50" y="500" width="240" height="70" rx="8" fill="url(#gpu)" filter="url(#shadow)"/>
+  <text x="170" y="527" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">🖥️ Jetson Orin Nano 8GB</text>
+  <text x="170" y="545" text-anchor="middle" font-size="11" fill="#fff">JetPack 6 · CUDA · 1024-core GPU</text>
+  <text x="170" y="561" text-anchor="middle" font-size="9" fill="#DCFCE7">40 TOPS · M.2 NVMe 256GB · USB-C</text>
+
+  <!-- Layer arrows -->
+  <line x1="170" y1="155" x2="170" y2="168" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="170" y1="238" x2="170" y2="251" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="170" y1="321" x2="170" y2="334" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="170" y1="404" x2="170" y2="417" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="170" y1="487" x2="170" y2="500" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="4"/>
+
+  <!-- ===== RIGHT: Hardware & Peripherals ===== -->
+
+  <text x="550" y="105" font-size="14" font-weight="700" fill="#0F172A">🛠️ Hardware Peripherals</text>
+
+  <!-- Peripherals grid -->
+  <g transform="translate(370, 115)">
+    <!-- Jetson USB -->
+    <rect x="0" y="0" width="230" height="55" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="115" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">USB Webcam (UVC)</text>
+    <text x="115" y="36" text-anchor="middle" font-size="9" fill="#64748B">1280×960 @ 30fps · OpenCV</text>
+    <text x="115" y="49" text-anchor="middle" font-size="8" fill="#94A3B8">→ Jetson USB-A</text>
+
+    <rect x="240" y="0" width="230" height="55" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="355" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">RPLidar A1 (360°)</text>
+    <text x="355" y="36" text-anchor="middle" font-size="9" fill="#64748B">12m range · 8000 pts/sec</text>
+    <text x="355" y="49" text-anchor="middle" font-size="8" fill="#94A3B8">→ Jetson USB-UART</text>
+
+    <!-- Arduino I2C row -->
+    <rect x="0" y="65" width="155" height="55" rx="6" fill="#F0FDF4" stroke="#86EFAC"/>
+    <text x="77" y="85" text-anchor="middle" font-size="12" font-weight="700" fill="#166534">BNO055 IMU</text>
+    <text x="77" y="101" text-anchor="middle" font-size="9" fill="#15803D">9-DOF · I²C 0x28</text>
+    <text x="77" y="114" text-anchor="middle" font-size="8" fill="#4ADE80">→ Arduino Wire</text>
+
+    <rect x="165" y="65" width="155" height="55" rx="6" fill="#F0FDF4" stroke="#86EFAC"/>
+    <text x="242" y="85" text-anchor="middle" font-size="12" font-weight="700" fill="#166534">PCA9685 Servo</text>
+    <text x="242" y="101" text-anchor="middle" font-size="9" fill="#15803D">16ch · I²C 0x40</text>
+    <text x="242" y="114" text-anchor="middle" font-size="8" fill="#4ADE80">→ Arduino Wire</text>
+
+    <rect x="330" y="65" width="140" height="55" rx="6" fill="#F0FDF4" stroke="#86EFAC"/>
+    <text x="400" y="85" text-anchor="middle" font-size="12" font-weight="700" fill="#166534">SH1106 OLED</text>
+    <text x="400" y="101" text-anchor="middle" font-size="9" fill="#15803D">1.3″ · I²C 0x70</text>
+    <text x="400" y="114" text-anchor="middle" font-size="8" fill="#4ADE80">→ Arduino Wire</text>
+
+    <!-- Motor row -->
+    <rect x="0" y="130" width="230" height="55" rx="6" fill="#FEF2F2" stroke="#FCA5A5"/>
+    <text x="115" y="150" text-anchor="middle" font-size="12" font-weight="700" fill="#991B1B">2× BTS7960 Motor Drivers</text>
+    <text x="115" y="166" text-anchor="middle" font-size="9" fill="#DC2626">43A H-bridge · PWM + DIR</text>
+    <text x="115" y="179" text-anchor="middle" font-size="8" fill="#F87171">← Arduino D4-D7</text>
+
+    <rect x="240" y="130" width="230" height="55" rx="6" fill="#FEF2F2" stroke="#FCA5A5"/>
+    <text x="355" y="150" text-anchor="middle" font-size="12" font-weight="700" fill="#991B1B">2× JGB37-520 Motors</text>
+    <text x="355" y="166" text-anchor="middle" font-size="9" fill="#DC2626">12V DC · 30:1 · Encoder A/B</text>
+    <text x="355" y="179" text-anchor="middle" font-size="8" fill="#F87171">→ Arduino D2-D3, D18-D19</text>
+
+    <!-- Eyes row -->
+    <rect x="0" y="195" width="230" height="55" rx="6" fill="#EFF6FF" stroke="#93C5FD"/>
+    <text x="115" y="215" text-anchor="middle" font-size="12" font-weight="700" fill="#1E40AF">ESP32-S3 Eyes</text>
+    <text x="115" y="231" text-anchor="middle" font-size="9" fill="#2563EB">2× GC9A01 Round LCD</text>
+    <text x="115" y="244" text-anchor="middle" font-size="8" fill="#60A5FA">← Jetson USB-UART · JSON</text>
+
+    <!-- Audio row -->
+    <rect x="240" y="195" width="230" height="55" rx="6" fill="#EFF6FF" stroke="#93C5FD"/>
+    <text x="355" y="215" text-anchor="middle" font-size="12" font-weight="700" fill="#1E40AF">ReSpeaker 4-Mic Array</text>
+    <text x="355" y="231" text-anchor="middle" font-size="9" fill="#2563EB">Far-field · Wake word</text>
+    <text x="355" y="244" text-anchor="middle" font-size="8" fill="#60A5FA">→ Jetson USB-A</text>
+  </g>
+
+  <!-- ===== Serial Link Arrow ===== -->
+  <g transform="translate(310, 510)">
+    <rect x="0" y="0" width="130" height="36" rx="18" fill="#0F172A"/>
+    <text x="65" y="23" text-anchor="middle" font-size="11" font-weight="700" fill="#F8FAFC">↔ Serial 115200</text>
+  </g>
+  <line x1="290" y1="452" x2="310" y2="528" stroke="#94A3B8" stroke-width="1.5"/>
+  <line x1="440" y1="452" x2="440" y2="510" stroke="#94A3B8" stroke-width="1.5"/>
+
+  <!-- ===== Bottom Stats ===== -->
+  <g transform="translate(0, 620)">
+    <rect x="50" y="0" width="150" height="50" rx="6" fill="#F1F5F9"/>
+    <text x="125" y="20" text-anchor="middle" font-size="10" fill="#64748B">AI Runtime</text>
+    <text x="125" y="38" text-anchor="middle" font-size="13" font-weight="700" fill="#0F172A">CUDA · llama.cpp</text>
+
+    <rect x="215" y="0" width="150" height="50" rx="6" fill="#F1F5F9"/>
+    <text x="290" y="20" text-anchor="middle" font-size="10" fill="#64748B">ROS 2 Packages</text>
+    <text x="290" y="38" text-anchor="middle" font-size="13" font-weight="700" fill="#0F172A">16 ament_python</text>
+
+    <rect x="380" y="0" width="150" height="50" rx="6" fill="#F1F5F9"/>
+    <text x="455" y="20" text-anchor="middle" font-size="10" fill="#64748B">CLI Utilities</text>
+    <text x="455" y="38" text-anchor="middle" font-size="13" font-weight="700" fill="#0F172A">400+ commands</text>
+
+    <rect x="545" y="0" width="150" height="50" rx="6" fill="#F1F5F9"/>
+    <text x="620" y="20" text-anchor="middle" font-size="10" fill="#64748B">AI Managers</text>
+    <text x="620" y="38" text-anchor="middle" font-size="13" font-weight="700" fill="#0F172A">35 managers</text>
+
+    <rect x="710" y="0" width="150" height="50" rx="6" fill="#F1F5F9"/>
+    <text x="785" y="20" text-anchor="middle" font-size="10" fill="#64748B">Cognitive Systems</text>
+    <text x="785" y="38" text-anchor="middle" font-size="13" font-weight="700" fill="#0F172A">22 systems</text>
+  </g>
+</svg>

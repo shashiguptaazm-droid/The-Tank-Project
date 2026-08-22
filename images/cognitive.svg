@@ -1,0 +1,188 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="shadow"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.1"/></filter>
+    <linearGradient id="gradPerception" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#8B5CF6"/><stop offset="100%" stop-color="#7C3AED"/></linearGradient>
+    <linearGradient id="gradAttention" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3B82F6"/><stop offset="100%" stop-color="#2563EB"/></linearGradient>
+    <linearGradient id="gradReasoning" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10B981"/><stop offset="100%" stop-color="#059669"/></linearGradient>
+    <linearGradient id="gradPlanning" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#D97706"/></linearGradient>
+    <linearGradient id="gradDecision" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#EF4444"/><stop offset="100%" stop-color="#DC2626"/></linearGradient>
+    <linearGradient id="gradLearning" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#EC4899"/><stop offset="100%" stop-color="#DB2777"/></linearGradient>
+    <linearGradient id="gradMemory" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#06B6D4"/><stop offset="100%" stop-color="#0891B2"/></linearGradient>
+    <linearGradient id="gradEmotion" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#F97316"/><stop offset="100%" stop-color="#EA580C"/></linearGradient>
+    <linearGradient id="gradMeta" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366F1"/><stop offset="100%" stop-color="#4F46E5"/></linearGradient>
+  </defs>
+
+  <text x="500" y="30" text-anchor="middle" font-size="20" font-weight="800" fill="#0F172A">🧠 Cognitive Architecture — 22 Integrated Systems</text>
+  <text x="500" y="48" text-anchor="middle" font-size="11" fill="#64748B">Perception → Attention → Reasoning → Planning → Decision → Learning → Memory → Emotion → Metacognition</text>
+
+  <!-- Row 1: Perception & Attention -->
+  <g transform="translate(20, 65)">
+    <rect x="0" y="0" width="140" height="90" rx="8" fill="url(#gradPerception)" filter="url(#shadow)"/>
+    <text x="70" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">👁️ Perception</text>
+    <text x="70" y="45" text-anchor="middle" font-size="9" fill="#EDE9FE">Vision</text>
+    <text x="70" y="58" text-anchor="middle" font-size="9" fill="#EDE9FE">Audio</text>
+    <text x="70" y="71" text-anchor="middle" font-size="9" fill="#EDE9FE">Sensors</text>
+    <text x="70" y="84" text-anchor="middle" font-size="9" fill="#EDE9FE">LiDAR</text>
+
+    <rect x="160" y="0" width="140" height="90" rx="8" fill="url(#gradAttention)" filter="url(#shadow)"/>
+    <text x="230" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">🎯 Attention</text>
+    <text x="230" y="45" text-anchor="middle" font-size="9" fill="#DBEAFE">Saliency</text>
+    <text x="230" y="58" text-anchor="middle" font-size="9" fill="#DBEAFE">Focus</text>
+    <text x="230" y="71" text-anchor="middle" font-size="9" fill="#DBEAFE">Priorities</text>
+    <text x="230" y="84" text-anchor="middle" font-size="9" fill="#DBEAFE">Filtering</text>
+
+    <rect x="320" y="0" width="140" height="90" rx="8" fill="url(#gradReasoning)" filter="url(#shadow)"/>
+    <text x="390" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">🧩 Reasoning</text>
+    <text x="390" y="45" text-anchor="middle" font-size="9" fill="#D1FAE5">Logic</text>
+    <text x="390" y="58" text-anchor="middle" font-size="9" fill="#D1FAE5">Deduction</text>
+    <text x="390" y="71" text-anchor="middle" font-size="9" fill="#D1FAE5">Abstraction</text>
+    <text x="390" y="84" text-anchor="middle" font-size="9" fill="#D1FAE5">Commonsense</text>
+
+    <rect x="480" y="0" width="140" height="90" rx="8" fill="url(#gradPlanning)" filter="url(#shadow)"/>
+    <text x="550" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">🗺️ Planning</text>
+    <text x="550" y="45" text-anchor="middle" font-size="9" fill="#FEF3C7">Goals</text>
+    <text x="550" y="58" text-anchor="middle" font-size="9" fill="#FEF3C7">Strategies</text>
+    <text x="550" y="71" text-anchor="middle" font-size="9" fill="#FEF3C7">Scheduling</text>
+    <text x="550" y="84" text-anchor="middle" font-size="9" fill="#FEF3C7">Waypoints</text>
+
+    <rect x="640" y="0" width="140" height="90" rx="8" fill="url(#gradDecision)" filter="url(#shadow)"/>
+    <text x="710" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">⚡ Decision</text>
+    <text x="710" y="45" text-anchor="middle" font-size="9" fill="#FEE2E2">Selection</text>
+    <text x="710" y="58" text-anchor="middle" font-size="9" fill="#FEE2E2">Trade-offs</text>
+    <text x="710" y="71" text-anchor="middle" font-size="9" fill="#FEE2E2">Risk eval</text>
+    <text x="710" y="84" text-anchor="middle" font-size="9" fill="#FEE2E2">Safety check</text>
+
+    <rect x="800" y="0" width="140" height="90" rx="8" fill="url(#gradLearning)" filter="url(#shadow)"/>
+    <text x="870" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">📚 Learning</text>
+    <text x="870" y="45" text-anchor="middle" font-size="9" fill="#FCE7F3">From mistakes</text>
+    <text x="870" y="58" text-anchor="middle" font-size="9" fill="#FCE7F3">From feedback</text>
+    <text x="870" y="71" text-anchor="middle" font-size="9" fill="#FCE7F3">Habits</text>
+    <text x="870" y="84" text-anchor="middle" font-size="9" fill="#FCE7F3">From GitHub</text>
+  </g>
+
+  <!-- Row 2: Memory & Emotion & Meta -->
+  <g transform="translate(130, 175)">
+    <rect x="0" y="0" width="160" height="90" rx="8" fill="url(#gradMemory)" filter="url(#shadow)"/>
+    <text x="80" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">💾 Memory</text>
+    <text x="80" y="45" text-anchor="middle" font-size="9" fill="#CFFAFE">Short-term</text>
+    <text x="80" y="58" text-anchor="middle" font-size="9" fill="#CFFAFE">Long-term</text>
+    <text x="80" y="71" text-anchor="middle" font-size="9" fill="#CFFAFE">Vector DB</text>
+    <text x="80" y="84" text-anchor="middle" font-size="9" fill="#CFFAFE">sqlite-vec</text>
+
+    <rect x="180" y="0" width="160" height="90" rx="8" fill="url(#gradEmotion)" filter="url(#shadow)"/>
+    <text x="260" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">❤️ Emotion</text>
+    <text x="260" y="45" text-anchor="middle" font-size="9" fill="#FFEDD5">Valence</text>
+    <text x="260" y="58" text-anchor="middle" font-size="9" fill="#FFEDD5">Arousal</text>
+    <text x="260" y="71" text-anchor="middle" font-size="9" fill="#FFEDD5">Expression</text>
+    <text x="260" y="84" text-anchor="middle" font-size="9" fill="#FFEDD5">Tone</text>
+
+    <rect x="360" y="0" width="160" height="90" rx="8" fill="url(#gradMeta)" filter="url(#shadow)"/>
+    <text x="440" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">🔍 Metacognition</text>
+    <text x="440" y="45" text-anchor="middle" font-size="9" fill="#E0E7FF">Self-check</text>
+    <text x="440" y="58" text-anchor="middle" font-size="9" fill="#E0E7FF">Confidence</text>
+    <text x="440" y="71" text-anchor="middle" font-size="9" fill="#E0E7FF">Reflection</text>
+    <text x="440" y="84" text-anchor="middle" font-size="9" fill="#E0E7FF">Correction</text>
+
+    <rect x="540" y="0" width="160" height="90" rx="8" fill="#475569" filter="url(#shadow)"/>
+    <text x="620" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">🔄 Actuation</text>
+    <text x="620" y="45" text-anchor="middle" font-size="9" fill="#CBD5E1">Speech</text>
+    <text x="620" y="58" text-anchor="middle" font-size="9" fill="#CBD5E1">Movement</text>
+    <text x="620" y="71" text-anchor="middle" font-size="9" fill="#CBD5E1">Expression</text>
+    <text x="620" y="84" text-anchor="middle" font-size="9" fill="#CBD5E1">Actions</text>
+  </g>
+
+  <!-- Arrows between row 1 cells -->
+  <g stroke="#94A3B8" stroke-width="1.5" fill="#94A3B8">
+    <polygon points="162,110 172,106 172,114"/>
+    <polygon points="322,110 332,106 332,114"/>
+    <polygon points="482,110 492,106 492,114"/>
+    <polygon points="642,110 652,106 652,114"/>
+  </g>
+
+  <!-- Arrows row 1 → row 2 -->
+  <g stroke="#94A3B8" stroke-width="1" stroke-dasharray="4">
+    <line x1="280" y1="155" x2="210" y2="175"/>
+    <line x1="360" y1="155" x2="260" y2="175"/>
+    <line x1="490" y1="155" x2="440" y2="175"/>
+    <line x1="320" y1="155" x2="620" y2="175"/>
+    <line x1="640" y1="155" x2="540" y2="175"/>
+  </g>
+
+  <!-- Supporting Systems Row -->
+  <text x="500" y="300" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">🔧 Supporting Systems</text>
+
+  <g transform="translate(20, 315)" font-size="9">
+    <rect x="0" y="0" width="130" height="36" rx="6" fill="#F1F5F9" stroke="#CBD5E1"/>
+    <text x="65" y="16" text-anchor="middle" font-weight="600" fill="#334155">🛡️ Safety</text>
+    <text x="65" y="30" text-anchor="middle" fill="#64748B">E-STOP · Watchdog</text>
+
+    <rect x="140" y="0" width="130" height="36" rx="6" fill="#F1F5F9" stroke="#CBD5E1"/>
+    <text x="205" y="16" text-anchor="middle" font-weight="600" fill="#334155">🔒 Security</text>
+    <text x="205" y="30" text-anchor="middle" fill="#64748B">Auth · Encryption</text>
+
+    <rect x="280" y="0" width="130" height="36" rx="6" fill="#F1F5F9" stroke="#CBD5E1"/>
+    <text x="345" y="16" text-anchor="middle" font-weight="600" fill="#334155">🧭 Navigation</text>
+    <text x="345" y="30" text-anchor="middle" fill="#64748B">SLAM · RTAB-Map</text>
+
+    <rect x="420" y="0" width="130" height="36" rx="6" fill="#F1F5F9" stroke="#CBD5E1"/>
+    <text x="485" y="16" text-anchor="middle" font-weight="600" fill="#334155">💬 Voice</text>
+    <text x="485" y="30" text-anchor="middle" fill="#64748B">Whisper · Piper</text>
+
+    <rect x="560" y="0" width="130" height="36" rx="6" fill="#F1F5F9" stroke="#CBD5E1"/>
+    <text x="625" y="16" text-anchor="middle" font-weight="600" fill="#334155">🔋 Power</text>
+    <text x="625" y="30" text-anchor="middle" fill="#64748B">BMS · Dock</text>
+
+    <rect x="700" y="0" width="130" height="36" rx="6" fill="#F1F5F9" stroke="#CBD5E1"/>
+    <text x="765" y="16" text-anchor="middle" font-weight="600" fill="#334155">🌐 Network</text>
+    <text x="765" y="30" text-anchor="middle" fill="#64748B">WiFi · Tailscale</text>
+
+    <rect x="840" y="0" width="130" height="36" rx="6" fill="#F1F5F9" stroke="#CBD5E1"/>
+    <text x="905" y="16" text-anchor="middle" font-weight="600" fill="#334155">📊 Monitoring</text>
+    <text x="905" y="30" text-anchor="middle" fill="#64748B">Prometheus · Grafana</text>
+
+    <!-- Second row of supporting -->
+    <rect x="0" y="46" width="130" height="36" rx="6" fill="#F1F5F9" stroke="#CBD5E1"/>
+    <text x="65" y="62" text-anchor="middle" font-weight="600" fill="#334155">🎨 Personality</text>
+    <text x="65" y="76" text-anchor="middle" fill="#64748B">Tone · Persona</text>
+
+    <rect x="140" y="46" width="130" height="36" rx="6" fill="#F1F5F9" stroke="#CBD5E1"/>
+    <text x="205" y="62" text-anchor="middle" font-weight="600" fill="#334155">🚓 Patrol</text>
+    <text x="205" y="76" text-anchor="middle" fill="#64748B">Auto · Surveillance</text>
+
+    <rect x="280" y="46" width="130" height="36" rx="6" fill="#F1F5F9" stroke="#CBD5E1"/>
+    <text x="345" y="62" text-anchor="middle" font-weight="600" fill="#334155">🔄 OTA</text>
+    <text x="345" y="76" text-anchor="middle" fill="#64748B">Updates · A/B slot</text>
+
+    <rect x="420" y="46" width="130" height="36" rx="6" fill="#F1F5F9" stroke="#CBD5E1"/>
+    <text x="485" y="62" text-anchor="middle" font-weight="600" fill="#334155">💡 Creativity</text>
+    <text x="485" y="76" text-anchor="middle" fill="#64748B">Curiosity engine</text>
+
+    <rect x="560" y="46" width="130" height="36" rx="6" fill="#F1F5F9" stroke="#CBD5E1"/>
+    <text x="625" y="62" text-anchor="middle" font-weight="600" fill="#334155">🌍 Fleet</text>
+    <text x="625" y="76" text-anchor="middle" fill="#64748B">Multi-robot</text>
+
+    <rect x="700" y="46" width="130" height="36" rx="6" fill="#F1F5F9" stroke="#CBD5E1"/>
+    <text x="765" y="62" text-anchor="middle" font-weight="600" fill="#334155">📦 Preload</text>
+    <text x="765" y="76" text-anchor="middle" fill="#64748B">Offline-first</text>
+  </g>
+
+  <!-- Bottom: Full loop diagram -->
+  <rect x="50" y="410" width="900" height="55" rx="8" fill="#0F172A"/>
+  <text x="500" y="433" text-anchor="middle" font-size="12" font-weight="700" fill="#F8FAFC">🔄 Continuous Evolution Loop</text>
+  <g font-size="9">
+    <text x="120" y="453" fill="#94A3B8">Observe</text>
+    <text x="230" y="453" fill="#3B82F6">→</text>
+    <text x="260" y="453" fill="#94A3B8">Reason</text>
+    <text x="360" y="453" fill="#10B981">→</text>
+    <text x="390" y="453" fill="#94A3B8">Decide</text>
+    <text x="490" y="453" fill="#F59E0B">→</text>
+    <text x="520" y="453" fill="#94A3B8">Act</text>
+    <text x="610" y="453" fill="#EF4444">→</text>
+    <text x="640" y="453" fill="#94A3B8">Remember</text>
+    <text x="760" y="453" fill="#EC4899">→</text>
+    <text x="790" y="453" fill="#94A3B8">Reflect</text>
+    <text x="880" y="453" fill="#06B6D4">→</text>
+    <text x="900" y="453" fill="#94A3B8">Evolve</text>
+    <text x="980" y="453" fill="#8B5CF6">↻</text>
+  </g>
+</svg>
