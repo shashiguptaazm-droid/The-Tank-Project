@@ -51,7 +51,13 @@
   <img src="images/cognitive.svg" alt="Cognitive" width="32%">
 </p>
 
-> Full-resolution SVGs in [`images/`](images/) — 7 diagrams covering the full humanoid blueprint, system architecture, wiring, and cognitive pipeline. Traced from original hand-drawn schematics.
+## 🔧 Hardware Catalog
+
+<p align="center">
+  <img src="hardware/catalog.svg" alt="Hardware Catalog" width="95%">
+</p>
+
+> 42 components across 8 sections — Jetson + Arduino + ESP32-S3 · ₹53K–₹1.06L · Full BOM with prices and Amazon links in [`hardware.md`](hardware.md)
 
 ---
 

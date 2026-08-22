@@ -1,0 +1,429 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1100" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="sh"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.1"/></filter>
+  </defs>
+
+  <text x="700" y="28" text-anchor="middle" font-size="20" font-weight="800" fill="#0F172A">🔧 Hardware Component Catalog</text>
+  <text x="700" y="46" text-anchor="middle" font-size="11" fill="#64748B">The Tank Project — 42 Components · Jetson + Arduino + ESP32-S3 · ₹88,750 mid-band</text>
+
+  <!-- ═══════════ SECTION 1: COMPUTE ═══════════ -->
+  <g transform="translate(10, 60)">
+    <rect x="0" y="0" width="1380" height="120" rx="8" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1"/>
+    <text x="15" y="18" font-size="12" font-weight="700" fill="#1E40AF">🧠 Section 1 — Compute / Brains (5 items)</text>
+
+    <!-- Jetson -->
+    <g transform="translate(15, 28)">
+      <rect x="0" y="0" width="160" height="85" rx="6" fill="#fff" stroke="#60A5FA" filter="url(#sh)"/>
+      <rect x="10" y="8" width="140" height="50" rx="4" fill="#DBEAFE"/>
+      <text x="80" y="38" text-anchor="middle" font-size="10" font-weight="700" fill="#1E40AF">Jetson Orin</text>
+      <text x="80" y="52" text-anchor="middle" font-size="9" fill="#3B82F6">Nano Dev Kit</text>
+      <text x="80" y="70" text-anchor="middle" font-size="7" fill="#64748B">1024 CUDA cores</text>
+      <text x="80" y="82" text-anchor="middle" font-size="7" fill="#2563EB">₹25K–35K</text>
+    </g>
+
+    <!-- Arduino -->
+    <g transform="translate(185, 28)">
+      <rect x="0" y="0" width="160" height="85" rx="6" fill="#fff" stroke="#0D9488" filter="url(#sh)"/>
+      <rect x="10" y="8" width="140" height="50" rx="4" fill="#CCFBF1"/>
+      <text x="80" y="30" text-anchor="middle" font-size="10" font-weight="700" fill="#0F766E">Arduino UNO</text>
+      <text x="80" y="44" text-anchor="middle" font-size="10" font-weight="700" fill="#0F766E">R4 WiFi</text>
+      <text x="80" y="62" text-anchor="middle" font-size="7" fill="#64748B">Arm M4 48MHz</text>
+      <text x="80" y="82" text-anchor="middle" font-size="7" fill="#0D9488">₹1.8K–2.5K</text>
+    </g>
+
+    <!-- NVMe -->
+    <g transform="translate(355, 28)">
+      <rect x="0" y="0" width="160" height="85" rx="6" fill="#fff" stroke="#F59E0B" filter="url(#sh)"/>
+      <rect x="10" y="8" width="140" height="50" rx="4" fill="#FEF3C7"/>
+      <text x="80" y="30" text-anchor="middle" font-size="10" font-weight="700" fill="#92400E">NVMe SSD</text>
+      <text x="80" y="44" text-anchor="middle" font-size="9" fill="#B45309">256 GB M.2</text>
+      <text x="80" y="62" text-anchor="middle" font-size="7" fill="#64748B">22×80mm · PCIe x1</text>
+      <text x="80" y="82" text-anchor="middle" font-size="7" fill="#D97706">₹3.5K–5.5K</text>
+    </g>
+
+    <!-- ESP32-S3 -->
+    <g transform="translate(525, 28)">
+      <rect x="0" y="0" width="160" height="85" rx="6" fill="#fff" stroke="#EF4444" filter="url(#sh)"/>
+      <rect x="10" y="8" width="140" height="50" rx="4" fill="#FEE2E2"/>
+      <text x="80" y="30" text-anchor="middle" font-size="10" font-weight="700" fill="#991B1B">ESP32-S3</text>
+      <text x="80" y="44" text-anchor="middle" font-size="9" fill="#DC2626">DevKitC-1</text>
+      <text x="80" y="62" text-anchor="middle" font-size="7" fill="#64748B">N16R8 · USB-C</text>
+      <text x="80" y="82" text-anchor="middle" font-size="7" fill="#EF4444">₹700–1.1K</text>
+    </g>
+
+    <!-- MicroSD -->
+    <g transform="translate(695, 28)">
+      <rect x="0" y="0" width="160" height="85" rx="6" fill="#fff" stroke="#8B5CF6" filter="url(#sh)"/>
+      <rect x="10" y="8" width="140" height="50" rx="4" fill="#EDE9FE"/>
+      <text x="80" y="30" text-anchor="middle" font-size="10" font-weight="700" fill="#5B21B6">MicroSD</text>
+      <text x="80" y="44" text-anchor="middle" font-size="9" fill="#7C3AED">64 GB A2</text>
+      <text x="80" y="62" text-anchor="middle" font-size="7" fill="#64748B">Boot drive for Jetson</text>
+      <text x="80" y="82" text-anchor="middle" font-size="7" fill="#8B5CF6">₹600–900</text>
+    </g>
+  </g>
+
+  <!-- ═══════════ SECTION 2: VISION ═══════════ -->
+  <g transform="translate(10, 190)">
+    <rect x="0" y="0" width="1380" height="120" rx="8" fill="#FFF7ED" stroke="#F97316" stroke-width="1"/>
+    <text x="15" y="18" font-size="12" font-weight="700" fill="#9A3412">👁️ Section 2 — Vision / Display (4 items)</text>
+
+    <g transform="translate(15, 28)">
+      <rect x="0" y="0" width="160" height="85" rx="6" fill="#fff" stroke="#FB923C" filter="url(#sh)"/>
+      <rect x="10" y="8" width="140" height="50" rx="4" fill="#FED7AA"/>
+      <text x="80" y="30" text-anchor="middle" font-size="10" font-weight="700" fill="#9A3412">Round LCD</text>
+      <text x="80" y="44" text-anchor="middle" font-size="9" fill="#C2410C">GC9A01 ×2</text>
+      <text x="80" y="62" text-anchor="middle" font-size="7" fill="#64748B">1.28″ 240×240</text>
+      <text x="80" y="82" text-anchor="middle" font-size="7" fill="#F97316">₹2.8K–4K</text>
+    </g>
+
+    <g transform="translate(185, 28)">
+      <rect x="0" y="0" width="160" height="85" rx="6" fill="#fff" stroke="#818CF8" filter="url(#sh)"/>
+      <rect x="10" y="8" width="140" height="50" rx="4" fill="#E0E7FF"/>
+      <text x="80" y="30" text-anchor="middle" font-size="10" font-weight="700" fill="#3730A3">OLED</text>
+      <text x="80" y="44" text-anchor="middle" font-size="9" fill="#4F46E5">SH1106 1.3″</text>
+      <text x="80" y="62" text-anchor="middle" font-size="7" fill="#64748B">I²C 0x70 · 128×64</text>
+      <text x="80" y="82" text-anchor="middle" font-size="7" fill="#818CF8">₹350–600</text>
+    </g>
+
+    <g transform="translate(355, 28)">
+      <rect x="0" y="0" width="160" height="85" rx="6" fill="#fff" stroke="#EF4444" filter="url(#sh)"/>
+      <rect x="10" y="8" width="140" height="50" rx="4" fill="#FEE2E2"/>
+      <text x="80" y="30" text-anchor="middle" font-size="10" font-weight="700" fill="#991B1B">USB Camera</text>
+      <text x="80" y="44" text-anchor="middle" font-size="9" fill="#DC2626">IMX219/C920</text>
+      <text x="80" y="62" text-anchor="middle" font-size="7" fill="#64748B">UVC · OpenCV</text>
+      <text x="80" y="82" text-anchor="middle" font-size="7" fill="#EF4444">₹1.2K–2.5K</text>
+    </g>
+
+    <g transform="translate(525, 28)">
+      <rect x="0" y="0" width="160" height="85" rx="6" fill="#fff" stroke="#64748B" filter="url(#sh)"/>
+      <rect x="10" y="8" width="140" height="50" rx="4" fill="#F1F5F9"/>
+      <text x="80" y="30" text-anchor="middle" font-size="10" font-weight="700" fill="#334155">Standoff Kit</text>
+      <text x="80" y="44" text-anchor="middle" font-size="9" fill="#475569">M2.5/M3 Nylon</text>
+      <text x="80" y="62" text-anchor="middle" font-size="7" fill="#64748B">50 pcs · 5/10/15/20mm</text>
+      <text x="80" y="82" text-anchor="middle" font-size="7" fill="#94A3B8">₹250–450</text>
+    </g>
+  </g>
+
+  <!-- ═══════════ SECTION 3: MOTION ═══════════ -->
+  <g transform="translate(10, 320)">
+    <rect x="0" y="0" width="1380" height="120" rx="8" fill="#FEF2F2" stroke="#EF4444" stroke-width="1"/>
+    <text x="15" y="18" font-size="12" font-weight="700" fill="#991B1B">⚙️ Section 3 — Motion / Drive Train (8 items)</text>
+
+    <g transform="translate(15, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#F87171" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#FEE2E2"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#991B1B">DC Motor ×2</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#DC2626">JGB37-520</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">12V · Encoder · 30:1</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#EF4444">₹1.3K–1.9K</text>
+    </g>
+
+    <g transform="translate(140, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#F87171" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#FEE2E2"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#991B1B">BTS7960 ×2</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#DC2626">Motor Driver</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">43A H-Bridge</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#EF4444">₹0 (owned)</text>
+    </g>
+
+    <g transform="translate(265, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#F87171" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#FEE2E2"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#991B1B">Chassis</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#DC2626">Tracked 12V</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">Aluminium · 15cm</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#EF4444">₹1.8K–3.2K</text>
+    </g>
+
+    <g transform="translate(390, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#F87171" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#FEE2E2"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#991B1B">SG90 Servo ×2</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#DC2626">Pan/Tilt</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">50Hz PWM · 180°</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#EF4444">₹360–560</text>
+    </g>
+
+    <g transform="translate(515, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#F87171" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#FEE2E2"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#991B1B">PCA9685</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#DC2626">16ch PWM</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">I²C 0x40 · 12-bit</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#EF4444">₹450–750</text>
+    </g>
+
+    <g transform="translate(640, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#F87171" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#FEE2E2"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#991B1B">Pan-Tilt</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#DC2626">Bracket</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">2-axis · SG90</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#EF4444">₹250–450</text>
+    </g>
+
+    <g transform="translate(765, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#F87171" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#FEE2E2"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#991B1B">E-STOP</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#DC2626">Mushroom 16mm</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">NO/NC · Panel</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#EF4444">₹150–350</text>
+    </g>
+  </g>
+
+  <!-- ═══════════ SECTION 4: SENSORS ═══════════ -->
+  <g transform="translate(10, 450)">
+    <rect x="0" y="0" width="1380" height="120" rx="8" fill="#ECFDF5" stroke="#10B981" stroke-width="1"/>
+    <text x="15" y="18" font-size="12" font-weight="700" fill="#065F46">📡 Section 4 — Sensors (7 items)</text>
+
+    <g transform="translate(15, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#34D399" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#D1FAE5"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#065F46">RPLidar A1</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#047857">360° LiDAR</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">12m · USB</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#10B981">₹5K–8.5K</text>
+    </g>
+
+    <g transform="translate(140, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#34D399" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#D1FAE5"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#065F46">BNO055</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#047857">9-DOF IMU</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">I²C 0x28</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#10B981">₹1.2K–2K</text>
+    </g>
+
+    <g transform="translate(265, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#34D399" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#D1FAE5"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#065F46">INA219 ×2</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#047857">Current/Volt</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">I²C 0x40</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#10B981">₹500–900</text>
+    </g>
+
+    <g transform="translate(390, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#34D399" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#D1FAE5"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#065F46">R307</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#047857">Fingerprint</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">UART 57600</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#10B981">₹850–1.4K</text>
+    </g>
+
+    <g transform="translate(515, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#34D399" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#D1FAE5"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#065F46">HC-SR04 ×2</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#047857">Ultrasonic</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">GPIO Trig/Echo</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#10B981">₹240–360</text>
+    </g>
+
+    <g transform="translate(640, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#34D399" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#D1FAE5"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#065F46">DS18B20 ×3</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#047857">Temp Probe</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">1-Wire · ±0.5°C</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#10B981">₹360–840</text>
+    </g>
+
+    <g transform="translate(765, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#34D399" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#D1FAE5"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#065F46">4.7kΩ ×10</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#047857">Pull-up</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">1-Wire bus</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#10B981">₹30–80</text>
+    </g>
+  </g>
+
+  <!-- ═══════════ SECTION 5: AUDIO ═══════════ -->
+  <g transform="translate(10, 580)">
+    <rect x="0" y="0" width="680" height="120" rx="8" fill="#FDF4FF" stroke="#A855F7" stroke-width="1"/>
+    <text x="15" y="18" font-size="12" font-weight="700" fill="#6D28D9">🔊 Section 5 — Audio In/Out (4 items)</text>
+
+    <g transform="translate(15, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#C084FC" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#F3E8FF"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#6D28D9">ReSpeaker</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#7C3AED">4-Mic Array</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">USB · Far-field</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#A855F7">₹2.8K–4.2K</text>
+    </g>
+
+    <g transform="translate(140, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#C084FC" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#F3E8FF"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#6D28D9">USB DAC</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#7C3AED">Audio Class</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">3.5mm jack</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#A855F7">₹400–750</text>
+    </g>
+
+    <g transform="translate(265, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#C084FC" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#F3E8FF"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#6D28D9">3W Speaker</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#7C3AED">8Ω · JST</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">28mm round</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#A855F7">₹150–300</text>
+    </g>
+
+    <g transform="translate(390, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#C084FC" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#F3E8FF"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#6D28D9">USB Speaker</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#7C3AED">Amplified</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">85×45mm · USB-A</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#A855F7">₹600–1.1K</text>
+    </g>
+  </g>
+
+  <!-- ═══════════ SECTION 6: POWER ═══════════ -->
+  <g transform="translate(710, 580)">
+    <rect x="0" y="0" width="680" height="120" rx="8" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1"/>
+    <text x="15" y="18" font-size="12" font-weight="700" fill="#92400E">🔋 Section 6 — Power / Battery (6+ items)</text>
+
+    <g transform="translate(15, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#FBBF24" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#FEF3C7"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#92400E">Jetson PSU</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#B45309">19V Barrel</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">Included w/ dev kit</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#F59E0B">Included</text>
+    </g>
+
+    <g transform="translate(140, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#FBBF24" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#FEF3C7"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#92400E">Power Bank</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#B45309">20000mAh ×3</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">USB-C PD 27W+</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#F59E0B">₹2.4K–3K</text>
+    </g>
+
+    <g transform="translate(265, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#FBBF24" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#FEF3C7"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#92400E">Pebble ×3</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#B45309">5000mAh ESP32</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">Wireless dock</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#F59E0B">₹900–1.5K</text>
+    </g>
+
+    <g transform="translate(390, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#FBBF24" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#FEF3C7"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#92400E">XT60 Pair</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#B45309">+ JST-PH</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">Motor rail</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#F59E0B">₹150–350</text>
+    </g>
+
+    <g transform="translate(515, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#FBBF24" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#FEF3C7"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#92400E">30A Fuse</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#B45309">ATC Blade</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">Motor safety</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#F59E0B">₹120–280</text>
+    </g>
+  </g>
+
+  <!-- ═══════════ SECTION 7: NETWORKING ═══════════ -->
+  <g transform="translate(10, 710)">
+    <rect x="0" y="0" width="680" height="120" rx="8" fill="#F0F9FF" stroke="#0EA5E9" stroke-width="1"/>
+    <text x="15" y="18" font-size="12" font-weight="700" fill="#0C4A6E">🌐 Section 7 — Networking (4 items)</text>
+
+    <g transform="translate(15, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#38BDF8" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#E0F2FE"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#0C4A6E">WiFi 6 USB</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#0369A1">TP-Link T2U</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">Backup link</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#0EA5E9">₹550–900</text>
+    </g>
+
+    <g transform="translate(140, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#38BDF8" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#E0F2FE"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#0C4A6E">RJ-45</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#0369A1">Ethernet</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">Jetson native</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#0EA5E9">Included</text>
+    </g>
+
+    <g transform="translate(265, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#38BDF8" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#E0F2FE"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#0C4A6E">USB Hub</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#0369A1">Powered 3.0</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">7-port + PD</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#0EA5E9">₹500–1K</text>
+    </g>
+
+    <g transform="translate(390, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#38BDF8" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#E0F2FE"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#0C4A6E">LTE Modem</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#0369A1">4G USB</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">Optional backup</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#0EA5E9">₹1.5K–3K</text>
+    </g>
+  </g>
+
+  <!-- ═══════════ SECTION 8: CHASSIS ═══════════ -->
+  <g transform="translate(710, 710)">
+    <rect x="0" y="0" width="680" height="120" rx="8" fill="#F8FAFC" stroke="#64748B" stroke-width="1"/>
+    <text x="15" y="18" font-size="12" font-weight="700" fill="#334155">🏗️ Section 8 — Chassis / Wiring (8 items)</text>
+
+    <g transform="translate(15, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#94A3B8" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#F1F5F9"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#334155">3D Print</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#475569">TPU + PETG</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">OpenSCAD source</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#94A3B8">₹500–1K</text>
+    </g>
+
+    <g transform="translate(140, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#94A3B8" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#F1F5F9"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#334155">Wire Loom</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#475569">Rubber Tubing</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">Cable management</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#94A3B8">₹200–400</text>
+    </g>
+
+    <g transform="translate(265, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#94A3B8" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#F1F5F9"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#334155">22 AWG Wire</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#475569">Power Sink</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">Hard port cables</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#94A3B8">₹300–600</text>
+    </g>
+
+    <g transform="translate(390, 28)">
+      <rect x="0" y="0" width="115" height="85" rx="6" fill="#fff" stroke="#94A3B8" filter="url(#sh)"/>
+      <rect x="5" y="8" width="105" height="48" rx="4" fill="#F1F5F9"/>
+      <text x="57" y="30" text-anchor="middle" font-size="9" font-weight="700" fill="#334155">Servo Horns</text>
+      <text x="57" y="44" text-anchor="middle" font-size="7" fill="#475569">SG90 Arms</text>
+      <text x="57" y="62" text-anchor="middle" font-size="6" fill="#64748B">Cross + circle</text>
+      <text x="57" y="82" text-anchor="middle" font-size="6" fill="#94A3B8">₹50–150</text>
+    </g>
+  </g>
+
+  <!-- ═══════════ TOTAL BAND ═══════════ -->
+  <rect x="10" y="845" width="1380" height="45" rx="8" fill="#0F172A"/>
+  <text x="700" y="868" text-anchor="middle" font-size="13" font-weight="700" fill="#F8FAFC">💰 Total BOM: ₹53,550 (low) — ₹88,750 (mid) — ₹1,06,000 (high) · 42 components · 3 boards (Jetson + Arduino + ESP32-S3)</text>
+  <text x="700" y="883" text-anchor="middle" font-size="9" fill="#94A3B8">Prices INR · Amazon.in · Includes GST · Sales can save 10-15%</text>
+
+  <!-- Footer -->
+  <text x="700" y="920" text-anchor="middle" font-size="8" fill="#94A3B8">The Tank Project · Hardware Catalog · Competition Submission · MIT Licensed · github.com/shashiguptaazm-droid/The-Tank-Project</text>
+</svg>
