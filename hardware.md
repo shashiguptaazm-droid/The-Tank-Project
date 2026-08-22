@@ -15,12 +15,10 @@
 > knock **10–15 %** off the mid-band. The mid-band numbers below are the
 > realistic "buy today" prices.
 >
-> ⚡ **Power architecture (revised):** USB-C PD power bank → Raspberry Pi 5
+> ⚡ **Power architecture (revised):** Jetson Orin Nano powered via 19 V DC barrel jack
 > **separately** from a 12 V motor battery → BTS7960 drivers and motors.
-> Keeping the motor rail and the Pi rail on *isolated* grounds prevents
-> motor current spikes from sagging Pi 5 voltage → undervoltage resets.
-> The 4-cell Li-ion pack + 24→12 V buck + 12→5 V buck chain from previous
-> drafts is **no longer needed** if a USB-C PD power bank already exists.
+> Keeping the motor rail and the Jetson rail on *isolated* grounds prevents
+> motor current spikes from sagging Jetson voltage → brownout resets.
 
 ---
 
@@ -28,19 +26,21 @@
 
 | Section | Items | Sub-total mid-band |
 |---|---|---:|
-| 1. Compute / Brains | 6 | ₹ 17,200 |
-| 2. Vision / Display | 5 | ₹ 8,400 |
+| 1. Compute / Brains | 5 | ₹ 42,500 |
+| 2. Vision / Display | 4 | ₹ 6,200 |
 | 3. Motion / Drive Train | 8 | ₹ 9,650 |
 | 4. Sensors | 7 | ₹ 9,950 |
 | 5. Audio In / Out | 4 | ₹ 4,750 |
 | 6. Power / Battery | 2 | ₹ 1,900 |
 | 7. Networking / Cellular | 4 | ₹ 5,950 |
 | 8. Chassis / Wiring / Safety | 8 | ₹ 6,650 |
-| **Grand total mid-band** | **44** | **₹ 64,450** |
-| Lower / upper band | | **₹ 53,550 — ₹ 80,250** |
+| **Grand total mid-band** | **42** | **₹ 88,750** |
+| Lower / upper band | | **₹ 76,500 — ₹ 1,06,000** |
 
 > **Money saved vs. earlier draft: ~₹ 9,550** (the 4 removed power items +
 > a generic Cytron MDD10A that was already covered by the BTS7960 in hand).
+> **Jetson + Arduino upgrade** adds ~₹ 24,000 over the Pi 5 baseline but
+> provides hardware-accelerated CUDA AI inference and real-time motor control.
 >
 > Add **≈ ₹ 4,500** for a basic toolbox (soldering iron, heat gun, snips,
 > screwdrivers, multimeter) if you don't already own one.
@@ -51,14 +51,19 @@
 
 | # | Item | Photo / Google-Shopping Description | Driver / Use in The Tank | Price (₹) | Amazon Search Link |
 |---|------|--------------------------------------|--------------------------|----------:|--------------------|
-| 1 | **Raspberry Pi 5, 8 GB** | Square single-board computer, ~85 × 56 mm, silver aluminium heatsink on top, two micro-HDMI ports side-by-side, USB-C PD on one edge, 40-pin GPIO header along the top, silver-and-black PCB | Master controller running ROS 2 Humble (16 ament_python packages) | 7,500 – 9,000 | [amazon.in/s?k=raspberry+pi+5+8gb](https://www.amazon.in/s?k=raspberry+pi+5+8gb) |
-| 2 | **MicroSD card 64 GB A2** | Tiny blue/black microSD card, ~15 × 11 mm | Boot drive for Pi 5 OS | 600 – 900 | [amazon.in/s?k=micro+sd+64gb+a2](https://www.amazon.in/s?k=micro+sd+64gb+a2) |
-| 3 | **M.2 NVMe SSD 256 GB** (Samsung 980 / WD SN570 / Crucial P3) | Stick-shaped module ~22 × 80 mm, green PCB, gold contact edge, "NVMe" label | `/var/lib/tank` for vector memory, ROS bags, recordings, sqlite-vec db | 3,500 – 5,500 | [amazon.in/s?k=m.2+nvme+256gb](https://www.amazon.in/s?k=m.2+nvme+256gb) |
-| 4 | **Pi 5 M.2 HAT+ (NVMe base)** | Purple/black HAT board, stacked above the Pi 5, FPC ribbon going to the Pi's PCIe connector, M.2 slot on top with a small heatsink | Houses the NVMe and provides the PCIe-Gen2-x1 link | 1,000 – 1,800 | [amazon.in/s?k=raspberry+pi+5+m.2+hat+plus](https://www.amazon.in/s?k=raspberry+pi+5+m.2+hat+plus) |
-| 5 | **Official Pi 5 PSU 27 W USB-C PD** *(alt)* | White wall-wart, USB-C tip on a captive cable, "Raspberry Pi" printed on the side | Power the Pi 5 (5 V / 5 A) *via mains OR* use the USB-C PD power bank (#28 in §6 narrative) | 1,200 – 1,600 | [amazon.in/s?k=raspberry+pi+5+27w+psu](https://www.amazon.in/s?k=raspberry+pi+5+27w+psu) |
-| 6 | **ESP32-S3 DevKitC-1** (N16R8) | Narrow black dev board, dual-row pin headers, USB-C on one short edge, tiny PCB antenna trace, Espressif logo | Drives the 2 × round eye displays over SPI, receives JSON over UART2 from the Pi 5 | 700 – 1,100 | [amazon.in/s?k=esp32-s3+devkitc-1+n16r8](https://www.amazon.in/s?k=esp32-s3+devkitc-1+n16r8) |
+| 1 | **NVIDIA Jetson Orin Nano Dev Kit (8 GB)** | Black rectangular carrier board, NVIDIA module on top with heatsink + fan, DisplayPort, 2× MIPI CSI, M.2 slot, USB-C, RJ45, 40-pin GPIO header, 19 V barrel jack | **AI Brain** — runs ROS 2 Humble, all 16 ament_python packages, TankOS GUI, on-device AI inference (CUDA-accelerated llama.cpp, Whisper, YOLOv8n, SDXL) | 25,000 – 35,000 | [amazon.in/s?k=jetson+orin+nano+dev+kit+8gb](https://www.amazon.in/s?k=jetson+orin+nano+dev+kit+8gb) |
+| 2 | **Arduino UNO R4 WiFi** | Blue rectangular board, USB-C, 2×15-pin female headers, ESP32-S3 co-processor for Wi-Fi/BLE, 12×8 LED matrix, Qwiic I²C connector, Arm Cortex-M4 @ 48 MHz | **Real-time controller** — motor PWM, encoder tick counting (hardware interrupts), I²C sensor polling, serial bridge (115200 baud) to Jetson. Offloads all deterministic timing from Jetson. | 1,800 – 2,500 | [amazon.in/s?k=arduino+uno+r4+wifi](https://www.amazon.in/s?k=arduino+uno+r4+wifi) |
+| 3 | **M.2 NVMe SSD 256 GB** (Samsung 980 / WD SN570 / Crucial P3) | Stick-shaped module ~22 × 80 mm, green PCB, gold contact edge, "NVMe" label | `/var/lib/tank` for vector memory, ROS bags, recordings, sqlite-vec db, AI model cache | 3,500 – 5,500 | [amazon.in/s?k=m.2+nvme+256gb](https://www.amazon.in/s?k=m.2+nvme+256gb) |
+| 4 | **ESP32-S3 DevKitC-1** (N16R8) | Narrow black dev board, dual-row pin headers, USB-C on one short edge, tiny PCB antenna trace, Espressif logo | Drives the 2 × round eye displays over SPI, receives JSON over UART from Jetson | 700 – 1,100 | [amazon.in/s?k=esp32-s3+devkitc-1+n16r8](https://www.amazon.in/s?k=esp32-s3+devkitc-1+n16r8) |
+| 5 | **MicroSD card 64 GB A2** | Tiny blue/black microSD card, ~15 × 11 mm | Boot drive for Jetson (JetPack 6) | 600 – 900 | [amazon.in/s?k=micro+sd+64gb+a2](https://www.amazon.in/s?k=micro+sd+64gb+a2) |
 
-**Subtotal 1 → ₹ 14,500 – 19,900 (mid ₹ 17,200)**
+**Subtotal 1 → ₹ 31,600 – 45,000 (mid ₹ 42,500)**
+
+> ⚡ **Two-board architecture:** Jetson Orin Nano is the *AI brain* (high-level ROS2 nodes,
+> AI inference, TankOS GUI). Arduino UNO R4 WiFi is the *real-time controller* (motor PWM,
+> encoder interrupts, sensor I²C reads). They communicate over USB serial at 115200 baud
+> with a compact binary protocol. This split keeps real-time deadlines on the Arduino
+> (sub-millisecond encoder response) while Jetson handles the heavy AI workloads.
 
 ---
 
@@ -68,11 +73,10 @@
 |---|------|--------------------------------------|--------------|----------:|-------------|
 | 7 | **Waveshare 1.28″ Round LCD (GC9A101)** × 2 | Round TFT disc ~32 mm diameter, 240 × 240 px, short FPC tail, "GC9A01" silkscreened | Animated eye expressions (left + right), driven by the ESP32-S3 firmware | 2 × (1,400 – 2,000) = 2,800 – 4,000 | [amazon.in/s?k=waveshare+1.28+round+lcd+gc9a01](https://www.amazon.in/s?k=waveshare+1.28+round+lcd+gc9a01) |
 | 8 | **1.3″ SH1106 / SSD1306 OLED (I²C)** | Tiny blue/white OLED ~30 × 35 mm, 4-pin I²C tail, blue glow when on | Status face on chassis front (`tank_display` package) | 350 – 600 | [amazon.in/s?k=1.3+oled+sh1106+i2c](https://www.amazon.in/s?k=1.3+oled+sh1106+i2c) |
-| 9 | **Pi Camera Module 3 (IMX708)** *or* **IMX296 global-shutter** | Small rectangular camera board ~25 × 24 mm, Sony IMX sensor visible on top, 22-pin 0.5 mm FPC ribbon | ROS `tank_vision.camera_publisher` via libcamera (1280 × 960 @ 30 fps) | 1,800 – 3,500 | [amazon.in/s?k=raspberry+pi+camera+module+3](https://www.amazon.in/s?k=raspberry+pi+camera+module+3) |
-| 10 | **Camera FPC cable (22-pin, 200 mm)** | Flat brown flex cable, 22 gold contact pads, "CSI" silkscreen | Plugs the camera into the Pi 5's CAM1 port | 150 – 300 | [amazon.in/s?k=pi+5+camera+fpc+cable](https://www.amazon.in/s?k=pi+5+camera+fpc+cable) |
-| 11 | **M2.5 / M3 standoff kit (nylon)** | Small black/white hex standoffs, 5/10/15/20 mm lengths, ~50 pcs | Mounts Pi 5 + HAT + camera board inside the chassis | 250 – 450 | [amazon.in/s?k=m3+nylon+standoff+kit](https://www.amazon.in/s?k=m3+nylon+standoff+kit) |
+| 9 | **USB Camera (IMX219 / IMX477 / C920 webcam)** | Small USB webcam, clip-on mount, UVC-compatible | ROS `tank_vision.camera_publisher` via OpenCV (1280 × 960 @ 30 fps). USB to Jetson — no CSI ribbon needed | 1,200 – 2,500 | [amazon.in/s?k=usb+webcam+1080p](https://www.amazon.in/s?k=usb+webcam+1080p) |
+| 10 | **M2.5 / M3 standoff kit (nylon)** | Small black/white hex standoffs, 5/10/15/20 mm lengths, ~50 pcs | Mounts Jetson + Arduino + camera board inside the chassis | 250 – 450 | [amazon.in/s?k=m3+nylon+standoff+kit](https://www.amazon.in/s?k=m3+nylon+standoff+kit) |
 
-**Subtotal 2 → ₹ 5,350 – 8,850 (mid ₹ 8,400)**
+**Subtotal 2 → ₹ 4,600 – 7,550 (mid ₹ 6,200)**
 
 ---
 
@@ -124,21 +128,22 @@
 
 ## 6️⃣ Power Architecture (revised)
 
-> ⚡ **Two-rail power.** The Pi 5 and the BTS7960 motor drivers **must
+> ⚡ **Two-rail power.** The Jetson Orin Nano and the BTS7960 motor drivers **must
 > not share ground through the same battery**. The intended wiring is:
 >
 > ```text
-> ┌──────────────────┐    USB-C PD     ┌──────────────────────┐
-> │ USB-C PD power   │ ──────────────► │ Raspberry Pi 5       │
-> │ bank (>= 27 W,   │  5 V / 5 A      │ (8 GB, M.2 NVMe)     │
-> │ already on hand) │                 └──────────────────────┘
+> ┌──────────────────┐    19 V DC      ┌──────────────────────┐
+> │ Jetson PSU       │ ──────────────► │ NVIDIA Jetson        │
+> │ (barrel jack,    │                 │ Orin Nano (8 GB)     │
+> │ included in kit) │                 └──────────────────────┘
 > └──────────────────┘
 >                                                 │
 >                                                 │ USB-A
 >                                                 ▼
 >                                       ┌──────────────────────┐
+>                                       │ Arduino UNO R4 WiFi  │
+>                                       │ LiDAR, USB Camera    │
 >                                       │ ReSpeaker, LTE modem │
->                                       │ Wi-Fi/Ethernet, etc. │
 >                                       └──────────────────────┘
 >
 > ┌──────────────────────┐               ┌──────────────────────┐
@@ -149,16 +154,9 @@
 > ```
 >
 > **Why separate rails:** motor inrush (a stalled tank wheel can pull
-> 20 A for 50 ms) sags the motor rail. If the Pi 5 sat on the same rail,
-> that sag would trigger a 4.63 V undervoltage → Pi 5 reset → ROS nodes
+> 20 A for 50 ms) sags the motor rail. If the Jetson sat on the same rail,
+> that sag would trigger an undervoltage → Jetson brownout → ROS nodes
 > restart mid-mission. Independent rails = independent brown-outs.
->
-> **What is no longer in this BOM** (was in earlier drafts):
->
-> - ❌ **4S Li-ion pack 14.8 V** — not needed; existing 12 V motor supply drops to a BTS7960's Vin range without conversion.
-> - ❌ **4S balance charger** — irrelevant once 4S pack is dropped.
-> - ❌ **DC-DC buck 24→12 V 10 A** — only useful to step a 4S→6S pack, no longer needed.
-> - ❌ **DC-DC buck 12→5 V 5 A** — Pi 5 gets its 5 V from USB-C PD; 5 A @ 12 V regulator no longer needed.
 
 ### 6.1 Items actually to buy
 
@@ -171,7 +169,7 @@
 
 ### 6.2 Already on hand (do NOT buy)
 
-- 🟢 **USB-C PD power bank ≥ 27 W** — drives the Pi 5 directly.
+- 🟢 **Jetson Orin Nano PSU (19 V barrel jack)** — included with dev kit.
 - 🟢 **2 × BTS7960 43 A drivers** — purchased.
 - 🟢 **12 V motor battery** — any existing 12 V SLA, 3S Li-ion, RC car pack, or bench supply ≥ 5 Ah works. Re-use what you have before buying.
 
@@ -238,17 +236,15 @@ don't already own one — that brings a *first-time builder* total to **₹ 68,9
 
 ```csv
 "#",section,item,low_inr,high_inr,amazon_search_slug
-1,Compute,Raspberry Pi 5 8GB,7500,9000,raspberry+pi+5+8gb
-2,Compute,MicroSD 64GB A2,600,900,micro+sd+64gb+a2
+1,Compute,Jetson Orin Nano Dev Kit 8GB,25000,35000,jetson+orin+nano+dev+kit+8gb
+2,Compute,Arduino UNO R4 WiFi,1800,2500,arduino+uno+r4+wifi
 3,Compute,M.2 NVMe 256GB,3500,5500,m.2+nvme+256gb
-4,Compute,Pi 5 M.2 HAT+,1000,1800,raspberry+pi+5+m.2+hat+plus
-5,Compute,Pi 5 27W PSU (alt to power bank),1200,1600,raspberry+pi+5+27w+psu
-6,Compute,ESP32-S3 DevKitC-1 N16R8,700,1100,esp32-s3+devkitc-1+n16r8
-7,Vision,Waveshare 1.28" round GC9A101 (×2),2800,4000,waveshare+1.28+round+lcd+gc9a01
-8,Vision,1.3" SH1106 OLED I²C,350,600,1.3+oled+sh1106+i2c
-9,Vision,Pi Camera Module 3 IMX708,1800,3500,raspberry+pi+camera+module+3
-10,Vision,Pi Camera FPC cable,150,300,pi+5+camera+fpc+cable
-11,Vision,M2.5/M3 standoff kit,250,450,m3+nylon+standoff+kit
+4,Compute,ESP32-S3 DevKitC-1 N16R8,700,1100,esp32-s3+devkitc-1+n16r8
+5,Compute,MicroSD 64GB A2,600,900,micro+sd+64gb+a2
+6,Vision,Waveshare 1.28" round GC9A101 (×2),2800,4000,waveshare+1.28+round+lcd+gc9a01
+7,Vision,1.3" SH1106 OLED I²C,350,600,1.3+oled+sh1106+i2c
+8,Vision,USB Camera IMX219/C920,1200,2500,usb+webcam+1080p
+9,Vision,M2.5/M3 standoff kit,250,450,m3+nylon+standoff+kit
 12,Motion,12V DC geared motor w/ encoder (×2),1300,1900,jgb37-520+encoder+motor
 13,Motion,"2 × BTS7960 43 A driver (already on hand)",0,0,(no buy)
 14,Motion,Tracked chassis w/ 12V motors,1800,3200,tracked+robot+chassis+12v
@@ -334,8 +330,8 @@ don't already own one — that brings a *first-time builder* total to **₹ 68,9
 7. **Prices fluctuate**: every row is a band; treat the mid-band as the
    realistic planning number, the high-band as the worst-case if every
    part is bought the day you need it.
-8. **Total assumes a single Pi 5 chassis.** Adding a second tank nearly
-   doubles the cost (only the tools, charger, and Pi are unique).
+8. **Total assumes a single Jetson + Arduino chassis.** Adding a second tank nearly
+   doubles the cost (only the tools can be shared).
 9. **Tools not listed** — these are implicit but real: soldering iron
    (₹ 1,200), heat-shrink gun (₹ 400), multimeter (₹ 700), wire snips
    (₹ 250), Phillips/flat drivers (₹ 200). Budget ~₹ 3,000 for these
@@ -346,9 +342,7 @@ don't already own one — that brings a *first-time builder* total to **₹ 68,9
 *Compiled from the canonical `tank_ws/src/tank_meta/content/hardware.json`
 plus the implicit physical-build inventory in `WIRING.md` and
 `ARCHITECTURE.md`. Refresh the price bands whenever sales land or
-Amazon-IN replaces a SKU. The total band shrinks by ~₹ 9,500 whenever
-you can re-use a USB-C PD power bank + 12 V motor supply already on
-hand.*
+Amazon-IN replaces a SKU.*
 
 ---
 
@@ -358,19 +352,20 @@ hand.*
 
 | Hardware | TankOS Module | Driver / Interface | Status |
 |----------|---------------|-------------------|--------|
-| Raspberry Pi 5 | TankOS Core + AI + Shell | Native (Layer 1–4) | ✅ |
-| 7" DSI Touchscreen | TankShell (Qt GUI) | `vc4-kms-v3d`, PySide6 | 🟡 Planned |
-| ESP32-S3 Round Eyes | EmotionManager, `eye_lcd_bridge` | UART2 @ 115200 | ✅ |
+| NVIDIA Jetson Orin Nano | TankOS Core + AI + Shell | Native (Layer 1–4) | ✅ |
+| Arduino UNO R4 WiFi | RobotManager — `motor_controller` | USB Serial @ 115200 / GPIO | ✅ |
+| 7" HDMI/DP Touchscreen | TankShell (Qt GUI) | PySide6 | 🟡 Planned |
+| ESP32-S3 Round Eyes | EmotionManager, `eye_lcd_bridge` | UART @ 115200 | ✅ |
 | Waveshare 1.28" LCD × 2 | Eye expressions | SPI → ESP32 → UART | ✅ |
 | SH1106 OLED (I²C) | `tank_display` (status face) | luma.oled, I²C 0x3C | ✅ |
 | DFRobot AI Camera | VisionManager — YOLO, detection | USB, ultralytics | 🟡 Planned |
-| RPi Camera Module 3 | VisionManager — `camera_publisher` | CSI, libcamera, picamera2 | ✅ |
-| ProBots Tank Chassis | RobotManager — `motor_controller` | GPIO + BTS7960 | ✅ |
-| BTS7960 × 2 | RobotManager — drive motors | GPIO PWM/DIR (level-shifted) | ✅ |
-| PCA9685 Servo Controller | RobotManager — `pan_tilt_controller` | I²C 0x40, adafruit-servokit | 🟡 Planned |
+| USB Camera (IMX219 / C920) | VisionManager — `camera_publisher` | USB UVC, OpenCV | ✅ |
+| ProBots Tank Chassis | RobotManager — `motor_controller` | Arduino GPIO + BTS7960 | ✅ |
+| BTS7960 × 2 | RobotManager — drive motors | Arduino PWM/DIR | ✅ |
+| PCA9685 Servo Controller | RobotManager — `pan_tilt_controller` | I²C 0x40 (Arduino), adafruit-servokit | 🟡 Planned |
 | SG90 Servo × 2 | Pan/tilt camera head | PWM 50 Hz via PCA9685 | 🟡 Planned |
-| MPU6050 IMU | `tank_sensors.imu_publisher` | I²C 0x68 | 🟡 Planned |
-| BNO055 9-DOF IMU | `tank_sensors.imu_publisher` (upgrade) | I²C 0x28 | 🟡 Future |
+| MPU6050 IMU | `tank_sensors.imu_publisher` | I²C 0x68 (Arduino) | 🟡 Planned |
+| BNO055 9-DOF IMU | `tank_sensors.imu_publisher` (upgrade) | I²C 0x28 (Arduino) | 🟡 Future |
 | HC-SR04 × 2 | Obstacle detection | GPIO trigger/echo | 🟡 Planned |
 | TF-Luna LiDAR | NavigationManager — obstacle avoidance | UART | 🟡 Considering |
 | RPLidar A1 / LD19 | NavigationManager — SLAM | USB, rplidar_ros | 🟡 Planned |

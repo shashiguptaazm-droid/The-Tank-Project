@@ -9,14 +9,16 @@
 
 ## 1. What this is
 
-A tracked Raspberry Pi 5 (8 GB) AI-companion robot — eyes, voice,
-vision, navigation, persistent memory, structured coding-agent memory,
+A tracked NVIDIA Jetson Orin Nano (8 GB) + Arduino UNO R4 WiFi AI-companion robot —
+eyes, voice, vision, navigation, persistent memory, structured coding-agent memory,
 home-security expansion — packaged as a single ROS 2 Humble **colcon
-workspace** plus an out-of-tree Arduino sketch for the ESP32-S3 eyes.
+workspace** plus out-of-tree Arduino sketches for the ESP32-S3 eyes and
+Arduino UNO R4 motor/sensor firmware.
 
 * **Repo root:**   `/root/the tank project/`
 * **Workspace:**   `/root/the tank project/tank_ws/`
-* **Robot:**       Raspberry Pi 5, Ubuntu 22.04 / Raspberry Pi OS 64-bit
+* **AI Brain:**    NVIDIA Jetson Orin Nano 8 GB, JetPack 6 / Ubuntu 22.04
+* **Controller:**  Arduino UNO R4 WiFi (real-time motor/sensor I/O)
 * **ROS distro:**  `humble`
 * **Build:**       `ament_python` (every package is pure-Python — no C++)
 
@@ -30,7 +32,7 @@ workspace** plus an out-of-tree Arduino sketch for the ESP32-S3 eyes.
 ├── ARCHITECTURE.md       ASCII diagram + package table
 ├── PHASES.md             phase tracker / checklist
 ├── scripts/
-│   ├── provision_pi5.sh  single idempotent installer (apt + pip + docker HA + Prom/Grafana + WG + Tailscale + Samba + WebDAV)
+│   ├── provision_pi5.sh  single idempotent installer (apt + pip + docker HA + Prom/Grafana + WG + Tailscale + Samba + WebDAV) — works on Jetson too
 │   ├── dump_pinout.py    CLI dumping the GPIO map
 │   ├── measure_track_width.py  one-shot odometry calibration
 │   ├── replay_memory.py  offline recall CLI for tank_memory
@@ -266,7 +268,7 @@ python3 /root/the\ tank\ project/tank_ws/src/tank_meta/scripts/search_meta.py st
 * **pytest run in this CI environment:** all but one case pass; the
   failing case (`test_rag_meta_context_block_calls_meta_handles`) needs
   `rclpy` which is not installed in the dev sandbox — the case is
-  expected to pass on the Pi 5 host where ROS 2 Humble base is provided by
+  expected to pass on the Jetson host where ROS 2 Humble base is provided by
   `scripts/provision_pi5.sh`.
 * **`bash -n` on shell scripts:** passes
 * **JSON content files:** parse OK (hardware, decisions, project)
@@ -322,7 +324,7 @@ These were enforced after code-review in earlier phases and should be upheld:
 | Decision DEC-007 smoke-test via the new `/meta/decision_append`    | ✅ done — `tank_meta/scripts/smoke_test_dec007.py` |
 | `tank_meta` → `tank_assistant.emotion_node` link (a successful decision-append injects a 'satisfied' valence spike) | ✅ done — see `tank_assistant.emotion_node.EmotionNode._on_decision_result` (feel-good loop) |
 | rclone cron template (`tank_nas/scripts/auto_backup.py`) — systemd timer | P3 carryover                                                  |
-| Real-hardware bring-up on Pi 5 (boot, run `provision_pi5.sh --apply`, launch `tank_bringup/launch/robot.launch.py`) | P7 |
+| Real-hardware bring-up on Jetson + Arduino (boot, run `provision_pi5.sh --apply`, flash Arduino firmware, launch `tank_bringup/launch/robot.launch.py`) | P7 |
 
 ---
 
@@ -347,7 +349,7 @@ python3 "/root/the tank project/tank_ws/src/tank_meta/scripts/search_meta.py" co
 python3 "/root/the tank project/tank_ws/src/tank_meta/scripts/search_meta.py" hardware pan_servo
 python3 "/root/the tank project/tank_ws/src/tank_meta/scripts/search_meta.py" decisions "pwm frequency"
 
-# 5. Build ROS 2 workspace (Pi 5 only — needs colcon + ament_python + ROS Humble base).
+# 5. Build ROS 2 workspace (Jetson only — needs colcon + ament_python + ROS Humble base).
 cd /root/the\ tank\ project/tank_ws && colcon build --symlink-install
 
 # 6. Bring the full system up.
@@ -590,7 +592,7 @@ python3 scripts/model_rotation.py --discover-first --timeout 10
 # Discover current models from all providers
 python3 scripts/model_auto_finder.py --timeout 15
 
-# Install on Pi 5
+# Install on Jetson Orin Nano
 bash tank_os/install.sh --apply
 
 # Start at boot
@@ -704,7 +706,7 @@ Plus: **files (Files/Storage) ✅ — NEW**, **terminal (AI Terminal REPL) ✅**
 
 | Item | Priority | Notes |
 |------|----------|-------|
-| Real hardware bring-up on Pi 5 | 🔴 High | P8 — boot, provision_pi5.sh, launch |
+| Real hardware bring-up on Jetson + Arduino | 🔴 High | P8 — boot, provision_pi5.sh, flash Arduino, launch |
 | Unit tests for TankOS managers | Medium | 9/35 covered — expand coverage |
 | Fix DeepSeek API key | External | HTTP 401 |
 | Top up OpenRouter credits | External | HTTP 402 |

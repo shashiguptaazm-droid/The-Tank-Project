@@ -2,11 +2,12 @@
 
 <p align="center">
   <b>A self-evolving, emotionally-aware, track-driven AI companion robot</b><br>
-  <sub>Raspberry Pi 5 · ROS2 Humble · Python · PySide6 · ESP32-S3</sub>
+  <sub>NVIDIA Jetson Orin Nano · Arduino UNO R4 WiFi · ROS2 Humble · Python · PySide6 · ESP32-S3</sub>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/hardware-Raspberry_Pi_5-C51A4A?logo=raspberrypi&logoColor=white" alt="Pi 5">
+  <img src="https://img.shields.io/badge/ai-Jetson_Orin_Nano-76B900?logo=nvidia&logoColor=white" alt="Jetson">
+  <img src="https://img.shields.io/badge/controller-Arduino_UNO_R4-00979D?logo=arduino&logoColor=white" alt="Arduino">
   <img src="https://img.shields.io/badge/ros-ROS2_Humble-22314E?logo=ros&logoColor=white" alt="ROS2">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
   <img src="https://img.shields.io/badge/python-3.10+-blue?logo=python&logoColor=white" alt="Python">
@@ -15,7 +16,7 @@
   <img src="https://img.shields.io/badge/ROS2_packages-16-orange" alt="Packages">
 </p>
 
-> **TankOS** — a complete graphical AI operating environment that replaces the Raspberry Pi desktop with a PySide6/Qt6 shell, 35 AI-powered managers, 400+ CLI utilities, and a 22-system cognitive architecture. All AI runs **fully offline** (llama.cpp, Whisper, Piper TTS, YOLOv8n).
+> **TankOS** — a complete graphical AI operating environment that replaces the desktop with a PySide6/Qt6 shell, 35 AI-powered managers, 400+ CLI utilities, and a 22-system cognitive architecture. Runs on **NVIDIA Jetson Orin Nano** for hardware-accelerated AI inference. Core functions operate fully offline.
 
 ---
 
@@ -28,7 +29,7 @@
 | 🖥️ **TankOS GUI Apps** | 13 (Home, AI Chat, Camera, Navigation, Memory, Security, Patrol, Files, Diagnostics, Developer, Settings, Power, Updates) |
 | 🔧 **Host CLIs** | 400+ subcommands across 60+ scripts (diagnostics, calibration, OTA, fleet, SLAM, vision, security, power, etc.) |
 | 📦 **ROS2 Packages** | 16 (motion, vision, navigation, speech, memory, assistant, security, health, dashboard, meta, etc.) |
-| 🛠️ **Hardware** | Raspberry Pi 5, RPLidar A1, BNO055 IMU, Pi Cam v3, PCA9685 servos, ESP32-S3 OLED eyes, L298N motor driver |
+| 🛠️ **Hardware** | NVIDIA Jetson Orin Nano (AI brain), Arduino UNO R4 WiFi (motor/sensor controller), RPLidar A1, BNO055 IMU, USB camera, PCA9685 servos, ESP32-S3 OLED eyes, BTS7960 motor drivers |
 | 🔒 **Privacy-first** | Fully offline AI. No cloud dependency for core functions. All inference runs locally. |
 | 📐 **CAD** | 3D-printable chassis with OpenSCAD sources, STL exports, BOM, assembly guide |
 
@@ -153,7 +154,7 @@ PYTHONPATH=. python3 -m tank_os.shell.main
 # Run with Qt GUI (requires PySide6)
 TANKOS_QT=1 PYTHONPATH=. python3 -m tank_os.shell.main
 
-# SINGLE COMMAND — Install EVERYTHING on Pi 5
+# SINGLE COMMAND — Install EVERYTHING on Jetson Orin Nano (JetPack 6)
 sudo bash tank_os/install.sh --apply
 
 # Install without AI models (run later with internet)
@@ -183,7 +184,7 @@ The unified installer (`tank_os/install.sh`) does it all in 12 steps:
 ## Quick start
 
 ```bash
-# 1.  SINGLE COMMAND — install EVERYTHING on Pi 5 (hardware, system, AI models, service)
+# 1.  SINGLE COMMAND — install EVERYTHING on Jetson Orin Nano (JetPack 6, hardware, system, AI models, service)
 sudo bash tank_os/install.sh --apply
 
 # 2.  Launch TankOS graphical environment
@@ -192,7 +193,7 @@ TANKOS_QT=1 python3 -m tank_os.shell.main
 # Or launch in simulation mode (no display required)
 python3 -m tank_os.shell.main
 
-# 3.  On a Pi 5 — TankOS boots automatically at startup via tank-init.service
+# 3.  TankOS boots automatically at startup via tank-init.service
 systemctl start tank-init.service
 
 # 4.  ROS2 workspace (for development / direct robot control)
