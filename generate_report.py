@@ -98,7 +98,7 @@ doc.add_heading('How Your Project Works', level=2)
 doc.add_paragraph(
     'The Tank is an autonomous humanoid AI robot built for the Arduino Physical AI Challenge 2026. '
     'It uses a three-board architecture: an NVIDIA Jetson Orin Nano (AI brain running CUDA-accelerated '
-    'inference at 40 TOPS), an Arduino UNO R4 WiFi (real-time motor and sensor controller), and six '
+    'inference at 40 TOPS), an Arduino UNO Q (real-time motor and sensor controller), and six '
     'ESP32-S3 nodes (distributed controllers for eyes, hands, and limbs). The robot perceives its '
     'environment through a multi-sensor suite — LiDAR, camera, thermal sensor, and IMU — fuses this '
     'data into unified entities, runs AI analysis, makes safety-validated decisions, and executes '
@@ -110,11 +110,11 @@ doc.add_paragraph(
 
 doc.add_heading('Why Arduino UNO Q?', level=2)
 doc.add_paragraph(
-    'The Arduino UNO R4 WiFi serves as the real-time controller, handling all deterministic I/O that '
+    'The Arduino UNO Q serves as the real-time controller, handling all deterministic I/O that '
     'requires sub-millisecond response times. While the Jetson Orin Nano handles high-level AI inference '
     'and the graphical interface, the Arduino manages motor PWM at 1kHz, encoder quadrature counting via '
     'hardware interrupts, and I²C sensor polling — tasks where Linux scheduling jitter would cause '
-    'failures. The UNO R4\'s Arm Cortex-M4 processor at 48MHz provides the deterministic timing needed '
+    'failures. The UNO Q\'s Arm Cortex-M4 processor at 48MHz provides the deterministic timing needed '
     'for safe motor control, while its built-in WiFi/BLE enables wireless configuration. This clean '
     'separation between AI (Jetson) and real-time control (Arduino) is the core architectural innovation '
     'that makes the Tank both intelligent and reliable.'
@@ -141,7 +141,7 @@ for cell in table.rows[0].cells:
             r.bold = True
 
 components = [
-    ('Arduino UNO R4 WiFi (ABX00087)', '1', 'Real-time motor/sensor controller'),
+    ('Arduino UNO Q (ABX00087)', '1', 'Real-time motor/sensor controller'),
     ('NVIDIA Jetson Orin Nano Dev Kit (8GB)', '1', 'AI brain — ROS2, CUDA inference, TankOS GUI'),
     ('ESP32-S3 DevKitC-1 (N16R8)', '6', 'Distributed nodes — eyes, hands, limbs'),
     ('RPLidar A1 360° LiDAR', '1', 'SLAM, mapping, obstacle detection'),
@@ -177,12 +177,12 @@ doc.add_heading('3. System Architecture & Circuit', level=1)
 
 doc.add_heading('Step-by-Step Workflow', level=2)
 workflow = [
-    'SENSE — Arduino UNO R4 reads all sensors at 1kHz: encoder ticks, IMU orientation, ultrasonic distances. Jetson reads camera frames and LiDAR scans via USB.',
+    'SENSE — Arduino UNO Q reads all sensors at 1kHz: encoder ticks, IMU orientation, ultrasonic distances. Jetson reads camera frames and LiDAR scans via USB.',
     'PERCEIVE — Sensor data is extracted into structured readings. Camera detections (YOLOv8n at 30fps), LiDAR distance (8000 pts/sec), thermal human presence, IMU orientation.',
     'FUSE — The Sensor Fusion layer combines camera, LiDAR, and thermal data into unified FusedEntity objects. Each entity carries confidence, distance, contributing sources, and explicit uncertainty tracking.',
     'UNDERSTAND — The AI Engine analyzes fused entities. It runs object detection (YOLOv8n), classification, and situation analysis. If VPS is available, it requests deeper AI reasoning. Otherwise, it falls back to local inference.',
     'DECIDE — AI recommendations pass through the Decision Engine: VALIDATION (is the output sane?) → SAFETY CHECK (is this safe to execute?) → DECISION (what action to take?). AI never executes commands directly.',
-    'ACT — Motor commands are sent to Arduino UNO R4 via USB serial at 115200 baud. Arduino generates PWM signals for motor drivers and servos.',
+    'ACT — Motor commands are sent to Arduino UNO Q via USB serial at 115200 baud. Arduino generates PWM signals for motor drivers and servos.',
     'VERIFY — The system checks if the action completed successfully. If not, it triggers safety recovery.',
     'LEARN/LOG — Every event is logged with timestamp, source, confidence, and system state. The daily evolution cycle discovers new AI models and improves responses.',
 ]
@@ -319,7 +319,7 @@ doc.add_heading('Challenges Faced', level=2)
 challenges = [
     'Motor inrush current brownout: Motors pulling 20A for 50ms caused voltage sag on shared power rails, resetting the Jetson. Solved with 4 galvanically isolated power rails.',
     'Single AI provider failure: If one cloud API went down, the robot became brainless. Solved with 14-provider rotation and automatic circuit-breaker fallback.',
-    'Real-time motor timing on Linux: Linux scheduler jitter caused uneven motor PWM. Solved by offloading all real-time I/O to Arduino UNO R4.',
+    'Real-time motor timing on Linux: Linux scheduler jitter caused uneven motor PWM. Solved by offloading all real-time I/O to Arduino UNO Q.',
     '6 ESP32 nodes coordination: Multiple microcontrollers needed synchronized communication. Solved with ESP-NOW mesh and Jetson USB serial bridge.',
     'Walking balance: Humanoid locomotion requires real-time balance feedback. Solved with pressure sensors in feet and IMU feedback loop.',
 ]

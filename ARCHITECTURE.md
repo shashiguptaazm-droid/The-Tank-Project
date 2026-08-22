@@ -2,7 +2,7 @@
 
 The Tank Project ships as a single ROS2 Humble colcon workspace split
 into sixteen `ament_python` packages plus an out-of-tree Arduino
-sketch for the ESP32-S3 eyes and the Arduino UNO R4 WiFi motor/sensor firmware, **plus the TankOS graphical operating environment**.
+sketch for the ESP32-S3 eyes and the Arduino UNO Q motor/sensor firmware, **plus the TankOS graphical operating environment**.
 
 ## Six-Layer Architecture
 
@@ -14,7 +14,7 @@ TankOS introduces a 6-layer architecture that wraps the ROS2 workspace:
 | **Layer 4** | Tank Shell | PySide6 full-screen GUI (13 apps: Home, Chat, Camera, Nav, Memory, Security, Patrol, Files, Diagnostics, Developer, Settings, Power, Updates) |
 | **Layer 3** | TankOS Core | 35 AI-powered managers: Event Bus, Plugin System, Theme Engine, Animation Engine, Robot Manager, Vision Manager, Security Manager, Memory Manager, Emotion Manager, Diagnostics, Recovery, Network, Storage, **Preload Manager** (95-dependency manifest), **Unified Installer** (12-step), Internet Manager, **Evolution Bridge** (14 LLM providers + rotation orchestrator), **Local LLM Provider** (offline GGUF inference), **Model Discovery** (auto-discover models from APIs), etc. |
 | **Layer 2** | ROS2 | 16 unchanged ROS2 Humble packages: tank_motion, tank_vision, tank_assistant, tank_navigation, tank_security, tank_health, tank_dashboard, tank_meta, tank_display, tank_patrol, tank_task, tank_personalize, tank_command_bridge, etc. |
-| **Layer 1** | Hardware | NVIDIA Jetson Orin Nano (AI brain) running JetPack 6 — ROS2 + AI models + TankOS GUI. Arduino UNO R4 WiFi (real-time controller) — motor PWM, encoder ticks, sensor polling over I²C/GPIO, serial bridge to Jetson |
+| **Layer 1** | Hardware | NVIDIA Jetson Orin Nano (AI brain) running JetPack 6 — ROS2 + AI models + TankOS GUI. Arduino UNO Q (real-time controller) — motor PWM, encoder ticks, sensor polling over I²C/GPIO, serial bridge to Jetson |
 
 Phases built so far:
 
@@ -165,9 +165,9 @@ sudo bash scripts/tankos_setup.sh --status
 | `tank_patrol`    | ament_python | autonomous patrolling (waypoint + random) + AI surveillance fusion (P7)                                  |
 | `tank_display`   | ament_python | emotion-driven face on 1.3" SH1106 OLED (I²C 0x70) + NullHal fallback (P5½)                              || `tank_command_bridge` | ament_python | bidirectional AI ↔ robot command bridge on port 8082 (Freebuff/Claude/Codex) with bearer auth + per-token rate-limit + manifest introspection (P9) |
 | `tank_personalize` | ament_python | AI humanness layer: Persona dataclass + Preferences (motion/privacy/audio) + UserMemory + composed system prompt + dialogue patterns + complete preferences dashboard on port 8084 (P10½) |
-| firmware (out-of-tree) | Arduino | ESP32-S3 eyes firmware (P2) + Arduino UNO R4 WiFi motor/sensor firmware (P1) |
+| firmware (out-of-tree) | Arduino | ESP32-S3 eyes firmware (P2) + Arduino UNO Q motor/sensor firmware (P1) |
 
-## Provisioning (Jetson Orin Nano + Arduino UNO R4)
+## Provisioning (Jetson Orin Nano + Arduino UNO Q)
 
 **SINGLE COMMAND: `sudo bash tank_os/install.sh --apply`**
 
@@ -176,7 +176,7 @@ that supersedes the legacy `setup_pi5.sh` and `provision_pi5.sh` scripts (both n
 wrapper scripts that delegate to the unified installer).
 
 **Hardware split:** Jetson Orin Nano runs ROS2 + TankOS + all AI inference.
-Arduino UNO R4 WiFi handles real-time motor/sensor I/O, bridging to Jetson over
+Arduino UNO Q handles real-time motor/sensor I/O, bridging to Jetson over
 serial (115200 baud) with a compact binary protocol.
 
 12-step install flow:

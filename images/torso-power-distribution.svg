@@ -61,7 +61,7 @@
   <text x="132" y="383" text-anchor="middle" font-size="7" fill="#065F46">+ Smart Fan (PWM)</text>
 
   <rect x="225" y="340" width="150" height="50" rx="5" fill="#A7F3D0"/>
-  <text x="300" y="356" text-anchor="middle" font-size="9" font-weight="600" fill="#047857">Arduino UNO R4 WiFi</text>
+  <text x="300" y="356" text-anchor="middle" font-size="9" font-weight="600" fill="#047857">Arduino UNO Q</text>
   <text x="300" y="370" text-anchor="middle" font-size="7" fill="#065F46">Real-time Motor Ctrl</text>
   <text x="300" y="383" text-anchor="middle" font-size="7" fill="#065F46">Serial → Jetson</text>
 

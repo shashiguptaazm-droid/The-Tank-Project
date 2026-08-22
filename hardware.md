@@ -52,7 +52,7 @@
 | # | Item | Photo / Google-Shopping Description | Driver / Use in The Tank | Price (₹) | Amazon Search Link |
 |---|------|--------------------------------------|--------------------------|----------:|--------------------|
 | 1 | **NVIDIA Jetson Orin Nano Dev Kit (8 GB)** | Black rectangular carrier board, NVIDIA module on top with heatsink + fan, DisplayPort, 2× MIPI CSI, M.2 slot, USB-C, RJ45, 40-pin GPIO header, 19 V barrel jack | **AI Brain** — runs ROS 2 Humble, all 16 ament_python packages, TankOS GUI, on-device AI inference (CUDA-accelerated llama.cpp, Whisper, YOLOv8n, SDXL) | 25,000 – 35,000 | [amazon.in/s?k=jetson+orin+nano+dev+kit+8gb](https://www.amazon.in/s?k=jetson+orin+nano+dev+kit+8gb) |
-| 2 | **Arduino UNO R4 WiFi** | Blue rectangular board, USB-C, 2×15-pin female headers, ESP32-S3 co-processor for Wi-Fi/BLE, 12×8 LED matrix, Qwiic I²C connector, Arm Cortex-M4 @ 48 MHz | **Real-time controller** — motor PWM, encoder tick counting (hardware interrupts), I²C sensor polling, serial bridge (115200 baud) to Jetson. Offloads all deterministic timing from Jetson. | 1,800 – 2,500 | [amazon.in/s?k=arduino+uno+r4+wifi](https://www.amazon.in/s?k=arduino+uno+r4+wifi) |
+| 2 | **Arduino UNO Q** | Blue rectangular board, USB-C, 2×15-pin female headers, ESP32-S3 co-processor for Wi-Fi/BLE, 12×8 LED matrix, Qwiic I²C connector, Arm Cortex-M4 @ 48 MHz | **Real-time controller** — motor PWM, encoder tick counting (hardware interrupts), I²C sensor polling, serial bridge (115200 baud) to Jetson. Offloads all deterministic timing from Jetson. | 1,800 – 2,500 | [amazon.in/s?k=arduino+uno+q](https://www.amazon.in/s?k=arduino+uno+q) |
 | 3 | **M.2 NVMe SSD 256 GB** (Samsung 980 / WD SN570 / Crucial P3) | Stick-shaped module ~22 × 80 mm, green PCB, gold contact edge, "NVMe" label | `/var/lib/tank` for vector memory, ROS bags, recordings, sqlite-vec db, AI model cache | 3,500 – 5,500 | [amazon.in/s?k=m.2+nvme+256gb](https://www.amazon.in/s?k=m.2+nvme+256gb) |
 | 4 | **ESP32-S3 DevKitC-1** (N16R8) | Narrow black dev board, dual-row pin headers, USB-C on one short edge, tiny PCB antenna trace, Espressif logo | Drives the 2 × round eye displays over SPI, receives JSON over UART from Jetson | 700 – 1,100 | [amazon.in/s?k=esp32-s3+devkitc-1+n16r8](https://www.amazon.in/s?k=esp32-s3+devkitc-1+n16r8) |
 | 5 | **MicroSD card 64 GB A2** | Tiny blue/black microSD card, ~15 × 11 mm | Boot drive for Jetson (JetPack 6) | 600 – 900 | [amazon.in/s?k=micro+sd+64gb+a2](https://www.amazon.in/s?k=micro+sd+64gb+a2) |
@@ -60,7 +60,7 @@
 **Subtotal 1 → ₹ 31,600 – 45,000 (mid ₹ 42,500)**
 
 > ⚡ **Two-board architecture:** Jetson Orin Nano is the *AI brain* (high-level ROS2 nodes,
-> AI inference, TankOS GUI). Arduino UNO R4 WiFi is the *real-time controller* (motor PWM,
+> AI inference, TankOS GUI). Arduino UNO Q is the *real-time controller* (motor PWM,
 > encoder interrupts, sensor I²C reads). They communicate over USB serial at 115200 baud
 > with a compact binary protocol. This split keeps real-time deadlines on the Arduino
 > (sub-millisecond encoder response) while Jetson handles the heavy AI workloads.
@@ -141,7 +141,7 @@
 >                                                 │ USB-A
 >                                                 ▼
 >                                       ┌──────────────────────┐
->                                       │ Arduino UNO R4 WiFi  │
+>                                       │ Arduino UNO Q  │
 >                                       │ LiDAR, USB Camera    │
 >                                       │ ReSpeaker, LTE modem │
 >                                       └──────────────────────┘
@@ -237,7 +237,7 @@ don't already own one — that brings a *first-time builder* total to **₹ 68,9
 ```csv
 "#",section,item,low_inr,high_inr,amazon_search_slug
 1,Compute,Jetson Orin Nano Dev Kit 8GB,25000,35000,jetson+orin+nano+dev+kit+8gb
-2,Compute,Arduino UNO R4 WiFi,1800,2500,arduino+uno+r4+wifi
+2,Compute,Arduino UNO Q,1800,2500,arduino+uno+q
 3,Compute,M.2 NVMe 256GB,3500,5500,m.2+nvme+256gb
 4,Compute,ESP32-S3 DevKitC-1 N16R8,700,1100,esp32-s3+devkitc-1+n16r8
 5,Compute,MicroSD 64GB A2,600,900,micro+sd+64gb+a2
@@ -353,7 +353,7 @@ Amazon-IN replaces a SKU.*
 | Hardware | TankOS Module | Driver / Interface | Status |
 |----------|---------------|-------------------|--------|
 | NVIDIA Jetson Orin Nano | TankOS Core + AI + Shell | Native (Layer 1–4) | ✅ |
-| Arduino UNO R4 WiFi | RobotManager — `motor_controller` | USB Serial @ 115200 / GPIO | ✅ |
+| Arduino UNO Q | RobotManager — `motor_controller` | USB Serial @ 115200 / GPIO | ✅ |
 | 7" HDMI/DP Touchscreen | TankShell (Qt GUI) | PySide6 | 🟡 Planned |
 | ESP32-S3 Round Eyes | EmotionManager, `eye_lcd_bridge` | UART @ 115200 | ✅ |
 | Waveshare 1.28" LCD × 2 | Eye expressions | SPI → ESP32 → UART | ✅ |

@@ -6,13 +6,13 @@
 
 <p align="center">
   <b>A self-evolving, emotionally-aware humanoid AI robot</b><br>
-  <sub>NVIDIA Jetson Orin Nano · Arduino UNO R4 WiFi · ESP32-S3 Swarm · ROS2 · TankOS</sub>
+  <sub>NVIDIA Jetson Orin Nano · Arduino UNO Q · ESP32-S3 Swarm · ROS2 · TankOS</sub>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/competition-Arduino_Physical_AI_Challenge-00979D?style=flat-square" alt="Competition">
   <img src="https://img.shields.io/badge/ai-Jetson_Orin_Nano-76B900?logo=nvidia&logoColor=white&style=flat-square" alt="Jetson">
-  <img src="https://img.shields.io/badge/controller-UNO_R4-00979D?logo=arduino&logoColor=white&style=flat-square" alt="Arduino">
+  <img src="https://img.shields.io/badge/controller-UNO_Q-00979D?logo=arduino&logoColor=white&style=flat-square" alt="Arduino">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
 </p>
 
@@ -26,7 +26,7 @@
 
 ## 2. Project Overview
 
-The Tank is a humanoid robot built for the **Arduino Physical AI Challenge 2026**. It combines a **NVIDIA Jetson Orin Nano** (AI brain, 40 TOPS CUDA inference) with an **Arduino UNO R4 WiFi** (real-time motor/sensor controller) and a network of **ESP32-S3 nodes** (eyes, hands, limbs). The robot walks, sees, hears, speaks, and **learns from its environment** — running a complete 22-system cognitive architecture with a 14-provider AI brain that evolves daily.
+The Tank is a humanoid robot built for the **Arduino Physical AI Challenge 2026**. It combines a **NVIDIA Jetson Orin Nano** (AI brain, 40 TOPS CUDA inference) with an **Arduino UNO Q** (real-time motor/sensor controller) and a network of **ESP32-S3 nodes** (eyes, hands, limbs). The robot walks, sees, hears, speaks, and **learns from its environment** — running a complete 22-system cognitive architecture with a 14-provider AI brain that evolves daily.
 
 **Registration ID: APC-2026-RJ-75818**
 
@@ -57,7 +57,7 @@ A three-board architecture that cleanly separates concerns:
 | Board | Role | Why |
 |-------|------|-----|
 | **Jetson Orin Nano** | AI Brain | 40 TOPS CUDA, runs ROS2, llama.cpp, Whisper, YOLOv8n, TankOS GUI |
-| **Arduino UNO R4 WiFi** | Real-time Controller | Sub-millisecond encoder response, motor PWM, I²C sensor polling |
+| **Arduino UNO Q** | Real-time Controller | Sub-millisecond encoder response, motor PWM, I²C sensor polling |
 | **ESP32-S3 ×6** | Distributed Nodes | Eyes, hands, limbs — each node handles its own domain independently |
 
 They communicate via USB serial at 115200 baud with a compact binary protocol. The Jetson never touches a motor wire. The Arduino never runs an inference. Clean separation = reliable system.
@@ -134,7 +134,7 @@ The Tank's key innovations:
 │  motion · vision · nav · speech · memory · assistant │
 │  security · health · dashboard · meta · display      │
 ├─────────────────────────────────────────────────────┤
-│         Jetson Orin Nano    │   Arduino UNO R4       │
+│         Jetson Orin Nano    │   Arduino UNO Q       │
 │         (AI inference)      │   (real-time I/O)      │
 │         USB serial 115200   │   PWM · I²C · INT      │
 └────────────────────┬────────┴───────────┬───────────┘
@@ -177,7 +177,7 @@ Perception → Attention → Reasoning → Planning → Decision → Action
 Three-board distributed architecture:
 
 - **Jetson Orin Nano 8GB** — AI compute (CUDA 40 TOPS), M.2 NVMe 256GB, JetPack 6
-- **Arduino UNO R4 WiFi** — Real-time motor/sensor I/O (Arm Cortex-M4 48MHz)
+- **Arduino UNO Q** — Real-time motor/sensor I/O (Arm Cortex-M4 48MHz)
 - **ESP32-S3 ×6** — Distributed nodes (eyes, hands, limbs, sensors)
 
 See [`hardware/catalog.svg`](hardware/catalog.svg) for the full 42-component visual catalog.
@@ -202,7 +202,7 @@ See [`hardware/catalog.svg`](hardware/catalog.svg) for the full 42-component vis
 
 ### Compute (5)
 - NVIDIA Jetson Orin Nano Dev Kit (8GB) — AI brain
-- Arduino UNO R4 WiFi — real-time controller
+- Arduino UNO Q — real-time controller
 - M.2 NVMe SSD 256GB — storage
 - ESP32-S3 DevKitC-1 (N16R8) ×6 — distributed nodes
 - MicroSD 64GB A2 — boot drive
@@ -282,7 +282,7 @@ Full BOM with Amazon links: [`hardware.md`](hardware.md)
 | Component | Spec | Role |
 |-----------|------|------|
 | Jetson Orin Nano | 8GB RAM, 1024 CUDA cores, 40 TOPS | AI inference, ROS2, TankOS |
-| Arduino UNO R4 WiFi | Arm M4 48MHz, 32KB SRAM, WiFi/BLE | Motor PWM, encoder INT, I²C |
+| Arduino UNO Q | Arm M4 48MHz, 32KB SRAM, WiFi/BLE | Motor PWM, encoder INT, I²C |
 | ESP32-S3 | 16MB Flash, 8MB PSRAM, USB-C | Eye display, hand control, limb I/O |
 | RPLidar A1 | 360°, 12m, 8000 pts/sec, USB | SLAM, mapping, obstacle detection |
 | BNO055 | 9-DOF, I²C 0x28, fusion engine | Orientation, heading, tilt |
@@ -296,7 +296,7 @@ Full BOM with Amazon links: [`hardware.md`](hardware.md)
 
 See [`images/wiring.svg`](images/wiring.svg) for the full schematic.
 
-**Arduino UNO R4 WiFi Pin Map:**
+**Arduino UNO Q Pin Map:**
 
 | Pin | Function | Direction |
 |-----|----------|-----------|
@@ -340,7 +340,7 @@ All rails are isolated to prevent motor inrush from brownout-ing the Jetson.
 The Tank uses off-the-shelf breakout boards rather than custom PCBs:
 
 - **Jetson carrier board** (included with dev kit)
-- **Arduino UNO R4 WiFi** (standard form factor)
+- **Arduino UNO Q** (standard form factor)
 - **ESP32-S3 DevKitC-1** (breadboard-compatible)
 - **PCA9685 servo driver** (I²C breakout)
 - **INA219 current sensors** (I²C breakout)
@@ -465,13 +465,13 @@ STL exports, STEP interchange, and 3MF multi-part bundles available in [`cad/cha
   - Feeds `/imu/data` topic
 - **MPU6050** (head): 6-DOF, acceleromter + gyro
   - I²C 0x68, head stabilization
-- **Arduino UNO R4**: Reads both IMUs via I²C, sends fused orientation to Jetson
+- **Arduino UNO Q**: Reads both IMUs via I²C, sends fused orientation to Jetson
 
 ---
 
 ## 30. Arduino Implementation
 
-The Arduino UNO R4 WiFi handles **all real-time I/O**:
+The Arduino UNO Q handles **all real-time I/O**:
 
 ```cpp
 // Core loop (runs at ~1kHz)
@@ -769,7 +769,7 @@ Demo video and presentation slides: [`images/competition/`](images/competition/)
 |-----------|----------|
 | Motor inrush brownouts Jetson | 4 galvanically isolated power rails |
 | Single AI provider failure | 14-provider rotation with circuit breaker |
-| Real-time motor timing on Linux | Arduino UNO R4 handles all real-time I/O |
+| Real-time motor timing on Linux | Arduino UNO Q handles all real-time I/O |
 | 6 ESP32 nodes need coordination | ESP-NOW mesh + Jetson USB serial bridge |
 | 8.6GB AI models on 256GB SSD | PreloadManager with lazy download + background fetch |
 | Walking balance | Pressure sensors in feet + IMU feedback loop |

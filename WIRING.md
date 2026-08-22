@@ -4,7 +4,7 @@ Single source of truth for the electrical hookup. Every pin in this table
 matches a ROS2 parameter in `tank_bringup/config/*.yaml`, so you can override
 on a per-robot basis without touching code.
 
-## GPIO — Arduino UNO R4 WiFi (real-time controller)
+## GPIO — Arduino UNO Q (real-time controller)
 
 > **All real-time I/O is on the Arduino.** Jetson sends high-level commands over
 > USB serial (115200 baud); Arduino handles PWM generation, encoder interrupts,
@@ -23,7 +23,7 @@ on a per-robot basis without touching code.
 | `e_stop_led_pin`  | D8    | OUT       | indicates E-STOP latch (high = latched)   |
 | `e_stop_in_pin`   | D9    | IN        | Hardware E-STOP button (with pull-up)     |
 
-## I²C bus — Arduino UNO R4 WiFi (Wire)
+## I²C bus — Arduino UNO Q (Wire)
 
 | Address | Device                                | Driver                        |
 |---------|---------------------------------------|-------------------------------|
@@ -31,7 +31,7 @@ on a per-robot basis without touching code.
 | 0x40    | PCA9685 16-channel 12-bit PWM         | `adafruit_pca9685` + `adafruit_motor.servo` |
 | 0x70    | 1.3" OLED (SH1106) — phase 2          | `adafruit_ssd1306` / `luma.oled` |
 
-Arduino UNO R4 WiFi has I²C on A4 (SDA) / A5 (SCL) plus a Qwiic connector.
+Arduino UNO Q has I²C on A4 (SDA) / A5 (SCL) plus a Qwiic connector.
 All I²C devices connect to the Arduino, not the Jetson.## SPI bus — reserved
 
 | Arduino Pin | Function |
@@ -77,7 +77,7 @@ parallel so an overcurrent event also opens it.
 |--------------------|-------------------------------------|--------------------------------------|
 | VBAT (≈ 22.2 V)    | 6S Li-ion via BMS                   | Motor driver H-bridge                |
 | 12 V               | DC-DC buck from VBAT                | Fans, LiDAR, camera illuminator     |
-| 5 V                | Arduino UNO R4 onboard reg (7-12 V in) or USB-C PD | Arduino, PCA9685, IMU, OLED, sensors |
+| 5 V                | Arduino UNO Q onboard reg (7-12 V in) or USB-C PD | Arduino, PCA9685, IMU, OLED, sensors |
 | 19 V               | Jetson Orin Nano barrel jack PSU    | Jetson, USB peripherals              |
 
 Keep motor power and logic power physically separated on the chassis — run

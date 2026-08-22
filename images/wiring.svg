@@ -5,7 +5,7 @@
 
   <!-- Title -->
   <text x="450" y="32" text-anchor="middle" font-size="20" font-weight="800" fill="#0F172A">Wiring Schematic — The Tank Project</text>
-  <text x="450" y="52" text-anchor="middle" font-size="11" fill="#64748B">Arduino UNO R4 WiFi ↔ Jetson Orin Nano ↔ Peripherals</text>
+  <text x="450" y="52" text-anchor="middle" font-size="11" fill="#64748B">Arduino UNO Q ↔ Jetson Orin Nano ↔ Peripherals</text>
 
   <!-- ===== JETSON (right side) ===== -->
   <rect x="540" y="80" width="310" height="240" rx="10" fill="#F0FDF4" stroke="#4ADE80" stroke-width="2" filter="url(#shadow)"/>
@@ -41,7 +41,7 @@
 
   <!-- ===== ARDUINO (left) ===== -->
   <rect x="50" y="80" width="440" height="240" rx="10" fill="#F0FDFA" stroke="#14B8A6" stroke-width="2" filter="url(#shadow)"/>
-  <text x="270" y="105" text-anchor="middle" font-size="15" font-weight="700" fill="#0F766E">⚡ Arduino UNO R4 WiFi</text>
+  <text x="270" y="105" text-anchor="middle" font-size="15" font-weight="700" fill="#0F766E">⚡ Arduino UNO Q</text>
   <text x="270" y="122" text-anchor="middle" font-size="10" fill="#0D9488">Real-time Motor &amp; Sensor Controller · Arm Cortex-M4 48MHz</text>
 
   <!-- Arduino pin rows -->

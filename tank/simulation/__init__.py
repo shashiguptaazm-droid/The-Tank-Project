@@ -1,2 +1,2 @@
-"""Tank Simulation — Mock sensors for testing without hardware."""
-from .mock_sensors import create_mock_sensors
+"""Tank — Simulation package."""
+from .mock_sensors import MockCamera, MockLidar, MockThermal, MockIMU, create_mock_sensors

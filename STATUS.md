@@ -9,16 +9,16 @@
 
 ## 1. What this is
 
-A tracked NVIDIA Jetson Orin Nano (8 GB) + Arduino UNO R4 WiFi AI-companion robot —
+A tracked NVIDIA Jetson Orin Nano (8 GB) + Arduino UNO Q AI-companion robot —
 eyes, voice, vision, navigation, persistent memory, structured coding-agent memory,
 home-security expansion — packaged as a single ROS 2 Humble **colcon
 workspace** plus out-of-tree Arduino sketches for the ESP32-S3 eyes and
-Arduino UNO R4 motor/sensor firmware.
+Arduino UNO Q motor/sensor firmware.
 
 * **Repo root:**   `/root/the tank project/`
 * **Workspace:**   `/root/the tank project/tank_ws/`
 * **AI Brain:**    NVIDIA Jetson Orin Nano 8 GB, JetPack 6 / Ubuntu 22.04
-* **Controller:**  Arduino UNO R4 WiFi (real-time motor/sensor I/O)
+* **Controller:**  Arduino UNO Q (real-time motor/sensor I/O)
 * **ROS distro:**  `humble`
 * **Build:**       `ament_python` (every package is pure-Python — no C++)
 

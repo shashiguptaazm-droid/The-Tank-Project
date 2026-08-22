@@ -9,7 +9,7 @@
 |------|-------------|
 | [`blueprint-master.svg`](blueprint-master.svg) | **Full humanoid robot blueprint** — head, neck, torso, arms, hands, legs, circuit board, rotary joint, component legend. Traced from original hand-drawn schematic. |
 | [`architecture.svg`](architecture.svg) | 6-layer system stack: Jetson Orin Nano → Arduino → ROS2 → TankOS Core → Tank Shell → Simple Internet, plus hardware peripherals map |
-| [`wiring.svg`](wiring.svg) | Full pinout schematic: Arduino UNO R4 GPIO assignments, I²C bus map, BTS7960 motor driver wiring, Jetson USB connections, serial bridge protocol |
+| [`wiring.svg`](wiring.svg) | Full pinout schematic: Arduino UNO Q GPIO assignments, I²C bus map, BTS7960 motor driver wiring, Jetson USB connections, serial bridge protocol |
 | [`cognitive.svg`](cognitive.svg) | 22-system cognitive architecture: Perception → Attention → Reasoning → Planning → Decision → Learning → Memory → Emotion → Metacognition pipeline |
 | [`head-neck-closeup.svg`](head-neck-closeup.svg) | Head sensor array: AI Camera, Depth Camera, Thermal MLX90640, MPU6050, Dual Round Eyes, Speaker, USB-C Hub routing. Neck with linear actuator + 360° rotational joint. |
 | [`torso-power-distribution.svg`](torso-power-distribution.svg) | Torso bays: Main Compute (Jetson + Arduino), Storage (M.2 + USB HDD), ESP32 Node Bay, Power Pebble Docks. 4 isolated power rails with INU2604 monitoring. |
@@ -35,4 +35,4 @@ Place real build photos here:
 - `demo/` — video thumbnails, demo screencaps
 - `competition/` — presentation slides, posters
 
-> 📸 **TODO:** Add real hardware photos once the Jetson Orin Nano + Arduino UNO R4 chassis is assembled.
+> 📸 **TODO:** Add real hardware photos once the Jetson Orin Nano + Arduino UNO Q chassis is assembled.
