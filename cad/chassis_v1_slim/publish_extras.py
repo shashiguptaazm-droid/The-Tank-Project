@@ -103,7 +103,7 @@ ENRICH_TABLE: list[tuple[str, dict]] = [
         "Datasheet": "",
     }),
     ("tt-style dc gearmotor", {
-        "Supplier": "Amazon / Probots",
+        "Supplier": "Robu.in",
         "Manufacturer_Part": "Probots 21mm TT (3-12 V)",
         "SKU": "PRB-TT3-12V",
         "Unit_Cost_USD": 7.50,

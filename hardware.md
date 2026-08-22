@@ -4,13 +4,13 @@
 > (the file the project's own `tank_meta` indexer introspects, 12 components)
 > + `WIRING.md` + `ARCHITECTURE.md` for the implicit physical-build items.
 >
-> **Prices are approximate for July 2026 in INR (₹) on amazon.in.**
-> Treat each band as a planning estimate; listings rotate weekly.
-> Every Amazon link below is a *search URL* — never a single ASIN — so it
-> never 404s even when a listing changes. Swap `amazon.in → amazon.com`
+> **Prices are approximate for July 2026 in INR (₹) on robu.in.**
+> Treat each band as a planning estimate; stock varies weekly.
+> Every Robu.in link below is a *search URL* — never a single ASIN — so it
+> never 404s even when a listing changes. Buy from robu.in
 > for US pricing.
 >
-> **Currency disclaimer:** Amazon-IN prices include GST; during sales
+> **Currency disclaimer:** Robu.in prices include GST; during sales
 > (Prime Day, Republic Day) and with SBI / HDFC / ICICI cashback you can
 > knock **10–15 %** off the mid-band. The mid-band numbers below are the
 > realistic "buy today" prices.
@@ -49,13 +49,13 @@
 
 ## 1️⃣ Compute / Brains
 
-| # | Item | Photo / Google-Shopping Description | Driver / Use in The Tank | Price (₹) | Amazon Search Link |
+| # | Item | Photo / Google-Shopping Description | Driver / Use in The Tank | Price (₹) | Robu.in Link |
 |---|------|--------------------------------------|--------------------------|----------:|--------------------|
-| 1 | **NVIDIA Jetson Orin Nano Dev Kit (8 GB)** | Black rectangular carrier board, NVIDIA module on top with heatsink + fan, DisplayPort, 2× MIPI CSI, M.2 slot, USB-C, RJ45, 40-pin GPIO header, 19 V barrel jack | **AI Brain** — runs ROS 2 Humble, all 16 ament_python packages, TankOS GUI, on-device AI inference (CUDA-accelerated llama.cpp, Whisper, YOLOv8n, SDXL) | 25,000 – 35,000 | [amazon.in/s?k=jetson+orin+nano+dev+kit+8gb](https://www.amazon.in/s?k=jetson+orin+nano+dev+kit+8gb) |
-| 2 | **Arduino UNO Q** | Blue rectangular board, USB-C, 2×15-pin female headers, ESP32-S3 co-processor for Wi-Fi/BLE, 12×8 LED matrix, Qwiic I²C connector, Arm Cortex-M4 @ 48 MHz | **Real-time controller** — motor PWM, encoder tick counting (hardware interrupts), I²C sensor polling, serial bridge (115200 baud) to Jetson. Offloads all deterministic timing from Jetson. | 1,800 – 2,500 | [amazon.in/s?k=arduino+uno+q](https://www.amazon.in/s?k=arduino+uno+q) |
-| 3 | **M.2 NVMe SSD 256 GB** (Samsung 980 / WD SN570 / Crucial P3) | Stick-shaped module ~22 × 80 mm, green PCB, gold contact edge, "NVMe" label | `/var/lib/tank` for vector memory, ROS bags, recordings, sqlite-vec db, AI model cache | 3,500 – 5,500 | [amazon.in/s?k=m.2+nvme+256gb](https://www.amazon.in/s?k=m.2+nvme+256gb) |
-| 4 | **ESP32-S3 DevKitC-1** (N16R8) | Narrow black dev board, dual-row pin headers, USB-C on one short edge, tiny PCB antenna trace, Espressif logo | Drives the 2 × round eye displays over SPI, receives JSON over UART from Jetson | 700 – 1,100 | [amazon.in/s?k=esp32-s3+devkitc-1+n16r8](https://www.amazon.in/s?k=esp32-s3+devkitc-1+n16r8) |
-| 5 | **MicroSD card 64 GB A2** | Tiny blue/black microSD card, ~15 × 11 mm | Boot drive for Jetson (JetPack 6) | 600 – 900 | [amazon.in/s?k=micro+sd+64gb+a2](https://www.amazon.in/s?k=micro+sd+64gb+a2) |
+| 1 | **NVIDIA Jetson Orin Nano Dev Kit (8 GB)** | Black rectangular carrier board, NVIDIA module on top with heatsink + fan, DisplayPort, 2× MIPI CSI, M.2 slot, USB-C, RJ45, 40-pin GPIO header, 19 V barrel jack | **AI Brain** — runs ROS 2 Humble, all 16 ament_python packages, TankOS GUI, on-device AI inference (CUDA-accelerated llama.cpp, Whisper, YOLOv8n, SDXL) | 25,000 – 35,000 | [robu.in/?s=jetson+orin+nano+dev+kit+8gb](https://robu.in/?s=jetson+orin+nano&post_type=product) |
+| 2 | **Arduino UNO Q** | Blue rectangular board, USB-C, 2×15-pin female headers, ESP32-S3 co-processor for Wi-Fi/BLE, 12×8 LED matrix, Qwiic I²C connector, Arm Cortex-M4 @ 48 MHz | **Real-time controller** — motor PWM, encoder tick counting (hardware interrupts), I²C sensor polling, serial bridge (115200 baud) to Jetson. Offloads all deterministic timing from Jetson. | 1,800 – 2,500 | [robu.in/?s=arduino+uno+q](https://robu.in/?s=arduino+uno+q&post_type=product) |
+| 3 | **M.2 NVMe SSD 256 GB** (Samsung 980 / WD SN570 / Crucial P3) | Stick-shaped module ~22 × 80 mm, green PCB, gold contact edge, "NVMe" label | `/var/lib/tank` for vector memory, ROS bags, recordings, sqlite-vec db, AI model cache | 3,500 – 5,500 | [robu.in/?s=m.2+nvme+256gb](https://robu.in/?s=nvme+ssd+256gb&post_type=product) |
+| 4 | **ESP32-S3 DevKitC-1** (N16R8) | Narrow black dev board, dual-row pin headers, USB-C on one short edge, tiny PCB antenna trace, Espressif logo | Drives the 2 × round eye displays over SPI, receives JSON over UART from Jetson | 700 – 1,100 | [robu.in/?s=esp32-s3+devkitc-1+n16r8](https://robu.in/?s=esp32-s3&post_type=product) |
+| 5 | **MicroSD card 64 GB A2** | Tiny blue/black microSD card, ~15 × 11 mm | Boot drive for Jetson (JetPack 6) | 600 – 900 | [robu.in/?s=micro+sd+64gb+a2](https://robu.in/?s=micro+sd+64gb&post_type=product) |
 
 **Subtotal 1 → ₹ 31,600 – 45,000 (mid ₹ 42,500)**
 
@@ -69,12 +69,12 @@
 
 ## 2️⃣ Vision / Display
 
-| # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Amazon Link |
+| # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Robu.in Link |
 |---|------|--------------------------------------|--------------|----------:|-------------|
-| 7 | **Waveshare 1.28″ Round LCD (GC9A101)** × 2 | Round TFT disc ~32 mm diameter, 240 × 240 px, short FPC tail, "GC9A01" silkscreened | Animated eye expressions (left + right), driven by the ESP32-S3 firmware | 2 × (1,400 – 2,000) = 2,800 – 4,000 | [amazon.in/s?k=waveshare+1.28+round+lcd+gc9a01](https://www.amazon.in/s?k=waveshare+1.28+round+lcd+gc9a01) |
-| 8 | **1.3″ SH1106 / SSD1306 OLED (I²C)** | Tiny blue/white OLED ~30 × 35 mm, 4-pin I²C tail, blue glow when on | Status face on chassis front (`tank_display` package) | 350 – 600 | [amazon.in/s?k=1.3+oled+sh1106+i2c](https://www.amazon.in/s?k=1.3+oled+sh1106+i2c) |
-| 9 | **USB Camera (IMX219 / IMX477 / C920 webcam)** | Small USB webcam, clip-on mount, UVC-compatible | ROS `tank_vision.camera_publisher` via OpenCV (1280 × 960 @ 30 fps). USB to Jetson — no CSI ribbon needed | 1,200 – 2,500 | [amazon.in/s?k=usb+webcam+1080p](https://www.amazon.in/s?k=usb+webcam+1080p) |
-| 10 | **M2.5 / M3 standoff kit (nylon)** | Small black/white hex standoffs, 5/10/15/20 mm lengths, ~50 pcs | Mounts Jetson + Arduino + camera board inside the chassis | 250 – 450 | [amazon.in/s?k=m3+nylon+standoff+kit](https://www.amazon.in/s?k=m3+nylon+standoff+kit) |
+| 7 | **Waveshare 1.28″ Round LCD (GC9A101)** × 2 | Round TFT disc ~32 mm diameter, 240 × 240 px, short FPC tail, "GC9A01" silkscreened | Animated eye expressions (left + right), driven by the ESP32-S3 firmware | 2 × (1,400 – 2,000) = 2,800 – 4,000 | [robu.in/?s=waveshare+1.28+round+lcd+gc9a01](https://robu.in/?s=waveshare+round+lcd&post_type=product) |
+| 8 | **1.3″ SH1106 / SSD1306 OLED (I²C)** | Tiny blue/white OLED ~30 × 35 mm, 4-pin I²C tail, blue glow when on | Status face on chassis front (`tank_display` package) | 350 – 600 | [robu.in/?s=1.3+oled+sh1106+i2c](https://robu.in/?s=oled+display+i2c&post_type=product) |
+| 9 | **USB Camera (IMX219 / IMX477 / C920 webcam)** | Small USB webcam, clip-on mount, UVC-compatible | ROS `tank_vision.camera_publisher` via OpenCV (1280 × 960 @ 30 fps). USB to Jetson — no CSI ribbon needed | 1,200 – 2,500 | [robu.in/?s=usb+webcam+1080p](https://robu.in/?s=usb+webcam&post_type=product) |
+| 10 | **M2.5 / M3 standoff kit (nylon)** | Small black/white hex standoffs, 5/10/15/20 mm lengths, ~50 pcs | Mounts Jetson + Arduino + camera board inside the chassis | 250 – 450 | [robu.in/?s=m3+nylon+standoff+kit](https://robu.in/?s=standoff+kit&post_type=product) |
 
 **Subtotal 2 → ₹ 4,600 – 7,550 (mid ₹ 6,200)**
 
@@ -82,15 +82,15 @@
 
 ## 3️⃣ Motion / Drive Train
 
-| # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Amazon Link |
+| # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Robu.in Link |
 |---|------|--------------------------------------|--------------|----------:|-------------|
-| 12 | **2 × 12 V DC geared motor w/ encoder (e.g. JGB37-520, 30:1 or 60:1)** | Cylindrical black gearbox ~65 × 22 mm, D-shaft, pigtail with 6 wires (motor + encoder A/B) | Left + right drive motor. `tank_motion.motor_controller` w/ BTS7960 | 2 × (650 – 950) = 1,300 – 1,900 | [amazon.in/s?k=jgb37-520+encoder+motor](https://www.amazon.in/s?k=jgb37-520+encoder+motor) |
+| 12 | **2 × 12 V DC geared motor w/ encoder (e.g. JGB37-520, 30:1 or 60:1)** | Cylindrical black gearbox ~65 × 22 mm, D-shaft, pigtail with 6 wires (motor + encoder A/B) | Left + right drive motor. `tank_motion.motor_controller` w/ BTS7960 | 2 × (650 – 950) = 1,300 – 1,900 | [robu.in/?s=jgb37-520+encoder+motor](https://robu.in/?s=dc+gear+motor+encoder&post_type=product) |
 | 13 | **2 × BTS7960 43 A motor driver (already on hand)** ★ | Big red PCB ~50 × 50 mm with two large terminal blocks and big heatsinks; *one driver per motor* | H-bridge for the two drive motors, PWM + DIR control. **Already purchased — no buy.** | 0 (owned) | — |
-| 14 | **Tracked chassis w/ 12 V motors (aluminium, ~15 cm wheelbase)** | Two black rubber tracks, side aluminium plates, motor mounts pre-drilled | The tank's body — bolts the motors, Pi, and battery together | 1,800 – 3,200 | [amazon.in/s?k=tracked+robot+chassis+12v](https://www.amazon.in/s?k=tracked+robot+chassis+12v) |
-| 15 | **2 × Tower Pro SG90 micro servo (pan + tilt)** | Tiny blue servo ~23 × 12 mm, 3-wire pigtail (signal/V+/GND), white spline horn on top | Pan-tilt head. `pan_tilt_controller` on GPIO18 + GPIO19 at 50 Hz | 2 × (180 – 280) = 360 – 560 | [amazon.in/s?k=tower+pro+sg90+servo](https://www.amazon.in/s?k=tower+pro+sg90+servo) |
-| 16 | **PCA9685 16-channel 12-bit PWM / Servo HAT (I²C 0x40)** | Small purple/blue breakout ~63 × 25 mm, 16 × 3-pin servo headers in two rows | Lets you offload the pan/tilt servos off the Pi's PWM | 450 – 750 | [amazon.in/s?k=pca9685+servo+driver+i2c](https://www.amazon.in/s?k=pca9685+servo+driver+i2c) |
-| 17 | **Pan-tilt bracket (2-axis, SG90-compatible, plastic / aluminium)** | Black U-shaped bracket with two axis pivots and mounting flanges | Mechanical mount for the head with the camera + eyes | 250 – 450 | [amazon.in/s?k=pan+tilt+bracket+sg90](https://www.amazon.in/s?k=pan+tilt+bracket+sg90) |
-| 18 | **Mushroom-head E-STOP switch (NO/NC, panel-mount, 16 mm)** | Big red mushroom button with yellow guard ring, 2-pin NO/NC terminals | Hardware kill-switch in series with the BMS VBAT trace | 150 – 350 | [amazon.in/s?k=mushroom+emergency+stop+button](https://www.amazon.in/s?k=mushroom+emergency+stop+button) |
+| 14 | **Tracked chassis w/ 12 V motors (aluminium, ~15 cm wheelbase)** | Two black rubber tracks, side aluminium plates, motor mounts pre-drilled | The tank's body — bolts the motors, Pi, and battery together | 1,800 – 3,200 | [robu.in/?s=tracked+robot+chassis+12v](https://robu.in/?s=robot+chassis&post_type=product) |
+| 15 | **2 × Tower Pro SG90 micro servo (pan + tilt)** | Tiny blue servo ~23 × 12 mm, 3-wire pigtail (signal/V+/GND), white spline horn on top | Pan-tilt head. `pan_tilt_controller` on GPIO18 + GPIO19 at 50 Hz | 2 × (180 – 280) = 360 – 560 | [robu.in/?s=tower+pro+sg90+servo](https://robu.in/?s=sg90+servo&post_type=product) |
+| 16 | **PCA9685 16-channel 12-bit PWM / Servo HAT (I²C 0x40)** | Small purple/blue breakout ~63 × 25 mm, 16 × 3-pin servo headers in two rows | Lets you offload the pan/tilt servos off the Pi's PWM | 450 – 750 | [robu.in/?s=pca9685+servo+driver+i2c](https://robu.in/?s=pca9685&post_type=product) |
+| 17 | **Pan-tilt bracket (2-axis, SG90-compatible, plastic / aluminium)** | Black U-shaped bracket with two axis pivots and mounting flanges | Mechanical mount for the head with the camera + eyes | 250 – 450 | [robu.in/?s=pan+tilt+bracket+sg90](https://robu.in/?s=pan+tilt+bracket&post_type=product) |
+| 18 | **Mushroom-head E-STOP switch (NO/NC, panel-mount, 16 mm)** | Big red mushroom button with yellow guard ring, 2-pin NO/NC terminals | Hardware kill-switch in series with the BMS VBAT trace | 150 – 350 | [robu.in/?s=mushroom+emergency+stop+button](https://robu.in/?s=emergency+stop&post_type=product) |
 
 **Subtotal 3 → ₹ 4,310 – 7,760 (mid ₹ 9,650)** *(chassis dominates)*
 ★ = good stock already owned; do not buy.
@@ -99,15 +99,15 @@
 
 ## 4️⃣ Sensors
 
-| # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Amazon Link |
+| # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Robu.in Link |
 |---|------|--------------------------------------|--------------|----------:|-------------|
-| 19 | **RPLidar A1** *or* **LDROBOT LD19** (360° LiDAR) | Black cylinder ~98 × 65 mm spinning disc on top, USB-A pigtail, or small black puck with motor | `tank_sensors.lidar_publisher` over `/dev/ttyUSB0` @ 115200 baud | 5,000 – 8,500 | [amazon.in/s?k=rplidar+a1](https://www.amazon.in/s?k=rplidar+a1) |
-| 20 | **BNO055 9-DOF IMU breakout (Adafruit or generic, I²C 0x28)** | Small purple PCB ~30 × 25 mm with a Bosch BNO055 chip visible, STEMMA-QT port on one side | `tank_sensors.imu_publisher` (orientation as `sensor_msgs/Imu`) | 1,200 – 2,000 | [amazon.in/s?k=bno055+imu+i2c+breakout](https://www.amazon.in/s?k=bno055+imu+i2c+breakout) |
-| 21 | **INA219 DC current/voltage sensor (I²C 0x40)** | Small green breakout ~25 × 20 mm with INA219 chip, two screw terminals for the shunt | `tank_health.health_node` battery telemetry (one board per rail: Pi + motor) | 2 × (250 – 450) = 500 – 900 | [amazon.in/s?k=ina219+current+sensor](https://www.amazon.in/s?k=ina219+current+sensor) |
-| 22 | **R307 / ZFM-708 fingerprint sensor (UART, optical)** | Small black plastic cube with a metallic fingerprint window, 4-wire UART pigtail (V+/GND/TX/RX) | `tank_security` home-unlock feature (`/dev/ttyAMA0` @ 57600 baud) | 850 – 1,400 | [amazon.in/s?k=r307+fingerprint+sensor](https://www.amazon.in/s?k=r307+fingerprint+sensor) |
-| 23 | **Ultrasonic HC-SR04 × 2** (rear / cliff safety) | Two-black-eyes PCB ~45 × 20 mm with twin cylindrical transducers | Front + rear obstacle abort, /scan fusion safety layer | 2 × (120 – 180) = 240 – 360 | [amazon.in/s?k=hc-sr04+ultrasonic+sensor](https://www.amazon.in/s?k=hc-sr04+ultrasonic+sensor) |
-| 24 | **DS18B20 waterproof 1-Wire temperature probe (1 m cable, ±0.5 °C)** *(separate, dedicated)* | Stainless-steel M6 cap probe ~30 × 6 mm on a 1 m waterproof PVC cable, 3-wire pigtail (red VCC / black GND / yellow DATA) | **Standalone** temperature for battery + motors + chassis ambient. 1-Wire on GPIO4 (Pi header pin 7), 4.7 kΩ pull-up to 3.3 V. Buy **≥ 3** (one per hot spot). | 120 – 280 *(each)* → 360 – 840 *(3 probes)* | [amazon.in/s?k=ds18b20+waterproof+probe+1m](https://www.amazon.in/s?k=ds18b20+waterproof+probe+1m) |
-| 24a | **4.7 kΩ resistor (1-Wire pull-up, through-hole)** *(1 small resistor)* (qty 10 pack) | Tiny axial resistor yellow-violet-red-gold stripes, ~10 pcs in a tape strip | Pull-up resistor for DS18B20 data line to 3.3 V | 30 – 80 | [amazon.in/s?k=4.7k+resistor+pack](https://www.amazon.in/s?k=4.7k+resistor+pack) |
+| 19 | **RPLidar A1** *or* **LDROBOT LD19** (360° LiDAR) | Black cylinder ~98 × 65 mm spinning disc on top, USB-A pigtail, or small black puck with motor | `tank_sensors.lidar_publisher` over `/dev/ttyUSB0` @ 115200 baud | 5,000 – 8,500 | [robu.in/?s=rplidar+a1](https://robu.in/?s=rplidar&post_type=product) |
+| 20 | **BNO055 9-DOF IMU breakout (Adafruit or generic, I²C 0x28)** | Small purple PCB ~30 × 25 mm with a Bosch BNO055 chip visible, STEMMA-QT port on one side | `tank_sensors.imu_publisher` (orientation as `sensor_msgs/Imu`) | 1,200 – 2,000 | [robu.in/?s=bno055+imu+i2c+breakout](https://robu.in/?s=bno055+imu&post_type=product) |
+| 21 | **INA219 DC current/voltage sensor (I²C 0x40)** | Small green breakout ~25 × 20 mm with INA219 chip, two screw terminals for the shunt | `tank_health.health_node` battery telemetry (one board per rail: Pi + motor) | 2 × (250 – 450) = 500 – 900 | [robu.in/?s=ina219+current+sensor](https://robu.in/?s=ina219&post_type=product) |
+| 22 | **R307 / ZFM-708 fingerprint sensor (UART, optical)** | Small black plastic cube with a metallic fingerprint window, 4-wire UART pigtail (V+/GND/TX/RX) | `tank_security` home-unlock feature (`/dev/ttyAMA0` @ 57600 baud) | 850 – 1,400 | [robu.in/?s=r307+fingerprint+sensor](https://robu.in/?s=fingerprint+sensor&post_type=product) |
+| 23 | **Ultrasonic HC-SR04 × 2** (rear / cliff safety) | Two-black-eyes PCB ~45 × 20 mm with twin cylindrical transducers | Front + rear obstacle abort, /scan fusion safety layer | 2 × (120 – 180) = 240 – 360 | [robu.in/?s=hc-sr04+ultrasonic+sensor](https://robu.in/?s=hc-sr04&post_type=product) |
+| 24 | **DS18B20 waterproof 1-Wire temperature probe (1 m cable, ±0.5 °C)** *(separate, dedicated)* | Stainless-steel M6 cap probe ~30 × 6 mm on a 1 m waterproof PVC cable, 3-wire pigtail (red VCC / black GND / yellow DATA) | **Standalone** temperature for battery + motors + chassis ambient. 1-Wire on GPIO4 (Pi header pin 7), 4.7 kΩ pull-up to 3.3 V. Buy **≥ 3** (one per hot spot). | 120 – 280 *(each)* → 360 – 840 *(3 probes)* | [robu.in/?s=ds18b20+waterproof+probe+1m](https://robu.in/?s=ds18b20&post_type=product) |
+| 24a | **4.7 kΩ resistor (1-Wire pull-up, through-hole)** *(1 small resistor)* (qty 10 pack) | Tiny axial resistor yellow-violet-red-gold stripes, ~10 pcs in a tape strip | Pull-up resistor for DS18B20 data line to 3.3 V | 30 – 80 | [robu.in/?s=4.7k+resistor+pack](https://robu.in/?s=resistor+kit&post_type=product) |
 
 **Subtotal 4 → ₹ 8,180 – 14,080 (mid ₹ 9,950)** *(RPLidar dominates, DS18B20 cluster adds ~₹150 for 3 probes)*
 
@@ -115,12 +115,12 @@
 
 ## 5️⃣ Audio In / Out
 
-| # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Amazon Link |
+| # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Robu.in Link |
 |---|------|--------------------------------------|--------------|----------:|-------------|
-| 25 | **ReSpeaker 4-Mic Array (USB, Seeed)** | Black square PCB ~70 × 70 mm with four small MEMS microphones on each corner, glowing centre LED ring | `tank_speech.wake_word_listener` (openWakeWord → `/wake_detected`) | 2,800 – 4,200 | [amazon.in/s?k=respeaker+4+mic+array](https://www.amazon.in/s?k=respeaker+4+mic+array) |
-| 26 | **USB Audio Class DAC (e.g. UGreen or Topping)** | Tiny black USB dongle ~60 × 25 mm with a 3.5 mm jack on the other end | `tank_text.tts_node` (Piper ONNX → sounddevice.play) | 400 – 750 | [amazon.in/s?k=usb+audio+dac+3.5mm](https://www.amazon.in/s?k=usb+audio+dac+3.5mm) |
-| 27 | **3 W 8 Ω speaker w/ JST-PH pigtail** | Small round 28 mm black speaker with a JST-PH 2.0 mm white connector | Tank's voice output | 150 – 300 | [amazon.in/s?k=3w+8ohm+speaker+jst](https://www.amazon.in/s?k=3w+8ohm+speaker+jst) |
-| 28 | **Mini amplified USB speaker (recess-mount)** | Small black rectangular box speaker, ~85 × 45 mm, USB-A plug on a short lead, magnet on the back | For dashboards / docks | 600 – 1,100 | [amazon.in/s?k=mini+usb+speaker+amplified](https://www.amazon.in/s?k=mini+usb+speaker+amplified) |
+| 25 | **ReSpeaker 4-Mic Array (USB, Seeed)** | Black square PCB ~70 × 70 mm with four small MEMS microphones on each corner, glowing centre LED ring | `tank_speech.wake_word_listener` (openWakeWord → `/wake_detected`) | 2,800 – 4,200 | [robu.in/?s=respeaker+4+mic+array](https://robu.in/?s=respeaker+mic&post_type=product) |
+| 26 | **USB Audio Class DAC (e.g. UGreen or Topping)** | Tiny black USB dongle ~60 × 25 mm with a 3.5 mm jack on the other end | `tank_text.tts_node` (Piper ONNX → sounddevice.play) | 400 – 750 | [robu.in/?s=usb+audio+dac+3.5mm](https://robu.in/?s=usb+audio+dac&post_type=product) |
+| 27 | **3 W 8 Ω speaker w/ JST-PH pigtail** | Small round 28 mm black speaker with a JST-PH 2.0 mm white connector | Tank's voice output | 150 – 300 | [robu.in/?s=3w+8ohm+speaker+jst](https://robu.in/?s=speaker+3w&post_type=product) |
+| 28 | **Mini amplified USB speaker (recess-mount)** | Small black rectangular box speaker, ~85 × 45 mm, USB-A plug on a short lead, magnet on the back | For dashboards / docks | 600 – 1,100 | [robu.in/?s=mini+usb+speaker+amplified](https://robu.in/?s=usb+speaker&post_type=product) |
 
 **Subtotal 5 → ₹ 3,950 – 6,350 (mid ₹ 4,750)** *(Respeaker dominates)*
 
@@ -160,10 +160,10 @@
 
 ### 6.1 Items actually to buy
 
-| # | Item | Note | Price (₹) | Amazon Link |
+| # | Item | Note | Price (₹) | Robu.in Link |
 |---|------|------|----------:|-------------|
-| 29 | **XT60 connector pair + JST-PH 2-pin pigtails** *(kit)* | Yellow male+female barrel pair + JST housings + crimp pins. Connects the 12 V motor battery to the BTS7960 input rail cleanly. | 150 – 350 | [amazon.in/s?k=xt60+connector+pair](https://www.amazon.in/s?k=xt60+connector+pair) |
-| 30 | **Inline inline 30 A blade fuse + holder** | ATO/ATC blade fuse holder + a 30 A replacement fuse. Sits between the 12 V motor battery and the BTS7960 rail; cheap insurance against a stalled motor stalling the wiring harness. | 120 – 280 | [amazon.in/s?k=30a+inline+blade+fuse+holder](https://www.amazon.in/s?k=30a+inline+blade+fuse+holder) |
+| 29 | **XT60 connector pair + JST-PH 2-pin pigtails** *(kit)* | Yellow male+female barrel pair + JST housings + crimp pins. Connects the 12 V motor battery to the BTS7960 input rail cleanly. | 150 – 350 | [robu.in/?s=xt60+connector+pair](https://robu.in/?s=xt60+connector&post_type=product) |
+| 30 | **Inline inline 30 A blade fuse + holder** | ATO/ATC blade fuse holder + a 30 A replacement fuse. Sits between the 12 V motor battery and the BTS7960 rail; cheap insurance against a stalled motor stalling the wiring harness. | 120 – 280 | [robu.in/?s=30a+inline+blade+fuse+holder](https://robu.in/?s=blade+fuse&post_type=product) |
 
 **Subtotal 6 → ₹ 270 – 630 (mid ₹ 1,900 ... with a generous buffer for spares)**
 
@@ -175,10 +175,10 @@
 
 ### 6.3 If you really must start from zero on the motor rail (worst-case only)
 
-| # | Item | Note | Price (₹) | Amazon Link |
+| # | Item | Note | Price (₹) | Robu.in Link |
 |---|------|------|----------:|-------------|
-| 30★ | **12 V 5 Ah SLA battery** *(optional, only if you have no 12 V supply)* | Sealed lead-acid, hobby-grade. Cheap, dumb, effective. | 750 – 1,200 | [amazon.in/s?k=12v+5ah+sla+battery](https://www.amazon.in/s?k=12v+5ah+sla+battery) |
-| 31★ | **SLA charger 12 V 1 A** *(optional, pairs with 30★)* | Black wall-wart, 2-pin output, simple float charger. | 350 – 650 | [amazon.in/s?k=12v+1a+sla+charger](https://www.amazon.in/s?k=12v+1a+sla+charger) |
+| 30★ | **12 V 5 Ah SLA battery** *(optional, only if you have no 12 V supply)* | Sealed lead-acid, hobby-grade. Cheap, dumb, effective. | 750 – 1,200 | [robu.in/?s=12v+5ah+sla+battery](https://robu.in/?s=sla+battery+12v&post_type=product) |
+| 31★ | **SLA charger 12 V 1 A** *(optional, pairs with 30★)* | Black wall-wart, 2-pin output, simple float charger. | 350 – 650 | [robu.in/?s=12v+1a+sla+charger](https://robu.in/?s=battery+charger+12v&post_type=product) |
 
 ★ = only buy if you do not already own a 12 V motor supply. Skip otherwise.
 
@@ -186,12 +186,12 @@
 
 ## 7️⃣ Networking / Cellular
 
-| # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Amazon Link |
+| # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Robu.in Link |
 |---|------|--------------------------------------|--------------|----------:|-------------|
-| 32 | **USB Wi-Fi 6 adapter (e.g. TP-Link Archer T2U)** | Small USB-A dongle ~30 × 15 mm with a tiny antenna | Backup Wi-Fi link if Jetson Wi-Fi fails on Jetson metal-shielded chassis | 550 – 900 | [amazon.in/s?k=usb+wifi+6+adapter](https://www.amazon.in/s?k=usb+wifi+6+adapter) |
-| 33 | **Quectel EC25** *or* **SIM7600E LTE modem (USB)** | Small black stick ~85 × 30 mm with two SMA antenna ports, USIM slot | Cellular failover when Wi-Fi drops (`tank_scripts/lte_handoff.py`) | 2,800 – 4,500 | [amazon.in/s?k=quectel+ec25+lte](https://www.amazon.in/s?k=quectel+ec25+lte) |
-| 34 | **LTE SMA antenna (4G/LTE puck, 5 dBi)** | Small black rubber puck ~50 × 50 mm with a short coaxial lead + SMA male | Antenna for the LTE modem | 250 – 450 | [amazon.in/s?k=lte+4g+antenna+sma](https://www.amazon.in/s?k=lte+4g+antenna+sma) |
-| 35 | **Ethernet USB adapter (10/100)** | Tiny white USB-A dongle, RJ45 jack on the other end | Wired backhaul into the home router (preferred over fragile Wi-Fi) | 350 – 600 | [amazon.in/s?k=usb+ethernet+adapter+10](https://www.amazon.in/s?k=usb+ethernet+adapter+10) |
+| 32 | **USB Wi-Fi 6 adapter (e.g. TP-Link Archer T2U)** | Small USB-A dongle ~30 × 15 mm with a tiny antenna | Backup Wi-Fi link if Jetson Wi-Fi fails on Jetson metal-shielded chassis | 550 – 900 | [robu.in/?s=usb+wifi+6+adapter](https://robu.in/?s=wifi+adapter+usb&post_type=product) |
+| 33 | **Quectel EC25** *or* **SIM7600E LTE modem (USB)** | Small black stick ~85 × 30 mm with two SMA antenna ports, USIM slot | Cellular failover when Wi-Fi drops (`tank_scripts/lte_handoff.py`) | 2,800 – 4,500 | [robu.in/?s=quectel+ec25+lte](https://robu.in/?s=lte+modem&post_type=product) |
+| 34 | **LTE SMA antenna (4G/LTE puck, 5 dBi)** | Small black rubber puck ~50 × 50 mm with a short coaxial lead + SMA male | Antenna for the LTE modem | 250 – 450 | [robu.in/?s=lte+4g+antenna+sma](https://robu.in/?s=lte+antenna&post_type=product) |
+| 35 | **Ethernet USB adapter (10/100)** | Tiny white USB-A dongle, RJ45 jack on the other end | Wired backhaul into the home router (preferred over fragile Wi-Fi) | 350 – 600 | [robu.in/?s=usb+ethernet+adapter+10](https://robu.in/?s=usb+ethernet&post_type=product) |
 
 **Subtotal 7 → ₹ 3,950 – 6,450 (mid ₹ 5,950)** *(LTE modem dominates)*
 
@@ -199,16 +199,16 @@
 
 ## 8️⃣ Chassis / Wiring / Safety Sundries
 
-| # | Item | Photo / Google-Shopping Description | Price (₹) | Amazon Link |
+| # | Item | Photo / Google-Shopping Description | Price (₹) | Robu.in Link |
 |---|------|--------------------------------------|----------:|-------------|
-| 36 | **Silicone wire kit (24/26/28 AWG, 6 colours, ~10 m each)** | Spools of stranded silicone wire in red/black/yellow/blue/green/white | 350 – 650 | [amazon.in/s?k=silicone+wire+kit+24+26+28+awg](https://www.amazon.in/s?k=silicone+wire+kit+24+26+28+awg) |
-| 37 | **JST-PH 2-pin / 3-pin / 4-pin connector kit (Dupont-style housings + crimps)** | Plastic housings + metal crimp pins | 300 – 600 | [amazon.in/s?k=jst+ph+connector+kit](https://www.amazon.in/s?k=jst+ph+connector+kit) |
-| 38 | **Heat-shrink tubing assortment (black, 2–10 mm)** | Black plastic tubing, ~200 pcs in a clear poly bag | 200 – 350 | [amazon.in/s?k=heat+shrink+tubing+kit](https://www.amazon.in/s?k=heat+shrink+tubing+kit) |
-| 39 | **Cable gland + spiral wrap (10 mm bundle, 1 m)** | Black nylon spiral wrap coiled into a flat ring | 200 – 350 | [amazon.in/s?k=spiral+wrap+10mm+cable](https://www.amazon.in/s?k=spiral+wrap+10mm+cable) |
-| 40 | **40-pin GPIO ribbon cable + breakout + T-cobbler** | Rainbow ribbon cable with two 40-pin sockets, small T-cobbler PCB | 250 – 450 | [amazon.in/s?k=raspberry+pi+gpio+ribbon+cable](https://www.amazon.in/s?k=raspberry+pi+gpio+ribbon+cable) |
-| 41 | **Small breadboard (400-tie, 830-tie × 2)** | White plastic breadboard 165 × 55 mm with red/blue power rails | 2 × (150 – 250) = 300 – 500 | [amazon.in/s?k=breadboard+830+tie](https://www.amazon.in/s?k=breadboard+830+tie) |
-| 42 | **M2 / M2.5 / M3 screw + standoff kit (200+ pcs)** | Tubs of small steel screws + nylon standoffs in a clear plastic box | 350 – 600 | [amazon.in/s?k=screw+kit+m2+m3+standoff](https://www.amazon.in/s?k=screw+kit+m2+m3+standoff) |
-| 43 | **40 × 40 mm or 25 × 25 mm 12 V cooling fan** | Small black 4-wire PWM fan ~40 × 40 × 10 mm | 250 – 450 | [amazon.in/s?k=40mm+12v+cooling+fan+pwm](https://www.amazon.in/s?k=40mm+12v+cooling+fan+pwm) |
+| 36 | **Silicone wire kit (24/26/28 AWG, 6 colours, ~10 m each)** | Spools of stranded silicone wire in red/black/yellow/blue/green/white | 350 – 650 | [robu.in/?s=silicone+wire+kit+24+26+28+awg](https://robu.in/?s=silicone+wire&post_type=product) |
+| 37 | **JST-PH 2-pin / 3-pin / 4-pin connector kit (Dupont-style housings + crimps)** | Plastic housings + metal crimp pins | 300 – 600 | [robu.in/?s=jst+ph+connector+kit](https://robu.in/?s=jst+connector&post_type=product) |
+| 38 | **Heat-shrink tubing assortment (black, 2–10 mm)** | Black plastic tubing, ~200 pcs in a clear poly bag | 200 – 350 | [robu.in/?s=heat+shrink+tubing+kit](https://robu.in/?s=heat+shrink&post_type=product) |
+| 39 | **Cable gland + spiral wrap (10 mm bundle, 1 m)** | Black nylon spiral wrap coiled into a flat ring | 200 – 350 | [robu.in/?s=spiral+wrap+10mm+cable](https://robu.in/?s=spiral+wrap&post_type=product) |
+| 40 | **40-pin GPIO ribbon cable + breakout + T-cobbler** | Rainbow ribbon cable with two 40-pin sockets, small T-cobbler PCB | 250 – 450 | [robu.in/?s=raspberry+pi+gpio+ribbon+cable](https://robu.in/?s=gpio+ribbon+cable&post_type=product) |
+| 41 | **Small breadboard (400-tie, 830-tie × 2)** | White plastic breadboard 165 × 55 mm with red/blue power rails | 2 × (150 – 250) = 300 – 500 | [robu.in/?s=breadboard+830+tie](https://robu.in/?s=breadboard&post_type=product) |
+| 42 | **M2 / M2.5 / M3 screw + standoff kit (200+ pcs)** | Tubs of small steel screws + nylon standoffs in a clear plastic box | 350 – 600 | [robu.in/?s=screw+kit+m2+m3+standoff](https://robu.in/?s=screw+kit&post_type=product) |
+| 43 | **40 × 40 mm or 25 × 25 mm 12 V cooling fan** | Small black 4-wire PWM fan ~40 × 40 × 10 mm | 250 – 450 | [robu.in/?s=40mm+12v+cooling+fan+pwm](https://robu.in/?s=cooling+fan+12v&post_type=product) |
 
 **Subtotal 8 → ₹ 2,200 – 3,950 (mid ₹ 6,650)** *(consumables — order generously)*
 
@@ -235,7 +235,7 @@ don't already own one — that brings a *first-time builder* total to **₹ 68,9
 ## 📦 CSV — for spreadsheet import
 
 ```csv
-"#",section,item,low_inr,high_inr,amazon_search_slug
+"#",section,item,low_inr,high_inr,robu_search_slug
 1,Compute,Jetson Orin Nano Dev Kit 8GB,25000,35000,jetson+orin+nano+dev+kit+8gb
 2,Compute,Arduino UNO Q,1800,2500,arduino+uno+q
 3,Compute,M.2 NVMe 256GB,3500,5500,m.2+nvme+256gb
@@ -318,7 +318,7 @@ don't already own one — that brings a *first-time builder* total to **₹ 68,9
 4. **Camera variants**: I recommend the **IMX708 (Camera Module 3)** as the
    default because of the huge community. Use **IMX296 global-shutter** if
    you need crisp frames of fast-moving objects (e.g. ball-tracking).
-   Amazon-IN rotates weekly.
+   Robu.in rotates weekly.
 5. **ESP32 variants**: the firmware pinout is for **ESP32-S3 DevKitC-1
    N16R8**. The plain DevKitC (no `-S3`) or any board without PSRAM
    **won't work** for the GC9A101 driver.
@@ -342,7 +342,7 @@ don't already own one — that brings a *first-time builder* total to **₹ 68,9
 *Compiled from the canonical `tank_ws/src/tank_meta/content/hardware.json`
 plus the implicit physical-build inventory in `WIRING.md` and
 `ARCHITECTURE.md`. Refresh the price bands whenever sales land or
-Amazon-IN replaces a SKU.*
+Robu.in replaces a SKU.*
 
 ---
 

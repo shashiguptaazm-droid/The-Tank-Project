@@ -352,7 +352,7 @@ See [`hardware/catalog.svg`](hardware/catalog.svg) for the full 42-component vis
 | Chassis | 4 | 1,700 |
 | **Total** | **41** | **₹82,250** |
 
-Full BOM with Amazon links: [`hardware.md`](hardware.md)
+Full BOM with Robu.in links: [`hardware.md`](hardware.md)
 
 ---
 
