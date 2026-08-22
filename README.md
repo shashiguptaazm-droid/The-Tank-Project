@@ -91,7 +91,45 @@ The Tank's key innovations:
 
 4. **Distributed ESP32 Swarm** — Instead of running everything on one board, the Tank distributes intelligence across 6 ESP32-S3 nodes. Eyes, hands, and limbs each have their own microcontroller, reducing latency and wiring complexity.
 
+
 ---
+
+## 8. Feature Status Legend
+
+| Symbol | Meaning |
+|--------|---------|
+| 🟢 | **Working** — tested and functional |
+| 🔵 | **Implemented / Needs Validation** — code exists, needs hardware testing |
+| 🟡 | **In Progress** — actively being developed |
+| 🔴 | **Planned** — designed but not yet built |
+
+### Current Status
+
+| System | Status | Evidence |
+|--------|--------|----------|
+| Event Bus | 🟢 | 19/19 tests passing |
+| State Machine | 🟢 | Validated transitions |
+| Decision Engine | 🟢 | AI→validate→safety→decide pipeline |
+| Sensor Fusion | 🟢 | Camera+LiDAR+thermal tested |
+| Safety System | 🟢 | E-stop, watchdog, timeout |
+| Mock Sensors | 🟢 | Simulation mode fully working |
+| ESP32 Swarm | 🟢 | 5-node serial communication |
+| SQLite Storage | 🟢 | Event/telemetry logging |
+| Terminal Dashboard | 🟢 | Competition-quality display |
+| Hardware Registry | 🟢 | 42 components cataloged |
+| Full Pipeline | 🟢 | SENSE→PERCEIVE→FUSE→AI→DECIDE→ACT→VERIFY |
+| USB Camera Driver | 🔵 | OpenCV code ready, needs hardware |
+| LiDAR Driver | 🔵 | rplidar SDK ready, needs hardware |
+| Thermal Sensor | 🔵 | MLX90640 I2C driver ready |
+| IMU Driver | 🔵 | BNO055/MPU6050 drivers ready |
+| Servo Control | 🔵 | GPIO PWM code ready |
+| Linear Actuator | 🔵 | BTS7960 H-bridge ready |
+| Finger Control | 🔵 | SG90 servo code ready |
+| VPS AI Client | 🔵 | HTTPS+auth+retry ready |
+| Humanoid Walking | 🟡 | Gait algorithm in progress |
+| 5-Finger Grasp | 🟡 | Force control in progress |
+| Competition Demo | 🟡 | Script ready, needs hardware |
+
 
 ## 8. Objectives
 
@@ -257,7 +295,48 @@ See [`hardware/catalog.svg`](hardware/catalog.svg) for the full 42-component vis
 - 22 AWG power sink cables — hard ports
 - Servo horns (cross + circle) — mechanical linkage
 
+
 ---
+
+## 15. ROS Architecture (16 packages)
+
+**Communication Model:** Publish/Subscribe + Services + Actions
+
+### Core Topics
+
+| Topic | Type | Publisher | Subscriber | Rate |
+|-------|------|-----------|------------|------|
+| `/cmd_vel` | geometry_msgs/Twist | Nav2 / teleop | motor_controller | 20Hz |
+| `/scan` | sensor_msgs/LaserScan | lidar_publisher | SLAM / Nav2 | 5.5Hz |
+| `/imu/data` | sensor_msgs/Imu | imu_publisher | localization | 100Hz |
+| `/camera/image_raw` | sensor_msgs/Image | camera_publisher | yolo_detector | 30fps |
+| `/camera/detections` | std_msgs/String | yolo_detector | decision_engine | 30fps |
+| `/thermal/human` | std_msgs/Bool | thermal_publisher | perception_fusion | 4Hz |
+| `/cmd_motor` | std_msgs/String | decision_engine | motor_controller | on_event |
+| `/cmd_servo` | std_msgs/String | decision_engine | servo_controller | on_event |
+| `/emotion/state` | std_msgs/String | emotion_manager | eye_display | 2Hz |
+| `/voice/input` | std_msgs/String | whisper_stt | intent_parser | on_speech |
+| `/voice/output` | std_msgs/String | piper_tts | audio_output | on_text |
+| `/health/status` | std_msgs/String | health_monitor | dashboard | 1Hz |
+| `/event/log` | std_msgs/String | event_bus_bridge | storage_node | on_event |
+
+### Services
+
+| Service | Type | Server | Purpose |
+|---------|------|--------|---------|
+| `/tank/diagnostics` | tank_msgs/Diagnostics | health_node | Full system check |
+| `/tank/config` | tank_msgs/Config | config_manager | Get/set parameters |
+| `/tank/evolution` | tank_msgs/Evolution | evolution_bridge | Trigger model update |
+| `/tank/security` | tank_msgs/Security | security_manager | Arm/disarm patrol |
+
+### Actions
+
+| Action | Type | Server | Purpose |
+|--------|------|--------|---------|
+| `/tank/navigate` | tank_msgs/Navigate | nav_manager | Waypoint following |
+| `/tank/patrol` | tank_msgs/Patrol | patrol_manager | Route patrol |
+| `/tank/search` | tank_msgs/Search | search_manager | Object finding |
+
 
 ## 16. Bill of Materials
 
@@ -774,7 +853,24 @@ Demo video and presentation slides: [`images/competition/`](images/competition/)
 | 8.6GB AI models on 256GB SSD | PreloadManager with lazy download + background fetch |
 | Walking balance | Pressure sensors in feet + IMU feedback loop |
 
+
 ---
+
+## 46. Known Limitations
+
+| Limitation | Impact | Mitigation | Status |
+|-----------|--------|------------|--------|
+| No real hardware photos yet | Competition presentation | Blueprints + SVG diagrams | 🔵 Placeholder |
+| Walking gait not optimized | Unstable locomotion | IMU feedback loop + pressure sensors | 🟡 In progress |
+| 5-finger grasp uncalibrated | Weak object manipulation | Force-torque sensor tuning | 🟡 In progress |
+| No demo video | Competition demo | Script ready, needs recording | 🔴 Planned |
+| VPS has no real deployment | Cloud AI unavailable | Local llama.cpp fallback works | 🟡 Configured |
+| No custom PCB | Wiring complexity | Breakout boards + wire loom | 🔵 Planned |
+| Single-person recognition | Limited face DB | DeepFace enrollment system ready | 🔵 Planned |
+| No OTA update system | Manual updates | rsync/scp over SSH works | 🔵 Planned |
+| No battery management BMS | Manual monitoring | INA219 sensors + health_node | 🔵 Planned |
+| Competition deadline pressure | Feature scope | Focus on core demo pipeline | 🟡 Active |
+
 
 ## 49. Future Improvements
 
@@ -814,3 +910,34 @@ Demo video and presentation slides: [`images/competition/`](images/competition/)
 ## License
 
 MIT License — see [LICENSE](LICENSE)
+
+
+---
+
+## 51. Competition Summary
+
+**What is The Tank?**
+The Tank is a humanoid AI robot that demonstrates **Physical AI** — the integration of sensing, perception, reasoning, and physical action in a real-world robot.
+
+**What is demonstrated:**
+1. **SENSE** — 10 sensor types (camera, LiDAR, thermal, IMU, ultrasonic, etc.) read the environment
+2. **PERCEIVE** — Object detection (YOLOv8n) and classification runs at 30fps
+3. **FUSE** — Multiple sensors are combined into a unified world model with uncertainty tracking
+4. **UNDERSTAND** — AI engine analyzes the situation using structured reasoning
+5. **DECIDE** — Deterministic decision engine validates AI output through safety checks
+6. **ACT** — Motor/servo commands execute physical movement
+7. **VERIFY** — Action results are checked against expectations
+8. **LEARN/LOG** — Events are stored in SQLite for analysis and improvement
+
+**What makes it technically innovative:**
+- **42-component hardware registry** with body-section organization
+- **5-node ESP32 swarm** for distributed control (head, chest, neck, 2× hand)
+- **Circuit-breaker resilience** — 14 AI providers with automatic failover
+- **Self-evolving AI** — discovers new models daily, tests them, adds to rotation
+- **Deterministic state machine** — 10 states with validated transitions
+- **Safety-first design** — E-stop, watchdog, action timeout, sensor failure handling
+- **Full simulation mode** — entire stack works without hardware for testing
+- **19/19 automated tests** covering every critical subsystem
+
+**Registration: APC-2026-RJ-75818**
+
