@@ -1,0 +1,30 @@
+# Tank — YAML Configuration
+# Override defaults here. Env vars take priority.
+
+simulation: true
+demo_mode: false
+log_level: INFO
+dashboard_port: 8080
+api_port: 8085
+
+vps:
+  url: "http://localhost:8000"
+  timeout: 30.0
+  retries: 3
+
+sensors:
+  camera_device: 0
+  camera_fps: 30
+  camera_resolution: [640, 480]
+  lidar_port: "/dev/ttyUSB0"
+  lidar_baud: 115200
+
+ai:
+  model: "yolov8n.pt"
+  confidence_threshold: 0.5
+  local_model: "tinyllama"
+
+control:
+  motor_pwm_freq: 1000
+  max_speed: 1.0
+  safety_timeout: 2.0
