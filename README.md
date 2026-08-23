@@ -547,9 +547,9 @@ GENERATE → SANDBOX → STATIC ANALYSIS → UNIT TEST → SIMULATION
 
 ---
 
-## 📺 Android TV GUI — 200 Features
+## 📺 Android TV GUI — 500 Features
 
-TankOS has a **200-feature Android TV-style interface** organized into 14 panels across two tiers:
+TankOS has a **500-feature Android TV-style interface** organized into 21 panels across three tiers:
 
 ### Tier 1: Advanced Features (201-300)
 
@@ -574,6 +574,18 @@ TankOS has a **200-feature Android TV-style interface** organized into 14 panels
 | 🌐 **Network** | 15 | 🟢 | Tailscale topology, LTE modem, WiFi scanner, hotspot, SSH |
 | 📦 **ROS2 & System** | 10 | 🟢 | Node graph, topic monitor, launch files, colcon build, systemd |
 | 📈 **Telemetry** | 5 | 🟢 | Realtime dashboard, event history, mission replay, annotation |
+
+### Tier 3: Extended Features (401-500)
+
+| Panel | Features | Description |
+|-------|----------|-------------|
+| 🖥️ **VPS & Cloud** | 15 | Aria2, Nextcloud, MariaDB, Docker, Nginx, Fail2ban, Xrdp |
+| 🧪 **Testing & Sim** | 15 | Hardware-in-loop, sensor injection, rosbag, benchmarks, stress tests |
+| 🔐 **Security Extended** | 15 | Multi-user login, RBAC, TOTP 2FA, audit trail, encryption |
+| 🎯 **Mission Planning** | 15 | Drag-drop editor, scheduled missions, patrol generator, KML import |
+| 🧠 **Knowledge/Learning** | 15 | Knowledge graph, vector memory, RL viewer, active learning |
+| 🔧 **Debug & Dev Tools** | 15 | Variable watcher, code editor, profiler, serial monitor, FSM visualizer |
+| 🎨 **UX & Customization** | 10 | Themes, layout editor, icon packs, languages, welcome wizard |
 
 ### Highlight Features
 
