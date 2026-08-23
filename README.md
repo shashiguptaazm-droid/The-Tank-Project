@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <b>A self-evolving, emotionally-aware humanoid AI robot</b><br>
+  <b>An autonomous AI robotic platform with cognitive architecture</b><br>
   <sub>NVIDIA Jetson Orin Nano · Arduino UNO Q · ESP32-S3 Swarm · ROS2 · TankOS</sub>
 </p>
 
@@ -20,13 +20,13 @@
 
 ## 1. Project Title
 
-**The Tank** — An Autonomous Humanoid AI Robot with Self-Evolving Intelligence
+**The Tank** — An Autonomous AI Robotic Platform with Cognitive Architecture
 
 ---
 
 ## 2. Project Overview
 
-The Tank is a humanoid robot built for the **Arduino Physical AI Challenge 2026**. It combines a **NVIDIA Jetson Orin Nano** (AI brain, 40 TOPS CUDA inference) with an **Arduino UNO Q** (real-time motor/sensor controller) and a network of **ESP32-S3 nodes** (eyes, hands, limbs). The robot walks, sees, hears, speaks, and **learns from its environment** — running a complete 22-system cognitive architecture with a 14-provider AI brain that evolves daily.
+The Tank is an autonomous AI robotic platform built for the **Arduino Physical AI Challenge 2026**. It combines a **NVIDIA Jetson Orin Nano Super** (AI brain, 67 TOPS INT8) with an **Arduino UNO Q** (real-time controller with Qualcomm QRB2210 + STM32U585 MCU) and a network of **ESP32-S3 nodes** (5 distributed peripheral controllers). The platform sees, hears, speaks, and **discovers new capabilities through automated model evaluation** — running a complete 22-system cognitive architecture.
 
 **Registration ID: APC-2026-RJ-75818**
 
@@ -56,11 +56,11 @@ A three-board architecture that cleanly separates concerns:
 
 | Board | Role | Why |
 |-------|------|-----|
-| **Jetson Orin Nano** | AI Brain | 40 TOPS CUDA, runs ROS2, llama.cpp, Whisper, YOLOv8n, TankOS GUI |
-| **Arduino UNO Q** | Real-time Controller | Sub-millisecond encoder response, motor PWM, I²C sensor polling |
-| **ESP32-S3 ×6** | Distributed Nodes | Eyes, hands, limbs — each node handles its own domain independently |
+| **Jetson Orin Nano Super** | AI Brain | 67 TOPS INT8, runs ROS2 Jazzy, llama.cpp, Whisper, YOLOv8n, TankOS GUI |
+| **Arduino UNO Q** | Real-time Controller | Qualcomm QRB2210 Linux + STM32U585 MCU for deterministic motor/encoder/I2C |
+| **ESP32-S3 ×5** | Distributed Peripheral Nodes | Eyes, hands — each node handles its own domain independently |
 
-They communicate via USB serial at 115200 baud with a compact binary protocol. The Jetson never touches a motor wire. The Arduino never runs an inference. Clean separation = reliable system.
+They communicate via USB serial at 115200 baud with a compact JSON protocol. The Jetson never touches a motor wire. The Arduino never runs an inference. Clean separation = reliable system.
 
 ---
 
@@ -72,10 +72,9 @@ They communicate via USB serial at 115200 baud with a compact binary protocol. T
 - 🎭 **Emotional Intelligence** — valence/arrousal/dominance emotion model, facial expression on round LCD eyes
 - 🗣️ **Voice Interface** — Whisper STT + Piper TTS + openWakeWord
 - 👁️ **Multi-Sensor Fusion** — LiDAR, IMU, thermal camera, depth camera, ultrasonic
-- 🚶 **Bipedal Locomotion** — linear actuators, rotary joints, pressure-sensing feet
-- 🔒 **Fully Offline** — core AI runs on-device (llama.cpp GGUF inference)
+- 🔒 **Hybrid AI** — local models (llama.cpp) provide offline operation; 14 cloud providers are optional fallback
 - 📱 **TankOS GUI** — 13 full-screen apps on a 7" touchscreen
-- 🔧 **400+ CLI Utilities** — diagnostics, calibration, OTA, fleet management
+- 🔧 **400+ CLI Utilities** — diagnostics, calibration, fleet management
 
 ---
 
@@ -89,7 +88,7 @@ The Tank's key innovations:
 
 3. **Cognitive Metacognition** — The robot knows when it doesn't know something. Its metacognition system monitors confidence levels and triggers exploration (curiosity engine) when uncertainty is high.
 
-4. **Distributed ESP32 Swarm** — Instead of running everything on one board, the Tank distributes intelligence across 6 ESP32-S3 nodes. Eyes, hands, and limbs each have their own microcontroller, reducing latency and wiring complexity.
+4. **Distributed ESP32 Swarm** — Instead of running everything on one board, the Tank distributes peripheral control across 5 ESP32-S3 nodes. Eyes and hands each have their own microcontroller, reducing latency and wiring complexity.
 
 
 ---
@@ -113,16 +112,16 @@ The Tank's key innovations:
 | Sensor Fusion | 🟢 | Camera+LiDAR+thermal tested |
 | Safety System | 🟢 | E-stop, watchdog, timeout |
 | Mock Sensors | 🟢 | Simulation mode fully working |
-| ESP32 Swarm | 🟢 | 5-node serial communication |
+| ESP32 Swarm | 🟢 | 5-node distributed peripheral control |
 | SQLite Storage | 🟢 | Event/telemetry logging |
 | Terminal Dashboard | 🟢 | Competition-quality display |
-| Hardware Registry | 🟢 | 42 components cataloged |
+| Hardware Registry | 🟢 | 41 components cataloged |
 | Full Pipeline | 🟢 | SENSE→PERCEIVE→FUSE→AI→DECIDE→ACT→VERIFY |
 | USB Camera Driver | 🔵 | OpenCV code ready, needs hardware |
 | LiDAR Driver | 🔵 | rplidar SDK ready, needs hardware |
 | Thermal Sensor | 🔵 | MLX90640 I2C driver ready |
-| IMU Driver | 🔵 | BNO055/MPU6050 drivers ready |
-| Servo Control | 🔵 | GPIO PWM code ready |
+| IMU Driver | 🔵 | BNO055 I2C driver ready (via Arduino UNO Q) |
+| Servo Control | 🔵 | PCA9685 I2C servo driver ready (via Arduino UNO Q) |
 | Linear Actuator | 🔵 | BTS7960 H-bridge ready |
 | Finger Control | 🔵 | SG90 servo code ready |
 | VPS AI Client | 🔵 | HTTPS+auth+retry ready |
@@ -168,7 +167,7 @@ The Tank's key innovations:
 │  EventBus · Vision · Memory · Emotion · Security ·  │
 │  Voice · Evolution Bridge · Local LLM · Preload      │
 ├─────────────────────────────────────────────────────┤
-│                   ROS2 HUMBLE (16 packages)          │
+│                   ROS2 HUMBLE (23 packages)          │
 │  motion · vision · nav · speech · memory · assistant │
 │  security · health · dashboard · meta · display      │
 ├─────────────────────────────────────────────────────┤
@@ -178,7 +177,7 @@ The Tank's key innovations:
 └────────────────────┬────────┴───────────┬───────────┘
                      │                    │
               ┌──────┴──────┐      ┌──────┴──────┐
-              │ ESP32-S3 ×6 │      │  Sensors    │
+              │ ESP32-S3 ×5 │      │  Sensors    │
               │ Eyes·Hands  │      │ LiDAR·IMU  │
               │ Limbs·Feet  │      │ Camera·Mic  │
               └─────────────┘      └─────────────┘
@@ -214,11 +213,11 @@ Perception → Attention → Reasoning → Planning → Decision → Action
 
 Three-board distributed architecture:
 
-- **Jetson Orin Nano 8GB** — AI compute (CUDA 40 TOPS), M.2 NVMe 256GB, JetPack 6
+- **Jetson Orin Nano Super 8GB** — AI compute (CUDA 40 TOPS), M.2 NVMe 256GB, JetPack 6
 - **Arduino UNO Q** — Real-time motor/sensor I/O (Arm Cortex-M4 48MHz)
-- **ESP32-S3 ×6** — Distributed nodes (eyes, hands, limbs, sensors)
+- **ESP32-S3 ×5** — Distributed nodes (eyes, hands, limbs, sensors)
 
-See [`hardware/catalog.svg`](hardware/catalog.svg) for the full 42-component visual catalog.
+See [`hardware/catalog.svg`](hardware/catalog.svg) for the full 41-component visual catalog.
 
 ---
 
@@ -229,7 +228,7 @@ See [`hardware/catalog.svg`](hardware/catalog.svg) for the full 42-component vis
 | **L5** | Simple Internet | REST API, universal downloader, 400+ CLI commands |
 | **L4** | Tank Shell | PySide6/Qt6 — 13 full-screen apps |
 | **L3** | TankOS Core | 35 AI managers, EventBus, Evolution Bridge |
-| **L2** | ROS2 Humble | 16 ament_python packages |
+| **L2** | ROS2 Jazzy | 23 ament_python packages |
 | **L1** | Arduino | Bare-metal motor/sensor firmware |
 
 ---
@@ -298,7 +297,7 @@ See [`hardware/catalog.svg`](hardware/catalog.svg) for the full 42-component vis
 
 ---
 
-## 15. ROS Architecture (16 packages)
+## 15. ROS Architecture (23 packages)
 
 **Communication Model:** Publish/Subscribe + Services + Actions
 
@@ -361,7 +360,7 @@ Full BOM with Robu.in links: [`hardware.md`](hardware.md)
 | Component | Spec | Role |
 |-----------|------|------|
 | Jetson Orin Nano | 8GB RAM, 1024 CUDA cores, 40 TOPS | AI inference, ROS2, TankOS |
-| Arduino UNO Q | Arm M4 48MHz, 32KB SRAM, WiFi/BLE | Motor PWM, encoder INT, I²C |
+| Arduino UNO Q | Qualcomm QRB2210 + STM32U585, 32KB SRAM, WiFi/BLE | Motor PWM, encoder INT, I²C |
 | ESP32-S3 | 16MB Flash, 8MB PSRAM, USB-C | Eye display, hand control, limb I/O |
 | RPLidar A1 | 360°, 12m, 8000 pts/sec, USB | SLAM, mapping, obstacle detection |
 | BNO055 | 9-DOF, I²C 0x28, fusion engine | Orientation, heading, tilt |
@@ -401,7 +400,7 @@ See [`images/wiring.svg`](images/wiring.svg) for the full schematic.
 
 ## 19. Circuit Schematic
 
-The Tank uses 4 galvanically isolated power rails:
+The Tank uses 4 separately managed power rails:
 
 | Rail | Voltage | Powers |
 |------|---------|--------|
@@ -581,7 +580,7 @@ void loop() {
 
 ## 31. ESP32 Implementation
 
-6 ESP32-S3 nodes, each handling its own domain:
+5 ESP32-S3 nodes, each handling its own domain:
 
 | Node | Location | Handles |
 |------|----------|---------|
@@ -846,10 +845,10 @@ Demo video and presentation slides: [`images/competition/`](images/competition/)
 
 | Challenge | Solution |
 |-----------|----------|
-| Motor inrush brownouts Jetson | 4 galvanically isolated power rails |
+| Motor inrush brownouts Jetson | 4 separately managed power rails |
 | Single AI provider failure | 14-provider rotation with circuit breaker |
 | Real-time motor timing on Linux | Arduino UNO Q handles all real-time I/O |
-| 6 ESP32 nodes need coordination | ESP-NOW mesh + Jetson USB serial bridge |
+| 5 ESP32 nodes need coordination | ESP-NOW mesh + Jetson USB serial bridge |
 | 8.6GB AI models on 256GB SSD | PreloadManager with lazy download + background fetch |
 | Walking balance | Pressure sensors in feet + IMU feedback loop |
 
@@ -892,7 +891,7 @@ Demo video and presentation slides: [`images/competition/`](images/competition/)
 | **System Architect** | Overall design, hardware integration, competition strategy |
 | **AI Engineer** | Evolution system, LLM integration, cognitive architecture |
 | **Embedded Developer** | Arduino firmware, ESP32 nodes, motor control |
-| **ROS2 Developer** | 16 ament_python packages, Nav2, SLAM |
+| **ROS2 Developer** | 23 ament_python packages, Nav2, SLAM |
 | **Mechanical Designer** | Chassis CAD, 3D printing, assembly |
 | **Software Engineer** | TankOS GUI, 400+ CLI utilities, testing |
 
@@ -928,7 +927,7 @@ MIT License — see [LICENSE](LICENSE)
 ## 51. Competition Summary
 
 **What is The Tank?**
-The Tank is a humanoid AI robot that demonstrates **Physical AI** — the integration of sensing, perception, reasoning, and physical action in a real-world robot.
+The Tank is a autonomous AI robotic platform that demonstrates **Physical AI** — the integration of sensing, perception, reasoning, and physical action in a real-world robot.
 
 **What is demonstrated:**
 1. **SENSE** — 10 sensor types (camera, LiDAR, thermal, IMU, ultrasonic, etc.) read the environment
@@ -941,7 +940,7 @@ The Tank is a humanoid AI robot that demonstrates **Physical AI** — the integr
 8. **LEARN/LOG** — Events are stored in SQLite for analysis and improvement
 
 **What makes it technically innovative:**
-- **42-component hardware registry** with body-section organization
+- **41-component hardware registry** with body-section organization
 - **5-node ESP32 swarm** for distributed control (head, chest, neck, 2× hand)
 - **Circuit-breaker resilience** — 14 AI providers with automatic failover
 - **Self-evolving AI** — discovers new models daily, tests them, adds to rotation

@@ -48,7 +48,7 @@ the tank project/
 
 | Framework | Where | Purpose |
 |-----------|-------|---------|
-| ROS2 Humble | tank_ws/src/ | 26 robot packages (motion, vision, nav, etc.) |
+| ROS2 Jazzy | tank_ws/src/ | 26 robot packages (motion, vision, nav, etc.) |
 | PySide6/Qt6 | tank_os/shell/ | 13-screen GUI |
 | FastAPI | tank_os/agent_framework/ | REST API server (:8085) |
 | SQLAlchemy | tank_os/internet/ | Database layer |
