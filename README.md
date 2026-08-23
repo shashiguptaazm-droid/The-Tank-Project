@@ -547,11 +547,11 @@ GENERATE → SANDBOX → STATIC ANALYSIS → UNIT TEST → SIMULATION
 
 ---
 
-## 📺 Android TV GUI — 100 Advanced Features
+## 📺 Android TV GUI — 200 Features
 
-TankOS has a **100-feature Android TV-style interface** organized into 6 panels:
+TankOS has a **200-feature Android TV-style interface** organized into 14 panels across two tiers:
 
-### Panel Overview
+### Tier 1: Advanced Features (201-300)
 
 | Panel | Features | Description |
 |-------|----------|-------------|
@@ -561,6 +561,19 @@ TankOS has a **100-feature Android TV-style interface** organized into 6 panels:
 | 🗺️ **Navigation & Mapping** | 15 | No-go zones, map layers, trajectory, path editing, coverage |
 | ⚙️ **Settings & Customization** | 15 | Themes, plugins, languages, haptics, onboarding |
 | 🔒 **Security & Admin** | 10 | RBAC, audit log, API keys, backup/restore |
+
+### Tier 2: Hardware-Specific Features (301-400)
+
+| Panel | Features | Status | Description |
+|-------|----------|--------|-------------|
+| 📊 **Dashboard** | 15 | 🟢 93 Live | Tailscale IPs, HW inventory, 3-board arch, power rails, system metrics |
+| 📷 **Camera & Vision** | 15 | 🟢 | Multi-stream (DFRobot+ESP32), YOLO overlay, PiP, motion zones, flash |
+| 🗺️ **LiDAR & Mapping** | 10 | 🟢 | LD19 point cloud, occupancy grid, path planning, obstacle distances |
+| 🎮 **Motor & Control** | 15 | 🟢 | Virtual joystick, E-STOP, PID tuning, servo PCA9685, calibration |
+| 🧠 **AI & LLM** | 15 | 🟢 | Chat, Whisper STT, Piper TTS, reasoning trace, memory browser |
+| 🌐 **Network** | 15 | 🟢 | Tailscale topology, LTE modem, WiFi scanner, hotspot, SSH |
+| 📦 **ROS2 & System** | 10 | 🟢 | Node graph, topic monitor, launch files, colcon build, systemd |
+| 📈 **Telemetry** | 5 | 🟢 | Realtime dashboard, event history, mission replay, annotation |
 
 ### Highlight Features
 
