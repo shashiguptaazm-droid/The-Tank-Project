@@ -1,0 +1,19 @@
+#!/bin/bash
+# UNO Q Network — Auto-connect WiFi/Jetson hotspot/Tailscale
+LOG=/var/log/unoq_network.log
+JETSON_AP=TANK-HOTSPOT
+JETSON_PASS=tank2026
+log() { echo $(date '+%Y-%m-%d %H:%M:%S') $1 | tee -a $LOG; }
+check_internet() { ping -c 1 -W 3 8.8.8.8 >/dev/null 2>&1; }
+log 'UNO Q Network Manager starting'
+while true; do
+  if ! check_internet; then
+    log 'No internet — scanning for Jetson hotspot'
+    nmcli device wifi rescan 2>/dev/null; sleep 3
+    if nmcli device wifi list 2>/dev/null | grep -q $JETSON_AP; then
+      nmcli device wifi connect $JETSON_AP password $JETSON_PASS 2>/dev/null
+      log 'Connected to Jetson hotspot'
+    fi
+  fi
+  sleep 60
+done

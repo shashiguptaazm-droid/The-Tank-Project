@@ -1,0 +1,29 @@
+#!/bin/bash
+# Tank Network Manager — WiFi→LTE→Hotspot failover
+LOG=/var/log/tank_network.log
+WIFI_SSID=AirFiber-X9nxU1
+HOTSPOT_SSID=TANK-HOTSPOT
+HOTSPOT_PASS=tank2026
+log() { echo $(date '+%Y-%m-%d %H:%M:%S') $1 | tee -a $LOG; }
+check_internet() { ping -c 1 -W 3 8.8.8.8 >/dev/null 2>&1; }
+case "$1" in
+  start)
+    log 'Tank Network Manager starting'
+    while true; do
+      if ! check_internet; then
+        log 'Internet down — checking LTE'
+        nmcli connection up Tank-LTE 2>/dev/null
+        sleep 10
+        if ! check_internet; then
+          log 'LTE down — starting hotspot'
+          nmcli device wifi hotspot ifname wlP1p1s0 con-name TankHotspot ssid $HOTSPOT_SSID password $HOTSPOT_PASS 2>/dev/null
+        fi
+      fi
+      sleep 60
+    done ;;
+  status)
+    echo 'WiFi:' $(nmcli -t -f GENERAL.STATE connection show AirFiber-X9nxU1 2>/dev/null)
+    echo 'LTE:' $(nmcli -t -f GENERAL.STATE connection show Tank-LTE 2>/dev/null)
+    echo 'Internet:' $(check_internet && echo OK || echo DOWN) ;;
+  *) echo 'Usage: tank-network {start|status}' ;;
+esac
