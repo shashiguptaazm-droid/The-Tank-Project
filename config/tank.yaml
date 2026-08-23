@@ -8,7 +8,7 @@ dashboard_port: 8080
 api_port: 8085
 
 vps:
-  url: "http://localhost:8000"
+  url: "http://100.71.127.19:8888"
   timeout: 30.0
   retries: 3
 
