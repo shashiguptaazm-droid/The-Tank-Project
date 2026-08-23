@@ -975,3 +975,78 @@ The Tank is a autonomous AI robotic platform that demonstrates **Physical AI** �
 
 **Registration: APC-2026-RJ-75818**
 
+
+---
+
+## 🙏 Credits — Software & Open Source
+
+> Built with these amazing open-source projects. Every badge links to the developer.
+
+### 🧠 AI & Machine Learning
+
+| | Software | Developer | Used For |
+|---|----------|-----------|----------|
+| <img src='https://img.shields.io/badge/NVIDIA-Jetson_Orin-76B900?style=flat-square&logo=nvidia&logoColor=white' width='24'> | NVIDIA JetPack 6 | NVIDIA | CUDA inference, GPU |
+| <img src='https://img.shields.io/badge/Meta-LLaMA-3.1-0467DF?style=flat-square&logo=meta&logoColor=white' width='24'> | LLaMA 3.1 8B | Meta AI | Local LLM |
+| <img src='https://img.shields.io/badge/Microsoft-Phi--3-0078D4?style=flat-square&logo=microsoft&logoColor=white' width='24'> | Phi-3 Mini | Microsoft | Small local LLM |
+| <img src='https://img.shields.io/badge/TinyLlama-1.1B-FF6F00?style=flat-square' width='24'> | TinyLlama | TinyLlama | Ultra-light LLM |
+| <img src='https://img.shields.io/badge/llama.cpp-GGUF-000000?style=flat-square' width='24'> | llama.cpp | ggerganov | CPU inference |
+| <img src='https://img.shields.io/badge/Ultralytics-YOLOv8-00D4AA?style=flat-square&logo=opencv&logoColor=white' width='24'> | YOLOv8n | Ultralytics | Object detection |
+| <img src='https://img.shields.io/badge/OpenAI-Whisper-412991?style=flat-square&logo=openai&logoColor=white' width='24'> | Whisper | OpenAI | Speech-to-text |
+| <img src='https://img.shields.io/badge/Piper-TTS-4CAF50?style=flat-square' width='24'> | Piper TTS | rhasspy | Text-to-speech |
+| <img src='https://img.shields.io/badge/openWakeWord-FF9800?style=flat-square' width='24'> | openWakeWord | dscripka | Wake word detection |
+
+### 🤖 Robotics
+
+| | Software | Developer | Used For |
+|---|----------|-----------|----------|
+| <img src='https://img.shields.io/badge/ROS2-Humble-223344?style=flat-square&logo=ros&logoColor=white' width='24'> | ROS2 Humble | ROS.org | Robot middleware |
+| <img src='https://img.shields.io/badge/Arduino-CLI-00979D?style=flat-square&logo=arduino&logoColor=white' width='24'> | Arduino CLI | Arduino | ESP32 firmware |
+| <img src='https://img.shields.io/badge/esptool-ESP32-000000?style=flat-square' width='24'> | esptool | espressif | Flash programming |
+| <img src='https://img.shields.io/badge/OpenCV-5.0-5C3EE8?style=flat-square&logo=opencv&logoColor=white' width='24'> | OpenCV 5.0 | opencv.jp | Camera, ArUco, vision |
+| <img src='https://img.shields.io/badge/Nav2-Planning-223344?style=flat-square&logo=ros&logoColor=white' width='24'> | Nav2 | ROS Navigation | Path planning |
+
+### 🌐 Networking
+
+| | Software | Developer | Used For |
+|---|----------|-----------|----------|
+| <img src='https://img.shields.io/badge/Tailscale-Mesh-000000?style=flat-square&logo=tailscale&logoColor=white' width='24'> | Tailscale | Tailscale | Mesh VPN |
+| <img src='https://img.shields.io/badge/ModemManager-4G-FF0000?style=flat-square' width='24'> | ModemManager | freedesktop | LTE modem |
+| <img src='https://img.shields.io/badge/nginx-Proxy-009639?style=flat-square&logo=nginx&logoColor=white' width='24'> | nginx | nginx.org | Reverse proxy |
+| <img src='https://img.shields.io/badge/FastAPI-REST-009688?style=flat-square&logo=fastapi&logoColor=white' width='24'> | FastAPI | tiangolo | REST API server |
+
+### 🖥️ Frontend
+
+| | Software | Developer | Used For |
+|---|----------|-----------|----------|
+| <img src='https://img.shields.io/badge/PySide6-Qt6-41CD52?style=flat-square&logo=qt&logoColor=white' width='24'> | PySide6 | Qt Company | Desktop GUI |
+| <img src='https://img.shields.io/badge/PWA-Mobile-5A0FC8?style=flat-square' width='24'> | PWA Dashboard | Custom | Mobile control |
+| <img src='https://img.shields.io/badge/Telegram-Bot-0088CC?style=flat-square&logo=telegram&logoColor=white' width='24'> | Telegram Bot | Telegram | Notifications |
+
+### 🛠️ Dev Tools
+
+| | Software | Developer | Used For |
+|---|----------|-----------|----------|
+| <img src='https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white' width='24'> | Python 3.12 | python.org | Core language |
+| <img src='https://img.shields.io/badge/Git-VCS-F05032?style=flat-square&logo=git&logoColor=white' width='24'> | Git | git-scm | Version control |
+| <img src='https://img.shields.io/badge/GitHub-Hosting-181717?style=flat-square&logo=github&logoColor=white' width='24'> | GitHub | github.com | Code hosting |
+| <img src='https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white' width='24'> | SQLite | sqlite.org | Local database |
+
+### 🏆 Hardware Stack
+
+
+
+### 📜 Licenses
+
+| Component | License |
+|-----------|---------|
+| TankOS Core | MIT |
+| LLaMA 3.1 | Llama 3.1 Community |
+| YOLOv8 | AGPL-3.0 |
+| Whisper | MIT |
+| ROS2 | Apache 2.0 |
+| OpenCV | Apache 2.0 |
+| FastAPI | MIT |
+| PySide6 | LGPL-3 |
+
+*Generated by TankOS · Updated August 2026*
