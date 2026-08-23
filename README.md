@@ -76,11 +76,11 @@ The Tank solves all three: multi-provider AI with automatic fallback, daily self
 
 A three-board architecture that cleanly separates concerns:
 
-| Board | Role | Why |
-|-------|------|-----|
-| **Jetson Orin Nano Super** | AI Brain | 67 TOPS INT8, runs ROS2 Jazzy, llama.cpp, Whisper, YOLOv8n, TankOS GUI |
-| **Arduino UNO Q** | Real-time Controller | Qualcomm QRB2210 Linux + STM32U585 MCU for deterministic motor/encoder/I2C |
-| **ESP32-S3 ×5** | Distributed Peripheral Nodes | Eyes, hands — each node handles its own domain independently |
+| Board | Role | Why | Photo |
+|-------|------|-----|-------|
+| **Jetson Orin Nano Super** | AI Brain | 67 TOPS INT8, runs ROS2 Jazzy, llama.cpp, Whisper, YOLOv8n, TankOS GUI | ![Jetson](docs/hardware_photos/1_jeton_orin_nano_super.jpg) |
+| **Arduino UNO Q** | Real-time Controller | Qualcomm QRB2210 Linux + STM32U585 MCU for deterministic motor/encoder/I2C | ![Arduino](docs/hardware_photos/2_arduino_uno_q.jpg) |
+| **ESP32-S3 ×5** | Distributed Peripheral Nodes | Eyes, hands — each node handles its own domain independently | ![ESP32-S3](docs/hardware_photos/6_esp32_s3_devkitc_1.png) |
 
 They communicate via USB serial at 115200 baud with a compact JSON protocol. The Jetson never touches a motor wire. The Arduino never runs an inference. Clean separation = reliable system.
 
@@ -257,33 +257,33 @@ See [`hardware/catalog.svg`](hardware/catalog.svg) for the full 41-component vis
 
 ## 15. Hardware Components
 
-41 components across 8 sections. Full catalog: [`hardware/catalog.svg`](hardware/catalog.svg)
+41 components across 8 sections. Full catalog: [`hardware/catalog.svg`](hardware/catalog.svg). Real product photos for every verified component: [`docs/hardware_photos/`](docs/hardware_photos/PHOTOS_README.md) — build photos: [`images/build/`](images/build/).
 
 ### Compute (5)
-- NVIDIA Jetson Orin Nano Super Developer Kit (8GB) — AI brain
-- Arduino UNO Q — real-time controller
+- NVIDIA Jetson Orin Nano Super Developer Kit (8GB) — AI brain  ![Jetson](docs/hardware_photos/1_jeton_orin_nano_super.jpg)
+- Arduino UNO Q — real-time controller  ![Arduino](docs/hardware_photos/2_arduino_uno_q.jpg)
 - M.2 NVMe SSD 256GB — storage
-- ESP32-S3 DevKitC-1 (N16R8) ×5 — distributed nodes
+- ESP32-S3 DevKitC-1 (N16R8) ×5 — distributed nodes  ![ESP32-S3](docs/hardware_photos/6_esp32_s3_devkitc_1.png)
 - MicroSD 64GB A2 — boot drive
 
 ### Vision & Display (4)
-- Waveshare 1.28" Round LCD (GC9A01) ×2 — eyes
-- SH1106 OLED 1.3" — status face
+- Waveshare 1.28" Round LCD (GC9A01) ×2 — eyes  ![Round LCD](docs/hardware_photos/5_waveshare_1.28_round_lcd_gc9a01.jpg)
+- SH1106 OLED 1.3" — status face  ![SH1106](docs/hardware_photos/11_sh1106_1.3_oled.jpg)
 - USB Camera (IMX219/C920) — vision
 - M2.5/M3 standoff kit — mounting
 
 ### Motion (7)
 - 12V DC geared motors ×2 (JGB37-520, 30:1) — drive
-- BTS7960 43A motor drivers ×2 — H-bridge
+- BTS7960 43A motor drivers ×2 — H-bridge  ![BTS7960](docs/hardware_photos/12_bts7960.jpg)
 - Tracked chassis (aluminium) — body
 - SG90 micro servos ×2 — pan/tilt
-- PCA9685 16ch PWM — servo controller
+- PCA9685 16ch PWM — servo controller  ![PCA9685](docs/hardware_photos/10_pca9685.jpg)
 - Pan-tilt bracket — head mount
 - Mushroom E-STOP switch — safety
 
 ### Sensors (7)
-- RPLidar A1 — 360° LiDAR (12m range)
-- BNO055 9-DOF IMU — orientation
+- RPLidar A1 — 360° LiDAR (12m range)  ![LD19](docs/hardware_photos/7_ldrobot_ld19.jpg)
+- BNO055 9-DOF IMU — orientation  ![BNO055](docs/hardware_photos/9_bno055_imu.jpg)
 - INA219 current/voltage ×2 — battery telemetry
 - R307 fingerprint sensor — security
 - HC-SR04 ultrasonic ×2 — obstacle detection
