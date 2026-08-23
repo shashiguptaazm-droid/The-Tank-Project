@@ -74,6 +74,17 @@ SENSE → PERCEIVE → FUSE → AI → DECIDE → ACT → VERIFY
 
 ---
 
+## 🖥 TankOS GUI Blueprint (robot-OS upgrade)
+
+> Full blueprint + audit: [`docs/TANKOS_GUI_BLUEPRINT.md`](docs/TANKOS_GUI_BLUEPRINT.md) · screenshots in [`docs/screenshots/gui/`](docs/screenshots/gui/).
+
+- ✅ **Core-7 live:** Home hub (8-tile launcher, ≤2 clicks) → Drive (joystick + E-stop + 5 modes)
+  → Mission (builder + 9 types) → Map → Vision → AI Brain (decision + **Why?**) → Robot Health
+- ✅ **Extras live:** ESP32 Fleet · Jetson dashboard (GPU/CPU/RAM/VRAM/AI FPS) · 🏆 Competition Mode
+  (10-step DEMO) · 🚨 Event Center (filtered stream)
+- ✅ 8 new screens (`tank_os/windows/`), one GUI → EventBus → TankOS/ROS2/Hardware backends
+- ✅ 10 new tests (`test_gui_blueprint_screens.py`) — full suite **310 passing**
+
 ## 🏗️ Next Steps
 
 1. **Physical motor test** — Connect BTS7960 + motors + encoders
