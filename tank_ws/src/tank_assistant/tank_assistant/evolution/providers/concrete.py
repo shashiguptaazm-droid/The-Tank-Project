@@ -395,6 +395,147 @@ class ReplicateProvider(CustomJsonMixin, BaseHttpProvider):
 
 
 # ════════════════════════════════════════════════════════════════════════
+# xAI (Grok) — OpenAI-compatible API
+# ════════════════════════════════════════════════════════════════════════
+
+@register_provider("xai", "XAI_API_KEY")
+class XAIProvider(OpenAIMixin, BaseHttpProvider):
+    """xAI Grok — OpenAI-compatible endpoint."""
+    name = "xai"
+    DEFAULT_MODEL = os.environ.get("XAI_MODEL", "grok-2-latest")
+    DEFAULT_BASE = os.environ.get(
+        "XAI_BASE_URL", "https://api.x.ai/v1")
+    KEY_NAME = "XAI_API_KEY"
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Together AI — OpenAI-compatible
+# ════════════════════════════════════════════════════════════════════════
+
+@register_provider("together", "TOGETHER_API_KEY")
+class TogetherProvider(OpenAIMixin, BaseHttpProvider):
+    name = "together"
+    DEFAULT_MODEL = os.environ.get(
+        "TOGETHER_MODEL", "meta-llama/Llama-3.3-70B-Instruct-Turbo")
+    DEFAULT_BASE = os.environ.get(
+        "TOGETHER_BASE_URL", "https://api.together.xyz/v1")
+    KEY_NAME = "TOGETHER_API_KEY"
+
+
+# ════════════════════════════════════════════════════════════════════════
+# DeepInfra — OpenAI-compatible
+# ════════════════════════════════════════════════════════════════════════
+
+@register_provider("deepinfra", "DEEPINFRA_API_KEY")
+class DeepInfraProvider(OpenAIMixin, BaseHttpProvider):
+    name = "deepinfra"
+    DEFAULT_MODEL = os.environ.get(
+        "DEEPINFRA_MODEL", "meta-llama/Llama-3.3-70B-Instruct")
+    DEFAULT_BASE = os.environ.get(
+        "DEEPINFRA_BASE_URL", "https://api.deepinfra.com/v1/openai")
+    KEY_NAME = "DEEPINFRA_API_KEY"
+
+
+# ════════════════════════════════════════════════════════════════════════
+# SambaNova — OpenAI-compatible
+# ════════════════════════════════════════════════════════════════════════
+
+@register_provider("sambanova", "SAMBANOVA_API_KEY")
+class SambaNovaProvider(OpenAIMixin, BaseHttpProvider):
+    name = "sambanova"
+    DEFAULT_MODEL = os.environ.get(
+        "SAMBANOVA_MODEL", "Meta-Llama-3.1-405B-Instruct")
+    DEFAULT_BASE = os.environ.get(
+        "SAMBANOVA_BASE_URL", "https://api.sambanova.ai/v1")
+    KEY_NAME = "SAMBANOVA_API_KEY"
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Fireworks AI — OpenAI-compatible
+# ════════════════════════════════════════════════════════════════════════
+
+@register_provider("fireworks", "FIREWORKS_API_KEY")
+class FireworksProvider(OpenAIMixin, BaseHttpProvider):
+    name = "fireworks"
+    DEFAULT_MODEL = os.environ.get(
+        "FIREWORKS_MODEL", "accounts/fireworks/models/llama-v3p3-70b-instruct")
+    DEFAULT_BASE = os.environ.get(
+        "FIREWORKS_BASE_URL", "https://api.fireworks.ai/inference/v1")
+    KEY_NAME = "FIREWORKS_API_KEY"
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Perplexity — OpenAI-compatible
+# ════════════════════════════════════════════════════════════════════════
+
+@register_provider("perplexity", "PERPLEXITY_API_KEY")
+class PerplexityProvider(OpenAIMixin, BaseHttpProvider):
+    name = "perplexity"
+    DEFAULT_MODEL = os.environ.get(
+        "PERPLEXITY_MODEL", "sonar-pro")
+    DEFAULT_BASE = os.environ.get(
+        "PERPLEXITY_BASE_URL", "https://api.perplexity.ai")
+    KEY_NAME = "PERPLEXITY_API_KEY"
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Hyperbolic — OpenAI-compatible
+# ════════════════════════════════════════════════════════════════════════
+
+@register_provider("hyperbolic", "HYPERBOLIC_API_KEY")
+class HyperbolicProvider(OpenAIMixin, BaseHttpProvider):
+    name = "hyperbolic"
+    DEFAULT_MODEL = os.environ.get(
+        "HYPERBOLIC_MODEL", "meta-llama/Llama-3.3-70B-Instruct")
+    DEFAULT_BASE = os.environ.get(
+        "HYPERBOLIC_BASE_URL", "https://api.hyperbolic.xyz/v1")
+    KEY_NAME = "HYPERBOLIC_API_KEY"
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Lambda Labs — OpenAI-compatible
+# ════════════════════════════════════════════════════════════════════════
+
+@register_provider("lambda", "LAMBDA_API_KEY")
+class LambdaProvider(OpenAIMixin, BaseHttpProvider):
+    name = "lambda"
+    DEFAULT_MODEL = os.environ.get(
+        "LAMBDA_MODEL", "meta-llama/Llama-3.3-70B-Instruct")
+    DEFAULT_BASE = os.environ.get(
+        "LAMBDA_BASE_URL", "https://api.lambdalabs.com/v1")
+    KEY_NAME = "LAMBDA_API_KEY"
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Voyage AI — embeddings provider (OpenAI-compatible)
+# ════════════════════════════════════════════════════════════════════════
+
+@register_provider("voyage", "VOYAGE_API_KEY")
+class VoyageProvider(OpenAIMixin, BaseHttpProvider):
+    """Voyage AI — primarily embeddings, but offers chat models."""
+    name = "voyage"
+    DEFAULT_MODEL = os.environ.get(
+        "VOYAGE_MODEL", "voyage-law-2")
+    DEFAULT_BASE = os.environ.get(
+        "VOYAGE_BASE_URL", "https://api.voyageai.com/v1")
+    KEY_NAME = "VOYAGE_API_KEY"
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Novita AI — OpenAI-compatible
+# ════════════════════════════════════════════════════════════════════════
+
+@register_provider("novita", "NOVITA_API_KEY")
+class NovitaProvider(OpenAIMixin, BaseHttpProvider):
+    name = "novita"
+    DEFAULT_MODEL = os.environ.get(
+        "NOVITA_MODEL", "meta-llama/llama-3.3-70b-instruct")
+    DEFAULT_BASE = os.environ.get(
+        "NOVITA_BASE_URL", "https://api.novita.ai/v3/openai")
+    KEY_NAME = "NOVITA_API_KEY"
+
+
+# ════════════════════════════════════════════════════════════════════════
 # HuggingFace Inference — serverless API
 # ════════════════════════════════════════════════════════════════════════
 

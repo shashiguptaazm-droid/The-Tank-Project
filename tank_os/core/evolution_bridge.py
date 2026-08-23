@@ -248,6 +248,11 @@ def init_evolution_providers(*,
             CohereProvider, OpenRouterProvider, CloudflareProvider,
             GeminiProvider, ReplicateProvider, DeepSeekProvider,
             HuggingFaceProvider, EndpointAIProvider,
+            OpenAIProvider, AnthropicProvider, FreebuffProvider,
+            XAIProvider, TogetherProvider, DeepInfraProvider,
+            SambaNovaProvider, FireworksProvider, PerplexityProvider,
+            HyperbolicProvider, LambdaProvider, VoyageProvider,
+            NovitaProvider,
         )
 
         # ── 3. Optionally discover models ──────────────────────────────
@@ -274,6 +279,10 @@ def init_evolution_providers(*,
             "gemini": 70, "replicate": 80, "deepseek": 90,
             "huggingface": 100, "endpointai": 110,
             "openai": 120, "anthropic": 130, "freebuff": 140,
+            "xai": 150, "together": 160, "deepinfra": 170,
+            "sambanova": 180, "fireworks": 190, "perplexity": 200,
+            "hyperbolic": 210, "lambda": 220, "voyage": 230,
+            "novita": 240,
         }
 
         CLASS_MAP = {
@@ -288,6 +297,19 @@ def init_evolution_providers(*,
             "deepseek": DeepSeekProvider,
             "huggingface": HuggingFaceProvider,
             "endpointai": EndpointAIProvider,
+            "openai": OpenAIProvider,
+            "anthropic": AnthropicProvider,
+            "freebuff": FreebuffProvider,
+            "xai": XAIProvider,
+            "together": TogetherProvider,
+            "deepinfra": DeepInfraProvider,
+            "sambanova": SambaNovaProvider,
+            "fireworks": FireworksProvider,
+            "perplexity": PerplexityProvider,
+            "hyperbolic": HyperbolicProvider,
+            "lambda": LambdaProvider,
+            "voyage": VoyageProvider,
+            "novita": NovitaProvider,
         }
 
         for name in names_in_priority_order():
