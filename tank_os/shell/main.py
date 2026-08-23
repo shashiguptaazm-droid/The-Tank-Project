@@ -116,6 +116,15 @@ _Dashboard = None
 _PowerScreen = None
 _UpdatesScreen = None
 _FilesScreen = None
+_UsbScreen = None
+_DriveScreen = None
+_MissionScreen = None
+_AIBrainScreen = None
+_HealthScreen = None
+_FleetScreen = None
+_JetsonScreen = None
+_CompetitionScreen = None
+_EventCenterScreen = None
 
 
 def _try_load_qt() -> None:
@@ -127,7 +136,9 @@ def _try_load_qt() -> None:
     global _NavigationScreen, _MemoryScreen, _SecurityScreen, _PatrolScreen
     global _DiagnosticsScreen, _SettingsScreen, _DeveloperScreen, _AIScreen
     global _TopBar, _BottomDock, _NotificationsOverlay, _Dashboard
-    global _PowerScreen, _UpdatesScreen, _FilesScreen
+    global _PowerScreen, _UpdatesScreen, _FilesScreen, _UsbScreen
+    global _DriveScreen, _MissionScreen, _AIBrainScreen, _HealthScreen
+    global _FleetScreen, _JetsonScreen, _CompetitionScreen, _EventCenterScreen
 
     if not _USE_QT:
         return
@@ -169,6 +180,15 @@ def _try_load_qt() -> None:
     from tank_os.windows.power_screen import PowerScreen as _pws
     from tank_os.windows.updates_screen import UpdatesScreen as _ups
     from tank_os.windows.files_screen import FilesScreen as _fls
+    from tank_os.windows.usb_screen import UsbScreen as _us
+    from tank_os.windows.drive_screen import DriveScreen as _drs
+    from tank_os.windows.mission_screen import MissionScreen as _msn
+    from tank_os.windows.ai_brain_screen import AIBrainScreen as _abs
+    from tank_os.windows.health_screen import HealthScreen as _hls
+    from tank_os.windows.fleet_screen import FleetScreen as _flt
+    from tank_os.windows.jetson_screen import JetsonScreen as _jts
+    from tank_os.windows.competition_screen import CompetitionScreen as _cps
+    from tank_os.windows.event_center import EventCenterScreen as _ecs
 
     _TopBar, _BottomDock, _NotificationsOverlay, _Dashboard = _tb, _bd, _no, _db
     _HomeScreen, _ChatScreen, _CameraScreen = _hs, _cs, _cms
@@ -176,6 +196,11 @@ def _try_load_qt() -> None:
     _PatrolScreen, _DiagnosticsScreen = _ps, _ds
     _SettingsScreen, _DeveloperScreen, _AIScreen = _sts, _dvs, _ais
     _PowerScreen, _UpdatesScreen, _FilesScreen = _pws, _ups, _fls
+    _UsbScreen = _us
+    _DriveScreen, _MissionScreen = _drs, _msn
+    _AIBrainScreen, _HealthScreen = _abs, _hls
+    _FleetScreen, _JetsonScreen = _flt, _jts
+    _CompetitionScreen, _EventCenterScreen = _cps, _ecs
 
     # Build TankShellMainWindow class (depends on Qt symbols)
     _TankShellMainWindow = _build_main_window_class()
@@ -199,6 +224,16 @@ def _build_main_window_class():
         "power": _PowerScreen,
         "updates": _UpdatesScreen,
         "files": _FilesScreen,
+        "usb": _UsbScreen,
+        # ── GUI blueprint additions (core-7 + extras) ────────────────
+        "drive": _DriveScreen,          # 🕹 Drive
+        "mission": _MissionScreen,      # 🎯 Mission Control
+        "brain": _AIBrainScreen,        # 🧠 AI Brain
+        "health": _HealthScreen,        # 🩺 Robot Health
+        "fleet": _FleetScreen,          # 🟢 ESP32 Fleet
+        "jetson": _JetsonScreen,        # 🟧 Jetson Dashboard
+        "competition": _CompetitionScreen,  # 🏆 Competition Mode
+        "events": _EventCenterScreen,   # 🚨 Event Center
     }
 
     class TankShellMainWindow(QMainWindow):
@@ -313,6 +348,7 @@ def _build_main_window_class():
             self._bus.on("estop_triggered", self._on_estop)
             self._bus.on("hardware_connected", self._on_hardware_event)
             self._bus.on("hardware_disconnected", self._on_hardware_event)
+            self._bus.on("navigate", self._on_navigate_request)
 
         def _on_battery_critical(self, event: Event) -> None:
             self._notifications.error(
@@ -334,6 +370,11 @@ def _build_main_window_class():
                 )
             else:
                 self._notifications.info("E-STOP", "Emergency stop released.")
+
+        def _on_navigate_request(self, event: Event) -> None:
+            screen = event.data.get("screen")
+            if screen in ScreenMap:
+                self._navigate_to(screen)
 
         def _on_hardware_event(self, event: Event) -> None:
             name = event.data.get("name", "device")
@@ -663,6 +704,7 @@ class TankShell:
         print("     power      — Power & Battery Management")
         print("     updates    — Software Updates")
         print("     files      — Files & Storage")
+        print("     usb        — USB Devices")
         print()
         print("  💻 Commands: terminal — drop into the AI terminal REPL")
         print("  🌊 Commands: torrent <query> — search torrents → pick → download")
@@ -724,6 +766,10 @@ class TankShell:
             def do_files(self, _):
                 self._show_screen("files", "📁", "Files & Storage")
                 print("  Volumes | File browser | Disk usage analyzer")
+
+            def do_usb(self, _):
+                self._show_screen("usb", "🔌", "USB Devices")
+                print("  Live device tree | VID:PID | Class | Speed | Drivers | TTY")
 
             def do_chat(self, _):
                 self._show_screen("chat", "💬", "AI Assistant Chat")

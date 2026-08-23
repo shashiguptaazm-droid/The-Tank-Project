@@ -91,12 +91,19 @@ class BottomDock(QFrame):
     screen_changed = Signal(str)
 
     DOCK_ITEMS: List[Tuple[str, str, str]] = [
+        # GUI blueprint core-7 experience + key extras (≤2 clicks)
         ("🏠", "Home", "home"),
+        ("🕹", "Drive", "drive"),
+        ("🎯", "Mission", "mission"),
+        ("🗺", "Map", "navigation"),
+        ("📷", "Vision", "camera"),
+        ("🧠", "AI", "brain"),
+        ("🩺", "Health", "health"),
+        ("🟢", "ESP32", "fleet"),
+        ("🟧", "Jetson", "jetson"),
+        ("🏆", "Compete", "competition"),
+        ("🚨", "Events", "events"),
         ("💬", "Chat", "chat"),
-        ("📷", "Camera", "camera"),
-        ("🗺", "Nav", "navigation"),
-        ("🧠", "AI", "ai"),
-        ("🛡", "Security", "security"),
         ("⚙️", "Settings", "settings"),
     ]
 

@@ -34,6 +34,28 @@ All TankOS GUI screenshots are real captures of the running Qt shell (window-gra
 
 ---
 
+## 🖥 GUI Blueprint — 8 new screens (40–48)
+
+> The robot-OS GUI upgrade — see [`docs/TANKOS_GUI_BLUEPRINT.md`](../TANKOS_GUI_BLUEPRINT.md).
+> Home hub with 8-tile launcher, Drive, Mission, AI Brain, Robot Health,
+> ESP32 Fleet, Jetson dashboard, Competition Mode, Event Center.
+
+| # | Screenshot | Screen | What it shows |
+|---|-----------|--------|---------------|
+| 40 | [home_hub](gui/40_home_hub.png) | **Home hub** | 8-tile launcher (DRIVE/AI/MAP/VISION/MISSION/SENSORS/SYSTEM/TV) + camera/avatar/map/health |
+| 41 | [drive](gui/41_drive.png) | **Drive** | Virtual joystick · track L/R · velocity · heading · E-stop · 5 drive modes |
+| 42 | [mission](gui/42_mission.png) | **Mission Control** | Mission builder chain + 9 mission types |
+| 43 | [ai_brain](gui/43_ai_brain.png) | **AI Brain** | Mission · perception · decision · risk · confidence · action + Why? |
+| 44 | [robot_health](gui/44_robot_health.png) | 🩺 **Robot Health** | 10-subsystem board from live RobotDoctor |
+| 45 | [esp32_fleet](gui/45_esp32_fleet.png) | **ESP32 Fleet** | Live fleet cards (host/serial/heartbeats/firmware) |
+| 46 | [jetson](gui/46_jetson.png) | **Jetson Dashboard** | GPU/CPU/RAM/VRAM · temp · power · AI FPS |
+| 47 | [competition](gui/47_competition.png) | 🏆 **Competition Mode** | One clean screen + DEMO MODE |
+| 48 | [event_center](gui/48_event_center.png) | 🚨 **Event Center** | Filtered EventBus stream |
+
+![Contact sheet](gui/contact_sheet_gui.png)
+
+---
+
 ## Web features
 
 | # | Screenshot | Feature | Verified |

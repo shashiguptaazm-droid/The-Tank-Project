@@ -180,6 +180,32 @@ Full tracker: [`docs/UNOQ_AI_PLAN.md`](docs/UNOQ_AI_PLAN.md) — all 150 items m
 
 ---
 
+## 7¾¾. 🖥 TankOS — One GUI, 15 Modes (Robot OS Blueprint)
+
+The TankOS GUI now behaves like a **robot operating system**, not a pile of
+dashboards — one shell, one EventBus, many backends. The blueprint's
+**core-7** (Home → Drive → Mission → Map → Vision → AI → Health) is live,
+plus 8 new screens with screenshots:
+
+| # | Screen | # | Screen |
+|---|--------|---|--------|
+| 40 | **Home hub** (8-tile launcher) | 45 | **ESP32 Fleet** |
+| 41 | **Drive** (joystick, E-stop, 5 modes) | 46 | **Jetson Dashboard** |
+| 42 | **Mission Control** (builder) | 47 | 🏆 **Competition Mode** |
+| 43 | **AI Brain** (decision + Why?) | 48 | 🚨 **Event Center** |
+| 44 | 🩺 **Robot Health** | | |
+
+| | |
+|---|---|
+| ![Home hub](docs/screenshots/gui/40_home_hub.png) | ![Drive](docs/screenshots/gui/41_drive.png) |
+| ![Mission](docs/screenshots/gui/42_mission.png) | ![AI Brain](docs/screenshots/gui/43_ai_brain.png) |
+| ![Robot Health](docs/screenshots/gui/44_robot_health.png) | ![ESP32 Fleet](docs/screenshots/gui/45_esp32_fleet.png) |
+| ![Jetson](docs/screenshots/gui/46_jetson.png) | ![Competition](docs/screenshots/gui/47_competition.png) |
+
+Full blueprint + audit: [`docs/TANKOS_GUI_BLUEPRINT.md`](docs/TANKOS_GUI_BLUEPRINT.md) · **310 tests passing**.
+
+---
+
 ## 8. Real Build Photos
 
 <p align="center">
@@ -223,6 +249,7 @@ Full tracker: [`docs/UNOQ_AI_PLAN.md`](docs/UNOQ_AI_PLAN.md) — all 150 items m
 | [`docs/screenshots/README.md`](docs/screenshots/README.md) | All feature screenshots with verification notes |
 | [`docs/UNOQ_MASTER_PLAN.md`](docs/UNOQ_MASTER_PLAN.md) | 400-item UNO Q upgrade tracker + top-20 audit |
 | [`docs/UNOQ_AI_PLAN.md`](docs/UNOQ_AI_PLAN.md) | 150-item UNO Q local-AI tracker + Robot Doctor & AI Supervisor |
+| [`docs/TANKOS_GUI_BLUEPRINT.md`](docs/TANKOS_GUI_BLUEPRINT.md) | 15-mode robot-OS GUI blueprint + 8 new screens |
 | [`docs/FEATURE_PROOF_TEMPLATE.md`](docs/FEATURE_PROOF_TEMPLATE.md) | Mandatory proof template for every feature |
 | [`WIRING.md`](WIRING.md) | Pin-level wiring, I²C map, power rails |
 | [`hardware.md`](hardware.md) | Full BOM with photos |

@@ -5,12 +5,14 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (
     QFrame, QGridLayout, QHBoxLayout, QLabel, QSizePolicy,
     QVBoxLayout, QWidget,
 )
 
+from tank_os.core.event_bus import Event, EventBus
+from tank_os.core.power_manager import PowerManager
 from tank_os.widgets.ai_avatar import AIAvatar
 from tank_os.widgets.camera_widget import CameraWidget
 from tank_os.widgets.map_widget import MapWidget
@@ -25,6 +27,8 @@ class HomeScreen(QWidget):
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
         self.setObjectName("homeScreen")
+        self._bus = EventBus()
+        self._power = PowerManager()
 
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(12, 12, 12, 12)
@@ -70,12 +74,28 @@ class HomeScreen(QWidget):
 
         main_layout.addLayout(grid, 1)
 
+        # ── Launcher grid (GUI blueprint — everything ≤ 2 clicks) ──────
+        launcher = QHBoxLayout()
+        launcher.setSpacing(8)
+        self._tiles: dict = {}
+        tile_defs = [
+            ("🤖", "DRIVE", "drive"), ("🧠", "AI", "brain"),
+            ("🗺", "MAP", "navigation"), ("📷", "VISION", "camera"),
+            ("🎯", "MISSION", "mission"), ("📡", "SENSORS", "diagnostics"),
+            ("⚙", "SYSTEM", "settings"), ("📺", "TV", "files"),
+        ]
+        for icon, label, screen in tile_defs:
+            tile = self._make_tile(icon, label, screen)
+            self._tiles[screen] = tile
+            launcher.addWidget(tile)
+        main_layout.addLayout(launcher)
+
         # Quick action buttons
         actions = QHBoxLayout()
         actions.setSpacing(10)
         for text, icon in [
             ("Start Camera", "📷"), ("Run Diagnostics", "🔍"),
-            ("Navigate Home", "🏠"), ("Emergency Stop", "⛔"),
+            ("🏆 Compete", "🏆"), ("Emergency Stop", "⛔"),
         ]:
             btn = self._make_action_btn(icon, text)
             actions.addWidget(btn)
@@ -102,6 +122,41 @@ class HomeScreen(QWidget):
         layout.addWidget(title_lbl)
         return frame
 
+    def _make_tile(self, icon: str, label: str, screen: str) -> QFrame:
+        """A launcher tile that navigates to a screen via the EventBus."""
+        frame = QFrame()
+        frame.setObjectName("homeTile")
+        frame.setCursor(Qt.PointingHandCursor)
+        frame.setStyleSheet("""
+            #homeTile {
+                background: rgba(0,191,255,0.10);
+                border: 1px solid rgba(0,191,255,0.25);
+                border-radius: 12px;
+            }
+            #homeTile:hover {
+                background: rgba(0,191,255,0.22);
+                border: 1px solid rgba(0,191,255,0.5);
+            }
+        """)
+        lay = QVBoxLayout(frame)
+        lay.setContentsMargins(8, 8, 8, 8)
+        lay.setSpacing(2)
+        icon_lbl = QLabel(icon)
+        icon_lbl.setAlignment(Qt.AlignCenter)
+        icon_lbl.setStyleSheet("font-size: 20px; background: transparent;")
+        lay.addWidget(icon_lbl)
+        text_lbl = QLabel(label)
+        text_lbl.setAlignment(Qt.AlignCenter)
+        text_lbl.setStyleSheet(
+            "font-size: 9px; font-weight: bold; color: #80D8FF; background: transparent;")
+        lay.addWidget(text_lbl)
+        frame.mousePressEvent = lambda e, s=screen: self._navigate(s)
+        return frame
+
+    def _navigate(self, screen: str) -> None:
+        self._bus.emit(Event("navigate", {"screen": screen},
+                             source="home_screen"))
+
     def _make_action_btn(self, icon: str, text: str) -> QLabel:
         label = QLabel(f"{icon} {text}")
         label.setCursor(Qt.PointingHandCursor)
@@ -123,6 +178,8 @@ class HomeScreen(QWidget):
             self._camera.start()
         elif "Stop" in text:
             self._camera.stop()
+        elif "Compete" in text:
+            self._navigate("competition")
 
     def on_enter(self) -> None:
         """Called when this screen becomes active."""

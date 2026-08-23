@@ -42,6 +42,8 @@
 >
 > 🧠 **UNO Q AI Plan:** [`docs/UNOQ_AI_PLAN.md`](docs/UNOQ_AI_PLAN.md) — 150 local-AI features · **`tank unoq doctor`** (Robot Doctor) + **`tank unoq supervisor`** (AI can recommend, safety can veto)
 >
+> 🖥 **GUI Blueprint:** [`docs/TANKOS_GUI_BLUEPRINT.md`](docs/TANKOS_GUI_BLUEPRINT.md) — 15-mode robot-OS GUI · core-7 (Home→Drive→Mission→Map→Vision→AI→Health) · 8 new screens · screenshots in [`docs/screenshots/gui/`](docs/screenshots/gui/)
+>
 > 🎬 **Presentation:** [`PRESENTATION.md`](PRESENTATION.md) — the full deck with hero banner, hardware wall, fleet map, and screenshots
 >
 > [`docs/HARDWARE_DEPENDENCIES.md §8`](docs/HARDWARE_DEPENDENCIES.md#8-hardware-photo-gallery) (photo gallery) ·

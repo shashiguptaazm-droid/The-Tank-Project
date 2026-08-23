@@ -248,4 +248,7 @@ Captured in `scripts/provision_pi5.sh`:
   shipped **AI Supervisor** (confidence arbitration — AI can recommend, safety can veto) +
   **Robot Doctor** (`tank unoq doctor` — 10-subsystem health, fault-injection acceptance test)
 - [x] **38 new AI tests** (supervisor 12 + robot doctor 26) — full suite now **300 passing**
+- [x] **TankOS GUI Blueprint** ([`docs/TANKOS_GUI_BLUEPRINT.md`](docs/TANKOS_GUI_BLUEPRINT.md)) — core-7
+  (Home hub · Drive · Mission · AI Brain · Robot Health) + ESP32 Fleet · Jetson dashboard ·
+  🏆 Competition Mode · 🚨 Event Center — 8 new screens, 10 new tests (**310 passing**)
 - [ ] Remaining ⬜/🔶 items (benchmarks §R, gamepad input, HIL rig, MCU watchdog) — tracked in the master plan
