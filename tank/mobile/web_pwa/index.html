@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a1a">
+<title>🤖 TankOS Command Center</title>
+<link rel="manifest" href="/app/manifest.json">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0a0a1a;--card:#12122a;--border:#1a1a3e;--accent:#00ff88;--warn:#ffd93d;--danger:#ff6b6b;--text:#e0e0e0;--dim:#666;--blue:#4da6ff;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.header{background:linear-gradient(135deg,#0d0d2b,#1a1a3e);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border);backdrop-filter:blur(20px)}
+.header h1{font-size:16px;color:var(--accent);display:flex;align-items:center;gap:6px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--danger);animation:pulse 2s infinite}
+.status-dot.online{background:var(--accent)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.tabs{display:flex;overflow-x:auto;padding:8px;gap:6px;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;background:var(--card);border:1px solid var(--border);color:var(--dim);cursor:pointer;white-space:nowrap;transition:.2s}
+.tab.active{background:var(--accent);color:#000;border-color:var(--accent)}
+.tab:hover{border-color:var(--accent)}
+.page{display:none;padding:12px;animation:fadeIn .3s}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.card h3{font-size:13px;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px}
+.metric{background:rgba(0,255,136,.05);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center}
+.metric .value{font-size:22px;font-weight:700;color:var(--accent)}
+.metric .label{font-size:10px;color:var(--dim);margin-top:2px}
+.camera-view{width:100%;aspect-ratio:4/3;background:#000;border-radius:var(--radius);overflow:hidden;position:relative;border:2px solid var(--border)}
+.camera-view img{width:100%;height:100%;object-fit:contain}
+.camera-view .overlay{position:absolute;bottom:8px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:center}
+.camera-view .fps{background:rgba(0,0,0,.7);padding:2px 8px;border-radius:4px;font-size:10px;color:var(--accent)}
+.cam-btns{display:flex;gap:8px;margin-top:8px}
+.cam-btn{flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;text-align:center}
+.cam-btn:active{background:var(--accent);color:#000}
+.joystick{width:200px;height:200px;border-radius:50%;background:rgba(0,255,136,.05);border:2px solid var(--border);position:relative;margin:20px auto;touch-action:none}
+.joystick-knob{width:60px;height:60px;border-radius:50%;background:var(--accent);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 20px rgba(0,255,136,.3);transition:transform .1s}
+.control-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:260px;margin:0 auto}
+.ctrl-btn{padding:14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card);color:var(--text);font-size:18px;text-align:center;cursor:pointer;transition:.15s}
+.ctrl-btn:active{background:var(--accent);color:#000;transform:scale(.95)}
+.ctrl-btn.stop{background:rgba(255,107,107,.1);border-color:var(--danger);color:var(--danger)}
+.ctrl-btn.stop:active{background:var(--danger);color:#fff}
+.speed-slider{width:100%;margin:12px 0;accent-color:var(--accent)}
+.chat-messages{max-height:50vh;overflow-y:auto;padding:8px}
+.chat-msg{padding:8px 12px;border-radius:12px;margin-bottom:6px;max-width:85%;font-size:13px;line-height:1.4;animation:fadeIn .3s}
+.chat-msg.user{background:var(--accent);color:#000;margin-left:auto;border-bottom-right-radius:4px}
+.chat-msg.bot{background:var(--card);border:1px solid var(--border);border-bottom-left-radius:4px}
+.chat-msg.system{background:rgba(255,217,61,.1);border:1px solid rgba(255,217,61,.3);color:var(--warn);font-size:11px;text-align:center;max-width:100%}
+.chat-input{display:flex;gap:8px;padding:8px;background:var(--card);border-top:1px solid var(--border);position:sticky;bottom:0}
+.chat-input input{flex:1;padding:10px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;outline:none}
+.chat-input button{padding:10px 18px;border-radius:20px;border:none;background:var(--accent);color:#000;font-weight:700;cursor:pointer}
+.alert-list{max-height:40vh;overflow-y:auto}
+.alert-item{padding:8px 10px;border-radius:8px;margin-bottom:6px;font-size:12px;display:flex;gap:8px;align-items:flex-start;border-left:3px solid var(--warn)}
+.alert-item.threat{border-left-color:var(--danger);background:rgba(255,107,107,.05)}
+.alert-item.info{border-left-color:var(--blue);background:rgba(77,166,255,.05)}
+.alert-item .time{color:var(--dim);font-size:10px;white-space:nowrap}
+.sensor-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sensor-card{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:10px}
+.sensor-card .name{font-size:11px;color:var(--dim)}
+.sensor-card .val{font-size:16px;font-weight:700;color:var(--accent)}
+.lidar-canvas{width:100%;aspect-ratio:1;background:#0d0d1a;border-radius:var(--radius);border:1px solid var(--border)}
+.sms-form{display:flex;flex-direction:column;gap:8px}
+.sms-form input,.sms-form textarea{padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;outline:none}
+.sms-form button{padding:12px;border-radius:8px;border:none;background:var(--accent);color:#000;font-weight:700;cursor:pointer}
+.server-url{font-size:10px;color:var(--dim);text-align:center;padding:4px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span class="status-dot" id="statusDot"></span> TankOS</h1>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span id="connLabel" style="font-size:11px;color:var(--dim)">Connecting...</span>
+    <span style="font-size:10px;color:var(--dim)" id="clockLabel"></span>
+  </div>
+</div>
+
+<div class="tabs" id="tabs">
+  <div class="tab active" data-page="dashboard">🏠</div>
+  <div class="tab" data-page="camera">📷</div>
+  <div class="tab" data-page="drive">🎮</div>
+  <div class="tab" data-page="sensors">📡</div>
+  <div class="tab" data-page="ai">🧠</div>
+  <div class="tab" data-page="alerts">🔔</div>
+  <div class="tab" data-page="sms">💬</div>
+  <div class="tab" data-page="lidar">🗺️</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="card">
+    <h3>🤖 System Status</h3>
+    <div class="metric-grid">
+      <div class="metric"><div class="value" id="cpuVal">--</div><div class="label">CPU %</div></div>
+      <div class="metric"><div class="value" id="ramVal">--</div><div class="label">RAM %</div></div>
+      <div class="metric"><div class="value" id="battVal">--</div><div class="label">Battery</div></div>
+      <div class="metric"><div class="value" id="signalVal">--</div><div class="label">4G Signal</div></div>
+      <div class="metric"><div class="value" id="modeVal">--</div><div class="label">Mode</div></div>
+      <div class="metric"><div class="value" id="tempVal">--</div><div class="label">Temp °C</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>⚡ Quick Actions</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="ctrl-btn" onclick="sendCmd('STATUS')">📊 Status</button>
+      <button class="ctrl-btn" onclick="captureAndShow()">📷 Snap</button>
+      <button class="ctrl-btn" onclick="sendCmd('SCAN')">🗺️ Scan</button>
+      <button class="ctrl-btn stop" onclick="sendCmd('STOP')">🛑 E-STOP</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📋 Recent Alerts</h3>
+    <div id="dashAlerts" class="alert-list" style="max-height:150px"></div>
+  </div>
+</div>
+
+<!-- CAMERA -->
+<div class="page" id="page-camera">
+  <div class="card">
+    <div class="camera-view" id="cameraView">
+      <img id="cameraImg" src="" alt="Camera Feed" style="display:none">
+      <div id="cameraPlaceholder" style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:14px">
+        📷 Tap "Capture" to get a frame
+      </div>
+      <div class="overlay">
+        <span class="fps" id="camFps">0 FPS</span>
+        <span class="fps" id="camRes">--</span>
+      </div>
+    </div>
+    <div class="cam-btns">
+      <button class="cam-btn" onclick="captureAndShow()">📸 Capture</button>
+      <button class="cam-btn" onclick="toggleStream()" id="streamBtn">▶️ Stream</button>
+      <button class="cam-btn" onclick="saveFrame()">💾 Save</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📐 Resolution</h3>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="cam-btn" onclick="setRes('QVGA')">320×240</button>
+      <button class="cam-btn" onclick="setRes('VGA')" style="border-color:var(--accent)">640×480</button>
+      <button class="cam-btn" onclick="setRes('SVGA')">800×600</button>
+      <button class="cam-btn" onclick="setRes('XGA')">1024×768</button>
+    </div>
+  </div>
+</div>
+
+<!-- DRIVE -->
+<div class="page" id="page-drive">
+  <div class="card">
+    <h3>🎮 Joystick Control</h3>
+    <div class="joystick" id="joystick">
+      <div class="joystick-knob" id="joystickKnob"></div>
+    </div>
+    <div style="text-align:center;margin-top:8px">
+      <label style="font-size:11px;color:var(--dim)">Speed</label>
+      <input type="range" class="speed-slider" id="speedSlider" min="0" max="255" value="180">
+      <span id="speedVal" style="font-size:12px;color:var(--accent)">180</span>
+    </div>
+  </div>
+  <div class="card">
+    <h3>🕹️ D-Pad</h3>
+    <div class="control-grid">
+      <div></div>
+      <button class="ctrl-btn" ontouchstart="moveDir('forward')" ontouchend="moveDir('stop')">⬆️</button>
+      <div></div>
+      <button class="ctrl-btn" ontouchstart="moveDir('left')" ontouchend="moveDir('stop')">⬅️</button>
+      <button class="ctrl-btn stop" onclick="moveDir('stop')">⏹️</button>
+      <button class="ctrl-btn" ontouchstart="moveDir('right')" ontouchend="moveDir('stop')">➡️</button>
+      <div></div>
+      <button class="ctrl-btn" ontouchstart="moveDir('backward')" ontouchend="moveDir('stop')">⬇️</button>
+      <div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>🦾 Servo Control</h3>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div style="flex:1;min-width:120px">
+        <label style="font-size:11px;color:var(--dim)">Pan</label>
+        <input type="range" class="speed-slider" min="0" max="180" value="90" oninput="setServo('pan',this.value)">
+      </div>
+      <div style="flex:1;min-width:120px">
+        <label style="font-size:11px;color:var(--dim)">Tilt</label>
+        <input type="range" class="speed-slider" min="0" max="180" value="90" oninput="setServo('tilt',this.value)">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SENSORS -->
+<div class="page" id="page-sensors">
+  <div class="card">
+    <h3>📡 Live Sensors</h3>
+    <div class="sensor-grid">
+      <div class="sensor-card"><div class="name">🧭 IMU Accel</div><div class="val" id="imuAcc">---</div></div>
+      <div class="sensor-card"><div class="name">🔄 IMU Gyro</div><div class="val" id="imuGyr">---</div></div>
+      <div class="sensor-card"><div class="name">📏 Distance L</div><div class="val" id="distL">---</div></div>
+      <div class="sensor-card"><div class="name">📏 Distance R</div><div class="val" id="distR">---</div></div>
+      <div class="sensor-card"><div class="name">🌡️ Temperature</div><div class="val" id="tempSens">---</div></div>
+      <div class="sensor-card"><div class="name">💡 Light Level</div><div class="val" id="lightLvl">---</div></div>
+      <div class="sensor-card"><div class="name">🔊 Sound Level</div><div class="val" id="soundLvl">---</div></div>
+      <div class="sensor-card"><div class="name">🔋 Voltage</div><div class="val" id="voltage">---</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>⚙️ Motor Status</h3>
+    <div class="metric-grid">
+      <div class="metric"><div class="value" id="motorL">0</div><div class="label">Left PWM</div></div>
+      <div class="metric"><div class="value" id="motorR">0</div><div class="label">Right PWM</div></div>
+      <div class="metric"><div class="value" id="encL">0</div><div class="label">Enc L</div></div>
+      <div class="metric"><div class="value" id="encR">0</div><div class="label">Enc R</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- AI CHAT -->
+<div class="page" id="page-ai">
+  <div class="card" style="padding:0;display:flex;flex-direction:column;height:70vh">
+    <div style="padding:10px;border-bottom:1px solid var(--border)">
+      <h3 style="margin:0">🧠 TankOS AI Assistant</h3>
+      <div style="font-size:10px;color:var(--dim)" id="aiModel">Model: loading...</div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-msg system">🤖 TankOS AI ready. Send a message or use commands.</div>
+    </div>
+    <div class="chat-input">
+      <input type="text" id="chatInput" placeholder="Ask Tank anything..." onkeypress="if(event.key==='Enter')sendChat()">
+      <button onclick="sendChat()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- ALERTS -->
+<div class="page" id="page-alerts">
+  <div class="card">
+    <h3>🔔 Alert Feed</h3>
+    <div id="alertFeed" class="alert-list"></div>
+  </div>
+</div>
+
+<!-- SMS -->
+<div class="page" id="page-sms">
+  <div class="card">
+    <h3>💬 SMS Gateway</h3>
+    <div class="sms-form">
+      <input type="text" id="smsPhone" placeholder="Phone number (e.g. +918306125819)">
+      <textarea id="smsMessage" rows="3" placeholder="Type SMS message..."></textarea>
+      <button onclick="sendSMS()">📤 Send SMS</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📢 Broadcast Alert</h3>
+    <div class="sms-form">
+      <textarea id="broadcastMsg" rows="2" placeholder="Alert message to broadcast..."></textarea>
+      <div style="display:flex;gap:8px">
+        <button onclick="broadcastSMS('normal')" style="flex:1;background:var(--warn)">⚠️ Normal</button>
+        <button onclick="broadcastSMS('high')" style="flex:1;background:var(--danger)">🚨 Urgent</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📜 SMS Log</h3>
+    <div id="smsLog" style="max-height:200px;overflow-y:auto;font-size:11px;font-family:monospace"></div>
+  </div>
+</div>
+
+<!-- LIDAR -->
+<div class="page" id="page-lidar">
+  <div class="card">
+    <h3>🗺️ LiDAR Map</h3>
+    <canvas class="lidar-canvas" id="lidarCanvas"></canvas>
+    <div style="margin-top:8px;display:flex;gap:8px">
+      <button class="cam-btn" onclick="requestScan()">📡 Scan</button>
+      <button class="cam-btn" onclick="clearLidar()">🗑️ Clear</button>
+    </div>
+  </div>
+</div>
+
+<div class="server-url" id="serverUrl"></div>
+
+<script>
+// === CONFIG ===
+const API_BASE = window.location.origin;
+let ws = null;
+let streaming = false;
+let streamInterval = null;
+let frameCount = 0;
+let lastFrameTime = Date.now();
+let alerts = [];
+let lidarData = [];
+
+// === TABS ===
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('page-' + tab.dataset.page).classList.add('active');
+  });
+});
+
+// === CLOCK ===
+setInterval(() => {
+  document.getElementById('clockLabel').textContent = new Date().toLocaleTimeString();
+}, 1000);
+
+// === WEBSOCKET ===
+function connectWS() {
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  ws = new WebSocket(`${proto}//${location.host}/ws`);
+  ws.onopen = () => {
+    document.getElementById('statusDot').classList.add('online');
+    document.getElementById('connLabel').textContent = 'Connected';
+  };
+  ws.onclose = () => {
+    document.getElementById('statusDot').classList.remove('online');
+    document.getElementById('connLabel').textContent = 'Reconnecting...';
+    setTimeout(connectWS, 3000);
+  };
+  ws.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    handleWSMessage(data);
+  };
+}
+
+function handleWSMessage(data) {
+  if (data.type === 'alert') {
+    addAlert(data.alert);
+  } else if (data.type === 'motor') {
+    document.getElementById('motorL').textContent = data.left;
+    document.getElementById('motorR').textContent = data.right;
+  } else if (data.type === 'reply') {
+    addChatMsg('bot', data.text);
+  }
+}
+
+// === API CALLS ===
+async function api(path, method='GET', body=null) {
+  try {
+    const opts = { method, headers: {'Content-Type': 'application/json'} };
+    if (body) opts.body = JSON.stringify(body);
+    const resp = await fetch(API_BASE + path, opts);
+    return await resp.json();
+  } catch(e) { return {error: e.message}; }
+}
+
+// === SYSTEM STATUS ===
+async function updateSystem() {
+  const data = await api('/api/system');
+  if (data.error) return;
+  document.getElementById('cpuVal').textContent = Math.round(data.cpu_percent) + '%';
+  document.getElementById('ramVal').textContent = Math.round(data.ram_percent) + '%';
+  if (data.modem && data.modem.signal) {
+    document.getElementById('signalVal').textContent = data.modem.signal.quality;
+  }
+  const robot = await api('/api/robot');
+  if (robot.robot_state) {
+    document.getElementById('modeVal').textContent = robot.robot_state.mode;
+  }
+}
+setInterval(updateSystem, 3000);
+
+// === CAMERA ===
+async function captureAndShow() {
+  document.getElementById('cameraPlaceholder').textContent = '⏳ Capturing...';
+  document.getElementById('cameraPlaceholder').style.display = 'flex';
+  document.getElementById('cameraImg').style.display = 'none';
+  const data = await api('/api/camera/capture', 'POST');
+  if (data.success) {
+    const img = document.getElementById('cameraImg');
+    img.src = API_BASE + '/api/camera/frame?t=' + Date.now();
+    img.style.display = 'block';
+    document.getElementById('cameraPlaceholder').style.display = 'none';
+    document.getElementById('camRes').textContent = `${data.width}×${data.height}`;
+    frameCount++;
+    const fps = 1000 / (Date.now() - lastFrameTime);
+    document.getElementById('camFps').textContent = Math.round(fps) + ' FPS';
+    lastFrameTime = Date.now();
+  } else {
+    document.getElementById('cameraPlaceholder').textContent = '❌ Capture failed: ' + (data.error || 'unknown');
+  }
+}
+
+function toggleStream() {
+  streaming = !streaming;
+  const btn = document.getElementById('streamBtn');
+  if (streaming) {
+    btn.textContent = '⏸️ Stop';
+    streamInterval = setInterval(captureAndShow, 200);
+  } else {
+    btn.textContent = '▶️ Stream';
+    clearInterval(streamInterval);
+  }
+}
+
+function saveFrame() {
+  const a = document.createElement('a');
+  a.href = API_BASE + '/api/camera/frame?t=' + Date.now();
+  a.download = 'tank_' + Date.now() + '.jpg';
+  a.click();
+}
+
+function setRes(res) {
+  api('/api/command', 'POST', {command: 'RES', args: {resolution: res}});
+}
+
+// === DRIVE ===
+async function moveDir(dir) {
+  if (dir === 'stop') {
+    await api('/api/stop', 'POST');
+  } else {
+    const speed = parseInt(document.getElementById('speedSlider').value);
+    await api('/api/move', 'POST', {command: 'move', args: {direction: dir, speed}});
+  }
+}
+
+document.getElementById('speedSlider').addEventListener('input', function() {
+  document.getElementById('speedVal').textContent = this.value;
+});
+
+// Joystick
+const joystick = document.getElementById('joystick');
+const knob = document.getElementById('joystickKnob');
+let joyActive = false;
+let joyTimeout = null;
+
+function handleJoystick(clientX, clientY) {
+  const rect = joystick.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  let dx = (clientX - cx) / (rect.width / 2);
+  let dy = (clientY - cy) / (rect.height / 2);
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  if (dist > 1) { dx /= dist; dy /= dist; }
+  knob.style.transform = `translate(calc(-50% + ${dx*60}px), calc(-50% + ${dy*60}px))`;
+
+  const left = Math.round((-dy + dx) * 127);
+  const right = Math.round((-dy - dx) * 127);
+  const speed = parseInt(document.getElementById('speedSlider').value);
+  const l = Math.round(left * speed / 255);
+  const r = Math.round(right * speed / 255);
+  api('/api/motors', 'POST', {command: 'motors', args: {left: l, right: r}});
+}
+
+joystick.addEventListener('touchstart', (e) => { joyActive = true; e.preventDefault(); });
+joystick.addEventListener('touchmove', (e) => {
+  if (joyActive) handleJoystick(e.touches[0].clientX, e.touches[0].clientY);
+  e.preventDefault();
+});
+joystick.addEventListener('touchend', () => {
+  joyActive = false;
+  knob.style.transform = 'translate(-50%, -50%)';
+  api('/api/motors', 'POST', {command: 'motors', args: {left: 0, right: 0}});
+});
+joystick.addEventListener('mousedown', (e) => { joyActive = true; handleJoystick(e.clientX, e.clientY); });
+document.addEventListener('mousemove', (e) => { if (joyActive) handleJoystick(e.clientX, e.clientY); });
+document.addEventListener('mouseup', () => {
+  if (joyActive) { joyActive = false; knob.style.transform = 'translate(-50%, -50%)'; api('/api/motors', 'POST', {command: 'motors', args: {left: 0, right: 0}}); }
+});
+
+function setServo(axis, val) {
+  api('/api/command', 'POST', {command: 'SERVO', args: {axis, angle: parseInt(val)}});
+}
+
+// === AI CHAT ===
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  addChatMsg('user', text);
+  const data = await api('/api/sms/command', 'POST', {command: text, args: {}});
+  if (data.reply) addChatMsg('bot', data.reply);
+}
+
+function addChatMsg(role, text) {
+  const div = document.getElementById('chatMessages');
+  const msg = document.createElement('div');
+  msg.className = 'chat-msg ' + role;
+  msg.textContent = text;
+  div.appendChild(msg);
+  div.scrollTop = div.scrollHeight;
+}
+
+// === ALERTS ===
+function addAlert(alert) {
+  alerts.unshift(alert);
+  if (alerts.length > 50) alerts.pop();
+  renderAlerts();
+}
+
+function renderAlerts() {
+  const feed = document.getElementById('alertFeed');
+  const dash = document.getElementById('dashAlerts');
+  feed.innerHTML = '';
+  dash.innerHTML = '';
+  alerts.slice(0, 20).forEach(a => {
+    const div = document.createElement('div');
+    div.className = 'alert-item ' + (a.type || '');
+    div.innerHTML = `<span class="time">${new Date(a.timestamp).toLocaleTimeString()}</span><span>${a.message}</span>`;
+    feed.appendChild(div);
+    if (alerts.indexOf(a) < 3) dash.appendChild(div.cloneNode(true));
+  });
+}
+
+async function loadAlerts() {
+  const data = await api('/api/alerts');
+  if (data.alerts) { alerts = data.alerts.reverse(); renderAlerts(); }
+}
+
+// === SMS ===
+async function sendSMS() {
+  const phone = document.getElementById('smsPhone').value;
+  const msg = document.getElementById('smsMessage').value;
+  if (!phone || !msg) return;
+  const data = await api('/api/sms/send', 'POST', {phone, message: msg});
+  addSMSLog('OUT', phone, msg, data.success);
+  document.getElementById('smsMessage').value = '';
+}
+
+async function broadcastSMS(priority) {
+  const msg = document.getElementById('broadcastMsg').value;
+  if (!msg) return;
+  await api('/api/alert', 'POST', {alert_type: 'info', message: msg, priority});
+  document.getElementById('broadcastMsg').value = '';
+}
+
+function addSMSLog(dir, phone, msg, status) {
+  const log = document.getElementById('smsLog');
+  const line = document.createElement('div');
+  line.style.cssText = 'padding:4px 0;border-bottom:1px solid var(--border)';
+  const dirEmoji = dir === 'IN' ? '📥' : '📤';
+  line.innerHTML = `${dirEmoji} <span style="color:${status?'var(--accent)':'var(--danger)'}">${status?'✓':'✗'}</span> ${phone}: ${msg}`;
+  log.prepend(line);
+}
+
+// === LIDAR ===
+function requestScan() { api('/api/command', 'POST', {command: 'SCAN', args: {}}); }
+function clearLidar() { lidarData = []; drawLidar(); }
+
+function drawLidar() {
+  const canvas = document.getElementById('lidarCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width = canvas.offsetWidth;
+  const h = canvas.height = canvas.offsetHeight;
+  const cx = w / 2, cy = h / 2;
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = 'rgba(0,255,136,0.05)';
+  ctx.beginPath(); ctx.arc(cx, cy, Math.min(w,h)/2 - 10, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = 'rgba(0,255,136,0.15)';
+  for (let r = 30; r < Math.min(w,h)/2; r += 30) {
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.stroke();
+  }
+  if (lidarData.length) {
+    ctx.fillStyle = 'var(--accent)';
+    lidarData.forEach(p => {
+      const x = cx + p.x * 0.5;
+      const y = cy + p.y * 0.5;
+      ctx.fillStyle = p.danger ? 'var(--danger)' : 'var(--accent)';
+      ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2); ctx.fill();
+    });
+  }
+}
+
+// === INIT ===
+connectWS();
+updateSystem();
+loadAlerts();
+document.getElementById('serverUrl').textContent = API_BASE;
+
+// Request notification permission
+if ('Notification' in window && Notification.permission === 'default') {
+  Notification.requestPermission();
+}
+</script>
+</body>
+</html>
