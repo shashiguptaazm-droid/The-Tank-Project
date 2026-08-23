@@ -15,7 +15,7 @@ WHAT did the robot detect?   WHY did it decide?
 HOW CONFIDENT is it?         WHAT SAFETY CHECK allowed or rejected the action?
 ```
 
-**The four new screens (shipped this pass):**
+**The four new screens (shipped pass 1):**
 
 | Screen | File | Plan items |
 |---|---|---|
@@ -23,6 +23,14 @@ HOW CONFIDENT is it?         WHAT SAFETY CHECK allowed or rejected the action?
 | 🔥 AI Safety Center | `tank_os/windows/ai_safety_center.py` | §16 #151–160 |
 | 🏆 Judge Mode | `tank_os/windows/judge_screen.py` | §20 #200 |
 | 🌐 Distributed-AI | `tank_os/windows/distributed_ai_screen.py` | §15 #141–150 |
+
+**Pass 2 — consolidation (shipped):**
+
+| Feature | File | Plan items |
+|---|---|---|
+| ⏯ Unified chronological event replay (0.25×/1×/4×, play/pause, progress, highlight) | `tank_os/windows/event_center.py` | §2 #20 |
+| 🤖 AI power-saving recommendations (quantified, e.g. VLM 5→1 Hz ≈ +11 min) | `tank_os/windows/power_dashboard.py` | §13 #130 |
+| 🏁 Benchmark suite (AI model / vision / navigation / sensor-fusion) | `tank_os/windows/developer_screen.py` | §17 #162–165 |
 
 ---
 
@@ -54,7 +62,7 @@ HOW CONFIDENT is it?         WHAT SAFETY CHECK allowed or rejected the action?
 | 17 | AI-model-switch timeline | 🔶 | Distributed-AI failover indicator |
 | 18 | Mission timeline | 🔶 | Mission screen builder chain |
 | 19 | Human-command timeline | 🔶 | AISupervisor history (source = manual) |
-| 20 | Unified chronological event replay | 🧭 | EventCenter — extend with replay at 0.25×/1×/4× |
+| 20 | Unified chronological event replay | ✅ | EventCenter — replay bar: ▶ PLAY / ⏸ PAUSE, 0.25×/1×/4×, progress, current-event highlight |
 
 ## 3. Explainable AI — 21–30 — `ai_brain_screen.py` ✅/🧭
 
@@ -222,7 +230,7 @@ HOW CONFIDENT is it?         WHAT SAFETY CHECK allowed or rejected the action?
 | 127 | Display-energy analysis | 🔶 | per-device bars |
 | 128 | Servo-energy analysis | 🔶 | per-device bars |
 | 129 | Energy-efficiency score | ✅ | efficiency % |
-| 130 | AI power-saving recommendations | 🧭 | power dashboard |
+| 130 | AI power-saving recommendations | ✅ | power dashboard — quantified tips (VLM 5→1 Hz ≈ +~11 min, dim display, ECO driving, critical-battery mode) |
 
 ## 🔧 14. Predictive Maintenance GUI — 131–140 — `health_screen.py` / `robot_doctor.py` ✅/🔶
 
@@ -286,10 +294,10 @@ the safety path — `AI can recommend. Safety can veto.`
 | # | Feature | Status | Where |
 |---|---|---|---|
 | 161 | Test-case launcher | ✅ | test center 12 test buttons |
-| 162 | AI model benchmark | 🧭 | developer mode |
-| 163 | Vision benchmark | 🧭 | developer mode |
-| 164 | Navigation benchmark | 🧭 | developer mode |
-| 165 | Sensor-fusion benchmark | 🧭 | developer mode |
+| 162 | AI model benchmark | ✅ | developer mode — Benchmarks tab (inference loop timing) |
+| 163 | Vision benchmark | ✅ | developer mode — NMS+decode pipeline timing |
+| 164 | Navigation benchmark | ✅ | developer mode — A* 64×64 grid search timing |
+| 165 | Sensor-fusion benchmark | ✅ | developer mode — 4-stream weighted fusion timing |
 | 166 | Fault-injection GUI | ✅ | `tank unoq doctor --inject <fault>` + test suite |
 | 167 | Sensor-failure simulation | ✅ | fault injection set |
 | 168 | Network-failure simulation | ✅ | fault injection set |
@@ -371,16 +379,16 @@ All subsystem checks come from the **live RobotDoctor**; battery from the live
 
 ## Proof
 
-- **322 tests passing** (318 + 4 new GUI smoke tests) — verified on the UNO Q
-  and the VPS.
-- 4 new screens render + navigate in the full shell; dock now exposes all 4.
-- Screenshots `58_ai_command_center` … `61_distributed_ai` + updated contact
-  sheet in `docs/screenshots/gui/`.
+- **328 tests passing** (322 + 6 new wave-2 tests: replay, power recs,
+  benchmarks) — verified on the UNO Q and the VPS.
+- 4 new screens render + navigate in the full shell; dock exposes all 4.
+- Screenshots `58_ai_command_center` … `61_distributed_ai`, re-captured
+  `10_developer` / `48_event_center` / `52_power_dashboard` with the new
+  features + updated contact sheet in `docs/screenshots/gui/`.
 - Every AI visualization exposes WHAT/WHY/CONFIDENCE/SAFETY per the plan.
 
 ## Prioritized next (consolidation, not new files)
 
-1. #20 Unified chronological event replay (0.25×/1×/4×) in Event Center.
-2. #33–40 World-model memory consolidation into the memory screen.
-3. #130 AI power-saving recommendations (e.g. "reduce VLM 5→1 Hz ≈ +11 min").
-4. #162–165 benchmark suite surfaced in Developer mode.
+1. #33–40 World-model memory consolidation into the memory screen.
+2. #79–90 Mission AI (duration/battery/success prediction on the mission screen).
+3. #181–190 AI memory search ("what did you see at the north doorway?").

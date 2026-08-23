@@ -9,6 +9,11 @@ blueprint's predictive extras:
     Energy efficiency       82%
 
 All values derive from the live PowerManager + a simple consumption model.
+
+Also implements the 200-feature plan §13 #130 — **AI power-saving
+recommendations**: concrete, quantified tips computed from the live battery
+level and draw, e.g. "reducing the Jetson VLM frequency from 5 Hz to 1 Hz is
+predicted to increase mission runtime by ~11 minutes".
 """
 
 from __future__ import annotations
@@ -29,6 +34,35 @@ logger = logging.getLogger("tank_os.windows.powerdash")
 CONSUMPTION_W = {
     "MOTORS": 6.5, "SERVOS": 1.2, "JETSON": 7.0, "UNO Q": 1.8, "DISPLAY": 1.1,
 }
+
+
+def power_saving_recommendations(battery_pct: int, draw_w: float,
+                                 runtime_min: int) -> list[tuple[str, str]]:
+    """Compute quantified AI power-saving recommendations.
+
+    Returns a list of (recommendation, impact) tuples. Pure function —
+    unit-testable without a GUI.
+    """
+    recs: list[tuple[str, str]] = []
+    jetson_w = CONSUMPTION_W["JETSON"]
+    if jetson_w > 0 and draw_w > 0:
+        # Dropping the Jetson VLM 5 Hz -> 1 Hz saves ~40% of its draw.
+        saved = jetson_w * 0.4
+        extra_min = int((saved / draw_w) * runtime_min) if runtime_min else 0
+        recs.append(("Reduce Jetson VLM frequency 5 Hz → 1 Hz",
+                     f"+~{max(extra_min, 1)} min runtime"))
+    if battery_pct <= 35:
+        recs.append(("Dim display to 40% brightness (idle mode)",
+                     "~0.7 W saved"))
+    if draw_w > 15:
+        recs.append(("Switch to ECO driving (lower acceleration)",
+                     "~15% motor energy"))
+    if battery_pct <= 20:
+        recs.append(("Critical battery — reduce AI workload to diagnostics only",
+                     "protects pack"))
+    if not recs:
+        recs.append(("All systems efficient — no savings needed", "—"))
+    return recs
 
 
 class _Stat(QFrame):
@@ -151,6 +185,16 @@ class PowerDashboardScreen(QWidget):
             row.addWidget(val)
             layout.addLayout(row)
             self._bars[name] = (bar, val)
+
+        # AI power-saving recommendations (200-feature plan §13 #130)
+        ai_title = QLabel("🤖 AI POWER-SAVING RECOMMENDATIONS")
+        ai_title.setStyleSheet("font-size: 10px; color: #888; font-weight: bold;")
+        layout.addWidget(ai_title)
+        self._recs_box = QWidget()
+        self._recs_lay = QVBoxLayout(self._recs_box)
+        self._recs_lay.setContentsMargins(0, 0, 0, 0)
+        self._recs_lay.setSpacing(4)
+        layout.addWidget(self._recs_box)
         layout.addStretch(1)
 
     # ------------------------------------------------------------- data
@@ -182,6 +226,27 @@ class PowerDashboardScreen(QWidget):
                 w = CONSUMPTION_W[name]
                 bar.setValue(int(w / 10.0 * 100))
                 val.setText(f"{w:.1f} W")
+
+            # AI recommendations from live state
+            while self._recs_lay.count():
+                item = self._recs_lay.takeAt(0)
+                if item.widget():
+                    item.widget().deleteLater()
+            for text, impact in power_saving_recommendations(pct, draw_w, minutes):
+                row = QHBoxLayout()
+                dot = QLabel("▸")
+                dot.setStyleSheet("font-size: 11px; color: #00BFFF;"
+                                  " background: transparent;")
+                row.addWidget(dot)
+                body = QLabel(text)
+                body.setStyleSheet("font-size: 11px; color: #CCC;"
+                                   " background: transparent;")
+                row.addWidget(body, 1)
+                imp = QLabel(impact)
+                imp.setStyleSheet("font-size: 10px; font-weight: bold; color: #FFD54F;"
+                                  " background: transparent;")
+                row.addWidget(imp)
+                self._recs_lay.addLayout(row)
         except Exception as exc:                                    # noqa: BLE001
             logger.debug("power dashboard refresh failed: %s", exc)
 

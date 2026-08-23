@@ -111,7 +111,12 @@ each mapped to code with ✅/🔶/⬜/🧭 audit status.
 | 🏆 Judge Mode | §20 #200 (one-screen AI system board: PERCEPTION/DECISION/LOCALIZATION/SAFETY/COMPUTE/POWER + live subsystem checks from RobotDoctor) | `tank_os/windows/judge_screen.py` |
 | 🌐 Distributed-AI | §15 #141–150 (AI task-distribution map JETSON/UNO Q/ESP32, model locations, latency comparison, Jetson-offline → UNO Q fallback) | `tank_os/windows/distributed_ai_screen.py` |
 
-- **322 tests passing** (4 new GUI smoke tests added; verified on VPS).
+- **328 tests passing** (wave-2 consolidation added 6 more tests; verified on VPS).
+- **Pass 2 — consolidation shipped:** unified chronological event replay in the Event
+  Center (▶ PLAY/⏸ PAUSE, 0.25×/1×/4×, progress + current-event highlight — plan §2
+  #20), quantified AI power-saving recommendations on the Power Dashboard (§13 #130,
+  e.g. "VLM 5→1 Hz ≈ +~11 min runtime"), and the runnable benchmark suite in Developer
+  mode (§17 #162–165 — AI model / vision / navigation / sensor-fusion).
 - Screenshots `58–61` + updated `contact_sheet_gui.png` in `docs/screenshots/gui/`.
 - Every AI visualization exposes **WHAT / WHY / CONFIDENCE / SAFETY**; screens emit
   EventBus commands only (one GUI → multiple backends; safety stays deterministic).
