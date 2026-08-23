@@ -92,3 +92,7 @@ chromium --headless --no-sandbox --screenshot=X.png --timeout=30000 URL
 | 59 | `59_ai_safety_center.png` | 🔥 AI Safety Center — risk bars + safety veto visualization |
 | 60 | `60_judge_mode.png` | 🏆 Judge Mode — one-screen AI system board |
 | 61 | `61_distributed_ai.png` | 🌐 Distributed-AI — task distribution map JETSON/UNO Q/ESP32 |
+
+| 62 | `62_human_control_center.png` | 👤 Human Control Center — person card, modes, control authority, AI request, ask-the-human |
+| 63 | `63_constitution_debate.png` | 🌟 Robot Constitution + AI Debate — 8 articles, debate votes, command chain |
+| 64 | `64_robot_knowledge_map.png` | 🧠 Robot Knowledge Map — environment + knowledge confidence + health |

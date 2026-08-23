@@ -137,6 +137,9 @@ _AiCommandCenterScreen = None
 _AiSafetyCenterScreen = None
 _JudgeScreen = None
 _DistributedAIScreen = None
+_HumanControlScreen = None
+_ConstitutionScreen = None
+_KnowledgeMapScreen = None
 
 
 def _try_load_qt() -> None:
@@ -155,7 +158,8 @@ def _try_load_qt() -> None:
     global _PowerDashboardScreen, _NetworkScreen, _SecurityCenterScreen
     global _AnalyticsScreen, _TvLauncherScreen
     global _AiCommandCenterScreen, _AiSafetyCenterScreen, _JudgeScreen
-    global _DistributedAIScreen
+    global _DistributedAIScreen, _HumanControlScreen, _ConstitutionScreen
+    global _KnowledgeMapScreen
 
     if not _USE_QT:
         return
@@ -218,6 +222,9 @@ def _try_load_qt() -> None:
     from tank_os.windows.ai_safety_center import AISafetyCenterScreen as _asc
     from tank_os.windows.judge_screen import JudgeScreen as _jgs
     from tank_os.windows.distributed_ai_screen import DistributedAIScreen as _das
+    from tank_os.windows.human_control_center import HumanControlCenterScreen as _hcc
+    from tank_os.windows.constitution_screen import ConstitutionScreen as _cst
+    from tank_os.windows.knowledge_map_screen import KnowledgeMapScreen as _kms
 
     _TopBar, _BottomDock, _NotificationsOverlay, _Dashboard = _tb, _bd, _no, _db
     _HomeScreen, _ChatScreen, _CameraScreen = _hs, _cs, _cms
@@ -236,6 +243,8 @@ def _try_load_qt() -> None:
     _AnalyticsScreen, _TvLauncherScreen = _ans, _tvs
     _AiCommandCenterScreen, _AiSafetyCenterScreen = _acc, _asc
     _JudgeScreen, _DistributedAIScreen = _jgs, _das
+    _HumanControlScreen, _ConstitutionScreen = _hcc, _cst
+    _KnowledgeMapScreen = _kms
 
     # Build TankShellMainWindow class (depends on Qt symbols)
     _TankShellMainWindow = _build_main_window_class()
@@ -283,6 +292,10 @@ def _build_main_window_class():
         "ai-safety": _AiSafetyCenterScreen,     # 🔥 AI Safety Center
         "judge": _JudgeScreen,                  # 🏆 Judge Mode
         "distributed-ai": _DistributedAIScreen, # 🌐 Distributed-AI
+        # ── Human coordination + originality plan ──────────────────────
+        "human": _HumanControlScreen,           # 👤 Human Control Center
+        "constitution": _ConstitutionScreen,    # 🌟 Robot Constitution + AI Debate
+        "knowledge-map": _KnowledgeMapScreen,   # 🧠 Robot Knowledge Map
     }
 
     class TankShellMainWindow(QMainWindow):

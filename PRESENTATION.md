@@ -286,3 +286,23 @@ Four new screens turn the GUI into an AI observability + safety + competition sy
 
 Full tracker: [`docs/TANKOS_AI_200_PLAN.md`](docs/TANKOS_AI_200_PLAN.md) ·
 Screenshots `58–61` in [`docs/screenshots/gui/`](docs/screenshots/gui/).
+
+## 7¾¾¾. 👤 Human Coordination + 🌟 Robot Constitution
+
+The Tank is a **human-collaborative** robot:
+
+- **Human Control Center** — a dedicated screen: tracked person card
+  (distance/direction/status/confidence), FOLLOW/STOP/ESCORT/RETURN modes,
+  CONTROL AUTHORITY panel, **AI REQUEST** approve/reject/modify (human-in-the-loop
+  autonomy: AI proposes → human decides → safety → robot), and the
+  **ASK THE HUMAN** route-choice demo (low AI confidence → "which route?" → LEFT/RIGHT).
+- **Robot Constitution** — a machine-readable 8-article policy every AI action
+  passes through (Protect humans · Never bypass safety · Obey authorized humans · …),
+  with the **AI Debate**: VISION/NAVIGATION/SAFETY/BATTERY vote on high-risk actions,
+  safety wins, fully explainable. Every action shows its command chain.
+- **Robot Knowledge Map** — environment map + knowledge-confidence map
+  (what the robot knows / doesn't know) + live health map.
+
+Trackers: [`docs/HUMAN_COORDINATION_PLAN.md`](docs/HUMAN_COORDINATION_PLAN.md) ·
+[`docs/TANK_ORIGINALITY_PLAN.md`](docs/TANK_ORIGINALITY_PLAN.md) ·
+Screenshots `62–64` in [`docs/screenshots/gui/`](docs/screenshots/gui/).

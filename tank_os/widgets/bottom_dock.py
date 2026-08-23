@@ -117,6 +117,10 @@ class BottomDock(QFrame):
         ("🚧", "Safety", "ai-safety"),
         ("👨⚖️", "Judge", "judge"),
         ("🌐", "Dist AI", "distributed-ai"),
+        # Human coordination + originality
+        ("👤", "Human", "human"),
+        ("🌟", "Const", "constitution"),
+        ("🧠", "Know Map", "knowledge-map"),
     ]
 
     def __init__(self, parent: Optional[QWidget] = None) -> None:

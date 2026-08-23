@@ -266,3 +266,14 @@ Captured in `scripts/provision_pi5.sh`:
 - **Distributed-AI** (`distributed_ai_screen.py`) — AI task-distribution map across
   JETSON / UNO Q / ESP32 with failover (Jetson-offline → UNO Q fallback).
 - Tracker: `docs/TANKOS_AI_200_PLAN.md` · Screenshots `58–61`.
+
+## Phase 17 — Human Coordination AI + Originality Ideas ✅
+
+- **HumanCoordination** (`core/human_coordination.py`) — people tracking,
+  interaction modes, control authority, human-in-the-loop approve/reject/modify,
+  "Ask the human" clarifications.
+- **Robot Constitution** (`core/robot_constitution.py`) — 8-article priority policy
+  with explainable vetoes; **AI Debate** (vision/nav/safety/resource, safety wins).
+- **3 new screens**: 👤 Human Control Center (62) · 🌟 Constitution + AI Debate (63) ·
+  🧠 Robot Knowledge Map (64).
+- Trackers: `docs/HUMAN_COORDINATION_PLAN.md` · `docs/TANK_ORIGINALITY_PLAN.md`.

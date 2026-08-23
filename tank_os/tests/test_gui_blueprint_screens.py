@@ -53,6 +53,9 @@ SCREENS = {
     "ai-safety": "tank_os.windows.ai_safety_center.AISafetyCenterScreen",
     "judge": "tank_os.windows.judge_screen.JudgeScreen",
     "distributed-ai": "tank_os.windows.distributed_ai_screen.DistributedAIScreen",
+    "human": "tank_os.windows.human_control_center.HumanControlCenterScreen",
+    "constitution": "tank_os.windows.constitution_screen.ConstitutionScreen",
+    "knowledge-map": "tank_os.windows.knowledge_map_screen.KnowledgeMapScreen",
 }
 
 
@@ -91,3 +94,5 @@ def test_dock_exposes_core_screens() -> None:
     assert {"fleet", "jetson", "competition", "events"} <= screens
     # 200-feature plan screens must be in the dock
     assert {"ai-command", "ai-safety", "judge", "distributed-ai"} <= screens
+    # Human coordination + originality screens in the dock
+    assert {"human", "constitution", "knowledge-map"} <= screens

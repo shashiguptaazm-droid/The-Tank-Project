@@ -121,4 +121,27 @@ each mapped to code with ✅/🔶/⬜/🧭 audit status.
 - Every AI visualization exposes **WHAT / WHY / CONFIDENCE / SAFETY**; screens emit
   EventBus commands only (one GUI → multiple backends; safety stays deterministic).
 
+
+
+---
+
+## 14. 👤 Human Coordination AI (100 features) + 🚀 25 Originality Ideas ✅
+
+Trackers: [`docs/HUMAN_COORDINATION_PLAN.md`](docs/HUMAN_COORDINATION_PLAN.md) ·
+[`docs/TANK_ORIGINALITY_PLAN.md`](docs/TANK_ORIGINALITY_PLAN.md)
+
+**Shipped this pass (2 core modules + 3 screens, all tested):**
+
+| Module / Screen | What it delivers |
+|---|---|
+| `tank_os/core/human_coordination.py` | Person registry (distance/direction/velocity/presence/zones/confidence), interaction modes (FOLLOW/STOP/ESCORT/MEET/RETURN…), control authority chain (safety > human > mission > autonomy), human-in-the-loop requests (AI proposes → human APPROVE/MODIFY/REJECT), **"Ask the human"** low-confidence clarifications |
+| `tank_os/core/robot_constitution.py` | The **Robot Constitution** policy engine (8 priority articles, vetoes carry the triggered article) + the **AI Debate** (vision/nav/safety/resource vote, safety wins, explainable) + explicit command chain |
+| 👤 Human Control Center (`62`) | Person card + FOLLOW/STOP/ESCORT/RETURN buttons, CONTROL AUTHORITY panel, AI REQUEST approve/reject/modify, ASK THE HUMAN LEFT/RIGHT route choice, interaction history |
+| 🌟 Constitution + AI Debate (`63`) | 8 articles with live triggered state, debate votes (SAFETY STOP → FINAL STOP), command chain |
+| 🧠 Robot Knowledge Map (`64`) | Environment + knowledge-confidence map (North corridor 96% … Stair area 22%), live RobotDoctor health panel |
+
+- **345 tests passing** (17 new: tracking, modes, authority, approve/reject/modify,
+  ask-the-human, 5 constitution veto classes, debate, command chain; verified on VPS).
+- Screenshots `62–64` + contact sheet (26 screens) in `docs/screenshots/gui/`.
+
 4. **Report finalization** — Update DOCX with final specs
