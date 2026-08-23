@@ -2,7 +2,8 @@
 
 > **Competition:** Arduino Physical AI Challenge 2026  
 > **Registration:** APC-2026-RJ-75818  
-> **Author:** Dr. Shashi Gupta
+> **Author:** Dr. Shashi Gupta  
+> **Last Updated:** 2026-08-23
 
 ---
 
@@ -10,262 +11,149 @@
 
 | Feature | How | Verified |
 |---------|-----|----------|
-| USB Camera streaming | DFRobot AI Camera → Jetson | ✅ JPEG frames |
-| YOLOv8n detection | CUDA GPU inference | ✅ Objects detected |
+| **3 Perception Nodes** | DFRobot CAM + LiDAR + ESP32-S3 CAM | ✅ All streaming |
+| USB Camera streaming | DFRobot AI Camera → Jetson | ✅ 640×480 @ 8.9fps |
+| YOLOv8n detection | CUDA GPU (Jetson) + CPU (UNO Q) | ✅ Objects detected |
 | LiDAR scanning | LDROBOT LD19 via USB | ✅ 360° points |
-| SMS commands | Quectel LTE modem | ✅ Messages sent |
-| PWA Dashboard | 8-tab mobile control | ✅ Phone access |
-| Tailscale mesh | 9 devices connected | ✅ All online |
-| Evolution system | 9/14 cloud providers | ✅ AI ranking |
-| Tool calling | 22 TankOS tools | ✅ LLM integration |
-| AprilTag detection | 16 tags defined | ✅ Dock + nav |
+| 3rd Perception (UNO Q) | ESP32-S3 CAM → WiFi → YOLOv8n | ✅ Remote detection |
 | Autonomous navigation | A* + VFH avoidance | ✅ Simulated |
-| Magnetic charging dock | 5-phase sequence | ✅ Code complete |
-| TankOS GUI | 16-tile launcher | ✅ Android TV style |
-| UNO Q TV launcher | 10-tile launcher | ✅ On Jetson desktop |
-| Mobile PWA | Dashboard on phone | ✅ Deployed |
+| Auto-dock | AprilTag + 5-phase charging | ✅ Code complete |
+| SMS commands | Quectel LTE modem | ✅ Messages sent |
+| Tailscale mesh | 3 Linux + 3 ESP32 connected | ✅ All online |
+| WiFi → LTE failover | Auto-switch on disconnect | ✅ Boot-persistent |
+| Evolution system | 9/14 cloud providers | ✅ AI ranking |
+| TankOS GUI | 70+ screens, Android TV style | ✅ All captured |
+| TankOS terminal | 1,966 tools registered | ✅ Running |
+| 327 LLM-callable modules | 18 categories | ✅ Typed + permissioned |
+| Robot Constitution | 8-article safety policy | ✅ AI Debate works |
+| 16-language i18n | Packs on VPS, cached locally | ✅ HTTP 200 verified |
+| 23 ROS2 packages | Jazzy (built on Jetson) | ✅ colcon build |
+| Face recognition | OpenCV DNN + embeddings | ✅ Pipeline ready |
 
 ---
 
-## 🔵 Implemented, Awaiting Physical Validation
+## 🔵 Implemented, Awaiting Physical Wiring
 
 | Feature | Code | Physical |
 |---------|------|----------|
-| Motor control (BTS7960) | ✅ | 🔵 Need motors |
-| Encoder odometry | ✅ | 🔵 Need encoders |
-| IMU (QMI8658/BNO055) | ✅ | 🔵 I²C connected |
-| Servo control (PCA9685) | ✅ | 🔵 Need servos |
-| E-STOP system | ✅ | 🔵 Need button |
-| Battery monitoring | ✅ | 🔵 Need INA219 |
-| Track slip detection | ✅ | 🔵 Need tracks |
+| Motor control (BTS7960) | ✅ | 🔵 Need motors connected |
+| Encoder odometry | ✅ | 🔵 Need encoders connected |
+| IMU (BNO055) | ✅ | 🔵 I²C not detected yet |
+| Servo control (PCA9685) | ✅ | 🔵 Not connected yet |
+| E-STOP system | ✅ | 🔵 Need button wired |
+| Battery monitoring (INA219) | ✅ | 🔵 Not connected yet |
 
 ---
 
 ## 📊 Pipeline Status
 
 ```
-SENSE → PERCEIVE → FUSE → AI → DECIDE → ACT → VERIFY
-  🟢      🟢        🟢     🟢     🟢      🔵     🟢
- Camera  YOLO    Kalman   LLM   Nav2    Motors  Vision
- LiDAR   Track   EKF    Tools  A*     Servos   Verify
- IMU     Detect  Grid   Chat   VFH    Safety   Status
+SENSE → PERCEIVE → FUSE → AI → DECIDE → ACT → VERIFY → LEARN
+  ✅      ✅        ✅     ✅     ✅      🔵     ✅      ✅
+ Camera  YOLO    Kalman   LLM   Nav2    Motors  Vision  SQLite
+ LiDAR   Track   EKF    Tools  A*     Servos   Status  Events
+ IMU     Detect  Grid   Chat   VFH    Safety   Verify  Memory
+ ESP-CAM 3 nodes        100 providers
 ```
+
+---
+
+## 📡 Hardware Status
+
+### Connected & Working
+
+| Device | Port | Status |
+|--------|------|--------|
+| DFRobot AI Camera (OV3660) | /dev/ttyACM1 | ✅ Streaming 640×480 @ 8.9fps |
+| LDROBOT LiDAR LD14/19 | /dev/ttyUSB0 | ✅ Binary aa55 protocol |
+| Quectel EG800AK 4G LTE | /dev/ttyUSB1-3 | ✅ Registered, 64% signal |
+| ESP32-S3 Eyes (GC9A01) | /dev/ttyACM1 | ✅ JSON expression protocol |
+| ESP32-S3 CAM (UNO Q) | WiFi 192.168.31.145 | ✅ ESPHome HTTP capture |
+
+### Not Connected (awaiting wiring)
+
+| Device | Expected | Status |
+|--------|----------|--------|
+| BNO055 IMU | I²C 0x28 | ❌ Not detected |
+| PCA9685 Servo Driver | I²C 0x40 | ❌ Not detected |
+| ReSpeaker 4-Mic Array | USB | ❌ Not detected |
+| HC-SR04 Ultrasonic ×2 | GPIO | ❌ Not connected |
+| Waveshare 1.28" LCD ×2 | SPI → Eyes ESP32 | ❌ Not wired |
 
 ---
 
 ## 🔑 API Keys (Evolution System)
 
-| Provider | Key | Status |
-|----------|-----|--------|
-| OpenRouter | ✅ | Configured |
-| Groq | ✅ | Configured |
-| Gemini | ✅ | Configured |
-| Mistral | ✅ | Configured |
-| Cerebras | ✅ | Configured |
-| Cohere | ✅ | Configured |
-| Replicate | ✅ | Configured |
-| HuggingFace | ✅ | Configured |
-| Cloudflare | ✅ | Configured |
-| OpenAI | ⬜ | Optional |
-| Anthropic | ⬜ | Optional |
-| Together | ⬜ | Optional |
-| DeepInfra | ⬜ | Optional |
-| SambaNova | ⬜ | Optional |
+| Provider | Status |
+|----------|--------|
+| OpenRouter, Groq, Gemini, Mistral, Cerebras, Cohere, Replicate, HuggingFace, Cloudflare | ✅ All configured |
+| OpenAI, Anthropic, Together, DeepInfra, SambaNova | ⬜ Optional |
 
 ---
 
-## 🖥 TankOS GUI Blueprint (robot-OS upgrade)
+## 🏗️ Architecture
 
-> Full blueprint + audit: [`docs/TANKOS_GUI_BLUEPRINT.md`](docs/TANKOS_GUI_BLUEPRINT.md) · screenshots in [`docs/screenshots/gui/`](docs/screenshots/gui/).
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    TANKOS MASTER ORCHESTRATOR                    │
+│   OBSERVE → UNDERSTAND → REMEMBER → REASON → PLAN → VALIDATE   │
+│   → ACT → OBSERVE → EVALUATE → LEARN → UPDATE STATE            │
+└───────┬──────────────────┬───────────────────┬──────────────────┘
+        │                  │                   │
+┌───────▼──────┐  ┌────────▼────────┐  ┌──────▼───────┐
+│   JETSON     │  │    UNO Q 4GB    │  │  3× ESP32-S3 │
+│  67 TOPS     │  │  QRB2210+STM32  │  │  Real-time   │
+│  AI Brain    │  │  Motors/Safety  │  │  Eyes/CAM/   │
+│  Vision      │  │  Android TV     │  │  Sensors/LTE │
+└──────┬───────┘  └────────┬────────┘  └──────────────┘
+       │                   │
+┌──────▼───────┐  ┌────────▼────────┐
+│  Camera      │  │  Motors ×2      │
+│  LiDAR       │  │  Servos ×4      │
+│  4G Modem    │  │  Encoders ×2    │
+└──────────────┘  └─────────────────┘
+```
 
-- ✅ **Core-7 live:** Home hub (8-tile launcher, ≤2 clicks) → Drive (joystick + E-stop + 5 modes)
-  → Mission (builder + 9 types) → Map → Vision → AI Brain (decision + **Why?**) → Robot Health
-- ✅ **Extras live:** ESP32 Fleet · Jetson dashboard (GPU/CPU/RAM/VRAM/AI FPS) · 🏆 Competition Mode
-  (10-step DEMO) · 🚨 Event Center (filtered stream)
-- ✅ **Wave 2 — 9 more screens** (`tank_os/windows/`): Sensor Fusion topology, Hardware Topology,
-  Testing Center (12 tests → report), Power Dashboard (runtime/mission-cost/efficiency), Network,
-  Security Center, Data/Analytics (11 sparklines), TV launcher, AI timeline — one GUI → EventBus →
-  TankOS/ROS2/Hardware backends
-- ✅ **17 new screens total**; 18 tests (`test_gui_blueprint_screens.py`) — full suite **318 passing**
+---
+
+## 📊 Project Metrics
+
+| Metric | Value |
+|--------|-------|
+| **Lines of Code** | 88,000+ |
+| **Python Files** | 127+ |
+| **Tests Passing** | 425+ |
+| **ROS2 Packages** | 23 (Jazzy) |
+| **LLM Modules** | 327 |
+| **AI Providers** | 100 |
+| **GUI Screens** | 70+ |
+| **Screenshots** | 70+ |
+| **SVG Infographics** | 51 |
+| **Git Commits** | 70+ |
+| **Total Cost** | ₹64,050 (~$800) |
+
+---
 
 ## 🏗️ Next Steps
 
-1. **Physical motor test** — Connect BTS7960 + motors + encoders
-2. **Full pipeline demo** — Camera → YOLO → Navigation → Motors
-3. **Competition dress rehearsal** — Full autonomous demo
-
-
----
-
-## 13. 🧠 200-Item GUI + AI Features Plan ✅
-
-Living tracker: [`docs/TANKOS_AI_200_PLAN.md`](docs/TANKOS_AI_200_PLAN.md) — 20 groups × 10 features,
-each mapped to code with ✅/🔶/⬜/🧭 audit status.
-
-**Shipped this pass (4 new screens, all tested):**
-
-| Screen | Plan items | File |
-|---|---|---|
-| 🧠 AI Command Center | §1 #1–10 (live decision feed, confidence/uncertainty/latency meters, rejected actions, reasoning, active model) | `tank_os/windows/ai_command_center.py` |
-| 🔥 AI Safety Center | §16 #151–160 (real-time risk, collision probability, human proximity, **safety veto visualization** — AI COMMAND → ANALYSIS → ❌ VETOED) | `tank_os/windows/ai_safety_center.py` |
-| 🏆 Judge Mode | §20 #200 (one-screen AI system board: PERCEPTION/DECISION/LOCALIZATION/SAFETY/COMPUTE/POWER + live subsystem checks from RobotDoctor) | `tank_os/windows/judge_screen.py` |
-| 🌐 Distributed-AI | §15 #141–150 (AI task-distribution map JETSON/UNO Q/ESP32, model locations, latency comparison, Jetson-offline → UNO Q fallback) | `tank_os/windows/distributed_ai_screen.py` |
-
-- **328 tests passing** (wave-2 consolidation added 6 more tests; verified on VPS).
-- **Pass 2 — consolidation shipped:** unified chronological event replay in the Event
-  Center (▶ PLAY/⏸ PAUSE, 0.25×/1×/4×, progress + current-event highlight — plan §2
-  #20), quantified AI power-saving recommendations on the Power Dashboard (§13 #130,
-  e.g. "VLM 5→1 Hz ≈ +~11 min runtime"), and the runnable benchmark suite in Developer
-  mode (§17 #162–165 — AI model / vision / navigation / sensor-fusion).
-- Screenshots `58–61` + updated `contact_sheet_gui.png` in `docs/screenshots/gui/`.
-- Every AI visualization exposes **WHAT / WHY / CONFIDENCE / SAFETY**; screens emit
-  EventBus commands only (one GUI → multiple backends; safety stays deterministic).
-
-
+1. **Wire remaining sensors** — BNO055 IMU, PCA9685 servos, INA219 power monitors
+2. **Physical motor test** — Connect BTS7960 + motors + encoders
+3. **Full pipeline demo** — Camera → YOLO → Navigation → Motors
+4. **Competition dress rehearsal** — Full autonomous demo
+5. **Record demo video** — 60-second competition video
 
 ---
 
-## 14. 👤 Human Coordination AI (100 features) + 🚀 25 Originality Ideas ✅
+## 📋 Competition Demo Pipeline
 
-Trackers: [`docs/HUMAN_COORDINATION_PLAN.md`](docs/HUMAN_COORDINATION_PLAN.md) ·
-[`docs/TANK_ORIGINALITY_PLAN.md`](docs/TANK_ORIGINALITY_PLAN.md)
+```
+SENSE → PERCEIVE → FUSE → UNDERSTAND → DECIDE → ACT → VERIFY → LEARN/LOG
+  ✅      ✅        ✅        ✅          ✅      🔵     ✅      ✅
+```
 
-**Shipped this pass (2 core modules + 3 screens, all tested):**
-
-| Module / Screen | What it delivers |
-|---|---|
-| `tank_os/core/human_coordination.py` | Person registry (distance/direction/velocity/presence/zones/confidence), interaction modes (FOLLOW/STOP/ESCORT/MEET/RETURN…), control authority chain (safety > human > mission > autonomy), human-in-the-loop requests (AI proposes → human APPROVE/MODIFY/REJECT), **"Ask the human"** low-confidence clarifications |
-| `tank_os/core/robot_constitution.py` | The **Robot Constitution** policy engine (8 priority articles, vetoes carry the triggered article) + the **AI Debate** (vision/nav/safety/resource vote, safety wins, explainable) + explicit command chain |
-| 👤 Human Control Center (`62`) | Person card + FOLLOW/STOP/ESCORT/RETURN buttons, CONTROL AUTHORITY panel, AI REQUEST approve/reject/modify, ASK THE HUMAN LEFT/RIGHT route choice, interaction history |
-| 🌟 Constitution + AI Debate (`63`) | 8 articles with live triggered state, debate votes (SAFETY STOP → FINAL STOP), command chain |
-| 🧠 Robot Knowledge Map (`64`) | Environment + knowledge-confidence map (North corridor 96% … Stair area 22%), live RobotDoctor health panel |
-
-- **345 tests passing** (17 new: tracking, modes, authority, approve/reject/modify,
-  ask-the-human, 5 constitution veto classes, debate, command chain; verified on VPS).
-- Screenshots `62–64` + contact sheet (26 screens) in `docs/screenshots/gui/`.
-
-
+**For judges:** See [JUDGE.md](JUDGE.md) for the quick-start guide.
 
 ---
 
-## 15. 🧠 Proper AI Tool-Calling Architecture (20-part plan) ✅
-
-Tracker: [`docs/TANK_TOOL_CALLING_PLAN.md`](docs/TANK_TOOL_CALLING_PLAN.md)
-
-**The fundamental rule (enforced):** `Human → AI → Tool Validator → Permission +
-Safety → Tool Executor → UNO Q/Jetson/ESP32/STM32 → Result → AI`. Never
-`LLM → arbitrary shell command → motor`.
-
-**Shipped this pass:**
-
-| Piece | What it delivers |
-|---|---|
-| `tank_os/core/tool_engine.py` | Typed, permissioned pipeline: `ToolSpec` registry (risk tiers read-only/low/controlled/high/emergency), agent roles (Observer/Assistant/Navigator/Maintenance/Admin), schema + **sandbox validator** (`max_speed_mps ≤ 0.5`, `distance ≤ 5 m` — rejects invented values), safety interlocks, high-risk `NEEDS_APPROVAL` gate, deterministic emergency path, standardized `ToolResult`, failure recovery (`OBSTACLE_DETECTED → replan`), audit log, tool chaining, discovery/capabilities, ownership map (vision→Jetson, robot→UNO Q, sensor→ESP32, motor→STM32), and the **AI Tool Composer** |
-| `tank_os/windows/tool_graph_screen.py` | Live tool graph — USER REQUEST → AI → tool nodes ✓ + audit log + composer readiness demo ("PATROL READINESS: 94%") |
-| Binding | Adopts the existing `agent_framework.ToolRegistry` (1,966 script tools discovered) |
-
-- **363 tests passing** (18 new tool-engine tests; verified on VPS).
-- Screenshot `65_ai_tool_graph` + 27-screen contact sheet in `docs/screenshots/gui/`.
-
-
-
----
-
-## 16. 🤖 Proper TankOS Architecture (30-part plan) ✅
-
-Tracker: [`docs/TANKOS_ARCHITECTURE_PLAN.md`](docs/TANKOS_ARCHITECTURE_PLAN.md)
-
-TankOS is the product; UNO Q / Jetson / STM32 / ESP32 are nodes underneath it.
-**ONE STATE · ONE EVENT BUS · ONE COMMAND BUS · ONE DEVICE REGISTRY · ONE
-SAFETY AUTHORITY · ONE CONFIGURATION · ONE TOOL REGISTRY · ONE API.**
-
-**Shipped this pass:**
-
-| Piece | What it delivers |
-|---|---|
-| `tank_os/core/tankos_core.py` | The canonical core — `TankOS` facade with `tank.device / state / command / mission / health`: **DeviceManager** (17 devices, lifecycle DISCOVERING→…→FAULT→RECOVERING→READY), **StateManager** (robot state machine BOOT→SELF_TEST→READY→MANUAL/ASSISTED/AUTONOMOUS/MISSION, any→EMERGENCY_STOP/FAULT/SAFE_MODE→RECOVERY), **CommandBus** (source+priority: E-STOP>HUMAN>SAFETY>MISSION>AI>BACKGROUND; validate→safety→execute with end-to-end traces), **HealthManager** (health from measurable signals), **MissionEngine** (first-class missions with CREATED→…→COMPLETED/ABORTED) |
-| `tank_os/cli/tankos_cli.py` | The **`tank` CLI**: status, health, devices, sensors, motors, battery, mission list/start, state, command, safety (estop/clear), events, api |
-| `tank_os/windows/tankos_system_screen.py` | The top-level system GUI — distributed node map (UNO Q/Jetson/STM32/ESP32/VPS), canonical state machine, device registry with lifecycle, health dashboard, command observability |
-
-- **380 tests passing** (17 new; verified on VPS) + CLI verified live.
-- Screenshot `66_tankos_system` + 28-screen contact sheet.
-
-
-
----
-
-## 17. 🧬 TankOS Evolution Engine — TEE (25-part plan) ✅
-
-Tracker: [`docs/TANKOS_EVOLUTION_PLAN.md`](docs/TANKOS_EVOLUTION_PLAN.md)
-
-> The Tank observes itself → identifies weaknesses → proposes an improvement →
-> tests it safely → measures the result → promotes it only if objectively
-> better → keeps rollback available. **Human approval is mandatory for
-> hardware, safety, firmware, security, or behavior changes.**
-
-**Shipped this pass:**
-
-| Piece | What it delivers |
-|---|---|
-| `tank_os/core/evolution_engine.py` | Baseline (navigation 91% / detection 94% / latency 83 ms / …), **weakness discovery** (mission-history cause+location correlation), **evolution proposals** (bounded genome params), **replay-based benchmarking**, **multi-objective score with safety as a HARD constraint** (unsafe ⇒ score 0), generations + versioned genome, shadow mode (candidate predicts silently), **automatic rollback** + checkpoints, resource-aware rejection (predicted GPU/thermal), and the explicit **evolution policy** (AI may analyze/propose/simulate/benchmark/bound — may NOT disable safety / modify E-stop / raise motor limits / deploy arbitrary code) |
-| `tank_os/windows/evolution_lab.py` | The Evolution Lab GUI — generation timeline with scores, weakness discovery panel, proposal card with **[APPROVE] [REJECT] [ROLLBACK]**, experiments + shadow summary, policy footer |
-
-- **398 tests passing** (18 new: baseline, discovery, proposal bounds, replay
-  benchmark, safety hard-gate, approve→deploy→rollback, experiments,
-  resource-aware rejection, shadow, policy, evolution story progression).
-- Screenshot `67_evolution_lab` + 29-screen contact sheet.
-
-4. **Report finalization** — Update DOCX with final specs
-
-
----
-
-## 18. 🧠 TankOS — 100 AI-Native Features ✅
-
-Tracker: [`docs/TANKOS_AI_NATIVE_PLAN.md`](docs/TANKOS_AI_NATIVE_PLAN.md)
-
-> **Make AI a native subsystem of the OS — capability-based, not model-based.**
-> Applications ask *"give me object detection"*, not *"run YOLOv11 on Jetson"*.
-> TankOS decides: which model · which device · which precision · which
-> accelerator · what FPS · what fallback.
-
-**Shipped this pass:**
-
-| Piece | What it delivers |
-|---|---|
-| `tank_os/ai/native_core.py` | The capability facade `tank.ai` — **AI Core** (ModelRegistry with auto-selection + health monitor + versioning + fallback chains, InferenceScheduler across Jetson/UNO Q, ResourceGovernor with GPU/CPU/RAM budgets, capability discovery), **Perception Layer** (10 capability backends: detection/tracking/person/pose/gesture/scene/segmentation/depth/motion/change), **World Intelligence** (semantic world model, object + location memory, unknown-area detection, `world.query` API), **Navigation AI** (risk/energy-aware multi-route + ETA + confidence), and the **AI Executive** ("Inspect the entire room" → CHECK SYSTEM → LOCALIZE → PLAN → NAVIGATE → SCAN → CLASSIFY → INVESTIGATE → REPORT) |
-| `tank_os/windows/ai_native_screen.py` | The AI Native screen — capability map, model registry with health badges, Jetson/UNO Q scheduler load, resource budgets, fallback status |
-
-- **416 tests passing** (17 new: registry/auto-selection, health + fallback chain,
-  scheduler, governor allow/deny, capability run with model/device/precision,
-  world memory + query, unknown areas, multi-route, intent, decomposition,
-  executive run, discovery, and the **device-change-doesn't-break-apps**
-  fallback proof — `yolo-v11n` dies, the same call returns `yolo-v11n-q8`/unoq).
-- Screenshot `68_ai_native` + 30-screen contact sheet.
-
-
----
-
-## 19. 🌐 TankOS i18n — Language Support for Everyone ✅
-
-Tracker: [`docs/TANKOS_I18N_PLAN.md`](docs/TANKOS_I18N_PLAN.md)
-
-> **16 languages, packs hosted on the VPS, device stays light, works offline.**
-
-**Shipped this pass:**
-
-| Piece | What it delivers |
-|---|---|
-| `tank_os/core/i18n.py` | `I18nManager` singleton — `set_language()` / `t()` lookup, `sync()` fetch from VPS + local cache, `translate_widget_tree()` walker, offline-first English fallback, `sync_async()` background sync |
-| `scripts/langgen.py` | Generates 16 language packs (45 UI keys: dock, settings, status) and uploads them to the VPS |
-| `tank_os/windows/settings_screen.py` | **Settings → 🌐 Language** — dropdown (flag + native name), ⬇ Sync from VPS button, cached-pack status |
-| `tank_os/widgets/bottom_dock.py` | Dock labels translate instantly on language change; persisted language applied at boot |
-
-- Packs live on the **VPS** (`/var/www/html/lang/`, nginx) and are fetched on
-  demand — the device stores only a small `~/.cache/tankos/lang/` cache, so
-  storage stays light and adding a language never needs a device update.
-- **Verified HTTP 200** on both the tailnet IP (`100.71.127.19/lang/…`) and
-  the public IP (`213.199.61.156/lang/…`).
-- **425 tests passing** (9 new i18n + 2 GUI language tests) — verified on
-  UNO Q **and** VPS (427 there).
-- Screenshots `69_settings_hindi` + `70_dock_languages` + 34-screen contact sheet.
+> **Generated by Buffy (Codebuff) 🤖**  
+> **Co-Authored-By: Codebuff <noreply@codebuff.com>**

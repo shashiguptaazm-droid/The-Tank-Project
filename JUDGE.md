@@ -10,9 +10,11 @@
 
 **The Tank is a distributed edge-AI robotic platform** that combines three computing layers:
 
-1. **Jetson Orin Nano Super** (67 TOPS) — AI brain
-2. **Arduino UNO Q 4GB** — Real-time body controller
-3. **ESP32-S3 ×6** — Distributed peripherals
+1. **Jetson Orin Nano Super** (67 TOPS, 8GB RAM) — AI brain
+2. **Arduino UNO Q 4GB** (QRB2210 + STM32U585) — real-time controller
+3. **ESP32-S3 ×3 + DFRobot AI Camera** — distributed peripherals
+
+**88,000+ lines of Python · 425+ tests · 70 screenshots · 23 ROS2 packages**
 
 ---
 
@@ -20,65 +22,102 @@
 
 | Innovation | Description |
 |-----------|-------------|
-| **Distributed AI** | Not one brain — three boards share intelligence |
-| **374 Features** | 200 Jetson + 100 UNO Q + 74 TankOS |
-| **22 AI Tools** | Any LLM can control physical robot functions |
-| **14 AI Providers** | Auto-discovers and selects best AI models |
-| **Controlled Evolution** | Benchmarks, ranks, and selects AI models |
-| **Hardware Safety** | E-STOP FSM, watchdog, degraded mode |
-| **SMS Control** | Text message commands via LTE modem |
+| **Distributed AI** | Three boards share intelligence — Jetson decides, UNO Q coordinates, ESP32 executes |
+| **Capability-Based AI** | Apps ask *"give me object detection"* — TankOS picks model, device, precision, fallback |
+| **327 LLM-Callable Modules** | Any AI model can discover and invoke typed, permissioned robot functions |
+| **100 AI Providers** | Auto-discovers and selects the best AI model for each task |
+| **Robot Constitution** | 8-article policy engine — AI proposes, safety vetoes, humans decide |
+| **Controlled Evolution** | Benchmarks, ranks, and only deploys proven improvements |
+| **3 Perception Nodes** | DFRobot AI Camera + LiDAR + ESP32-S3 CAM (on UNO Q) |
+| **Never-Offline Connectivity** | WiFi → 4G LTE → Hotspot → Tailscale mesh |
+| **SMS Control** | Text message commands via Quectel LTE modem |
 | **PWA Dashboard** | Phone-based 8-tab control center |
 
 ---
 
 ## 🔧 Hardware
 
-| Component | Model | Purpose |
-|-----------|-------|---------|
-| Jetson Orin Nano Super | NVIDIA 8GB | AI inference, vision, navigation |
-| Arduino UNO Q 4GB | QRB2210 + STM32 | Motor/sensor/safety control |
-| ESP32-S3 ×6 | DevKitC-1 N16R8 | Distributed peripherals |
-| Camera | DFRobot SEN0611 | USB serial video |
-| LiDAR | LDROBOT LD19 | 360° laser scanning |
-| 4G Modem | Quectel EG800K | SMS + data |
-| Motors | JGB37-520 ×2 | Tracked locomotion |
-| Motor Driver | BTS7960 ×2 | H-bridge control |
-| IMU | QMI8658 | Orientation sensing |
+| Component | Model | Purpose | Status |
+|-----------|-------|---------|--------|
+| Jetson Orin Nano Super | NVIDIA 8GB, 67 TOPS | AI inference, vision, navigation | ✅ Online |
+| Arduino UNO Q 4GB | QRB2210 + STM32U585 | Motor/sensor/safety control | ✅ Online |
+| DFRobot AI Camera | SEN0611, ESP32-S3 | RGB + night vision, 640×480 | ✅ Streaming |
+| LDROBOT LiDAR LD19 | 360° laser scanning | 12m range, 5kHz scan | ✅ Live |
+| ESP32-S3 CAM | ESPHome firmware | 3rd perception node on UNO Q | ✅ Online |
+| 4G Modem | Quectel EG800AK | SMS + data backup | ✅ 64% signal |
+| Motors | JGB37-520 ×2 | Tracked locomotion | 🔵 Firmware ready |
+| Motor Driver | BTS7960 ×2 | H-bridge control | 🔵 Firmware ready |
+| IMU | BNO055 | 9-DOF orientation | 🔵 I²C ready |
+| Servo Driver | PCA9685 | 16-channel servo PWM | 🔵 I²C ready |
 
-**Total Cost: ₹64,050 (~$800)**
+**Total Cost: ₹64,050 (~$800 USD)**
+
+---
+
+## 📡 3 Perception Nodes
+
+| # | Node | Hardware | Detection | Status |
+|---|------|----------|-----------|--------|
+| 1 | **DFRobot AI Camera** | ESP32-S3 + OV3660 | YOLOv8n @ 8.9fps | ✅ Streaming |
+| 2 | **LiDAR** | LDROBOT LD14/19 | Binary obstacle scan | ✅ Live |
+| 3 | **ESP32-S3 CAM + UNO Q** | ESP32-S3 (USB-C) + UNO Q | YOLOv8n via ESPHome HTTP | ✅ NEW |
+
+```
+ESP32-S3 CAM → WiFi HTTP capture → UNO Q ARM64 → YOLOv8n CPU → detections
+                                                                    │
+                        ┌───────────────────────────────────────────┘
+                        ▼
+            ┌─────────────────────────────────┐
+            │  Tailscale VPN → Jetson brain   │
+            │  (if WiFi down → LTE fallback)  │
+            └─────────────────────────────────┘
+```
 
 ---
 
 ## 💻 Software
 
-| System | Features | Status |
-|--------|----------|--------|
-| Jetson AI | 200 | 🟢 12/12 modules tested |
-| UNO Q | 100 | 🟢 10/10 modules tested |
-| TankOS Core | 74 | 🟢 9/9 modules tested |
-| **Total** | **374** | **31/31 modules tested** |
+| System | Features | Packages | Status |
+|--------|----------|----------|--------|
+| TankOS Core | 327 modules | 18 categories | ✅ All passing |
+| ROS2 Jazzy | 23 packages | Jetson + UNO Q | ✅ Built |
+| AI Providers | 100 cloud + local | Auto-selection | ✅ 9 active |
+| Tests | 425+ | Unit + integration | ✅ All passing |
+| GUI Screens | 70+ | Android TV style | ✅ All captured |
+
+### ROS2 Packages (23 built)
+
+tank_assistant · tank_bringup · tank_command_bridge · tank_dashboard ·  
+tank_display · tank_dock · tank_emotions · tank_health · tank_learn ·  
+tank_log · tank_memory · tank_meta · tank_motion · tank_nas · tank_offload ·  
+tank_patrol · tank_personalize · tank_security · tank_sensors · tank_speech ·  
+tank_task · tank_text · tank_vision
 
 ---
 
 ## 📊 What Can Be Demonstrated
 
-### 🟢 Working NOW (Software Tested)
-- USB Camera streaming over serial
-- YOLOv8n object detection on CUDA
-- Multi-object tracking with IDs
-- LiDAR scanning and occupancy grid
-- A* path planning + obstacle avoidance
-- Kalman filter sensor fusion
-- 22 AI tools callable by any LLM
-- SMS commands via LTE modem
-- PWA dashboard on phone
-- TankOS 16-tile GUI
-- Evolution system (9/14 providers)
-- AprilTag detection (16 tags)
-- Magnetic charging dock code
-- Autonomous navigation (simulated)
+### ✅ Working NOW (Live Verified)
 
-### 🔵 Code Complete, Needs Hardware
+- **3 perception nodes** streaming simultaneously
+- USB Camera (DFRobot) → JPEG frames + IMU data
+- YOLOv8n object detection on CUDA (Jetson) + CPU (UNO Q)
+- LiDAR scanning and occupancy grid
+- Tailscale mesh: 3 Linux nodes + 3 ESP32 boards connected
+- WiFi → LTE → Hotspot failover chain
+- SMS commands via Quectel LTE modem
+- PWA dashboard on phone
+- TankOS 16-tile GUI (Android TV style)
+- TankOS terminal with 1,966 tools
+- Evolution system (9/14 cloud providers)
+- TankOS 327-module LLM-callable registry
+- Robot Constitution + AI Debate
+- 16-language i18n support
+- 425+ tests passing
+- 23 ROS2 packages built (Jazzy)
+
+### 🔵 Code Complete, Needs Physical Wiring
+
 - Motor control (BTS7960)
 - Encoder odometry
 - Servo control (PCA9685)
@@ -86,94 +125,105 @@
 - E-STOP system
 - Battery monitoring
 
-### 🟡 Planned
-- Physical autonomous demo
-- Human-following behavior
-- Competition dress rehearsal
+### 🟡 Competition Demo
+
+- Full autonomous pipeline: SENSE → PERCEIVE → FUSE → UNDERSTAND → DECIDE → ACT → VERIFY → LEARN
+- Judge Mode: one-screen subsystem verification
+- Human Control Center: follow/stop/escort modes
 
 ---
 
-## 🔗 Quick Links
-
-| What | Where |
-|------|-------|
-| Architecture | [ARCHITECTURE.md](ARCHITECTURE.md) |
-| AI System | [docs/AI.md](docs/AI.md) |
-| Auto-Evolution | [docs/AUTO_EVOLUTION.md](docs/AUTO_EVOLUTION.md) |
-| Hardware BOM | [hardware.md](hardware.md) |
-| Wiring | [WIRING.md](WIRING.md) |
-| Status | [STATUS.md](STATUS.md) |
-| Comparison | [COMPARISON.md](COMPARISON.md) |
-| Screenshots | [docs/screenshots/](docs/screenshots/) |
-| Infographics | [docs/infographics/](docs/infographics/) |
-
----
-
-## 📊 Evidence of Work
-
-| Evidence | Location |
-|----------|----------|
-| 31 tested modules | Test output in commit history |
-| 50 infographics | `docs/infographics/` |
-| 25+ screenshots | `docs/screenshots/` |
-| 22 AI tools | `tank/ai/tool_registry.py` |
-| 14 providers | `.env` configuration |
-| SMS proof | Sent to 7860245819 |
-| GitHub history | 25+ commits |
-| Hardware photos | `images/` directory |
-
----
-
-## 🏗️ Architecture Diagram
+## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────┐
-│              JETSON ORIN NANO SUPER              │
-│                  67 TOPS AI                      │
-│  Vision · Detection · SLAM · Navigation · LLM    │
-└───────────────────┬─────────────────────────────┘
-                    │ USB Serial 115200
-┌───────────────────▼─────────────────────────────┐
-│               ARDUINO UNO Q 4GB                 │
-│  Motors · Encoders · Servos · Safety · Sensors   │
-└───────────────────┬─────────────────────────────┘
-                    │ I²C / GPIO
-┌───────────────────▼─────────────────────────────┐
-│              ESP32-S3 ×6 SWARM                   │
-│         Eyes · Hands · Limbs · Sensors           │
-└─────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                        HUMAN / GUI INTERFACE                    │
+│                 Android TV · Voice · Web · SMS                  │
+└──────────────────────────────┬──────────────────────────────────┘
+                               │
+┌──────────────────────────────▼──────────────────────────────────┐
+│                    TANKOS MASTER ORCHESTRATOR                    │
+│   OBSERVE → UNDERSTAND → REMEMBER → REASON → PLAN → VALIDATE   │
+│   → ACT → OBSERVE RESULT → EVALUATE → LEARN → UPDATE STATE     │
+└───────┬──────────────────┬───────────────────┬──────────────────┘
+        │                  │                   │
+┌───────▼──────┐  ┌────────▼────────┐  ┌──────▼───────┐
+│   JETSON     │  │    UNO Q 4GB    │  │  3× ESP32-S3 │
+│  Orin Nano   │  │  System Coord.  │  │  Real-time   │
+│  Super 8GB   │  │  QRB2210 Linux  │  │  Sensors/IO  │
+│  67 TOPS     │  │  STM32 MCU      │  │              │
+│              │  │  Motors/Safety  │  │  Eyes/CAM/   │
+│  AI Brain    │  │  Android TV     │  │  Sensors/LTE │
+│  Vision      │  │  Networking     │  │              │
+│  SLAM        │  │  Diagnostics    │  │              │
+└──────┬───────┘  └────────┬────────┘  └──────────────┘
+       │                   │
+┌──────▼───────┐  ┌────────▼────────┐
+│  Camera      │  │  Motors ×2      │
+│  LiDAR       │  │  Servos ×4      │
+│  Display     │  │  Encoders ×2    │
+│  USB Devices │  │  Battery Bank   │
+└──────────────┘  └─────────────────┘
 ```
+
+---
+
+## 🔗 Network Architecture
+
+| Device | Tailscale IP | Role | Status |
+|--------|-------------|------|--------|
+| Jetson (shashi) | `100.122.31.46` | AI brain | ✅ Online |
+| UNO Q (unoq) | `100.84.235.7` | Controller | ✅ Online |
+| VPS (medicscholar) | `100.71.127.19` | Cloud API | ✅ Online |
+| ESP32-S3 CAM | `192.168.31.145` | Camera | ✅ WiFi |
+
+**Failover:** WiFi → LTE (EG800AK) → Jetson Hotspot → Tailscale mesh
 
 ---
 
 ## 💰 Cost Comparison
 
-| | The Tank | Unitree Go2 |
-|---|---------|-------------|
-| Price | ₹64,050 ($800) | ₹2,35,000 ($2,800) |
-| Savings | **72% cheaper** | — |
-| 3-Year Cost | ₹84,450 | ₹4,71,900 |
-| AI Brain | 67 TOPS GPU | Limited CPU |
-| Battery | 2-3 hours | 40 minutes |
-| 4G/LTE | ✅ Full SMS | ❌ WiFi only |
-| Open Source | ✅ MIT | ❌ Closed |
-| Offline AI | ✅ Local LLM | ❌ Cloud only |
-| Customization | Unlimited | Low |
+| | The Tank | Unitree Go2 | Boston Dynamics Spot |
+|---|---------|-------------|---------------------|
+| Price | ₹64,050 ($800) | ₹2,35,000 ($2,800) | ₹62,50,000 ($74,500) |
+| Savings | — | **72% cheaper** | **99.9% cheaper** |
+| AI Brain | 67 TOPS GPU | Limited CPU | Custom |
+| Battery | 2-3 hours | 40 minutes | 90 minutes |
+| 4G/LTE | ✅ Full SMS | ❌ WiFi only | ❌ Enterprise only |
+| Open Source | ✅ MIT | ❌ Closed | ❌ Closed |
+| Offline AI | ✅ 42 local models | ❌ Cloud only | ❌ Cloud only |
+| Customization | Unlimited | Low | Low |
 
 ---
 
-## ✅ Why The Tank Wins
+## 📚 Key Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [README.md](README.md) | Full project overview (327 modules, 100 providers) |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Three-layer architecture deep dive |
+| [PRESENTATION.md](PRESENTATION.md) | Visual presentation with photos + GIFs |
+| [STATUS.md](STATUS.md) | Live project status |
+| [hardware.md](hardware.md) | Complete BOM with pricing |
+| [WIRING.md](WIRING.md) | Pin connections, I²C addresses |
+| [COMPARISON.md](COMPARISON.md) | TankOS vs competitors |
+| [docs/screenshots/](docs/screenshots/) | 70+ live screenshots |
+| [docs/infographics/](docs/infographics/) | 51 SVG architecture diagrams |
+
+---
+
+## 🏆 Why The Tank Wins
 
 1. **72% cheaper** than commercial alternatives
-2. **374 tested features** across 3 computing layers
+2. **327 tested modules** across 3 computing layers
 3. **3× longer battery** (2-3 hours vs 40 minutes)
 4. **67 TOPS GPU** vs limited CPU
-5. **14 AI providers** with auto-selection
-6. **Full offline AI** — works without internet
-7. **SMS control** — text your robot
-8. **Open source** — MIT license
-9. **Indian parts** — available on Robu.in
-10. **Learning platform** — teaches entire robotics stack
+5. **100 AI providers** with auto-selection
+6. **Full offline AI** — 42 local models, works without internet
+7. **3 perception nodes** — camera + LiDAR + remote detection
+8. **SMS control** — text your robot
+9. **Open source** — MIT license
+10. **Indian parts** — available on Robu.in
 
 ---
 
