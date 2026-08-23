@@ -102,3 +102,5 @@ chromium --headless --no-sandbox --screenshot=X.png --timeout=30000 URL
 | 66 | `66_tankos_system.png` | 🤖 TankOS System — distributed nodes, state machine, device lifecycle, health, traces |
 
 | 67 | `67_evolution_lab.png` | 🧬 Evolution Lab — generations, weakness discovery, proposal approve/reject, experiments |
+| 68 | `68_ai_native.png` | 🧠 AI-Native TankOS — capability map, model registry + health, Jetson/UNO Q scheduler, budgets, fallback |
+
