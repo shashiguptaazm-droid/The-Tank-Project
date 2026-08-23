@@ -1,0 +1,15 @@
+[Unit]
+Description=TankOS Terminal Embed (localhost)
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ttyd -p 7682 -i lo -t titleFixed=TankOS python3 /home/shashi/The-Tank-Project/tank_os/shell/terminal/agent_chat.py
+WorkingDirectory=/home/shashi/The-Tank-Project
+EnvironmentFile=/home/shashi/The-Tank-Project/.env
+Restart=always
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target

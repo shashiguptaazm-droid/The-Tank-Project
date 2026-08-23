@@ -1,0 +1,15 @@
+[Unit]
+Description=TankOS Web Terminal
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ttyd -p 7681 -c arduino:9936468425 -t titleFixed=TankOS python3 /home/shashi/The-Tank-Project/tank_os/shell/terminal/agent_chat.py
+WorkingDirectory=/home/shashi/The-Tank-Project
+EnvironmentFile=/home/shashi/The-Tank-Project/.env
+Restart=always
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target
