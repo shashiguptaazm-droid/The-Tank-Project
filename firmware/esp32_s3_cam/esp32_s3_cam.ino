@@ -1,114 +1,84 @@
 /*
- * ESP32-S3 CAM — USB Serial Camera Firmware v2
- * Auto-detects camera sensor across common pin configurations.
+ * ESP32-S3 CAM v6 — Keyestudio MB0184 / N16R8 pinout
  *
- * Tries multiple I2C pin pairs to find the camera sensor.
- * Once found, captures JPEG frames via USB serial SNAP command.
+ * Proven pin mapping (from Keyestudio docs):
+ *   SIOD=4, SIOC=5, VSYNC=6, HREF=7, XCLK=15, PCLK=13
+ *   D0(Y2)=11, D1(Y3)=9, D2(Y4)=8, D3(Y5)=10, D4(Y6)=12, D5(Y7)=18, D6(Y8)=17, D7(Y9)=16
+ *   PWDN=-1, RESET=-1
  *
  * Protocol (921600 baud):
- *   HOST → "SNAP\n", "STATUS\n", "LED 1\n", "LED 0\n"
- *   CAM  → "FRAME:<w>:<h>:<size>\n" + JPEG bytes, "OK:...\n", "ERR:...\n"
+ *   HOST → "SNAP\n", "STATUS\n"
+ *   CAM  → "FRAME:<w>:<h>:<size>\n" + JPEG bytes + \n
  */
-
 #include "esp_camera.h"
-#include <Wire.h>
 #include "esp_heap_caps.h"
-
-#define LED_FLASH_PIN  4
-
-// ── TRY THESE PIN CONFIGS (I2C pairs most likely to work) ──
-struct CamPins {
-  int xclk, pclk, vsync, href;
-  int sda, scl;
-  int y2, y3, y4, y5, y6, y7, y8, y9;
-  int pwdn, reset;
-};
-
-static const CamPins CONFIGS[] = {
-  // Config 0: DFRobot / ESP32-S3 CAM (GPIO8/9 I2C)
-  {5, 15, 1, 2,  8, 9,   16,18,21,17,14,7,6,4,  -1,-1},
-  // Config 1: Generic ESP32-S3 (GPIO4/5 I2C)  
-  {15, 13, 6, 7,  4, 5,   14,47,13,21,48,11,12,16,  -1,-1},
-  // Config 2: AI-Thinker / DevKitC-1 style (GPIO40/39 I2C — common for OV5640 boards)
-  {10, 13, 38, 47, 40, 39,  12,11,15,16,17,18,14,48, -1,-1},
-};
-
-static int found_config = -1;
-
-void setup_camera(int idx) {
-  const CamPins &p = CONFIGS[idx];
-  
-  camera_config_t cfg = {};
-  cfg.ledc_channel = LEDC_CHANNEL_0;
-  cfg.ledc_timer = LEDC_TIMER_0;
-  cfg.pin_d0 = p.y2;   cfg.pin_d1 = p.y3;
-  cfg.pin_d2 = p.y4;   cfg.pin_d3 = p.y5;
-  cfg.pin_d4 = p.y6;   cfg.pin_d5 = p.y7;
-  cfg.pin_d6 = p.y8;   cfg.pin_d7 = p.y9;
-  cfg.pin_xclk = p.xclk;     cfg.pin_pclk = p.pclk;
-  cfg.pin_vsync = p.vsync;   cfg.pin_href = p.href;
-  cfg.pin_sccb_sda = p.sda;  cfg.pin_sccb_scl = p.scl;
-  cfg.pin_pwdn = p.pwdn;     cfg.pin_reset = p.reset;
-  cfg.xclk_freq_hz = 20000000;
-  cfg.pixel_format = PIXFORMAT_JPEG;
-  cfg.frame_size = FRAMESIZE_VGA;    // 640x480 — plenty of PSRAM (8MB)
-  cfg.jpeg_quality = 10;             // 0-63, 10 = good quality
-  cfg.fb_count = 2;
-  cfg.fb_location = CAMERA_FB_IN_PSRAM;  // N16R8 has 8MB octal PSRAM
-  cfg.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
-
-  esp_camera_deinit();
-  esp_err_t err = esp_camera_init(&cfg);
-  if (err == ESP_OK) {
-    found_config = idx;
-    sensor_t *s = esp_camera_sensor_get();
-    Serial.printf("OK: Camera ready (%s %dMP, %dx%d, pins=%d, psram=%d)\n",
-      s->id.PID == OV5640_PID ? "OV5640" : 
-      s->id.PID == OV3660_PID ? "OV3660" :
-      s->id.PID == OV2640_PID ? "OV2640" : "unknown",
-      s->id.PID == OV5640_PID ? 5 : s->id.PID == OV3660_PID ? 3 : 2,
-      resolution[s->status.framesize].width,
-      resolution[s->status.framesize].height, idx,
-      heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-  } else {
-    Serial.printf("DBG: Config %d failed: 0x%x\n", idx, err);
-  }
-}
 
 void setup() {
   Serial.begin(921600);
-  while (!Serial) delay(10);
+  while(!Serial) delay(10);
   delay(500);
-  pinMode(LED_FLASH_PIN, OUTPUT);
-  digitalWrite(LED_FLASH_PIN, LOW);
-  
-  // Try each pin config
-  for (int i = 0; i < 3; i++) {
-    setup_camera(i);
-    if (found_config >= 0) break;
-    delay(100);
+
+  Serial.printf("PSRAM: %s (%d free)\n",
+    psramFound() ? "OK" : "NONE",
+    psramFound() ? heap_caps_get_free_size(MALLOC_CAP_SPIRAM) : -1);
+
+  camera_config_t cfg = {};
+  cfg.ledc_channel = LEDC_CHANNEL_0;
+  cfg.ledc_timer = LEDC_TIMER_0;
+  // Keyestudio MB0184 pinout
+  cfg.pin_d0  = 11;  // Y2
+  cfg.pin_d1  = 9;   // Y3
+  cfg.pin_d2  = 8;   // Y4
+  cfg.pin_d3  = 10;  // Y5
+  cfg.pin_d4  = 12;  // Y6
+  cfg.pin_d5  = 18;  // Y7
+  cfg.pin_d6  = 17;  // Y8
+  cfg.pin_d7  = 16;  // Y9
+  cfg.pin_xclk     = 15;
+  cfg.pin_pclk     = 13;
+  cfg.pin_vsync    = 6;
+  cfg.pin_href     = 7;
+  cfg.pin_sccb_sda = 4;
+  cfg.pin_sccb_scl = 5;
+  cfg.pin_pwdn     = -1;
+  cfg.pin_reset    = -1;
+  cfg.xclk_freq_hz  = 20000000;
+  cfg.pixel_format  = PIXFORMAT_JPEG;
+  cfg.frame_size    = FRAMESIZE_QVGA;
+  cfg.jpeg_quality  = 12;
+  cfg.fb_count      = 1;
+  cfg.fb_location   = CAMERA_FB_IN_PSRAM;
+  cfg.grab_mode     = CAMERA_GRAB_WHEN_EMPTY;
+
+  esp_err_t err = esp_camera_init(&cfg);
+  if (err != ESP_OK) {
+    Serial.printf("ERR: camera_init=0x%x\n", err);
+    return;
   }
-  
-  if (found_config < 0) {
-    Serial.println("ERR: No camera found — tried 3 pin configs");
+
+  sensor_t *s = esp_camera_sensor_get();
+  Serial.printf("OK: %s %dx%d\n",
+    s->id.PID == OV5640_PID ? "OV5640" : s->id.PID == OV3660_PID ? "OV3660" : "OV2640",
+    resolution[s->status.framesize].width,
+    resolution[s->status.framesize].height);
+
+  // Warm up with dummy grabs
+  for(int i = 0; i < 4; i++) {
+    camera_fb_t *fb = esp_camera_fb_get();
+    if(fb) { esp_camera_fb_return(fb); Serial.print("."); }
+    delay(50);
   }
+  Serial.println();
 }
 
 void loop() {
-  if (!Serial.available()) { delay(10); return; }
-  
-  String cmd = Serial.readStringUntil('\n');
-  cmd.trim();
-  
-  if (cmd == "SNAP") {
-    if (found_config < 0) {
-      Serial.println("ERR: No camera");
-      return;
-    }
+  if(!Serial.available()) { delay(10); return; }
+  String cmd = Serial.readStringUntil('\n'); cmd.trim();
+
+  if(cmd == "SNAP") {
     camera_fb_t *fb = esp_camera_fb_get();
-    if (!fb) {
-      Serial.printf("ERR: Capture failed (psram_free=%d)\n",
-        heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+    if(!fb) {
+      Serial.printf("ERR: fb_get=null psram=%d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
       return;
     }
     Serial.printf("FRAME:%d:%d:%d\n", fb->width, fb->height, fb->len);
@@ -116,34 +86,14 @@ void loop() {
     Serial.write('\n');
     esp_camera_fb_return(fb);
   }
-  else if (cmd == "STATUS") {
-    if (found_config < 0) {
-      Serial.println("ERR: No camera found");
-    } else {
-      sensor_t *s = esp_camera_sensor_get();
-      Serial.printf("OK: %s %dx%d config=%d\n",
-        s->id.PID == OV5640_PID ? "OV5640" :
-        s->id.PID == OV3660_PID ? "OV3660" :
-        s->id.PID == OV2640_PID ? "OV2640" : "?",
-        resolution[s->status.framesize].width,
-        resolution[s->status.framesize].height, found_config);
-    }
+  else if(cmd == "STATUS") {
+    sensor_t *s = esp_camera_sensor_get();
+    Serial.printf("OK: %s %dx%d psram=%d\n",
+      s->id.PID == OV5640_PID ? "OV5640" : s->id.PID == OV3660_PID ? "OV3660" : "OV2640",
+      resolution[s->status.framesize].width,
+      resolution[s->status.framesize].height,
+      heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
   }
-  else if (cmd == "RESCAN") {
-    found_config = -1;
-    for (int i = 0; i < 3; i++) {
-      setup_camera(i);
-      if (found_config >= 0) break;
-    }
-  }
-  else if (cmd.startsWith("LED ")) {
-    digitalWrite(LED_FLASH_PIN, cmd.substring(4).toInt() ? HIGH : LOW);
-    Serial.println("OK");
-  }
-  else if (cmd == "LIST") {
-    Serial.println("Commands: SNAP STATUS LED RESCAN LIST");
-  }
-  else {
-    Serial.printf("ERR: Unknown: %s\n", cmd.c_str());
-  }
+  else if(cmd == "LIST") Serial.println("SNAP STATUS LIST");
+  else Serial.printf("ERR:? %s\n", cmd.c_str());
 }
