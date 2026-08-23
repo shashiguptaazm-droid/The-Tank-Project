@@ -345,3 +345,22 @@ REGISTRY · ONE SAFETY AUTHORITY · ONE TOOL REGISTRY · ONE API**.
 
 Tracker: [`docs/TANKOS_ARCHITECTURE_PLAN.md`](docs/TANKOS_ARCHITECTURE_PLAN.md) ·
 Screenshot `66_tankos_system` in [`docs/screenshots/gui/`](docs/screenshots/gui/).
+
+## 7¾¾¾¾¾¾. 🧬 TankOS Evolution Engine (TEE)
+
+The Tank is not just an autonomous robot — TankOS **continuously measures its
+performance, identifies weaknesses, tests candidate improvements in replay and
+shadow mode, and evolves its non-safety-critical behavior under human
+supervision.**
+
+- Observe → analyze → propose → replay-benchmark → multi-objective score
+  (**safety is a hard constraint**) → **human approval** → deploy → monitor →
+  **rollback if worse**.
+- Generations timeline (GEN 0 82% → GEN 3 96%), weakness discovery
+  ("12 navigation failures / 50 missions, corridor B, conf 88%"), the proposal
+  card with [APPROVE] [REJECT], experiments (Vision FPS vs battery A/B/C),
+  resource-aware rejection, and the explicit evolution policy — AI may never
+  disable safety, modify E-stop, or raise motor limits.
+
+Tracker: [`docs/TANKOS_EVOLUTION_PLAN.md`](docs/TANKOS_EVOLUTION_PLAN.md) ·
+Screenshot `67_evolution_lab` in [`docs/screenshots/gui/`](docs/screenshots/gui/).

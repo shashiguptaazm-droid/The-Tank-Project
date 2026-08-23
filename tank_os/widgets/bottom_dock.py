@@ -125,6 +125,8 @@ class BottomDock(QFrame):
         ("🔧", "Tools", "tool-graph"),
         # TankOS proper
         ("🤖", "System", "system"),
+        # Evolution
+        ("🧬", "Evolve", "evolution"),
     ]
 
     def __init__(self, parent: Optional[QWidget] = None) -> None:

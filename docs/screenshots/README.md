@@ -100,3 +100,5 @@ chromium --headless --no-sandbox --screenshot=X.png --timeout=30000 URL
 | 65 | `65_ai_tool_graph.png` | 🧠 AI Tool Graph — typed tool-calling flow, composer readiness, audit log |
 
 | 66 | `66_tankos_system.png` | 🤖 TankOS System — distributed nodes, state machine, device lifecycle, health, traces |
+
+| 67 | `67_evolution_lab.png` | 🧬 Evolution Lab — generations, weakness discovery, proposal approve/reject, experiments |

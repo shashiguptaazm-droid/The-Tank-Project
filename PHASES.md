@@ -297,3 +297,13 @@ Captured in `scripts/provision_pi5.sh`:
 - **TankOS System screen** (`windows/tankos_system_screen.py`) — distributed node
   map, state machine, device lifecycle, health, command observability.
 - Tracker: `docs/TANKOS_ARCHITECTURE_PLAN.md` · Screenshot `66`.
+
+## Phase 20 — TankOS Evolution Engine (TEE) ✅
+
+- **EvolutionEngine** (`core/evolution_engine.py`) — baseline, weakness discovery,
+  proposals, replay benchmark, multi-objective scoring (safety = hard constraint),
+  generations/genome, shadow mode, deploy/rollback/checkpoints, resource-aware
+  rejection, evolution policy (no uncontrolled self-modification).
+- **Evolution Lab** (`windows/evolution_lab.py`) — generations timeline,
+  proposal approve/reject/rollback, experiments, policy.
+- Tracker: `docs/TANKOS_EVOLUTION_PLAN.md` · Screenshot `67`.

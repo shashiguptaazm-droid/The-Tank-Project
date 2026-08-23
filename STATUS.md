@@ -190,4 +190,29 @@ SAFETY AUTHORITY · ONE CONFIGURATION · ONE TOOL REGISTRY · ONE API.**
 - **380 tests passing** (17 new; verified on VPS) + CLI verified live.
 - Screenshot `66_tankos_system` + 28-screen contact sheet.
 
+
+
+---
+
+## 17. 🧬 TankOS Evolution Engine — TEE (25-part plan) ✅
+
+Tracker: [`docs/TANKOS_EVOLUTION_PLAN.md`](docs/TANKOS_EVOLUTION_PLAN.md)
+
+> The Tank observes itself → identifies weaknesses → proposes an improvement →
+> tests it safely → measures the result → promotes it only if objectively
+> better → keeps rollback available. **Human approval is mandatory for
+> hardware, safety, firmware, security, or behavior changes.**
+
+**Shipped this pass:**
+
+| Piece | What it delivers |
+|---|---|
+| `tank_os/core/evolution_engine.py` | Baseline (navigation 91% / detection 94% / latency 83 ms / …), **weakness discovery** (mission-history cause+location correlation), **evolution proposals** (bounded genome params), **replay-based benchmarking**, **multi-objective score with safety as a HARD constraint** (unsafe ⇒ score 0), generations + versioned genome, shadow mode (candidate predicts silently), **automatic rollback** + checkpoints, resource-aware rejection (predicted GPU/thermal), and the explicit **evolution policy** (AI may analyze/propose/simulate/benchmark/bound — may NOT disable safety / modify E-stop / raise motor limits / deploy arbitrary code) |
+| `tank_os/windows/evolution_lab.py` | The Evolution Lab GUI — generation timeline with scores, weakness discovery panel, proposal card with **[APPROVE] [REJECT] [ROLLBACK]**, experiments + shadow summary, policy footer |
+
+- **398 tests passing** (18 new: baseline, discovery, proposal bounds, replay
+  benchmark, safety hard-gate, approve→deploy→rollback, experiments,
+  resource-aware rejection, shadow, policy, evolution story progression).
+- Screenshot `67_evolution_lab` + 29-screen contact sheet.
+
 4. **Report finalization** — Update DOCX with final specs
