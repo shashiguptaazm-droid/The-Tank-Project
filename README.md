@@ -36,6 +36,8 @@
 </p>
 
 > 📄 Docs: [`docs/FLEET_INVENTORY.md`](docs/FLEET_INVENTORY.md) (live device audit) ·
+> 🎬 **Presentation:** [`PRESENTATION.md`](PRESENTATION.md) — the full deck with hero banner, hardware wall, fleet map, and screenshots
+>
 > [`docs/HARDWARE_DEPENDENCIES.md §8`](docs/HARDWARE_DEPENDENCIES.md#8-hardware-photo-gallery) (photo gallery) ·
 > [`assets/README.md`](assets/README.md) (media index)
 
