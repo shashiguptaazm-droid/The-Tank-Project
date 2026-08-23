@@ -244,4 +244,8 @@ Captured in `scripts/provision_pi5.sh`:
 - [x] **`tank unoq` CLI** (`tank_os/cli/unoq_cli.py`, #321–340) — status · diagnostics · sensors ·
       motors · power · mcu · esp32 · self-test · safety-test
 - [x] **14 new tests** (esp32 fleet + unoq CLI) — full suite **262 passing**
+- [x] **UNO Q AI layer** ([`docs/UNOQ_AI_PLAN.md`](docs/UNOQ_AI_PLAN.md)) — 150 local-AI features audited;
+  shipped **AI Supervisor** (confidence arbitration — AI can recommend, safety can veto) +
+  **Robot Doctor** (`tank unoq doctor` — 10-subsystem health, fault-injection acceptance test)
+- [x] **38 new AI tests** (supervisor 12 + robot doctor 26) — full suite now **300 passing**
 - [ ] Remaining ⬜/🔶 items (benchmarks §R, gamepad input, HIL rig, MCU watchdog) — tracked in the master plan

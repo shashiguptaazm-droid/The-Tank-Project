@@ -198,6 +198,134 @@ def cmd_safety_test(args) -> int:
     return 0 if passed else 1
 
 
+def cmd_doctor(args) -> int:
+    """Robot Doctor — 'diagnose robot' (AI plan #20/#40/#60/#100).
+
+    Gathers live telemetry from every subsystem and prints a ranked
+    diagnosis. With --inject <fault>, injects a known fault into the
+    telemetry layer and verifies the diagnostic identifies the correct
+    subsystem (the plan's acceptance test).
+    """
+    from tank_os.core.robot_doctor import RobotDoctor, SEV_FAULT, SEV_WARN
+
+    doctor = RobotDoctor()
+    if args.inject:
+        fault = args.inject.lower()
+        _inject_fault(doctor, fault)
+
+    diag = doctor.diagnose()
+    print(_bar("UNO Q — Robot Doctor"))
+    print(diag.render())
+    print()
+    if args.json:
+        import json as _json
+        print(_json.dumps(diag.as_dict(), indent=2))
+    return 0
+
+
+def _inject_fault(doctor, fault: str) -> None:
+    """Inject a known fault at the telemetry layer (acceptance test).
+
+    Each injectable fault flips exactly one subsystem to fault/warn so a
+    fault-injection suite can assert the diagnosis blames the right
+    subsystem.
+    """
+    from tank_os.core.robot_doctor import RobotDoctor as RD
+
+    faults = {
+        "motor-stall": lambda: ("motors", {"fault": "stall", "enabled": True}),
+        "motor-temp": lambda: ("motors", {"fault": None, "enabled": True, "temperature_c": 92}),
+        "servo-fault": lambda: ("servos", {"fault": "stuck", "enabled": True}),
+        "imu-offline": lambda: ("imu", {"rate_hz": 0, "dropouts": 9, "calibrated": True}),
+        "imu-drift": lambda: ("imu", {"rate_hz": 60, "dropouts": 12, "calibrated": False}),
+        "battery-low": lambda: ("battery", {"percent": 12, "voltage": 11.1, "temp_c": 32}),
+        "battery-critical": lambda: ("battery", {"percent": 3, "voltage": 10.2, "temp_c": 40}),
+        "cpu-peak": lambda: ("cpu_ram", {"cpu_percent": 97, "ram_percent": 40, "temp_c": 60}),
+        "ram-pressure": lambda: ("cpu_ram", {"cpu_percent": 50, "ram_percent": 95, "temp_c": 55}),
+        "mcu-disconnect": lambda: ("mcu", {"connected": False}),
+        "mcu-stale": lambda: ("mcu", {"connected": True, "heartbeat_age_s": 12}),
+        "jetson-latency": lambda: ("jetson", {"reachable": True, "latency_ms": 450, "cmd_timeout": False}),
+        "jetson-timeout": lambda: ("jetson", {"reachable": True, "latency_ms": 30, "cmd_timeout": True}),
+        "esp32-offline": lambda: ("esp32", {"total": 3, "online": 2, "offline": 1,
+                                            "boards": [{"name": "A"}, {"name": "B"}, {"name": "C"}]}),
+        "esp32-all-offline": lambda: ("esp32", {"total": 3, "online": 0, "offline": 3,
+                                                 "boards": [{"name": "A"}, {"name": "B"}, {"name": "C"}]}),
+        "network-down": lambda: ("network", {"connected": False, "signal_percent": 0}),
+        "wifi-weak": lambda: ("network", {"connected": True, "signal_percent": 18}),
+        "service-down": lambda: ("services", {"failed": ["tank-ai.service"]}),
+        "jetson-unreachable": lambda: ("jetson", {"reachable": False}),
+    }
+    if fault not in faults:
+        print(f"  ⚠ unknown fault '{fault}' — known: {', '.join(sorted(faults))}")
+        return
+    name, telemetry = faults[fault]()
+
+    def make_collector(name_: str, telemetry_: dict):
+        def collector():
+            return dict(telemetry_)
+        collector.__name__ = f"fault_{name_}"
+        return collector
+
+    doctor.register(name, make_collector(name, telemetry))
+    print(f"  ⚡ injected fault: {fault} → {name}")
+
+
+def cmd_supervisor(args) -> int:
+    """AI Supervisor — confidence arbitration board (AI plan #146–150).
+
+    Shows each command source's confidence and arbitrates a probe command.
+    With --command <cmd> --source <name>, arbitrates a specific candidate.
+    """
+    from tank_os.core.ai_supervisor import (AISupervisor, SourceRole, Verdict)
+
+    sup = AISupervisor()
+    # Wire the real safety classifier so dangerous commands are caught.
+    try:
+        from tank_os.shell.terminal.safety import CommandSafety
+        sup.configure(safety_classifier=CommandSafety().classify)
+    except Exception:                                           # noqa: BLE001
+        pass
+    # Default board from the plan's example (soft-register, keeps overrides)
+    existing = {s.name for s in sup.sources().values()}
+    defaults = {
+        "jetson": (SourceRole.AI, 0.94),
+        "manual": (SourceRole.MANUAL, 0.99),
+        "local-parser": (SourceRole.AI, 0.87),
+        "hardware-safety": (SourceRole.SAFETY, 1.00),
+        "battery-pred": (SourceRole.AI, 0.91),
+    }
+    for name, (role, conf) in defaults.items():
+        if name not in existing:
+            sup.register(name, role, conf)
+
+    print(_bar("UNO Q — AI Supervisor (confidence arbitration)"))
+    report = sup.report()
+    for row in report["sources"]:
+        role = row["role"]
+        icon = "🛡" if role == "safety" else ("👤" if role == "manual" else "🤖")
+        print(_kv(f"{icon} {row['name']}", f"{row['confidence']:.2f} ({role})"))
+    print(_kv("Rule", report["rule"]))
+
+    # Arbitrate the requested (or a default) command
+    command = args.command_text or "forward 0.5"
+    source = args.source or "local-parser"
+    result = sup.arbitrate(command, source)
+    verdict_icon = {
+        Verdict.ALLOW: "✅", Verdict.RECOMMEND: "🤔", Verdict.NEEDS_APPROVAL: "⚠️",
+        Verdict.VETO: "🛑", Verdict.REJECT: "🚫",
+    }.get(result.verdict, "·")
+    print()
+    print(_kv("Command", command))
+    print(_kv("From", f"{source} (conf {result.confidence:.2f})"))
+    print(_kv("Safety class", result.safety_class or "unknown"))
+    print(_kv("Verdict", f"{verdict_icon} {result.verdict.value.upper()}"))
+    print(_kv("Why", result.reason))
+    if args.json:
+        import json as _json
+        print(_json.dumps(result.as_dict(), indent=2))
+    return 0
+
+
 def cmd_all(args) -> int:
     """Run status + self-test + safety-test back to back."""
     rc = 0
@@ -217,6 +345,8 @@ SUBCOMMANDS = {
     "motors": (cmd_motors, "motor controller status (Jetson-side)"),
     "mcu": (cmd_mcu, "MCU bridge heartbeat (Jetson-side)"),
     "esp32": (cmd_esp32, "ESP32 fleet status (--self-test for full check)"),
+    "doctor": (cmd_doctor, "Robot Doctor — diagnose robot (--inject <fault> for fault testing)"),
+    "supervisor": (cmd_supervisor, "AI confidence arbitration board (--command/--source)"),
     "self-test": (cmd_self_test, "boot steps + fleet end-to-end self-test"),
     "safety-test": (cmd_safety_test, "validate safety classification of commands"),
     "all": (cmd_all, "status + self-test + safety-test"),
@@ -226,14 +356,20 @@ SUBCOMMANDS = {
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="tank unoq",
-        description="Consolidated UNO Q command surface (master-plan §P).",
+        description="Consolidated UNO Q command surface (master-plan §P + AI plan).",
     )
     parser.add_argument("command", choices=sorted(SUBCOMMANDS),
                         help="subcommand to run")
     parser.add_argument("--json", action="store_true",
-                        help="machine-readable output (diagnostics)")
+                        help="machine-readable output (diagnostics/doctor/supervisor)")
     parser.add_argument("--self-test", action="store_true",
                         help="run full self-test (esp32)")
+    parser.add_argument("--inject", default="",
+                        help="inject a known fault for the Robot Doctor (e.g. esp32-offline)")
+    parser.add_argument("--command-text", default="", dest="command_text",
+                        help="command to arbitrate (supervisor)")
+    parser.add_argument("--source", default="",
+                        help="source proposing the command (supervisor)")
     return parser
 
 

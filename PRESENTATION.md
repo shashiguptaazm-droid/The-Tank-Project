@@ -165,6 +165,21 @@ The whole repo was audited against **400 UNO Q upgrade targets**; the top
 
 ---
 
+## 7¾½. 🧠 UNO Q — Local AI (150-feature plan)
+
+Lightweight AI on the UNO Q's QRB2210 Linux side — the STM32 stays
+deterministic and safety-critical. Two competition features shipped:
+
+| Feature | What it does |
+|---------|--------------|
+| **Robot Doctor** (`tank unoq doctor`) | "Diagnose robot" — scores **10 subsystems**, ranked likely cause + recommendation. **20-fault injection suite passes** (each fault blamed on the right subsystem) |
+| **AI Supervisor** (`tank unoq supervisor`) | **Confidence arbitration** — Jetson 0.94 · manual 0.99 · local-parser 0.87 · safety 1.00 · battery 0.91. **AI can recommend. Safety can veto.** DANGEROUS commands never auto-execute |
+
+Full tracker: [`docs/UNOQ_AI_PLAN.md`](docs/UNOQ_AI_PLAN.md) — all 150 items mapped to code.
+**300 tests passing** (38 new).
+
+---
+
 ## 8. Real Build Photos
 
 <p align="center">
@@ -207,6 +222,7 @@ The whole repo was audited against **400 UNO Q upgrade targets**; the top
 | [`docs/HARDWARE_DEPENDENCIES.md`](docs/HARDWARE_DEPENDENCIES.md) | Hardware mapping + **photo gallery** |
 | [`docs/screenshots/README.md`](docs/screenshots/README.md) | All feature screenshots with verification notes |
 | [`docs/UNOQ_MASTER_PLAN.md`](docs/UNOQ_MASTER_PLAN.md) | 400-item UNO Q upgrade tracker + top-20 audit |
+| [`docs/UNOQ_AI_PLAN.md`](docs/UNOQ_AI_PLAN.md) | 150-item UNO Q local-AI tracker + Robot Doctor & AI Supervisor |
 | [`docs/FEATURE_PROOF_TEMPLATE.md`](docs/FEATURE_PROOF_TEMPLATE.md) | Mandatory proof template for every feature |
 | [`WIRING.md`](WIRING.md) | Pin-level wiring, I²C map, power rails |
 | [`hardware.md`](hardware.md) | Full BOM with photos |

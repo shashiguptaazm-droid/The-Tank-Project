@@ -15,7 +15,7 @@ def test_parser_exposes_all_priority_subcommands() -> None:
     parser = build_parser()
     assert set(SUBCOMMANDS) == {
         "status", "diagnostics", "power", "sensors", "motors", "mcu",
-        "esp32", "self-test", "safety-test", "all",
+        "esp32", "doctor", "supervisor", "self-test", "safety-test", "all",
     }
     args = parser.parse_args(["status"])
     assert args.command == "status"
@@ -43,6 +43,14 @@ def test_diagnostics_json_flag() -> None:
 
 def test_safety_test_passes() -> None:
     assert main(["safety-test"]) == 0
+
+
+def test_doctor_exits_zero() -> None:
+    assert main(["doctor"]) == 0
+
+
+def test_supervisor_exits_zero() -> None:
+    assert main(["supervisor"]) == 0
 
 
 def test_unknown_command_fails() -> None:

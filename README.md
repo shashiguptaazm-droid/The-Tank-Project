@@ -40,6 +40,8 @@
 >
 > 🟦 **UNO Q Master Plan:** [`docs/UNOQ_MASTER_PLAN.md`](docs/UNOQ_MASTER_PLAN.md) — 400-item upgrade tracker (top-20 audited) · every feature ships with [`docs/FEATURE_PROOF_TEMPLATE.md`](docs/FEATURE_PROOF_TEMPLATE.md) proof
 >
+> 🧠 **UNO Q AI Plan:** [`docs/UNOQ_AI_PLAN.md`](docs/UNOQ_AI_PLAN.md) — 150 local-AI features · **`tank unoq doctor`** (Robot Doctor) + **`tank unoq supervisor`** (AI can recommend, safety can veto)
+>
 > 🎬 **Presentation:** [`PRESENTATION.md`](PRESENTATION.md) — the full deck with hero banner, hardware wall, fleet map, and screenshots
 >
 > [`docs/HARDWARE_DEPENDENCIES.md §8`](docs/HARDWARE_DEPENDENCIES.md#8-hardware-photo-gallery) (photo gallery) ·

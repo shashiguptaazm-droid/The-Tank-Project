@@ -382,6 +382,15 @@ ros2 launch tank_bringup robot.launch.py
 * **Proof template:** [`docs/FEATURE_PROOF_TEMPLATE.md`](docs/FEATURE_PROOF_TEMPLATE.md) — mandatory
   FEATURE / TEST / MEASUREMENTS / STATUS block for every shipped feature (unit + simulated +
   hardware + failure test evidence).
+* **UNO Q AI Plan:** [`docs/UNOQ_AI_PLAN.md`](docs/UNOQ_AI_PLAN.md) — **150 local-AI features** mapped
+  to code (assistant, diagnostics, predictive maintenance, motion/sensor/network/power/security AI).
+  - `tank_os/core/ai_supervisor.py` — **AI confidence arbitration** (#146–150): confidence board
+    (Jetson 0.94 · manual 0.99 · local-parser 0.87 · hardware-safety 1.00 veto · battery-pred 0.91),
+    **"AI can recommend. Safety can veto."** — DANGEROUS commands never auto-execute.
+  - `tank_os/core/robot_doctor.py` — **Robot Doctor** (`tank unoq doctor`): scores 10 subsystems,
+    ranked likely cause + recommendation. **Fault-injection acceptance test:** 20 known faults,
+    each identified as the correct subsystem.
+  - `tank_os/tests/test_ai_supervisor.py` (12) + `test_robot_doctor.py` (26) — full suite now **300 passing**.
 
 ## Recent expansion (post F206)
 

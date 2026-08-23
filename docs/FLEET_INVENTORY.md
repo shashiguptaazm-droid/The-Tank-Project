@@ -115,6 +115,10 @@
 | **ESP32-S3 Dual-eyes** | `A0:F2:62:E3:DF:F4` | Jetson USB `/dev/ttyACM1` | ✅ Present; JSON `{cmd}` protocol (`happy`/`alert`/`blink`/`gaze`) | ![ESP32-S3](hardware_photos/6_esp32_s3_devkitc_1.png) |
 | **DFRobot AI Camera** (SEN0611) | `28:84:85:4C:84:04` | Jetson USB `/dev/ttyACM0` | ✅ **Flashing COMPLETE** — streams `[FRAME] 640x480` (CamWebServer) | ![DFRobot AI Cam](hardware_photos/3_dfrobot_esp32s3_ai_camera.webp) |
 
+> 🧠 **AI features:** `tank unoq doctor` (Robot Doctor — 10-subsystem health diagnosis) +
+> `tank unoq supervisor` (AI confidence arbitration — AI can recommend, safety can veto).
+> See the [UNO Q AI Plan](UNOQ_AI_PLAN.md).
+>
 > 🛰️ **Fleet-managed** by `tank_os/core/esp32_fleet.py` — identity registry (3 boards by MAC),
 > heartbeat + timeout detection, telemetry aggregation, and self-test via `tank unoq esp32`
 > / `tank unoq self-test` (14 tests). See the [UNO Q Master Plan](UNOQ_MASTER_PLAN.md) §N.

@@ -38,6 +38,10 @@
 #281–300) + `tank_os/cli/unoq_cli.py` (`tank unoq` command surface, §P) +
 `tank_os/tests/test_esp32_fleet.py` & `test_unoq_cli.py` (14 tests).
 
+**AI pass (second wave):** [`docs/UNOQ_AI_PLAN.md`](UNOQ_AI_PLAN.md) — 150 local-AI
+features; shipped **`ai_supervisor.py`** (confidence arbitration, #146–150),
+**`robot_doctor.py`** (`tank unoq doctor`), 38 new tests (suite now **300**).
+
 ---
 
 ## A. UNO Q platform / hardware intelligence — 1–20
