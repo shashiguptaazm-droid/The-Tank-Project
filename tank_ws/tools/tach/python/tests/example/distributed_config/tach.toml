@@ -1,3 +1,0 @@
-[[modules]]
-path = "project.top_level"
-depends_on = ["project.module_two"]

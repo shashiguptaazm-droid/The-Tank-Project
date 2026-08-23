@@ -1,3 +1,0 @@
-[[modules]]
-path = "mymodule"
-depends_on = []
