@@ -36,9 +36,19 @@ class ESP32CameraDriver:
     def _ensure_serial(self):
         if self._serial is None or not self._serial.is_open:
             import serial
-            self._serial = serial.Serial(self.port, self.baud, timeout=5)
-            time.sleep(0.3)
-            self._serial.read(self._serial.in_waiting)  # drain boot noise
+            self._serial = serial.Serial(self.port, self.baud, timeout=2)
+            # Drain boot noise — ESP32 may take 15-20s to init camera
+            time.sleep(0.5)
+            self._serial.read(self._serial.in_waiting)
+            # Wait for "OK: Camera ready" or timeout
+            deadline = time.time() + 25
+            while time.time() < deadline:
+                line = self._serial.readline()
+                if b"Camera ready" in line or b"No camera" in line:
+                    logger.debug("Camera boot: %s", line.decode().strip())
+                    break
+                if b"ERR:" in line:
+                    logger.debug("Camera boot msg: %s", line.decode().strip())
 
     def capture(self) -> Optional[Path]:
         """Capture a JPEG frame. Returns path to saved file, or None."""
