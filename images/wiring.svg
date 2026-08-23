@@ -42,7 +42,7 @@
   <!-- ===== ARDUINO (left) ===== -->
   <rect x="50" y="80" width="440" height="240" rx="10" fill="#F0FDFA" stroke="#14B8A6" stroke-width="2" filter="url(#shadow)"/>
   <text x="270" y="105" text-anchor="middle" font-size="15" font-weight="700" fill="#0F766E">⚡ Arduino UNO Q</text>
-  <text x="270" y="122" text-anchor="middle" font-size="10" fill="#0D9488">Real-time Motor &amp; Sensor Controller · Arm Cortex-M4 48MHz</text>
+  <text x="270" y="122" text-anchor="middle" font-size="10" fill="#0D9488">Real-time Motor &amp; Sensor Controller · Qualcomm QRB2210 + STM32U585 MCU</text>
 
   <!-- Arduino pin rows -->
   <g font-size="9">

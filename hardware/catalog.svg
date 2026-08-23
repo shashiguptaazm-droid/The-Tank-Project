@@ -26,8 +26,8 @@
       <rect x="0" y="0" width="160" height="85" rx="6" fill="#fff" stroke="#0D9488" filter="url(#sh)"/>
       <rect x="10" y="8" width="140" height="50" rx="4" fill="#CCFBF1"/>
       <text x="80" y="30" text-anchor="middle" font-size="10" font-weight="700" fill="#0F766E">Arduino UNO</text>
-      <text x="80" y="44" text-anchor="middle" font-size="10" font-weight="700" fill="#0F766E">R4 WiFi</text>
-      <text x="80" y="62" text-anchor="middle" font-size="7" fill="#64748B">Arm M4 48MHz</text>
+      <text x="80" y="44" text-anchor="middle" font-size="10" font-weight="700" fill="#0F766E">UNO Q</text>
+      <text x="80" y="62" text-anchor="middle" font-size="7" fill="#64748B">Qualcomm QRB2210 + STM32U585</text>
       <text x="80" y="82" text-anchor="middle" font-size="7" fill="#0D9488">₹1.8K–2.5K</text>
     </g>
 
