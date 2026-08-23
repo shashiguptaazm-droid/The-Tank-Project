@@ -547,9 +547,35 @@ GENERATE → SANDBOX → STATIC ANALYSIS → UNIT TEST → SIMULATION
 
 ---
 
-## 📺 Android TV GUI
+## 📺 Android TV GUI — 100 Advanced Features
 
-16-feature tile interface running on Jetson's display:
+TankOS has a **100-feature Android TV-style interface** organized into 6 panels:
+
+### Panel Overview
+
+| Panel | Features | Description |
+|-------|----------|-------------|
+| 🎮 **Control & Teleoperation** | 20 | Gravity, sketch, arm, AR, digital twin, fleet, sandbox |
+| 🧠 **AI & Autonomy** | 20 | Reasoning, shadow mode, explainability, sentry, mission planner |
+| 📊 **Telemetry & Diagnostics** | 20 | Network QoS, odometry, ROS browser, heatmap, self-test |
+| 🗺️ **Navigation & Mapping** | 15 | No-go zones, map layers, trajectory, path editing, coverage |
+| ⚙️ **Settings & Customization** | 15 | Themes, plugins, languages, haptics, onboarding |
+| 🔒 **Security & Admin** | 10 | RBAC, audit log, API keys, backup/restore |
+
+### Highlight Features
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 201 | Gravity Control | Tilt phone to steer robot |
+| 207 | AR View | Overlay digital info on live video |
+| 218 | Digital Twin | 3D model mirroring real-time state |
+| 221 | LLM Reasoning Panel | Show AI thought process |
+| 229 | Semantic Search | "Where did I leave the blue box?" |
+| 248 | Custom Dashboard | Drag-drop-resize widgets |
+| 263 | No-Go Zones | Draw avoidance areas on map |
+| 275 | Dynamic Map | Watch map build in real-time |
+| 293 | RBAC | Admin/Operator/Viewer permissions |
+| 300 | Backup/Restore | One-click system backup |
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -567,6 +593,17 @@ GENERATE → SANDBOX → STATIC ANALYSIS → UNIT TEST → SIMULATION
 │ 🧬 Evolution│ 👁️ AprilTag │ 🔌 USB      │ 💻 Terminal  │
 │ AI Improve  │ Dock Detect │ Devices     │ Full Shell   │
 └─────────────┴─────────────┴─────────────┴───────────────┘
+
+ADVANCED PANELS:
+┌─────────────────────────────────────────────────────────┐
+│ 🎮 Control  │ 🧠 AI  │ 📊 Telemetry │ 🗺️ Map │ ⚙️ Set │ 🔒 Sec │
+│─────────────────────────────────────────────────────────│
+│ • Gravity Steering    • AR View       • Digital Twin      │
+│ • Sketch-to-Path      • Fleet Control • No-Go Zones      │
+│ • 6-DOF Arm           • Shadow Mode   • Custom Dashboard │
+│ • Command Stacking    • Sentry Mode   • RBAC             │
+│ • Simulation Mode     • Mission Planner • Backup/Restore │
+└─────────────────────────────────────────────────────────┘
 ```
 
 ---
