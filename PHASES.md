@@ -228,3 +228,20 @@ Captured in `scripts/provision_pi5.sh`:
 - [x] llm-code: bartowski/DeepSeek-Coder-1.3B → Qwen/Qwen2.5-Coder-1.5B (open-access)
 - [x] llm-vision: bartowski/Llama-3.2-11B-Vision → bartowski/Qwen2-VL-7B + mmproj (open-access)
 - [x] All 5 URLs verified with 302 redirect (no auth required)
+
+---
+
+## Phase 15 — UNO Q 400-Item Upgrade Master Plan ✅ (audit + top-20 gaps)
+
+> Full tracker: [`docs/UNOQ_MASTER_PLAN.md`](docs/UNOQ_MASTER_PLAN.md) — all 400 targets (A–S)
+> audited against the live repo, every item mapped to its implementation.
+> Every shipped feature carries proof per [`docs/FEATURE_PROOF_TEMPLATE.md`](docs/FEATURE_PROOF_TEMPLATE.md).
+
+- [x] Audit the repo against the 400-item plan — top-20 P0/P1 prioritized
+- [x] **ESP32 fleet manager** (`tank_os/core/esp32_fleet.py`, #281–300) — identity registry (3 boards
+      by MAC), USB discovery, heartbeat, timeout detection, telemetry aggregation, fleet self-test;
+      **ESP32-S3 CAM verified ONLINE** on real hardware
+- [x] **`tank unoq` CLI** (`tank_os/cli/unoq_cli.py`, #321–340) — status · diagnostics · sensors ·
+      motors · power · mcu · esp32 · self-test · safety-test
+- [x] **14 new tests** (esp32 fleet + unoq CLI) — full suite **262 passing**
+- [ ] Remaining ⬜/🔶 items (benchmarks §R, gamepad input, HIL rig, MCU watchdog) — tracked in the master plan

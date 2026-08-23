@@ -70,6 +70,9 @@ The `/remote` page (also the desktop **"TV Remote"** launcher →
 
 ## Related
 
+- Upgrade roadmap: [`UNOQ_MASTER_PLAN.md`](UNOQ_MASTER_PLAN.md) — TV Mode = items **#236–260** (L),
+  with the full 400-item tracker and top-20 audit
+- Proof standard: [`FEATURE_PROOF_TEMPLATE.md`](FEATURE_PROOF_TEMPLATE.md)
 - Fleet node: `unoq` — see [`FLEET_INVENTORY.md`](FLEET_INVENTORY.md#2-unoq-this-board--arduino-uno-q)
 - The board itself: [`docs/hardware_photos/2_arduino_uno_q.jpg`](hardware_photos/2_arduino_uno_q.jpg)
 - Desktop launcher: `~/Desktop/TV Remote.desktop` → `http://192.168.31.72:8200/remote`

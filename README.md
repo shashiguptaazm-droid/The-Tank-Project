@@ -38,6 +38,8 @@
 > 📄 Docs: [`docs/FLEET_INVENTORY.md`](docs/FLEET_INVENTORY.md) (live device audit) ·
 > 📺 **UNO Q → Android TV:** [`docs/UNOQ_ANDROID_TV.md`](docs/UNOQ_ANDROID_TV.md) — TV kiosk, ADB remote, media hub · screenshots in [`docs/screenshots/tv/`](docs/screenshots/tv/)
 >
+> 🟦 **UNO Q Master Plan:** [`docs/UNOQ_MASTER_PLAN.md`](docs/UNOQ_MASTER_PLAN.md) — 400-item upgrade tracker (top-20 audited) · every feature ships with [`docs/FEATURE_PROOF_TEMPLATE.md`](docs/FEATURE_PROOF_TEMPLATE.md) proof
+>
 > 🎬 **Presentation:** [`PRESENTATION.md`](PRESENTATION.md) — the full deck with hero banner, hardware wall, fleet map, and screenshots
 >
 > [`docs/HARDWARE_DEPENDENCIES.md §8`](docs/HARDWARE_DEPENDENCIES.md#8-hardware-photo-gallery) (photo gallery) ·

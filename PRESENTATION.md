@@ -149,6 +149,22 @@ Architecture & config: [`docs/UNOQ_ANDROID_TV.md`](docs/UNOQ_ANDROID_TV.md) · a
 
 ---
 
+## 7¾. 🟦 UNO Q — 400-Item Upgrade Master Plan
+
+The whole repo was audited against **400 UNO Q upgrade targets**; the top
+**P0/P1 gaps** were implemented and shipped with proof:
+
+| New | What it does |
+|-----|--------------|
+| [`docs/UNOQ_MASTER_PLAN.md`](docs/UNOQ_MASTER_PLAN.md) | All 400 targets (A–S) mapped to code, top-20 audited ✅/🔶/⬜ |
+| `tank_os/core/esp32_fleet.py` | **ESP32 fleet manager** — discovery, heartbeat, self-test · **CAM detected ONLINE** on real hardware |
+| `tank_os/cli/unoq_cli.py` | **`tank unoq`** — status · diagnostics · sensors · motors · power · mcu · esp32 · self-test · safety-test |
+| [`docs/FEATURE_PROOF_TEMPLATE.md`](docs/FEATURE_PROOF_TEMPLATE.md) | Mandatory FEATURE / TEST / MEASUREMENTS / STATUS proof block |
+
+**262 tests passing** (14 new) — full regression suite green on the VPS.
+
+---
+
 ## 8. Real Build Photos
 
 <p align="center">
@@ -190,6 +206,8 @@ Architecture & config: [`docs/UNOQ_ANDROID_TV.md`](docs/UNOQ_ANDROID_TV.md) · a
 | [`docs/FLEET_INVENTORY.md`](docs/FLEET_INVENTORY.md) | Every device, interface, usage, connection & requirement |
 | [`docs/HARDWARE_DEPENDENCIES.md`](docs/HARDWARE_DEPENDENCIES.md) | Hardware mapping + **photo gallery** |
 | [`docs/screenshots/README.md`](docs/screenshots/README.md) | All feature screenshots with verification notes |
+| [`docs/UNOQ_MASTER_PLAN.md`](docs/UNOQ_MASTER_PLAN.md) | 400-item UNO Q upgrade tracker + top-20 audit |
+| [`docs/FEATURE_PROOF_TEMPLATE.md`](docs/FEATURE_PROOF_TEMPLATE.md) | Mandatory proof template for every feature |
 | [`WIRING.md`](WIRING.md) | Pin-level wiring, I²C map, power rails |
 | [`hardware.md`](hardware.md) | Full BOM with photos |
 | [`PHASES.md`](PHASES.md) | Development roadmap |

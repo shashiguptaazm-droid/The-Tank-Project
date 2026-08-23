@@ -367,6 +367,21 @@ ros2 launch tank_bringup robot.launch.py
 
 ## 12. What was built this session (recently, in summary)
 
+### 🟦 UNO Q 400-Item Upgrade Master Plan (latest)
+
+* **Master plan:** [`docs/UNOQ_MASTER_PLAN.md`](docs/UNOQ_MASTER_PLAN.md) — all **400 upgrade targets**
+  (sections A–S) mapped to their implementation, with the **top-20 P0/P1 priorities audited**
+  against the live repo. Consolidation-first: extend existing modules, do not add files.
+* **New code (the audited gaps):**
+  - `tank_os/core/esp32_fleet.py` — **ESP32 fleet manager** (#281–300): identity registry
+    (3 boards by MAC), USB discovery, heartbeat, timeout detection, telemetry aggregation,
+    fleet self-test. Verified live: **ESP32-S3 CAM detected ONLINE** (`14:C1:9F:C1:2C:24`).
+  - `tank_os/cli/unoq_cli.py` — **`tank unoq` command surface** (#321–340): `status · diagnostics ·
+    sensors · motors · power · mcu · esp32 · self-test · safety-test`.
+  - `tank_os/tests/test_esp32_fleet.py` + `test_unoq_cli.py` — **14 new tests**, full suite now **262 passing**.
+* **Proof template:** [`docs/FEATURE_PROOF_TEMPLATE.md`](docs/FEATURE_PROOF_TEMPLATE.md) — mandatory
+  FEATURE / TEST / MEASUREMENTS / STATUS block for every shipped feature (unit + simulated +
+  hardware + failure test evidence).
 
 ## Recent expansion (post F206)
 
