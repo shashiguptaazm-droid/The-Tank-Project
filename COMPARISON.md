@@ -252,3 +252,49 @@ Missing (5/14 optional): OpenAI, Anthropic, Together, DeepInfra, SambaNova
 Add keys: nano ~/The-Tank-Project/.env
 Evolution prompts for missing keys at runtime with setup URLs.
 
+
+
+---
+
+## 🔑 API Key Requirements (Evolution System)
+
+The TankOS evolution system discovers and configures AI providers during setup.
+
+### Required (free tier available)
+| Provider | Setup | Free Tier |
+|----------|-------|-----------|
+| [OpenRouter](https://openrouter.ai) | API key | ✅ Free models |
+| [Groq](https://groq.com) | API key | ✅ Free tier |
+| [Google Gemini](https://ai.google.dev) | API key | ✅ Free tier |
+| [Mistral](https://mistral.ai) | API key | ✅ Free tier |
+
+### Optional (enhanced capabilities)
+| Provider | Setup | Use Case |
+|----------|-------|----------|
+| [OpenAI](https://platform.openai.com) | API key | GPT-4 vision |
+| [Anthropic](https://console.anthropic.com) | API key | Claude reasoning |
+| [Cerebras](https://cerebras.ai) | API key | Fast inference |
+| [Replicate](https://replicate.com) | API key | Model hosting |
+| [Together AI](https://together.ai) | API key | Open-source models |
+| [HuggingFace](https://huggingface.co) | API key | Model hub |
+| [Cloudflare](https://workers.ai) | API key | Edge AI |
+
+### Local Models (offline, no key needed)
+| Model | Size | GPU | Task |
+|-------|------|-----|------|
+| Phi-3 Mini 4K | 2.3 GB | ✅ | General reasoning |
+| TinyLlama 1.1B | 1.1 GB | ✅ | Fast responses |
+| YOLOv8n | 6 MB | ✅ | Object detection |
+| Whisper base | 150 MB | ✅ | Speech recognition |
+| Piper TTS | 50 MB | CPU | Text-to-speech |
+| openWakeWord | 10 MB | CPU | Wake word detection |
+
+### Evolution Cycle Flow
+```
+1. SCAN   → Check all 14 providers for keys
+2. TEST   → Benchmark each configured provider
+3. RANK   → Score by speed + quality + cost
+4. SELECT → Set best as primary
+5. NOTIFY → SMS to 7860245819
+6. EVOLVE → Continuous improvement
+```

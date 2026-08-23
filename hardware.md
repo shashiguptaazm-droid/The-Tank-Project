@@ -1,407 +1,114 @@
-# 🧰 The Tank Project — Complete Hardware List
+# 🔧 HARDWARE — The Tank
 
-> **Source of truth:** `tank_ws/src/tank_meta/content/hardware.json`
-> (the file the project's own `tank_meta` indexer introspects, 12 components)
-> + `WIRING.md` + `ARCHITECTURE.md` for the implicit physical-build items.
->
-> **Prices are approximate for July 2026 in INR (₹) on robu.in.**
-> Treat each band as a planning estimate; stock varies weekly.
-> Every Robu.in link below is a *search URL* — never a single ASIN — so it
-> never 404s even when a listing changes. Buy from robu.in
-> for US pricing.
->
-> **Currency disclaimer:** Robu.in prices include GST; during sales
-> (Prime Day, Republic Day) and with SBI / HDFC / ICICI cashback you can
-> knock **10–15 %** off the mid-band. The mid-band numbers below are the
-> realistic "buy today" prices.
->
-> ⚡ **Power architecture (revised):** Jetson Orin Nano powered via 19 V DC barrel jack
-> **separately** from a 12 V motor battery → BTS7960 drivers and motors.
-> Keeping the motor rail and the Jetson rail on *isolated* grounds prevents
-> motor current spikes from sagging Jetson voltage → brownout resets.
+> **Complete Bill of Materials (BOM)**
 
 ---
 
-## 📸 Real Build Photos
+## 📊 Component Summary
 
-Actual photos of the tank and parts as they are being assembled (from the team's phone):
-
-| | |
-|---|---|
-| ![Build 1](images/build/20260720_180222.jpg) | ![Build 2](images/build/20260721_193849.jpg) |
-| ![Build 3](images/build/20260801_012257.jpg) | ![Build 4](images/build/20260803_162900.jpg) |
-| ![Build 5](images/build/20260809_232842.jpg) | ![Build 6](images/build/20260813_140304.jpg) |
-
-## 📊 Bill of Materials — at a glance
-
-| Section | Items | Sub-total mid-band |
-|---|---|---:|
-| 1. Compute / Brains | 5 | ₹ 42,500 |
-| 2. Vision / Display | 4 | ₹ 6,200 |
-| 3. Motion / Drive Train | 8 | ₹ 9,650 |
-| 4. Sensors | 7 | ₹ 9,950 |
-| 5. Audio In / Out | 4 | ₹ 4,750 |
-| 6. Power / Battery | 2 | ₹ 1,900 |
-| 7. Networking / Cellular | 4 | ₹ 5,950 |
-| 8. Chassis / Wiring / Safety | 8 | ₹ 6,650 |
-| **Grand total mid-band** | **42** | **₹ 88,750** |
-| Lower / upper band | | **₹ 76,500 — ₹ 1,06,000** |
-
-> **Money saved vs. earlier draft: ~₹ 9,550** (the 4 removed power items +
-> a generic Cytron MDD10A that was already covered by the BTS7960 in hand).
-> **Jetson + Arduino upgrade** adds ~₹ 24,000 over the Jetson baseline but
-> provides hardware-accelerated CUDA AI inference and real-time motor control.
->
-> Add **≈ ₹ 4,500** for a basic toolbox (soldering iron, heat gun, snips,
-> screwdrivers, multimeter) if you don't already own one.
+| Category | Count | Status |
+|----------|-------|--------|
+| Compute | 3 | Jetson + UNO Q + VPS |
+| Vision | 2 | DFRobot Camera + LDROBOT LiDAR |
+| Motion | 4 | 2×BTS7960 + 2×JGB37-520 Motors |
+| Sensors | 5 | IMU + INA219×2 + PCA9685 + LTE |
+| Communication | 2 | Tailscale + Quectel LTE |
+| Power | 2 | 4S Li-ion + DC/DC Buck |
+| Chassis | 1 | Tracked robot chassis |
+| ESP32 | 6 | ESP32-S3 DevKitC-1 N16R8 |
+| **TOTAL** | **25** | **Core components** |
 
 ---
 
-## 1️⃣ Compute / Brains
+## 🧠 Compute
 
-| # | Item | Photo / Google-Shopping Description | Driver / Use in The Tank | Price (₹) | Robu.in Link |
-|---|------|--------------------------------------|--------------------------|----------:|--------------------|
-| 1 | **NVIDIA Jetson Orin Nano Super Developer Kit (8 GB)**  ![📷](docs/hardware_photos/1_jeton_orin_nano_super.jpg)| Black rectangular carrier board, NVIDIA module on top with heatsink + fan, DisplayPort, 2× MIPI CSI, M.2 slot, USB-C, RJ45, 40-pin GPIO header, 19 V barrel jack | **AI Brain** — runs ROS 2 Humble, all 23 ament_python packages, TankOS GUI, on-device AI inference (CUDA-accelerated llama.cpp, Whisper, YOLOv8n, SDXL) | 25,000 – 35,000 | [robu.in/?s=jetson+orin+nano+dev+kit+8gb](https://robu.in/?s=jetson+orin+nano&post_type=product) |
-| 2 | **Arduino UNO Q**  ![📷](docs/hardware_photos/2_arduino_uno_q.jpg)| Blue rectangular board, USB-C, 2×15-pin female headers, ESP32-S3 co-processor for Wi-Fi/BLE, 12×8 LED matrix, Qwiic I²C connector, Qualcomm QRB2210 + STM32U585 MCU | **Real-time controller** — motor PWM, encoder tick counting (hardware interrupts), I²C sensor polling, serial bridge (115200 baud) to Jetson. Offloads all deterministic timing from Jetson. | 1,800 – 2,500 | [robu.in/?s=arduino+uno+q](https://robu.in/?s=arduino+uno+q&post_type=product) |
-| 3 | **M.2 NVMe SSD 256 GB** (Samsung 980 / WD SN570 / Crucial P3) | Stick-shaped module ~22 × 80 mm, green PCB, gold contact edge, "NVMe" label | `/var/lib/tank` for vector memory, ROS bags, recordings, sqlite-vec db, AI model cache | 3,500 – 5,500 | [robu.in/?s=m.2+nvme+256gb](https://robu.in/?s=nvme+ssd+256gb&post_type=product) |
-| 4 | **ESP32-S3 DevKitC-1** (N16R8)  ![📷](docs/hardware_photos/6_esp32_s3_devkitc_1.png)| Narrow black dev board, dual-row pin headers, USB-C on one short edge, tiny PCB antenna trace, Espressif logo | Drives the 2 × round eye displays over SPI, receives JSON over UART from Jetson | 700 – 1,100 | [robu.in/?s=esp32-s3+devkitc-1+n16r8](https://robu.in/?s=esp32-s3&post_type=product) |
-| 5 | **MicroSD card 64 GB A2** | Tiny blue/black microSD card, ~15 × 11 mm | Boot drive for Jetson (JetPack 6) | 600 – 900 | [robu.in/?s=micro+sd+64gb+a2](https://robu.in/?s=micro+sd+64gb&post_type=product) |
-
-**Subtotal 1 → ₹ 31,600 – 45,000 (mid ₹ 42,500)**
-
-> ⚡ **Two-board architecture:** Jetson Orin Nano is the *AI brain* (high-level ROS2 nodes,
-> AI inference, TankOS GUI). Arduino UNO Q is the *real-time controller* (motor PWM,
-> encoder interrupts, sensor I²C reads). They communicate over USB serial at 115200 baud
-> with a compact binary protocol. This split keeps real-time deadlines on the Arduino
-> (sub-millisecond encoder response) while Jetson handles the heavy AI workloads.
+| Component | Model | Specs | Price (₹) |
+|-----------|-------|-------|-----------|
+| Jetson Orin Nano Super | NVIDIA | 8GB, 67 TOPS, JetPack 6.2 | 25,000 |
+| Arduino UNO Q 4GB | Arduino | QRB2210 + STM32U585 | 12,500 |
+| VPS | Hetzner | 4 vCPU, 8GB RAM | 750/mo |
+| **Subtotal** | | | **38,250** |
 
 ---
 
-## 2️⃣ Vision / Display
+## 👁️ Vision
 
-| # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Robu.in Link |
-|---|------|--------------------------------------|--------------|----------:|-------------|
-| 7 | **Waveshare 1.28″ Round LCD (GC9A101)** × 2  ![📷](docs/hardware_photos/5_waveshare_1.28_round_lcd_gc9a01.jpg)| Round TFT disc ~32 mm diameter, 240 × 240 px, short FPC tail, "GC9A01" silkscreened | Animated eye expressions (left + right), driven by the ESP32-S3 firmware | 2 × (1,400 – 2,000) = 2,800 – 4,000 | [robu.in/?s=waveshare+1.28+round+lcd+gc9a01](https://robu.in/?s=waveshare+round+lcd&post_type=product) |
-| 8 | **1.3″ SH1106 / SSD1306 OLED (I²C)**  ![📷](docs/hardware_photos/11_sh1106_1.3_oled.jpg)| Tiny blue/white OLED ~30 × 35 mm, 4-pin I²C tail, blue glow when on | Status face on chassis front (`tank_display` package) | 350 – 600 | [robu.in/?s=1.3+oled+sh1106+i2c](https://robu.in/?s=oled+display+i2c&post_type=product) |
-| 9 | **USB Camera (IMX219 / IMX477 / C920 webcam)** | Small USB webcam, clip-on mount, UVC-compatible | ROS `tank_vision.camera_publisher` via OpenCV (1280 × 960 @ 30 fps). USB to Jetson — no CSI ribbon needed | 1,200 – 2,500 | [robu.in/?s=usb+webcam+1080p](https://robu.in/?s=usb+webcam&post_type=product) |
-| 10 | **M2.5 / M3 standoff kit (nylon)** | Small black/white hex standoffs, 5/10/15/20 mm lengths, ~50 pcs | Mounts Jetson + Arduino + camera board inside the chassis | 250 – 450 | [robu.in/?s=m3+nylon+standoff+kit](https://robu.in/?s=standoff+kit&post_type=product) |
-
-**Subtotal 2 → ₹ 4,600 – 7,550 (mid ₹ 6,200)**
+| Component | Model | Specs | Price (₹) |
+|-----------|-------|-------|-----------|
+| AI Camera | DFRobot SEN0611 | ESP32-S3, USB, Night Vision | 3,500 |
+| LiDAR | LDROBOT LD19 | 360°, 12m, 5kHz | 4,500 |
+| **Subtotal** | | | **8,000** |
 
 ---
 
-## 3️⃣ Motion / Drive Train
+## 🛞 Motion
 
-| # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Robu.in Link |
-|---|------|--------------------------------------|--------------|----------:|-------------|
-| 12 | **2 × 12 V DC geared motor w/ encoder (e.g. JGB37-520, 30:1 or 60:1)** | Cylindrical black gearbox ~65 × 22 mm, D-shaft, pigtail with 6 wires (motor + encoder A/B) | Left + right drive motor. `tank_motion.motor_controller` w/ BTS7960 | 2 × (650 – 950) = 1,300 – 1,900 | [robu.in/?s=jgb37-520+encoder+motor](https://robu.in/?s=dc+gear+motor+encoder&post_type=product) |
-| 13 | **2 × BTS7960 43 A motor driver (already on hand)** ★  ![📷](docs/hardware_photos/12_bts7960.jpg)| Big red PCB ~50 × 50 mm with two large terminal blocks and big heatsinks; *one driver per motor* | H-bridge for the two drive motors, PWM + DIR control. **Already purchased — no buy.** | 0 (owned) | — |
-| 14 | **Tracked chassis w/ 12 V motors (aluminium, ~15 cm wheelbase)** | Two black rubber tracks, side aluminium plates, motor mounts pre-drilled | The tank's body — bolts the motors, Pi, and battery together | 1,800 – 3,200 | [robu.in/?s=tracked+robot+chassis+12v](https://robu.in/?s=robot+chassis&post_type=product) |
-| 15 | **2 × Tower Pro SG90 micro servo (pan + tilt)** | Tiny blue servo ~23 × 12 mm, 3-wire pigtail (signal/V+/GND), white spline horn on top | Pan-tilt head. `pan_tilt_controller` on GPIO18 + GPIO19 at 50 Hz | 2 × (180 – 280) = 360 – 560 | [robu.in/?s=tower+pro+sg90+servo](https://robu.in/?s=sg90+servo&post_type=product) |
-| 16 | **PCA9685 16-channel 12-bit PWM / Servo HAT (I²C 0x40)**  ![📷](docs/hardware_photos/10_pca9685.jpg)| Small purple/blue breakout ~63 × 25 mm, 16 × 3-pin servo headers in two rows | Lets you offload the pan/tilt servos off the Pi's PWM | 450 – 750 | [robu.in/?s=pca9685+servo+driver+i2c](https://robu.in/?s=pca9685&post_type=product) |
-| 17 | **Pan-tilt bracket (2-axis, SG90-compatible, plastic / aluminium)** | Black U-shaped bracket with two axis pivots and mounting flanges | Mechanical mount for the head with the camera + eyes | 250 – 450 | [robu.in/?s=pan+tilt+bracket+sg90](https://robu.in/?s=pan+tilt+bracket&post_type=product) |
-| 18 | **Mushroom-head E-STOP switch (NO/NC, panel-mount, 16 mm)** | Big red mushroom button with yellow guard ring, 2-pin NO/NC terminals | Hardware kill-switch in series with the BMS VBAT trace | 150 – 350 | [robu.in/?s=mushroom+emergency+stop+button](https://robu.in/?s=emergency+stop&post_type=product) |
-
-**Subtotal 3 → ₹ 4,310 – 7,760 (mid ₹ 9,650)** *(chassis dominates)*
-★ = good stock already owned; do not buy.
+| Component | Model | Specs | Price (₹) |
+|-----------|-------|-------|-----------|
+| Motor Driver | BTS7960 ×2 | 43A, H-Bridge | 600 |
+| DC Motor | JGB37-520 ×2 | 12V, geared, encoder | 1,200 |
+| Servo Driver | PCA9685 | 16-ch PWM | 300 |
+| **Subtotal** | | | **2,100** |
 
 ---
 
-## 4️⃣ Sensors
+## 📡 Sensors
 
-| # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Robu.in Link |
-|---|------|--------------------------------------|--------------|----------:|-------------|
-| 19 | **RPLidar A1** *or* **LDROBOT LD19** (360° LiDAR)  ![📷](docs/hardware_photos/7_ldrobot_ld19.jpg)| Black cylinder ~98 × 65 mm spinning disc on top, USB-A pigtail, or small black puck with motor | `tank_sensors.lidar_publisher` over `/dev/ttyUSB0` @ 115200 baud | 5,000 – 8,500 | [robu.in/?s=rplidar+a1](https://robu.in/?s=rplidar&post_type=product) |
-| 20 | **BNO055 9-DOF IMU breakout (Adafruit or generic, I²C 0x28)**  ![📷](docs/hardware_photos/9_bno055_imu.jpg)| Small purple PCB ~30 × 25 mm with a Bosch BNO055 chip visible, STEMMA-QT port on one side | `tank_sensors.imu_publisher` (orientation as `sensor_msgs/Imu`) | 1,200 – 2,000 | [robu.in/?s=bno055+imu+i2c+breakout](https://robu.in/?s=bno055+imu&post_type=product) |
-| 21 | **INA219 DC current/voltage sensor (I²C 0x40)** | Small green breakout ~25 × 20 mm with INA219 chip, two screw terminals for the shunt | `tank_health.health_node` battery telemetry (one board per rail: Pi + motor) | 2 × (250 – 450) = 500 – 900 | [robu.in/?s=ina219+current+sensor](https://robu.in/?s=ina219&post_type=product) |
-| 22 | **R307 / ZFM-708 fingerprint sensor (UART, optical)** | Small black plastic cube with a metallic fingerprint window, 4-wire UART pigtail (V+/GND/TX/RX) | `tank_security` home-unlock feature (`/dev/ttyAMA0` @ 57600 baud) | 850 – 1,400 | [robu.in/?s=r307+fingerprint+sensor](https://robu.in/?s=fingerprint+sensor&post_type=product) |
-| 23 | **Ultrasonic HC-SR04 × 2** (rear / cliff safety) | Two-black-eyes PCB ~45 × 20 mm with twin cylindrical transducers | Front + rear obstacle abort, /scan fusion safety layer | 2 × (120 – 180) = 240 – 360 | [robu.in/?s=hc-sr04+ultrasonic+sensor](https://robu.in/?s=hc-sr04&post_type=product) |
-| 24 | **DS18B20 waterproof 1-Wire temperature probe (1 m cable, ±0.5 °C)** *(separate, dedicated)* | Stainless-steel M6 cap probe ~30 × 6 mm on a 1 m waterproof PVC cable, 3-wire pigtail (red VCC / black GND / yellow DATA) | **Standalone** temperature for battery + motors + chassis ambient. 1-Wire on GPIO4 (Pi header pin 7), 4.7 kΩ pull-up to 3.3 V. Buy **≥ 3** (one per hot spot). | 120 – 280 *(each)* → 360 – 840 *(3 probes)* | [robu.in/?s=ds18b20+waterproof+probe+1m](https://robu.in/?s=ds18b20&post_type=product) |
-| 24a | **4.7 kΩ resistor (1-Wire pull-up, through-hole)** *(1 small resistor)* (qty 10 pack) | Tiny axial resistor yellow-violet-red-gold stripes, ~10 pcs in a tape strip | Pull-up resistor for DS18B20 data line to 3.3 V | 30 – 80 | [robu.in/?s=4.7k+resistor+pack](https://robu.in/?s=resistor+kit&post_type=product) |
-
-**Subtotal 4 → ₹ 8,180 – 14,080 (mid ₹ 9,950)** *(RPLidar dominates, DS18B20 cluster adds ~₹150 for 3 probes)*
+| Component | Model | Interface | Price (₹) |
+|-----------|-------|-----------|-----------|
+| IMU | QMI8658 | I²C | 500 |
+| Battery Monitor | INA219 ×2 | I²C | 400 |
+| Servo Controller | PCA9685 | I²C | 300 |
+| **Subtotal** | | | **1,200** |
 
 ---
 
-## 5️⃣ Audio In / Out
+## 📶 Communication
 
-| # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Robu.in Link |
-|---|------|--------------------------------------|--------------|----------:|-------------|
-| 25 | **ReSpeaker 4-Mic Array (USB, Seeed)** | Black square PCB ~70 × 70 mm with four small MEMS microphones on each corner, glowing centre LED ring | `tank_speech.wake_word_listener` (openWakeWord → `/wake_detected`) | 2,800 – 4,200 | [robu.in/?s=respeaker+4+mic+array](https://robu.in/?s=respeaker+mic&post_type=product) |
-| 26 | **USB Audio Class DAC (e.g. UGreen or Topping)** | Tiny black USB dongle ~60 × 25 mm with a 3.5 mm jack on the other end | `tank_text.tts_node` (Piper ONNX → sounddevice.play) | 400 – 750 | [robu.in/?s=usb+audio+dac+3.5mm](https://robu.in/?s=usb+audio+dac&post_type=product) |
-| 27 | **3 W 8 Ω speaker w/ JST-PH pigtail** | Small round 28 mm black speaker with a JST-PH 2.0 mm white connector | Tank's voice output | 150 – 300 | [robu.in/?s=3w+8ohm+speaker+jst](https://robu.in/?s=speaker+3w&post_type=product) |
-| 28 | **Mini amplified USB speaker (recess-mount)** | Small black rectangular box speaker, ~85 × 45 mm, USB-A plug on a short lead, magnet on the back | For dashboards / docks | 600 – 1,100 | [robu.in/?s=mini+usb+speaker+amplified](https://robu.in/?s=usb+speaker&post_type=product) |
-
-**Subtotal 5 → ₹ 3,950 – 6,350 (mid ₹ 4,750)** *(Respeaker dominates)*
+| Component | Model | Specs | Price (₹) |
+|-----------|-------|-------|-----------|
+| 4G LTE Modem | Quectel EG800K | Airtel SIM | 2,500 |
+| Tailscale | Software | Mesh VPN | Free |
+| **Subtotal** | | | **2,500** |
 
 ---
 
-## 6️⃣ Power Architecture (revised)
+## 🔋 Power
 
-> ⚡ **Two-rail power.** The Jetson Orin Nano and the BTS7960 motor drivers **must
-> not share ground through the same battery**. The intended wiring is:
->
-> ```text
-> ┌──────────────────┐    19 V DC      ┌──────────────────────┐
-> │ Jetson PSU       │ ──────────────► │ NVIDIA Jetson        │
-> │ (barrel jack,    │                 │ Orin Nano (8 GB)     │
-> │ included in kit) │                 └──────────────────────┘
-> └──────────────────┘
->                                                 │
->                                                 │ USB-A
->                                                 ▼
->                                       ┌──────────────────────┐
->                                       │ Arduino UNO Q  │
->                                       │ LiDAR, USB Camera    │
->                                       │ ReSpeaker, LTE modem │
->                                       └──────────────────────┘
->
-> ┌──────────────────────┐               ┌──────────────────────┐
-> │ 12 V motor battery    │ ───────────► │ 2 × BTS7960 drivers │
-> │ (SLA or 4S Li-ion,    │   12 V /     │ → 2 × drive motors   │
-> │ already on hand)     │   30 A peak  │ (12 V each, encoder)│
-> └──────────────────────┘               └──────────────────────┘
-> ```
->
-> **Why separate rails:** motor inrush (a stalled tank wheel can pull
-> 20 A for 50 ms) sags the motor rail. If the Jetson sat on the same rail,
-> that sag would trigger an undervoltage → Jetson brownout → ROS nodes
-> restart mid-mission. Independent rails = independent brown-outs.
-
-### 6.1 Items actually to buy
-
-| # | Item | Note | Price (₹) | Robu.in Link |
-|---|------|------|----------:|-------------|
-| 29 | **XT60 connector pair + JST-PH 2-pin pigtails** *(kit)* | Yellow male+female barrel pair + JST housings + crimp pins. Connects the 12 V motor battery to the BTS7960 input rail cleanly. | 150 – 350 | [robu.in/?s=xt60+connector+pair](https://robu.in/?s=xt60+connector&post_type=product) |
-| 30 | **Inline inline 30 A blade fuse + holder** | ATO/ATC blade fuse holder + a 30 A replacement fuse. Sits between the 12 V motor battery and the BTS7960 rail; cheap insurance against a stalled motor stalling the wiring harness. | 120 – 280 | [robu.in/?s=30a+inline+blade+fuse+holder](https://robu.in/?s=blade+fuse&post_type=product) |
-
-**Subtotal 6 → ₹ 270 – 630 (mid ₹ 1,900 ... with a generous buffer for spares)**
-
-### 6.2 Already on hand (do NOT buy)
-
-- 🟢 **Jetson Orin Nano PSU (19 V barrel jack)** — included with dev kit.
-- 🟢 **2 × BTS7960 43 A drivers** — purchased.
-- 🟢 **12 V motor battery** — any existing 12 V SLA, 4S Li-ion, RC car pack, or bench supply ≥ 5 Ah works. Re-use what you have before buying.
-
-### 6.3 If you really must start from zero on the motor rail (worst-case only)
-
-| # | Item | Note | Price (₹) | Robu.in Link |
-|---|------|------|----------:|-------------|
-| 30★ | **12 V 5 Ah SLA battery** *(optional, only if you have no 12 V supply)* | Sealed lead-acid, hobby-grade. Cheap, dumb, effective. | 750 – 1,200 | [robu.in/?s=12v+5ah+sla+battery](https://robu.in/?s=sla+battery+12v&post_type=product) |
-| 31★ | **SLA charger 12 V 1 A** *(optional, pairs with 30★)* | Black wall-wart, 2-pin output, simple float charger. | 350 – 650 | [robu.in/?s=12v+1a+sla+charger](https://robu.in/?s=battery+charger+12v&post_type=product) |
-
-★ = only buy if you do not already own a 12 V motor supply. Skip otherwise.
+| Component | Model | Specs | Price (₹) |
+|-----------|-------|-------|-----------|
+| Battery | 4S Li-ion | 14.8V, 5000mAh | 3,000 |
+| DC/DC Buck | XL4015 | 12V→5V/5A | 200 |
+| **Subtotal** | | | **3,200** |
 
 ---
 
-## 7️⃣ Networking / Cellular
+## 🤖 ESP32 Swarm
 
-| # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Robu.in Link |
-|---|------|--------------------------------------|--------------|----------:|-------------|
-| 32 | **USB Wi-Fi 6 adapter (e.g. TP-Link Archer T2U)** | Small USB-A dongle ~30 × 15 mm with a tiny antenna | Backup Wi-Fi link if Jetson Wi-Fi fails on Jetson metal-shielded chassis | 550 – 900 | [robu.in/?s=usb+wifi+6+adapter](https://robu.in/?s=wifi+adapter+usb&post_type=product) |
-| 33 | **Quectel EC25** *or* **SIM7600E LTE modem (USB)** | Small black stick ~85 × 30 mm with two SMA antenna ports, USIM slot | Cellular failover when Wi-Fi drops (`tank_scripts/lte_handoff.py`) | 2,800 – 4,500 | [robu.in/?s=quectel+ec25+lte](https://robu.in/?s=lte+modem&post_type=product) |
-| 34 | **LTE SMA antenna (4G/LTE puck, 5 dBi)** | Small black rubber puck ~50 × 50 mm with a short coaxial lead + SMA male | Antenna for the LTE modem | 250 – 450 | [robu.in/?s=lte+4g+antenna+sma](https://robu.in/?s=lte+antenna&post_type=product) |
-| 35 | **Ethernet USB adapter (10/100)** | Tiny white USB-A dongle, RJ45 jack on the other end | Wired backhaul into the home router (preferred over fragile Wi-Fi) | 350 – 600 | [robu.in/?s=usb+ethernet+adapter+10](https://robu.in/?s=usb+ethernet&post_type=product) |
-
-**Subtotal 7 → ₹ 3,950 – 6,450 (mid ₹ 5,950)** *(LTE modem dominates)*
+| Component | Model | Qty | Price (₹) |
+|-----------|-------|-----|-----------|
+| ESP32-S3 DevKitC-1 | N16R8 | 6 | 1,800 |
+| **Subtotal** | | | **1,800** |
 
 ---
 
-## 8️⃣ Chassis / Wiring / Safety Sundries
+## 💰 Total Cost
 
-| # | Item | Photo / Google-Shopping Description | Price (₹) | Robu.in Link |
-|---|------|--------------------------------------|----------:|-------------|
-| 36 | **Silicone wire kit (24/26/28 AWG, 6 colours, ~10 m each)** | Spools of stranded silicone wire in red/black/yellow/blue/green/white | 350 – 650 | [robu.in/?s=silicone+wire+kit+24+26+28+awg](https://robu.in/?s=silicone+wire&post_type=product) |
-| 37 | **JST-PH 2-pin / 3-pin / 4-pin connector kit (Dupont-style housings + crimps)** | Plastic housings + metal crimp pins | 300 – 600 | [robu.in/?s=jst+ph+connector+kit](https://robu.in/?s=jst+connector&post_type=product) |
-| 38 | **Heat-shrink tubing assortment (black, 2–10 mm)** | Black plastic tubing, ~200 pcs in a clear poly bag | 200 – 350 | [robu.in/?s=heat+shrink+tubing+kit](https://robu.in/?s=heat+shrink&post_type=product) |
-| 39 | **Cable gland + spiral wrap (10 mm bundle, 1 m)** | Black nylon spiral wrap coiled into a flat ring | 200 – 350 | [robu.in/?s=spiral+wrap+10mm+cable](https://robu.in/?s=spiral+wrap&post_type=product) |
-| 40 | **40-pin GPIO ribbon cable + breakout + T-cobbler** | Rainbow ribbon cable with two 40-pin sockets, small T-cobbler PCB | 250 – 450 | [robu.in/?s=raspberry+pi+gpio+ribbon+cable](https://robu.in/?s=gpio+ribbon+cable&post_type=product) |
-| 41 | **Small breadboard (400-tie, 830-tie × 2)** | White plastic breadboard 165 × 55 mm with red/blue power rails | 2 × (150 – 250) = 300 – 500 | [robu.in/?s=breadboard+830+tie](https://robu.in/?s=breadboard&post_type=product) |
-| 42 | **M2 / M2.5 / M3 screw + standoff kit (200+ pcs)** | Tubs of small steel screws + nylon standoffs in a clear plastic box | 350 – 600 | [robu.in/?s=screw+kit+m2+m3+standoff](https://robu.in/?s=screw+kit&post_type=product) |
-| 43 | **40 × 40 mm or 25 × 25 mm 12 V cooling fan** | Small black 4-wire PWM fan ~40 × 40 × 10 mm | 250 – 450 | [robu.in/?s=40mm+12v+cooling+fan+pwm](https://robu.in/?s=cooling+fan+12v&post_type=product) |
-
-**Subtotal 8 → ₹ 2,200 – 3,950 (mid ₹ 6,650)** *(consumables — order generously)*
-
----
-
-## 🧾 Final Total
-
-| Quantity tier | Calculation | Sum |
-|----------------|-------------|----:|
-| **Lower band (cheap-importer)** | All minimums + cheapest compatible variants | **≈ ₹ 53,550** |
-| **MID band (what to plan for now)** | Mid of each row | **≈ ₹ 64,450** |
-| **Upper band (buying top brand)** | All maximums + branded variants (Sparkfun, Pololu, Seeed) | **≈ ₹ 80,250** |
-
-Plus a once-off **₹ 4,500** for a basic solder/measurement toolkit if you
-don't already own one — that brings a *first-time builder* total to **₹ 68,950 mid**.
-
-> Compared to the previous draft (₹ 72,350 mid / ₹ 89,780 upper), the
-> simplification saves **≈ ₹ 7,900 mid / ₹ 9,500 upper** — mostly from
-> dropping the 4-cell Li-ion pack + charger + dual buck cascade and
-> reusing the BTS7960 drivers already in hand.
+| Category | Amount (₹) |
+|----------|------------|
+| Compute | 38,250 |
+| Vision | 8,000 |
+| Motion | 2,100 |
+| Sensors | 1,200 |
+| Communication | 2,500 |
+| Power | 3,200 |
+| ESP32 | 1,800 |
+| Chassis | 5,000 |
+| Misc (wires, connectors) | 2,000 |
+| **GRAND TOTAL** | **₹64,050 (~$800)** |
 
 ---
 
-## 📦 CSV — for spreadsheet import
+## 📦 Component Images
 
-```csv
-"#",section,item,low_inr,high_inr,robu_search_slug
-1,Compute,Jetson Orin Nano Super Developer Kit 8GB,25000,35000,jetson+orin+nano+dev+kit+8gb
-2,Compute,Arduino UNO Q,1800,2500,arduino+uno+q
-3,Compute,M.2 NVMe 256GB,3500,5500,m.2+nvme+256gb
-4,Compute,ESP32-S3 DevKitC-1 N16R8,700,1100,esp32-s3+devkitc-1+n16r8
-5,Compute,MicroSD 64GB A2,600,900,micro+sd+64gb+a2
-6,Vision,Waveshare 1.28" round GC9A101 (×2),2800,4000,waveshare+1.28+round+lcd+gc9a01
-7,Vision,1.3" SH1106 OLED I²C,350,600,1.3+oled+sh1106+i2c
-8,Vision,USB Camera IMX219/C920,1200,2500,usb+webcam+1080p
-9,Vision,M2.5/M3 standoff kit,250,450,m3+nylon+standoff+kit
-12,Motion,12V DC geared motor w/ encoder (×2),1300,1900,jgb37-520+encoder+motor
-13,Motion,"2 × BTS7960 43 A driver (already on hand)",0,0,(no buy)
-14,Motion,Tracked chassis w/ 12V motors,1800,3200,tracked+robot+chassis+12v
-15,Motion,Tower Pro SG90 servo (×2),360,560,tower+pro+sg90+servo
-16,Motion,PCA9685 16-channel servo HAT,450,750,pca9685+servo+driver+i2c
-17,Motion,Pan-tilt bracket SG90-compatible,250,450,pan+tilt+bracket+sg90
-18,Motion,Mushroom-head E-STOP switch,150,350,mushroom+emergency+stop+button
-19,Sensors,RPLidar A1 / LD19,5000,8500,rplidar+a1
-20,Sensors,BNO055 9-DOF IMU,1200,2000,bno055+imu+i2c+breakout
-21,Sensors,INA219 current/voltage (×2: Pi + motor rail),500,900,ina219+current+sensor
-22,Sensors,R307 fingerprint sensor,850,1400,r307+fingerprint+sensor
-23,Sensors,HC-SR04 ultrasonic (×2),240,360,hc-sr04+ultrasonic+sensor
-24,Sensors,DS18B20 waterproof 1-Wire probe (×3),360,840,ds18b20+waterproof+probe+1m
-24a,Sundry,4.7kΩ resistor pack 10pcs,30,80,4.7k+resistor+pack
-25,Audio,ReSpeaker 4-Mic Array,2800,4200,respeaker+4+mic+array
-26,Audio,USB Audio DAC,400,750,usb+audio+dac+3.5mm
-27,Audio,3W 8Ω speaker w/ JST,150,300,3w+8ohm+speaker+jst
-28,Audio,Mini amplified USB speaker,600,1100,mini+usb+speaker+amplified
-29,Power,XT60 connector pair + JST-PH kit,150,350,xt60+connector+pair
-30,Power,Inline 30 A blade fuse + holder,120,280,30a+inline+blade+fuse+holder
-31,Network,USB Wi-Fi 6 adapter,550,900,usb+wifi+6+adapter
-32,Network,Quectel EC25 LTE modem,2800,4500,quectel+ec25+lte
-33,Network,LTE SMA antenna 4G puck,250,450,lte+4g+antenna+sma
-34,Network,USB Ethernet adapter,350,600,usb+ethernet+adapter+10
-35,Sundry,Silicone wire kit (24/26/28 AWG),350,650,silicone+wire+kit+24+26+28+awg
-36,Sundry,JST-PH connector kit,300,600,jst+ph+connector+kit
-37,Sundry,Heat-shrink tubing kit,200,350,heat+shrink+tubing+kit
-38,Sundry,Spiral cable wrap 10mm,200,350,spiral+wrap+10mm+cable
-39,Sundry,40-pin GPIO ribbon + cobbler,250,450,raspberry+pi+gpio+ribbon+cable
-40,Sundry,Breadboard (×2),300,500,breadboard+830+tie
-41,Sundry,M2/M2.5/M3 screw + standoff kit,350,600,screw+kit+m2+m3+standoff
-42,Sundry,40mm 12V cooling fan,250,450,40mm+12v+cooling+fan+pwm
-```
-
----
-
-## 💡 Money-saving notes
-
-* **Skip LTE modem (#32)** for indoor-Wi-Fi-only builds — saves ₹ 2,800–4,500.
-* **Use RPLidar A1** instead of A2/S2 if cost matters; the A1 has 2 000 Hz
-  sample rate vs A2's 4 000 Hz — fine for 2D SLAM at home scale.
-* **Substitute LDROBOT LD19** for RPLidar A1: similar price, similar
-  spec, different driver (`ldrobot_lidar_ros`).
-* **Generic PCA9685 vs Adafruit** — Adafruit is ~2× the price and brings
-  zero functional advantage for hobby use.
-* **Skip fingerprint sensor (#22)** if you don't need home-unlock; saves ₹ 1k.
-* **Skip OLED (#8)** — the eyes on the round GC9A101 already convey state
-  via `tank_display`. Saves ₹ 350–600.
-* **Skip SLA + SLA charger (★ 30 / ★ 31)** if you already own any 12 V
-  motor supply — saves up to ₹ 1,850.
-* **"Buy Indian" alternatives**: Robu.in, Evelta, Sunrom and rhydolabz
-  carry the same parts with no customs and faster shipping.
-* **Sales calendar** — Republic Day (Jan), Independence Day (Aug) and
-  Prime Day (Oct) typically drop prices 10–20 % on robotics SKUs.
-
----
-
-## ⚠️ Caveats
-
-1. **Power architecture (revised)**: this BOM assumes the user already
-   owns a USB-C PD power bank ≥ 27 W and a 12 V motor battery (SLA,
-   4S Li-ion, or bench supply). If you have neither, add **★ 30 + ★ 31**
-   (SLA + charger, ~₹ 1,150 mid).
-2. **Rail isolation**: connect Pi USB-C PD ground and motor battery
-   ground **at one star point only** (typically the BTS7960 chassis
-   ground). Do not connect two ground returns in series — that creates
-   ground-loops that the BTS7960's built-in filtering cannot absorb.
-3. **INA219 count**: the revised BOM needs **2** INA219 boards
-   (one per rail — Pi + motor) instead of one. The cost delta is
-   small but the dashboard's `tank_health` ate it up as 2× row.
-4. **Camera variants**: I recommend the **IMX708 (Camera Module 3)** as the
-   default because of the huge community. Use **IMX296 global-shutter** if
-   you need crisp frames of fast-moving objects (e.g. ball-tracking).
-   Robu.in rotates weekly.
-5. **ESP32 variants**: the firmware pinout is for **ESP32-S3 DevKitC-1
-   N16R8**. The plain DevKitC (no `-S3`) or any board without PSRAM
-   **won't work** for the GC9A101 driver.
-6. **BTS7960 wiring**: the 2 × BTS7960 inputs are 12 V; the modules will
-   happily run on 5 V logic for PWM/DIR but the motor rail is fixed at
-   whatever the battery delivers. Don't try to drive BTS7960 from a
-   Jetson GPIO line WITHOUT level shifting (3.3 V ↔ 5 V). Use a logic
-   level shifter or a small transistor buffer.
-7. **Prices fluctuate**: every row is a band; treat the mid-band as the
-   realistic planning number, the high-band as the worst-case if every
-   part is bought the day you need it.
-8. **Total assumes a single Jetson + Arduino chassis.** Adding a second tank nearly
-   doubles the cost (only the tools can be shared).
-9. **Tools not listed** — these are implicit but real: soldering iron
-   (₹ 1,200), heat-shrink gun (₹ 400), multimeter (₹ 700), wire snips
-   (₹ 250), Phillips/flat drivers (₹ 200). Budget ~₹ 3,000 for these
-   if you don't have them.
-
----
-
-*Compiled from the canonical `tank_ws/src/tank_meta/content/hardware.json`
-plus the implicit physical-build inventory in `WIRING.md` and
-`ARCHITECTURE.md`. Refresh the price bands whenever sales land or
-Robu.in replaces a SKU.*
-
----
-
-## 🧩 Software-Hardware Mapping
-
-> Full dependency reference at [`docs/HARDWARE_DEPENDENCIES.md`](docs/HARDWARE_DEPENDENCIES.md)
-
-| Hardware | TankOS Module | Driver / Interface | Status |
-|----------|---------------|-------------------|--------|
-| NVIDIA Jetson Orin Nano | TankOS Core + AI + Shell | Native (Layer 1–4) | ✅ |
-| Arduino UNO Q | RobotManager — `motor_controller` | USB Serial @ 115200 / GPIO | ✅ |
-| 7" HDMI/DP Touchscreen | TankShell (Qt GUI) | PySide6 | 🟡 Planned |
-| ESP32-S3 Round Eyes | EmotionManager, `eye_lcd_bridge` | UART @ 115200 | ✅ |
-| Waveshare 1.28" LCD × 2 | Eye expressions | SPI → ESP32 → UART | ✅ |
-| SH1106 OLED (I²C) | `tank_display` (status face) | luma.oled, I²C 0x3C | ✅ |
-| DFRobot AI Camera | VisionManager — YOLO, detection | USB, ultralytics | 🟡 Planned |
-| USB Camera (IMX219 / C920) | VisionManager — `camera_publisher` | USB UVC, OpenCV | ✅ |
-| ProBots Tank Chassis | RobotManager — `motor_controller` | Arduino GPIO + BTS7960 | ✅ |
-| BTS7960 × 2 | RobotManager — drive motors | Arduino PWM/DIR | ✅ |
-| PCA9685 Servo Controller | RobotManager — `pan_tilt_controller` | I²C 0x40 (Arduino), adafruit-servokit | 🟡 Planned |
-| SG90 Servo × 2 | Pan/tilt camera head | PWM 50 Hz via PCA9685 | 🟡 Planned |
-| BNO055 IMU | `tank_sensors.imu_publisher` | I²C 0x28 (UNO Q) | 🔵 Driver ready |
-| BNO055 9-DOF IMU | `tank_sensors.imu_publisher` (upgrade) | I²C 0x28 (Arduino) | 🟡 Future |
-| HC-SR04 × 2 | Obstacle detection | GPIO trigger/echo | 🟡 Planned |
-| TF-Luna LiDAR | NavigationManager — obstacle avoidance | UART | 🟡 Considering |
-| RPLidar A1 / LD19 | NavigationManager — SLAM | USB, rplidar_ros | 🟡 Planned |
-| AMG8833 Thermal Cam | SecurityManager / Vision AI | I²C 0x69, Adafruit | 🔴 Exp. |
-| AS608 Fingerprint | SecurityManager — auth | UART, adafruit-fingerprint | 🟡 Planned |
-| MAX98357A Amplifier | `tank_text.tts_node` — voice out | I²S GPIO18-21 | 🟡 Planned |
-| ReSpeaker 4-Mic | `tank_speech.wake_word_listener` | USB Audio, openWakeWord | 🟡 Planned |
-| SIM7600G / EC25 LTE | NetworkManager — cellular | USB ttyUSBx, PPP | 🟡 Planned |
-| NVMe SSD 256 GB | StorageManager + AI models | PCIe (M.2 HAT+) | ✅ |
-| USB Hub 4-port | HardwareManager — USB detection | Linux usbhid | ✅ |
-| 20K mAh Power Bank | PowerManager + `tank_health` | USB-C PD + INA219 | ✅ |
-| 4S Li-ion Pack | Motor power — `tank_health.battery` | XT60, INA219 | 🟡 Planned |
-| USB TTL CH341A | Debug / firmware flashing | Linux ch341.ko | ✅ |
-| GPIO Expansion Board | Prototyping | 40-pin breakout | ✅ |
-
-**Legend:** ✅ Working | 🟡 Planned (owned) | 🔴 Experimental
-
-### Key Software Dependencies
-
-| Library | For |
-|---------|-----|
-| PySide6 / Qt6 | Tank Shell GUI + DSI screen |
-| OpenCV + ultralytics (YOLO) | Camera vision (Jetson + DFRobot) |
-| picamera2 + libcamera | USB Camera |
-| luma.oled | SH1106 OLED face |
-| adafruit-circuitpython-servokit | PCA9685 servo control |
-| openWakeWord | Wake word detection via ReSpeaker |
-| sounddevice | Audio I/O (mic + speaker) |
-| rplidar_ros | RPLidar SLAM |
+See `images/` directory for hardware photos and `assets/infographics/` for visual documentation.

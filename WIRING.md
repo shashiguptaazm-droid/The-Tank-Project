@@ -1,93 +1,94 @@
-# Wiring — Phase 1
+# 🔌 WIRING GUIDE — The Tank
 
-Single source of truth for the electrical hookup. Every pin in this table
-matches a ROS2 parameter in `tank_bringup/config/*.yaml`, so you can override
-on a per-robot basis without touching code.
+> **Authoritative wiring for competition submission**
 
-> 🖼 **Hardware photos:** every component below has a real product photo in
-> [`docs/hardware_photos/PHOTOS_README.md`](docs/hardware_photos/PHOTOS_README.md) and real build
-> photos in [`images/build/`](images/build/) (embedded in
-> [HARDWARE_DEPENDENCIES.md §8](docs/HARDWARE_DEPENDENCIES.md#8-hardware-photo-gallery)).
+---
 
-## GPIO — Arduino UNO Q (real-time controller)
+## 🔗 Jetson ↔ UNO Q Connection
 
-![Arduino UNO Q](docs/hardware_photos/2_arduino_uno_q.jpg) · ![NVIDIA Jetson Orin Nano Super](docs/hardware_photos/1_jeton_orin_nano_super.jpg)
+| Jetson Pin | UNO Q Pin | Wire | Protocol |
+|-----------|-----------|------|----------|
+| USB-C (power) | — | USB-C cable | 5V/4A power |
+| USB-A (data) | USB-C (data) | USB cable | Serial 115200 |
+| — | GND | Common ground | Reference |
 
-> **All deterministic motor-control and safety I/O is handled by the UNO Q's real-time microcontroller subsystem.** Jetson sends high-level commands over
-> USB serial (115200 baud); Arduino handles PWM generation, encoder interrupts,
-> and sensor polling deterministically.
+---
 
-| Function          | Pin   | Direction | Notes                                     |
-|-------------------|-------|-----------|-------------------------------------------|
-| `dir_left_pin`    | D7    | OUT       | H-bridge DIR channel A                    |
-| `pwm_left_pin`    | D6    | OUT       | H-bridge PWM channel A (1 kHz, HW PWM)   |
-| `dir_right_pin`   | D4    | OUT       | H-bridge DIR channel B                    |
-| `pwm_right_pin`   | D5    | OUT       | H-bridge PWM channel B (1 kHz, HW PWM)   |
-| `enc_left_a`      | D2    | IN        | Left encoder channel A (INT0)             |
-| `enc_left_b`      | D3    | IN        | Left encoder channel B (INT1)             |
-| `enc_right_a`     | D18   | IN        | Right encoder channel A                   |
-| `enc_right_b`     | D19   | IN        | Right encoder channel B                   |
-| `e_stop_led_pin`  | D8    | OUT       | indicates E-STOP latch (high = latched)   |
-| `e_stop_in_pin`   | D9    | IN        | Hardware E-STOP button (with pull-up)     |
+## ⚡ UNO Q STM32 Pin Map
 
-## I²C bus — Arduino UNO Q (Wire)
+### Motors (BTS7960)
+| UNO Q Pin | Function | Wire | Destination |
+|-----------|----------|------|-------------|
+| D6 | Left Motor PWM | Orange | BTS7960 RPWM |
+| D7 | Left Motor DIR | Yellow | BTS7960 LPWM |
+| D4 | Right Motor PWM | Orange | BTS7960 RPWM |
+| D5 | Right Motor DIR | Yellow | BTS7960 LPWM |
 
-| Address | Device                                | Driver                        | Photo |
-|---------|---------------------------------------|-------------------------------|-------|
-| 0x28    | BNO055 IMU                            | `adafruit_bno055`             | ![BNO055](docs/hardware_photos/9_bno055_imu.jpg) |
-| 0x40    | PCA9685 16-channel 12-bit PWM         | `adafruit_pca9685` + `adafruit_motor.servo` | ![PCA9685](docs/hardware_photos/10_pca9685.jpg) |
-| 0x70    | 1.3" OLED (SH1106) — phase 2          | `adafruit_ssd1306` / `luma.oled` | ![SH1106 OLED](docs/hardware_photos/11_sh1106_1.3_oled.jpg) |
+### Encoders
+| UNO Q Pin | Function | Wire | Destination |
+|-----------|----------|------|-------------|
+| D2 | Left Encoder A | Green | JGB37-520 ENA |
+| D3 | Left Encoder B | Blue | JGB37-520 ENB |
+| D18 | Right Encoder A | Green | JGB37-520 ENA |
+| D19 | Right Encoder B | Blue | JGB37-520 ENB |
 
-Arduino UNO Q has I²C on A4 (SDA) / A5 (SCL) plus a Qwiic connector.
-All I²C devices connect to the Arduino, not the Jetson.## SPI bus — reserved
+### I²C Bus
+| UNO Q Pin | Function | Wire | Destination |
+|-----------|----------|------|-------------|
+| A4 (SDA) | I²C Data | White | BNO055 + PCA9685 + INA219 |
+| A5 (SCL) | I²C Clock | Black | BNO055 + PCA9685 + INA219 |
+| 5V | Power | Red | Sensor VCC |
+| GND | Ground | Black | Sensor GND |
 
-| Arduino Pin | Function |
-|-------------|----------|
-| D11 (MOSI)  | reserved for future SPI peripheral |
-| D12 (MISO)  | reserved |
-| D13 (SCLK)  | reserved |
-| D10 (SS)    | reserved |
+### Safety
+| UNO Q Pin | Function | Wire | Destination |
+|-----------|----------|------|-------------|
+| D9 | E-STOP Input | Red | Emergency button |
+| D8 | E-STOP LED | Yellow | Status LED |
 
-## Serial Links
+---
 
-| Link | Baud | Use | Hardware photo |
-|------|------|-----|----------------|
-| Jetson ↔ Arduino (USB-C) | 115200 | **Command bridge**: Jetson sends motor commands, receives encoder + sensor telemetry via compact binary protocol | ![Jetson](docs/hardware_photos/1_jeton_orin_nano_super.jpg) ![Arduino](docs/hardware_photos/2_arduino_uno_q.jpg) |
-| Jetson USB ↔ LiDAR | — | RPLidar A1/A2/A3 via USB-UART adapter (`/dev/ttyUSB0`) | ![LD19 LiDAR](docs/hardware_photos/7_ldrobot_ld19.jpg) |
-| Jetson USB ↔ ESP32-S3 | — | Eye expression commands (JSON over UART) | ![ESP32-S3](docs/hardware_photos/6_esp32_s3_devkitc_1.png) |
+## 📡 I²C Addresses
 
-RPLidars default to 115 200 baud and draw about 600 mA during spin-up — make
-sure your USB hub is powered. Add a udev rule so the adapter gets a stable
-name:
+| Device | Address | Board | Function |
+|--------|---------|-------|----------|
+| BNO055 | 0x28 | UNO Q | IMU |
+| PCA9685 | 0x40 | UNO Q | Servo PWM |
+| INA219 (motor) | 0x40 | UNO Q | Motor current |
+| INA219 (logic) | 0x41 | UNO Q | Logic current |
+
+---
+
+## 📷 USB Connections to Jetson
+
+| USB Port | Device | Cable | Protocol |
+|----------|--------|-------|----------|
+| USB-A 1 | LDROBOT LD19 LiDAR | USB-UART | 115200 baud |
+| USB-A 2 | DFRobot AI Camera | USB-C | Serial 921600 |
+| USB-A 3 | Arduino UNO Q | USB-C | Serial 115200 |
+| USB-A 4 | Quectel EG800K LTE | USB | AT commands |
+| USB-C | Power (5V/4A) | USB-C | Power delivery |
+
+---
+
+## 🔋 Battery Wiring
 
 ```
-# /etc/udev/rules.d/99-rplidar.rules
-SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", SYMLINK+="rplidar"
+4S Li-ion Pack (14.8V)
+    │
+    ├── (+) → BTS7960 VM (motor power)
+    ├── (+) → DC/DC Buck → 5V (Jetson USB-C)
+    ├── (+) → DC/DC Buck → 5V (UNO Q logic)
+    ├── (+) → LDO → 3.8V (LTE modem)
+    └── (-) → Common GND (all boards)
 ```
 
-## I²C contention notes
+---
 
-Both the IMU and the PCA9685 live on the Arduino's I²C bus. Since the Arduino
-runs bare-metal (no Linux scheduler jitter), I²C contention is not an issue —
-the firmware reads IMU and writes PCA9685 in the same `loop()` iteration.
+## ⚠️ Safety Notes
 
-## E-STOP wiring
-
-The hardware kill switch should be a normally-closed momentary pushbutton in
-series with the BMS VBAT trace feeding the motor driver. The BMS itself has
-a dedicated E-STOP input (PWMA-Safety harness variant) — wire that in
-parallel so an overcurrent event also opens it.
-
-## Power rails
-
-| Rail               | Source                              | Used by                              |
-|--------------------|-------------------------------------|--------------------------------------|
-| VBAT (≈ 22.2 V)    | 6S Li-ion via BMS                   | Motor driver H-bridge                |
-| 12 V               | DC-DC buck from VBAT                | Fans, LiDAR, camera illuminator     |
-| 5 V                | Arduino UNO Q onboard reg (7-12 V in) or USB-C PD | Arduino, PCA9685, IMU, OLED, sensors |
-| 19 V               | Jetson Orin Nano barrel jack PSU    | Jetson, USB peripherals              |
-
-> 📸 **Boards in this section:** ![Jetson Orin Nano Super](docs/hardware_photos/1_jeton_orin_nano_super.jpg) ![Arduino UNO Q](docs/hardware_photos/2_arduino_uno_q.jpg) ![BTS7960 driver](docs/hardware_photos/12_bts7960.jpg)
-
-Keep motor power and logic power physically separated on the chassis — run
-them on opposite sides of the cable spine.
+1. **Common ground** — All boards MUST share a common GND
+2. **E-STOP** — Hardware button cuts power to motors immediately
+3. **No Jetson GPIO to motors** — Jetson NEVER touches motor wires
+4. **USB serial only** — Jetson ↔ UNO Q communication via USB
+5. **Current sensing** — INA219 monitors both motor and logic rails
