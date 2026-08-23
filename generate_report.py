@@ -114,7 +114,7 @@ doc.add_paragraph(
     'requires sub-millisecond response times. While the Jetson Orin Nano handles high-level AI inference '
     'and the graphical interface, the Arduino manages motor PWM at 1kHz, encoder quadrature counting via '
     'hardware interrupts, and I²C sensor polling — tasks where Linux scheduling jitter would cause '
-    'failures. The UNO Q\'s Arm Cortex-M4 processor at 48MHz provides the deterministic timing needed '
+    'failures. The UNO Q\'s Qualcomm QRB2210 Linux processor + STM32U585 MCU provides the deterministic timing needed '
     'for safe motor control, while its built-in WiFi/BLE enables wireless configuration. This clean '
     'separation between AI (Jetson) and real-time control (Arduino) is the core architectural innovation '
     'that makes the Tank both intelligent and reliable.'
