@@ -4,6 +4,11 @@ Single source of truth for the electrical hookup. Every pin in this table
 matches a ROS2 parameter in `tank_bringup/config/*.yaml`, so you can override
 on a per-robot basis without touching code.
 
+> 🖼 **Hardware photos:** every component below has a real product photo in
+> [](docs/hardware_photos/PHOTOS_README.md) and real build photos in
+> [](images/build/) (embedded in
+> [HARDWARE_DEPENDENCIES.md §8](docs/HARDWARE_DEPENDENCIES.md#8-hardware-photo-gallery)).
+
 ## GPIO — Arduino UNO Q (real-time controller)
 
 > **All deterministic motor-control and safety I/O is handled by the UNO Q's real-time microcontroller subsystem.** Jetson sends high-level commands over

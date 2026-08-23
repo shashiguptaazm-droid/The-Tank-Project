@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="900" viewBox="0 0 1280 900" font-family="DejaVu Sans, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0e1b"/>
+      <stop offset="100%" stop-color="#0d1326"/>
+    </linearGradient>
+    <linearGradient id="l1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#312e81"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="l2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0e7490"/>
+      <stop offset="100%" stop-color="#164e63"/>
+    </linearGradient>
+    <linearGradient id="l3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#047857"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+    <linearGradient id="l4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b45309"/>
+      <stop offset="100%" stop-color="#78350f"/>
+    </linearGradient>
+    <linearGradient id="l5" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9d174d"/>
+      <stop offset="100%" stop-color="#701a40"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="900" fill="url(#bg)"/>
+
+  <text x="640" y="50" text-anchor="middle" font-size="30" font-weight="bold" fill="#eef2ff">TANKOS — SYSTEM ARCHITECTURE</text>
+  <text x="640" y="80" text-anchor="middle" font-size="15" fill="#8b93b5">Jetson brain · Arduino UNO Q controller · ESP32 peripherals · VPS cloud</text>
+  <line x1="300" y1="94" x2="980" y2="94" stroke="#2a3560" stroke-width="2"/>
+
+  <!-- Layer 5: Tank Shell (top) -->
+  <g>
+    <rect x="240" y="115" width="800" height="70" rx="12" fill="url(#l5)" stroke="#f472b6" stroke-width="1.5"/>
+    <text x="640" y="145" text-anchor="middle" font-size="17" font-weight="bold" fill="#fbcfe8">TANK SHELL · WEB · DESKTOP</text>
+    <text x="640" y="168" text-anchor="middle" font-size="12" fill="#f9a8d4">TankOS web terminal (ttyd) · USB Devices GUI · TankDashboard · x11vnc desktop</text>
+  </g>
+
+  <!-- Layer 4: Core Managers -->
+  <g>
+    <rect x="240" y="205" width="800" height="110" rx="12" fill="url(#l4)" stroke="#fbbf24" stroke-width="1.5"/>
+    <text x="640" y="233" text-anchor="middle" font-size="17" font-weight="bold" fill="#fde68a">TANKOS CORE MANAGERS</text>
+    <text x="340" y="262" font-size="12" fill="#fcd34d">Hardware · Network · Storage</text>
+    <text x="340" y="284" font-size="12" fill="#fcd34d">Power · Security · Diagnostics</text>
+    <text x="700" y="262" font-size="12" fill="#fcd34d">Emotion (eyes) · Robot (motion)</text>
+    <text x="700" y="284" font-size="12" fill="#fcd34d">Vision · Navigation · Voice · Display</text>
+  </g>
+
+  <!-- Layer 3: Robotics (tank_ws ROS2) -->
+  <g>
+    <rect x="240" y="335" width="800" height="110" rx="12" fill="url(#l3)" stroke="#34d399" stroke-width="1.5"/>
+    <text x="640" y="363" text-anchor="middle" font-size="17" font-weight="bold" fill="#a7f3d0">ROBOTICS LAYER — 16 ROS2 packages (ament_python)</text>
+    <text x="340" y="392" font-size="12" fill="#6ee7b7">tank_motion (BTS7960 + PCA9685)</text>
+    <text x="340" y="414" font-size="12" fill="#6ee7b7">tank_vision (YOLO + eye bridge)</text>
+    <text x="340" y="436" font-size="12" fill="#6ee7b7">tank_navigation (SLAM / LiDAR)</text>
+    <text x="700" y="392" font-size="12" fill="#6ee7b7">tank_sensors (IMU · LiDAR · thermal)</text>
+    <text x="700" y="414" font-size="12" fill="#6ee7b7">tank_speech · tank_text · tank_memory</text>
+    <text x="700" y="436" font-size="12" fill="#6ee7b7">tank_assistant (LLM + RAG) · tank_health</text>
+  </g>
+
+  <!-- Layer 2: AI Brain -->
+  <g>
+    <rect x="240" y="465" width="800" height="90" rx="12" fill="url(#l2)" stroke="#22d3ee" stroke-width="1.5"/>
+    <text x="640" y="495" text-anchor="middle" font-size="17" font-weight="bold" fill="#a5f3fc">AI BRAIN — NVIDIA JETSON ORIN NANO SUPER</text>
+    <text x="640" y="520" text-anchor="middle" font-size="12" fill="#67e8f9">JetPack / Ubuntu · 8 GB · GPU (nvgpu) · AIManager + Evolution Bridge</text>
+    <text x="640" y="542" text-anchor="middle" font-size="12" fill="#67e8f9">WiFi .74 · Tailscale 100.122.31.46 · 4G LTE failover (EG800AK-CN)</text>
+  </g>
+
+  <!-- Layer 1: Real-time Controller -->
+  <g>
+    <rect x="240" y="575" width="800" height="90" rx="12" fill="url(#l1)" stroke="#818cf8" stroke-width="1.5"/>
+    <text x="640" y="605" text-anchor="middle" font-size="17" font-weight="bold" fill="#c7d2fe">REAL-TIME CONTROLLER — ARDUINO UNO Q (unoq)</text>
+    <text x="640" y="630" text-anchor="middle" font-size="12" fill="#a5b4fc">Debian 13 · WiFi .72 · Tailscale 100.84.235.7 · OpenVPN tun0</text>
+    <text x="640" y="652" text-anchor="middle" font-size="12" fill="#a5b4fc">Deterministic motor/sensor I/O · USB serial bridge ↔ Jetson</text>
+  </g>
+
+  <!-- Peripherals row -->
+  <text x="640" y="700" text-anchor="middle" font-size="16" font-weight="bold" fill="#eef2ff">HARDWARE PERIPHERALS</text>
+
+  <!-- peripheral chips -->
+  <g>
+    <rect x="60" y="718" width="220" height="72" rx="10" fill="#101830" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="170" y="744" text-anchor="middle" font-size="13" font-weight="bold" fill="#fcd34d">👀 Dual-eyes ESP32-S3</text>
+    <text x="170" y="766" text-anchor="middle" font-size="11" fill="#cbd5f0">2× 1.28" round LCDs · SPI</text>
+    <text x="170" y="782" text-anchor="middle" font-size="10" fill="#93a4d8">Jetson ttyACM1</text>
+  </g>
+  <g>
+    <rect x="300" y="718" width="220" height="72" rx="10" fill="#101830" stroke="#7c3aed" stroke-width="1.5"/>
+    <text x="410" y="744" text-anchor="middle" font-size="13" font-weight="bold" fill="#f0abfc">🎥 DFRobot AI Cam</text>
+    <text x="410" y="766" text-anchor="middle" font-size="11" fill="#cbd5f0">OV3660 3MP · YOLO vision</text>
+    <text x="410" y="782" text-anchor="middle" font-size="10" fill="#93a4d8">Jetson ttyACM0 · streaming</text>
+  </g>
+  <g>
+    <rect x="540" y="718" width="220" height="72" rx="10" fill="#101830" stroke="#22d3ee" stroke-width="1.5"/>
+    <text x="650" y="744" text-anchor="middle" font-size="13" font-weight="bold" fill="#67e8f9">📷 ESP32-S3 CAM</text>
+    <text x="650" y="766" text-anchor="middle" font-size="11" fill="#cbd5f0">ESPHome · WiFi .145</text>
+    <text x="650" y="782" text-anchor="middle" font-size="10" fill="#93a4d8">unoq ttyACM0</text>
+  </g>
+  <g>
+    <rect x="780" y="718" width="220" height="72" rx="10" fill="#101830" stroke="#34d399" stroke-width="1.5"/>
+    <text x="890" y="744" text-anchor="middle" font-size="13" font-weight="bold" fill="#6ee7b7">📡 LD19 LiDAR</text>
+    <text x="890" y="766" text-anchor="middle" font-size="11" fill="#cbd5f0">360° · SLAM</text>
+    <text x="890" y="782" text-anchor="middle" font-size="10" fill="#93a4d8">Jetson ttyUSB0</text>
+  </g>
+  <g>
+    <rect x="1020" y="718" width="220" height="72" rx="10" fill="#101830" stroke="#fb7185" stroke-width="1.5"/>
+    <text x="1130" y="744" text-anchor="middle" font-size="13" font-weight="bold" fill="#fda4af">📶 EG800AK 4G LTE</text>
+    <text x="1130" y="766" text-anchor="middle" font-size="11" fill="#cbd5f0">Cat 1 · cellular backup</text>
+    <text x="1130" y="782" text-anchor="middle" font-size="10" fill="#93a4d8">Jetson ttyUSB1-3</text>
+  </g>
+
+  <!-- connector arrows between layers -->
+  <line x1="640" y1="185" x2="640" y2="205" stroke="#6b739a" stroke-width="2"/>
+  <line x1="640" y1="315" x2="640" y2="335" stroke="#6b739a" stroke-width="2"/>
+  <line x1="640" y1="445" x2="640" y2="465" stroke="#6b739a" stroke-width="2"/>
+  <line x1="640" y1="555" x2="640" y2="575" stroke="#6b739a" stroke-width="2"/>
+
+  <!-- VPS cloud right side -->
+  <g>
+    <rect x="1090" y="115" width="150" height="110" rx="12" fill="#101830" stroke="#7c3aed" stroke-width="1.5"/>
+    <text x="1165" y="145" text-anchor="middle" font-size="14" font-weight="bold" fill="#f0abfc">☁ VPS</text>
+    <text x="1165" y="168" text-anchor="middle" font-size="10" fill="#cbd5f0">tank-vps API</text>
+    <text x="1165" y="184" text-anchor="middle" font-size="10" fill="#cbd5f0">Nextcloud</text>
+    <text x="1165" y="200" text-anchor="middle" font-size="10" fill="#cbd5f0">webdav · nginx</text>
+    <text x="1165" y="216" text-anchor="middle" font-size="10" fill="#4ade80">● 100.71.127.19</text>
+  </g>
+  <path d="M 1040 170 C 1070 160, 1070 160, 1090 160" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5 4"/>
+
+  <text x="640" y="850" text-anchor="middle" font-size="11" fill="#6b739a">Architecture details: docs/ARCHITECTURE.md · hardware mapping: docs/HARDWARE_DEPENDENCIES.md · fleet: docs/FLEET_INVENTORY.md</text>
+  <text x="640" y="876" text-anchor="middle" font-size="11" fill="#6b739a">Network: WiFi → LTE → Hotspot → Tailscale · photos: docs/hardware_photos/ · eyes animation: assets/gifs/eyes_expressions.gif</text>
+</svg>

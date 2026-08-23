@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" font-family="DejaVu Sans, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0e1b"/>
+      <stop offset="100%" stop-color="#0d1326"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#151d38"/>
+      <stop offset="100%" stop-color="#0f162b"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="760" fill="url(#bg)"/>
+
+  <text x="640" y="50" text-anchor="middle" font-size="30" font-weight="bold" fill="#eef2ff">THE 3 ESP32 BOARDS — LOCATED &amp; ALIVE</text>
+  <text x="640" y="80" text-anchor="middle" font-size="15" fill="#8b93b5">All Espressif 303a:1001 · identified by unique serial MAC · live audit 2026-08-23</text>
+  <line x1="300" y1="94" x2="980" y2="94" stroke="#2a3560" stroke-width="2"/>
+
+  <!-- Board 1: Dual-eyes -->
+  <g>
+    <rect x="40" y="120" width="380" height="420" rx="16" fill="url(#card)" stroke="#f59e0b" stroke-width="2"/>
+    <text x="230" y="160" text-anchor="middle" font-size="20" font-weight="bold" fill="#fcd34d">① DUAL-EYES ESP32-S3</text>
+    <image x="110" y="180" width="240" height="170" preserveAspectRatio="xMidYMid meet" href="../../docs/hardware_photos/6_esp32_s3_devkitc_1.png"/>
+    <line x1="70" y1="370" x2="390" y2="370" stroke="#1e2a4d" stroke-width="1"/>
+    <text x="70" y="395" font-size="13" font-weight="bold" fill="#fcd34d">📍 Jetson — /dev/ttyACM1</text>
+    <text x="70" y="420" font-size="12" fill="#cbd5f0">Serial: A0:F2:62:E3:DF:F4</text>
+    <text x="70" y="444" font-size="12" fill="#cbd5f0">Role: drives both 1.28" round</text>
+    <text x="70" y="462" font-size="12" fill="#cbd5f0">      LCDs (GC9A01) over SPI</text>
+    <text x="70" y="486" font-size="12" fill="#cbd5f0">JSON over UART: happy / alert</text>
+    <text x="70" y="504" font-size="12" fill="#cbd5f0">      blink / gaze / neutral</text>
+    <text x="70" y="528" font-size="12" fill="#cbd5f0">Render loop ~9 FPS</text>
+    <text x="70" y="556" font-size="13" fill="#4ade80">● ONLINE — rendering eyes</text>
+  </g>
+
+  <!-- Board 2: DFRobot -->
+  <g>
+    <rect x="450" y="120" width="380" height="420" rx="16" fill="url(#card)" stroke="#7c3aed" stroke-width="2"/>
+    <text x="640" y="160" text-anchor="middle" font-size="20" font-weight="bold" fill="#f0abfc">② DFRobot AI CAMERA</text>
+    <image x="520" y="180" width="240" height="170" preserveAspectRatio="xMidYMid meet" href="../../docs/hardware_photos/3_dfrobot_esp32s3_ai_camera.webp"/>
+    <line x1="480" y1="370" x2="800" y2="370" stroke="#1e2a4d" stroke-width="1"/>
+    <text x="480" y="395" font-size="13" font-weight="bold" fill="#f0abfc">📍 Jetson — /dev/ttyACM0</text>
+    <text x="480" y="420" font-size="12" fill="#cbd5f0">Serial: 28:84:85:4C:84:04</text>
+    <text x="480" y="444" font-size="12" fill="#cbd5f0">Model: SEN0611 · ESP32-S3</text>
+    <text x="480" y="468" font-size="12" fill="#cbd5f0">Sensor: OV3660 3MP IR (night)</text>
+    <text x="480" y="492" font-size="12" fill="#cbd5f0">Flash: 16MB + 8MB PSRAM</text>
+    <text x="480" y="516" font-size="12" fill="#4ade80">✅ Flash COMPLETE — now</text>
+    <text x="480" y="534" font-size="12" fill="#4ade80">   streaming [FRAME] 640×480</text>
+    <text x="480" y="558" font-size="12" fill="#cbd5f0">   (CamWebServer.ino)</text>
+    <text x="480" y="584" font-size="13" fill="#4ade80">● ONLINE — video + IMU</text>
+  </g>
+
+  <!-- Board 3: ESP32-S3 CAM -->
+  <g>
+    <rect x="860" y="120" width="380" height="420" rx="16" fill="url(#card)" stroke="#22d3ee" stroke-width="2"/>
+    <text x="1050" y="160" text-anchor="middle" font-size="20" font-weight="bold" fill="#67e8f9">③ ESP32-S3 CAM</text>
+    <image x="930" y="180" width="240" height="170" preserveAspectRatio="xMidYMid meet" href="../../docs/hardware_photos/4_esp32_s3_cam.jpg"/>
+    <line x1="890" y1="370" x2="1210" y2="370" stroke="#1e2a4d" stroke-width="1"/>
+    <text x="890" y="395" font-size="13" font-weight="bold" fill="#67e8f9">📍 unoq — /dev/ttyACM0</text>
+    <text x="890" y="420" font-size="12" fill="#cbd5f0">Serial: 14:C1:9F:C1:2C:24</text>
+    <text x="890" y="444" font-size="12" fill="#cbd5f0">Firmware: ESPHome</text>
+    <text x="890" y="468" font-size="12" fill="#cbd5f0">WiFi: 192.168.31.145</text>
+    <text x="890" y="492" font-size="12" fill="#cbd5f0">Ports: 80 (web UI), 8080,</text>
+    <text x="890" y="510" font-size="12" fill="#cbd5f0">      3232, 6053 (native API)</text>
+    <text x="890" y="534" font-size="12" fill="#cbd5f0">Component: esp32_camera + SD</text>
+    <text x="890" y="558" font-size="12" fill="#cbd5f0">Power-save: HTTP sleeps</text>
+    <text x="890" y="576" font-size="12" fill="#cbd5f0">      between polls (normal)</text>
+    <text x="890" y="604" font-size="13" fill="#4ade80">● ONLINE — ESPHome alive</text>
+  </g>
+
+  <!-- bottom legend -->
+  <rect x="240" y="640" width="800" height="80" rx="12" fill="#101830" stroke="#2a3560" stroke-width="1"/>
+  <text x="640" y="672" text-anchor="middle" font-size="14" font-weight="bold" fill="#eef2ff">All three share Espressif VID:PID 303a:1001 (USB JTAG/serial)</text>
+  <text x="640" y="698" text-anchor="middle" font-size="12" fill="#8b93b5">Distinguished by unique serial MAC — see docs/FLEET_INVENTORY.md §5 · photos → docs/hardware_photos/</text>
+</svg>
