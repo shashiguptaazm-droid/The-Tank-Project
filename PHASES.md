@@ -1,5 +1,23 @@
 # Phase Roadmap
 
+> 🖼 **Every piece of hardware below has its real product photo here:**
+> [`docs/hardware_photos/PHOTOS_README.md`](docs/hardware_photos/PHOTOS_README.md)
+> · build photos in [`images/build/`](images/build/).
+>
+> ![Jetson Orin Nano Super](docs/hardware_photos/1_jeton_orin_nano_super.jpg)
+> ![Arduino UNO Q](docs/hardware_photos/2_arduino_uno_q.jpg)
+> ![ESP32-S3 CAM](docs/hardware_photos/4_esp32_s3_cam.jpg)
+> ![DFRobot AI Cam](docs/hardware_photos/3_dfrobot_esp32s3_ai_camera.webp)
+> ![ESP32-S3 DevKitC-1](docs/hardware_photos/6_esp32_s3_devkitc_1.png)
+> ![1.28" Round LCD](docs/hardware_photos/5_waveshare_1.28_round_lcd_gc9a01.jpg)
+> ![SH1106 OLED](docs/hardware_photos/11_sh1106_1.3_oled.jpg)
+> ![BTS7960](docs/hardware_photos/12_bts7960.jpg)
+> ![PCA9685](docs/hardware_photos/10_pca9685.jpg)
+> ![LD19 LiDAR](docs/hardware_photos/7_ldrobot_ld19.jpg)
+> ![BNO055 IMU](docs/hardware_photos/9_bno055_imu.jpg)
+> ![EG800AK 4G](docs/hardware_photos/8_quectel_eg800ak.jpg)
+>
+
 ## Phase 1 — Foundation, motion, vision ✅
 - [x] Project skeleton, ROS2 humbl colcon workspace
 - [x] motor_controller, pan_tilt_controller, imu_publisher,
@@ -7,7 +25,7 @@
 - [x] Kinematics unit tests (12/12 pass)
 
 ## Phase 2 — Eyes, tracker, mapping ✅
-- [x] ESP32-S3 firmware for two Waveshare 1.28" round GC9A101 LCDs
+- [x] ESP32-S3 firmware for two Waveshare 1.28" round GC9A101 LCDs  ![ESP32-S3](docs/hardware_photos/6_esp32_s3_devkitc_1.png) ![Round LCD](docs/hardware_photos/5_waveshare_1.28_round_lcd_gc9a01.jpg)
 - [x] eye_lcd_bridge (Pi ↔ ESP32-S3 UART JSON)
 - [x] object_tracker (YOLOv8n) with pan-tilt feedback
 - [x] tank_navigation (slam_toolbox 2D + RTAB-Map 3D)
@@ -100,7 +118,7 @@ Captured in `scripts/provision_pi5.sh`:
 - [x] End-to-end smoke test verified all indices + anomaly detection
 
 ## Phase 5½ — Emotion fan-out (eyes + OLED + dashboard) ✅
-- [x] `tank_display` package — 1.3\" SH1106 OLED face at I²C 0x70 (or NullHal for benches/CI) — see WIRING.md §I²C
+- [x] `tank_display` package — 1.3\" SH1106 OLED face at I²C 0x70 (or NullHal for benches/CI) — see WIRING.md §I²C  ![SH1106 OLED](docs/hardware_photos/11_sh1106_1.3_oled.jpg)
 - [x] `faces.py` — Pillow bitmaps for happy / sad / angry / scared / neutral
 - [x] `/emotion/state` 1:N fan-out: `eye_lcd_bridge` (UART → ESP32-S3), `tank_display` (I²C → OLED), `tank_dashboard` (WS → browser UI)
 - [x] `emotion_node` upgraded — EmotionState dataclass + decay-to-neutral after 8 s + hysteresis

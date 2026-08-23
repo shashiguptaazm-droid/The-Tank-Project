@@ -8,15 +8,15 @@
 
 ## 1. Fleet overview
 
-| # | Node | Role | Tailscale IP | LAN IP | OS / arch |
-|---|------|------|--------------|--------|-----------|
-| 1 | **unoq** (host `skullcandy`) | Arduino UNO Q real-time controller + TankOS terminal | `100.84.235.7` | `192.168.31.72` | Debian 13 (trixie), aarch64 |
-| 2 | **shashi** | NVIDIA Jetson Orin Nano Super — tank brain | `100.122.31.46` | `192.168.31.74` | JetPack Ubuntu, aarch64 |
-| 3 | **medicscholar** (medigyaan.com) | Cloud VPS — API, Nextcloud, webdav, torrent cloud | `100.71.127.19` | `213.199.61.156` | Ubuntu, x86_64 |
-| 4 | **shashis-z-flip6** | Operator phone (Tailscale app) | `100.91.134.103` | — | Android |
-| 5 | ESP32-S3 CAM | ESPHome camera | — | `192.168.31.145` | ESPHome |
-| 6 | ESP32-S3 Dual-eyes | Round-eye display driver (via Jetson USB) | — | — | ESP32-S3 |
-| 7 | DFRobot ESP32-S3 AI Cam | Vision + IMU (via Jetson USB) | — | — | ESP32-S3 |
+| # | Node | Role | Tailscale IP | LAN IP | OS / arch | Photo |
+|---|------|------|--------------|--------|-----------|-------|
+| 1 | **unoq** (host `skullcandy`) | Arduino UNO Q real-time controller + TankOS terminal | `100.84.235.7` | `192.168.31.72` | Debian 13 (trixie), aarch64 | ![Arduino UNO Q](hardware_photos/2_arduino_uno_q.jpg) |
+| 2 | **shashi** | NVIDIA Jetson Orin Nano Super — tank brain | `100.122.31.46` | `192.168.31.74` | JetPack Ubuntu, aarch64 | ![Jetson](hardware_photos/1_jeton_orin_nano_super.jpg) |
+| 3 | **medicscholar** (medigyaan.com) | Cloud VPS — API, Nextcloud, webdav, torrent cloud | `100.71.127.19` | `213.199.61.156` | Ubuntu, x86_64 | — |
+| 4 | **shashis-z-flip6** | Operator phone (Tailscale app) | `100.91.134.103` | — | Android | — |
+| 5 | ESP32-S3 CAM | ESPHome camera | — | `192.168.31.145` | ESPHome | ![ESP32-S3 CAM](hardware_photos/4_esp32_s3_cam.jpg) |
+| 6 | ESP32-S3 Dual-eyes | Round-eye display driver (via Jetson USB) | — | — | ESP32-S3 | ![ESP32-S3](hardware_photos/6_esp32_s3_devkitc_1.png) |
+| 7 | DFRobot ESP32-S3 AI Cam | Vision + IMU (via Jetson USB) | — | — | ESP32-S3 | ![DFRobot AI Cam](hardware_photos/3_dfrobot_esp32s3_ai_camera.webp) |
 
 **Offline nodes (not currently reachable):** `openwrt` (100.72.169.107, 22d), `openwrt-pi-storage` (100.106.250.6, 51d), `raspberrypi` (100.85.16.126, 11d), `transformer` (100.125.165.27, 2d).
 
@@ -64,12 +64,12 @@
 
 ### 3.2 USB devices
 
-| Device | VID:PID | Port | Purpose |
-|--------|---------|------|---------|
-| **DFRobot ESP32-S3 AI Cam** | `303a:1001` | `/dev/ttyACM0` | Vision + IMU — serial `28:84:85:4C:84:04` — **now streaming video frames** (flash complete) |
-| **ESP32-S3 Dual-eyes** | `303a:1001` | `/dev/ttyACM1` | Round-eye driver — serial `A0:F2:62:E3:DF:F4` — JSON commands over UART |
-| Silicon Labs CP210x (LiDAR) | `10c4:ea60` | `/dev/ttyUSB0` | LDROBOT LD19 LiDAR |
-| Quectel **EG800AK-CN** 4G LTE | `2c7c:6002` | `/dev/ttyUSB1-3` | Cellular backup — registered, 64% signal (AT / data / PPP) |
+| Device | VID:PID | Port | Purpose | Photo |
+|--------|---------|------|---------|-------|
+| **DFRobot ESP32-S3 AI Cam** | `303a:1001` | `/dev/ttyACM0` | Vision + IMU — serial `28:84:85:4C:84:04` — **now streaming video frames** (flash complete) | ![DFRobot AI Cam](hardware_photos/3_dfrobot_esp32s3_ai_camera.webp) |
+| **ESP32-S3 Dual-eyes** | `303a:1001` | `/dev/ttyACM1` | Round-eye driver — serial `A0:F2:62:E3:DF:F4` — JSON commands over UART | ![ESP32-S3](hardware_photos/6_esp32_s3_devkitc_1.png) |
+| Silicon Labs CP210x (LiDAR) | `10c4:ea60` | `/dev/ttyUSB0` | LDROBOT LD19 LiDAR | ![LD19](hardware_photos/7_ldrobot_ld19.jpg) |
+| Quectel **EG800AK-CN** 4G LTE | `2c7c:6002` | `/dev/ttyUSB1-3` | Cellular backup — registered, 64% signal (AT / data / PPP) | ![EG800AK](hardware_photos/8_quectel_eg800ak.jpg) |
 | WD My Passport | `1058:25e1` | — | Storage (WD20NMVW) |
 | Realtek 4-port USB 2.0/3.0 hubs | `0bda:5489` / `0bda:0489` | — | USB expansion |
 | Huasheng USB2.0 hubs | `214b:7260` ×2 | — | USB expansion |
@@ -108,11 +108,11 @@
 
 ## 5. ESP32 boards (the 3)
 
-| Board | MAC serial | Connection | Status 2026-08-23 |
-|-------|-----------|------------|-------------------|
-| **ESP32-S3 CAM** (ESPHome) | `14:C1:9F:C1:2C:24` | unoq USB `/dev/ttyACM0` + WiFi `.145` | ✅ ARP-reachable; HTTP sleeps in power-save (normal) |
-| **ESP32-S3 Dual-eyes** | `A0:F2:62:E3:DF:F4` | Jetson USB `/dev/ttyACM1` | ✅ Present; JSON `{cmd}` protocol (`happy`/`alert`/`blink`/`gaze`) |
-| **DFRobot AI Camera** (SEN0611) | `28:84:85:4C:84:04` | Jetson USB `/dev/ttyACM0` | ✅ **Flashing COMPLETE** — streams `[FRAME] 640x480` (CamWebServer) |
+| Board | MAC serial | Connection | Status 2026-08-23 | Photo |
+|-------|-----------|------------|-------------------|-------|
+| **ESP32-S3 CAM** (ESPHome) | `14:C1:9F:C1:2C:24` | unoq USB `/dev/ttyACM0` + WiFi `.145` | ✅ ARP-reachable; HTTP sleeps in power-save (normal) | ![ESP32-S3 CAM](hardware_photos/4_esp32_s3_cam.jpg) |
+| **ESP32-S3 Dual-eyes** | `A0:F2:62:E3:DF:F4` | Jetson USB `/dev/ttyACM1` | ✅ Present; JSON `{cmd}` protocol (`happy`/`alert`/`blink`/`gaze`) | ![ESP32-S3](hardware_photos/6_esp32_s3_devkitc_1.png) |
+| **DFRobot AI Camera** (SEN0611) | `28:84:85:4C:84:04` | Jetson USB `/dev/ttyACM0` | ✅ **Flashing COMPLETE** — streams `[FRAME] 640x480` (CamWebServer) | ![DFRobot AI Cam](hardware_photos/3_dfrobot_esp32s3_ai_camera.webp) |
 
 > ⚠️ **DFRobot camera updated:** previously "factory IMU-only", now flashing `CamWebServer.ino`
 > (`~/The-Tank-Project/firmware/dfrobot_camera/CamWebServer.ino.bin`). Desktop config YAML is stale —

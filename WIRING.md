@@ -5,11 +5,13 @@ matches a ROS2 parameter in `tank_bringup/config/*.yaml`, so you can override
 on a per-robot basis without touching code.
 
 > 🖼 **Hardware photos:** every component below has a real product photo in
-> [](docs/hardware_photos/PHOTOS_README.md) and real build photos in
-> [](images/build/) (embedded in
+> [`docs/hardware_photos/PHOTOS_README.md`](docs/hardware_photos/PHOTOS_README.md) and real build
+> photos in [`images/build/`](images/build/) (embedded in
 > [HARDWARE_DEPENDENCIES.md §8](docs/HARDWARE_DEPENDENCIES.md#8-hardware-photo-gallery)).
 
 ## GPIO — Arduino UNO Q (real-time controller)
+
+![Arduino UNO Q](docs/hardware_photos/2_arduino_uno_q.jpg) · ![NVIDIA Jetson Orin Nano Super](docs/hardware_photos/1_jeton_orin_nano_super.jpg)
 
 > **All deterministic motor-control and safety I/O is handled by the UNO Q's real-time microcontroller subsystem.** Jetson sends high-level commands over
 > USB serial (115200 baud); Arduino handles PWM generation, encoder interrupts,
@@ -30,11 +32,11 @@ on a per-robot basis without touching code.
 
 ## I²C bus — Arduino UNO Q (Wire)
 
-| Address | Device                                | Driver                        |
-|---------|---------------------------------------|-------------------------------|
-| 0x28    | BNO055 IMU                            | `adafruit_bno055`             |
-| 0x40    | PCA9685 16-channel 12-bit PWM         | `adafruit_pca9685` + `adafruit_motor.servo` |
-| 0x70    | 1.3" OLED (SH1106) — phase 2          | `adafruit_ssd1306` / `luma.oled` |
+| Address | Device                                | Driver                        | Photo |
+|---------|---------------------------------------|-------------------------------|-------|
+| 0x28    | BNO055 IMU                            | `adafruit_bno055`             | ![BNO055](docs/hardware_photos/9_bno055_imu.jpg) |
+| 0x40    | PCA9685 16-channel 12-bit PWM         | `adafruit_pca9685` + `adafruit_motor.servo` | ![PCA9685](docs/hardware_photos/10_pca9685.jpg) |
+| 0x70    | 1.3" OLED (SH1106) — phase 2          | `adafruit_ssd1306` / `luma.oled` | ![SH1106 OLED](docs/hardware_photos/11_sh1106_1.3_oled.jpg) |
 
 Arduino UNO Q has I²C on A4 (SDA) / A5 (SCL) plus a Qwiic connector.
 All I²C devices connect to the Arduino, not the Jetson.## SPI bus — reserved
@@ -48,11 +50,11 @@ All I²C devices connect to the Arduino, not the Jetson.## SPI bus — reserved
 
 ## Serial Links
 
-| Link | Baud | Use |
-|------|------|-----|
-| Jetson ↔ Arduino (USB-C) | 115200 | **Command bridge**: Jetson sends motor commands, receives encoder + sensor telemetry via compact binary protocol |
-| Jetson USB ↔ LiDAR | — | RPLidar A1/A2/A3 via USB-UART adapter (`/dev/ttyUSB0`) |
-| Jetson USB ↔ ESP32-S3 | — | Eye expression commands (JSON over UART) |
+| Link | Baud | Use | Hardware photo |
+|------|------|-----|----------------|
+| Jetson ↔ Arduino (USB-C) | 115200 | **Command bridge**: Jetson sends motor commands, receives encoder + sensor telemetry via compact binary protocol | ![Jetson](docs/hardware_photos/1_jeton_orin_nano_super.jpg) ![Arduino](docs/hardware_photos/2_arduino_uno_q.jpg) |
+| Jetson USB ↔ LiDAR | — | RPLidar A1/A2/A3 via USB-UART adapter (`/dev/ttyUSB0`) | ![LD19 LiDAR](docs/hardware_photos/7_ldrobot_ld19.jpg) |
+| Jetson USB ↔ ESP32-S3 | — | Eye expression commands (JSON over UART) | ![ESP32-S3](docs/hardware_photos/6_esp32_s3_devkitc_1.png) |
 
 RPLidars default to 115 200 baud and draw about 600 mA during spin-up — make
 sure your USB hub is powered. Add a udev rule so the adapter gets a stable
@@ -84,6 +86,8 @@ parallel so an overcurrent event also opens it.
 | 12 V               | DC-DC buck from VBAT                | Fans, LiDAR, camera illuminator     |
 | 5 V                | Arduino UNO Q onboard reg (7-12 V in) or USB-C PD | Arduino, PCA9685, IMU, OLED, sensors |
 | 19 V               | Jetson Orin Nano barrel jack PSU    | Jetson, USB peripherals              |
+
+> 📸 **Boards in this section:** ![Jetson Orin Nano Super](docs/hardware_photos/1_jeton_orin_nano_super.jpg) ![Arduino UNO Q](docs/hardware_photos/2_arduino_uno_q.jpg) ![BTS7960 driver](docs/hardware_photos/12_bts7960.jpg)
 
 Keep motor power and logic power physically separated on the chassis — run
 them on opposite sides of the cable spine.

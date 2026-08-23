@@ -22,6 +22,16 @@
 
 ---
 
+## 📸 Real Build Photos
+
+Actual photos of the tank and parts as they are being assembled (from the team's phone):
+
+| | |
+|---|---|
+| ![Build 1](images/build/20260720_180222.jpg) | ![Build 2](images/build/20260721_193849.jpg) |
+| ![Build 3](images/build/20260801_012257.jpg) | ![Build 4](images/build/20260803_162900.jpg) |
+| ![Build 5](images/build/20260809_232842.jpg) | ![Build 6](images/build/20260813_140304.jpg) |
+
 ## 📊 Bill of Materials — at a glance
 
 | Section | Items | Sub-total mid-band |
@@ -51,10 +61,10 @@
 
 | # | Item | Photo / Google-Shopping Description | Driver / Use in The Tank | Price (₹) | Robu.in Link |
 |---|------|--------------------------------------|--------------------------|----------:|--------------------|
-| 1 | **NVIDIA Jetson Orin Nano Super Developer Kit (8 GB)** | Black rectangular carrier board, NVIDIA module on top with heatsink + fan, DisplayPort, 2× MIPI CSI, M.2 slot, USB-C, RJ45, 40-pin GPIO header, 19 V barrel jack | **AI Brain** — runs ROS 2 Humble, all 23 ament_python packages, TankOS GUI, on-device AI inference (CUDA-accelerated llama.cpp, Whisper, YOLOv8n, SDXL) | 25,000 – 35,000 | [robu.in/?s=jetson+orin+nano+dev+kit+8gb](https://robu.in/?s=jetson+orin+nano&post_type=product) |
-| 2 | **Arduino UNO Q** | Blue rectangular board, USB-C, 2×15-pin female headers, ESP32-S3 co-processor for Wi-Fi/BLE, 12×8 LED matrix, Qwiic I²C connector, Qualcomm QRB2210 + STM32U585 MCU | **Real-time controller** — motor PWM, encoder tick counting (hardware interrupts), I²C sensor polling, serial bridge (115200 baud) to Jetson. Offloads all deterministic timing from Jetson. | 1,800 – 2,500 | [robu.in/?s=arduino+uno+q](https://robu.in/?s=arduino+uno+q&post_type=product) |
+| 1 | **NVIDIA Jetson Orin Nano Super Developer Kit (8 GB)**  ![📷](docs/hardware_photos/1_jeton_orin_nano_super.jpg)| Black rectangular carrier board, NVIDIA module on top with heatsink + fan, DisplayPort, 2× MIPI CSI, M.2 slot, USB-C, RJ45, 40-pin GPIO header, 19 V barrel jack | **AI Brain** — runs ROS 2 Humble, all 23 ament_python packages, TankOS GUI, on-device AI inference (CUDA-accelerated llama.cpp, Whisper, YOLOv8n, SDXL) | 25,000 – 35,000 | [robu.in/?s=jetson+orin+nano+dev+kit+8gb](https://robu.in/?s=jetson+orin+nano&post_type=product) |
+| 2 | **Arduino UNO Q**  ![📷](docs/hardware_photos/2_arduino_uno_q.jpg)| Blue rectangular board, USB-C, 2×15-pin female headers, ESP32-S3 co-processor for Wi-Fi/BLE, 12×8 LED matrix, Qwiic I²C connector, Qualcomm QRB2210 + STM32U585 MCU | **Real-time controller** — motor PWM, encoder tick counting (hardware interrupts), I²C sensor polling, serial bridge (115200 baud) to Jetson. Offloads all deterministic timing from Jetson. | 1,800 – 2,500 | [robu.in/?s=arduino+uno+q](https://robu.in/?s=arduino+uno+q&post_type=product) |
 | 3 | **M.2 NVMe SSD 256 GB** (Samsung 980 / WD SN570 / Crucial P3) | Stick-shaped module ~22 × 80 mm, green PCB, gold contact edge, "NVMe" label | `/var/lib/tank` for vector memory, ROS bags, recordings, sqlite-vec db, AI model cache | 3,500 – 5,500 | [robu.in/?s=m.2+nvme+256gb](https://robu.in/?s=nvme+ssd+256gb&post_type=product) |
-| 4 | **ESP32-S3 DevKitC-1** (N16R8) | Narrow black dev board, dual-row pin headers, USB-C on one short edge, tiny PCB antenna trace, Espressif logo | Drives the 2 × round eye displays over SPI, receives JSON over UART from Jetson | 700 – 1,100 | [robu.in/?s=esp32-s3+devkitc-1+n16r8](https://robu.in/?s=esp32-s3&post_type=product) |
+| 4 | **ESP32-S3 DevKitC-1** (N16R8)  ![📷](docs/hardware_photos/6_esp32_s3_devkitc_1.png)| Narrow black dev board, dual-row pin headers, USB-C on one short edge, tiny PCB antenna trace, Espressif logo | Drives the 2 × round eye displays over SPI, receives JSON over UART from Jetson | 700 – 1,100 | [robu.in/?s=esp32-s3+devkitc-1+n16r8](https://robu.in/?s=esp32-s3&post_type=product) |
 | 5 | **MicroSD card 64 GB A2** | Tiny blue/black microSD card, ~15 × 11 mm | Boot drive for Jetson (JetPack 6) | 600 – 900 | [robu.in/?s=micro+sd+64gb+a2](https://robu.in/?s=micro+sd+64gb&post_type=product) |
 
 **Subtotal 1 → ₹ 31,600 – 45,000 (mid ₹ 42,500)**
@@ -71,8 +81,8 @@
 
 | # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Robu.in Link |
 |---|------|--------------------------------------|--------------|----------:|-------------|
-| 7 | **Waveshare 1.28″ Round LCD (GC9A101)** × 2 | Round TFT disc ~32 mm diameter, 240 × 240 px, short FPC tail, "GC9A01" silkscreened | Animated eye expressions (left + right), driven by the ESP32-S3 firmware | 2 × (1,400 – 2,000) = 2,800 – 4,000 | [robu.in/?s=waveshare+1.28+round+lcd+gc9a01](https://robu.in/?s=waveshare+round+lcd&post_type=product) |
-| 8 | **1.3″ SH1106 / SSD1306 OLED (I²C)** | Tiny blue/white OLED ~30 × 35 mm, 4-pin I²C tail, blue glow when on | Status face on chassis front (`tank_display` package) | 350 – 600 | [robu.in/?s=1.3+oled+sh1106+i2c](https://robu.in/?s=oled+display+i2c&post_type=product) |
+| 7 | **Waveshare 1.28″ Round LCD (GC9A101)** × 2  ![📷](docs/hardware_photos/5_waveshare_1.28_round_lcd_gc9a01.jpg)| Round TFT disc ~32 mm diameter, 240 × 240 px, short FPC tail, "GC9A01" silkscreened | Animated eye expressions (left + right), driven by the ESP32-S3 firmware | 2 × (1,400 – 2,000) = 2,800 – 4,000 | [robu.in/?s=waveshare+1.28+round+lcd+gc9a01](https://robu.in/?s=waveshare+round+lcd&post_type=product) |
+| 8 | **1.3″ SH1106 / SSD1306 OLED (I²C)**  ![📷](docs/hardware_photos/11_sh1106_1.3_oled.jpg)| Tiny blue/white OLED ~30 × 35 mm, 4-pin I²C tail, blue glow when on | Status face on chassis front (`tank_display` package) | 350 – 600 | [robu.in/?s=1.3+oled+sh1106+i2c](https://robu.in/?s=oled+display+i2c&post_type=product) |
 | 9 | **USB Camera (IMX219 / IMX477 / C920 webcam)** | Small USB webcam, clip-on mount, UVC-compatible | ROS `tank_vision.camera_publisher` via OpenCV (1280 × 960 @ 30 fps). USB to Jetson — no CSI ribbon needed | 1,200 – 2,500 | [robu.in/?s=usb+webcam+1080p](https://robu.in/?s=usb+webcam&post_type=product) |
 | 10 | **M2.5 / M3 standoff kit (nylon)** | Small black/white hex standoffs, 5/10/15/20 mm lengths, ~50 pcs | Mounts Jetson + Arduino + camera board inside the chassis | 250 – 450 | [robu.in/?s=m3+nylon+standoff+kit](https://robu.in/?s=standoff+kit&post_type=product) |
 
@@ -85,10 +95,10 @@
 | # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Robu.in Link |
 |---|------|--------------------------------------|--------------|----------:|-------------|
 | 12 | **2 × 12 V DC geared motor w/ encoder (e.g. JGB37-520, 30:1 or 60:1)** | Cylindrical black gearbox ~65 × 22 mm, D-shaft, pigtail with 6 wires (motor + encoder A/B) | Left + right drive motor. `tank_motion.motor_controller` w/ BTS7960 | 2 × (650 – 950) = 1,300 – 1,900 | [robu.in/?s=jgb37-520+encoder+motor](https://robu.in/?s=dc+gear+motor+encoder&post_type=product) |
-| 13 | **2 × BTS7960 43 A motor driver (already on hand)** ★ | Big red PCB ~50 × 50 mm with two large terminal blocks and big heatsinks; *one driver per motor* | H-bridge for the two drive motors, PWM + DIR control. **Already purchased — no buy.** | 0 (owned) | — |
+| 13 | **2 × BTS7960 43 A motor driver (already on hand)** ★  ![📷](docs/hardware_photos/12_bts7960.jpg)| Big red PCB ~50 × 50 mm with two large terminal blocks and big heatsinks; *one driver per motor* | H-bridge for the two drive motors, PWM + DIR control. **Already purchased — no buy.** | 0 (owned) | — |
 | 14 | **Tracked chassis w/ 12 V motors (aluminium, ~15 cm wheelbase)** | Two black rubber tracks, side aluminium plates, motor mounts pre-drilled | The tank's body — bolts the motors, Pi, and battery together | 1,800 – 3,200 | [robu.in/?s=tracked+robot+chassis+12v](https://robu.in/?s=robot+chassis&post_type=product) |
 | 15 | **2 × Tower Pro SG90 micro servo (pan + tilt)** | Tiny blue servo ~23 × 12 mm, 3-wire pigtail (signal/V+/GND), white spline horn on top | Pan-tilt head. `pan_tilt_controller` on GPIO18 + GPIO19 at 50 Hz | 2 × (180 – 280) = 360 – 560 | [robu.in/?s=tower+pro+sg90+servo](https://robu.in/?s=sg90+servo&post_type=product) |
-| 16 | **PCA9685 16-channel 12-bit PWM / Servo HAT (I²C 0x40)** | Small purple/blue breakout ~63 × 25 mm, 16 × 3-pin servo headers in two rows | Lets you offload the pan/tilt servos off the Pi's PWM | 450 – 750 | [robu.in/?s=pca9685+servo+driver+i2c](https://robu.in/?s=pca9685&post_type=product) |
+| 16 | **PCA9685 16-channel 12-bit PWM / Servo HAT (I²C 0x40)**  ![📷](docs/hardware_photos/10_pca9685.jpg)| Small purple/blue breakout ~63 × 25 mm, 16 × 3-pin servo headers in two rows | Lets you offload the pan/tilt servos off the Pi's PWM | 450 – 750 | [robu.in/?s=pca9685+servo+driver+i2c](https://robu.in/?s=pca9685&post_type=product) |
 | 17 | **Pan-tilt bracket (2-axis, SG90-compatible, plastic / aluminium)** | Black U-shaped bracket with two axis pivots and mounting flanges | Mechanical mount for the head with the camera + eyes | 250 – 450 | [robu.in/?s=pan+tilt+bracket+sg90](https://robu.in/?s=pan+tilt+bracket&post_type=product) |
 | 18 | **Mushroom-head E-STOP switch (NO/NC, panel-mount, 16 mm)** | Big red mushroom button with yellow guard ring, 2-pin NO/NC terminals | Hardware kill-switch in series with the BMS VBAT trace | 150 – 350 | [robu.in/?s=mushroom+emergency+stop+button](https://robu.in/?s=emergency+stop&post_type=product) |
 
@@ -101,8 +111,8 @@
 
 | # | Item | Photo / Google-Shopping Description | Driver / Use | Price (₹) | Robu.in Link |
 |---|------|--------------------------------------|--------------|----------:|-------------|
-| 19 | **RPLidar A1** *or* **LDROBOT LD19** (360° LiDAR) | Black cylinder ~98 × 65 mm spinning disc on top, USB-A pigtail, or small black puck with motor | `tank_sensors.lidar_publisher` over `/dev/ttyUSB0` @ 115200 baud | 5,000 – 8,500 | [robu.in/?s=rplidar+a1](https://robu.in/?s=rplidar&post_type=product) |
-| 20 | **BNO055 9-DOF IMU breakout (Adafruit or generic, I²C 0x28)** | Small purple PCB ~30 × 25 mm with a Bosch BNO055 chip visible, STEMMA-QT port on one side | `tank_sensors.imu_publisher` (orientation as `sensor_msgs/Imu`) | 1,200 – 2,000 | [robu.in/?s=bno055+imu+i2c+breakout](https://robu.in/?s=bno055+imu&post_type=product) |
+| 19 | **RPLidar A1** *or* **LDROBOT LD19** (360° LiDAR)  ![📷](docs/hardware_photos/7_ldrobot_ld19.jpg)| Black cylinder ~98 × 65 mm spinning disc on top, USB-A pigtail, or small black puck with motor | `tank_sensors.lidar_publisher` over `/dev/ttyUSB0` @ 115200 baud | 5,000 – 8,500 | [robu.in/?s=rplidar+a1](https://robu.in/?s=rplidar&post_type=product) |
+| 20 | **BNO055 9-DOF IMU breakout (Adafruit or generic, I²C 0x28)**  ![📷](docs/hardware_photos/9_bno055_imu.jpg)| Small purple PCB ~30 × 25 mm with a Bosch BNO055 chip visible, STEMMA-QT port on one side | `tank_sensors.imu_publisher` (orientation as `sensor_msgs/Imu`) | 1,200 – 2,000 | [robu.in/?s=bno055+imu+i2c+breakout](https://robu.in/?s=bno055+imu&post_type=product) |
 | 21 | **INA219 DC current/voltage sensor (I²C 0x40)** | Small green breakout ~25 × 20 mm with INA219 chip, two screw terminals for the shunt | `tank_health.health_node` battery telemetry (one board per rail: Pi + motor) | 2 × (250 – 450) = 500 – 900 | [robu.in/?s=ina219+current+sensor](https://robu.in/?s=ina219&post_type=product) |
 | 22 | **R307 / ZFM-708 fingerprint sensor (UART, optical)** | Small black plastic cube with a metallic fingerprint window, 4-wire UART pigtail (V+/GND/TX/RX) | `tank_security` home-unlock feature (`/dev/ttyAMA0` @ 57600 baud) | 850 – 1,400 | [robu.in/?s=r307+fingerprint+sensor](https://robu.in/?s=fingerprint+sensor&post_type=product) |
 | 23 | **Ultrasonic HC-SR04 × 2** (rear / cliff safety) | Two-black-eyes PCB ~45 × 20 mm with twin cylindrical transducers | Front + rear obstacle abort, /scan fusion safety layer | 2 × (120 – 180) = 240 – 360 | [robu.in/?s=hc-sr04+ultrasonic+sensor](https://robu.in/?s=hc-sr04&post_type=product) |
