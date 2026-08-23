@@ -39,7 +39,16 @@ class VisionManager:
         except ImportError:
             self._yolo_available = False
 
+    # Remote ESP32 CAM sources (used by Jetson perception pipeline)
+    REMOTE_CAMERAS: Dict[str, str] = {
+        "unoq_esp32":    "http://192.168.31.72:8080/stream",      # UNO Q ESP32-S3 CAM MJPEG
+        "unoq_snapshot": "http://192.168.31.72:8080/snapshot.jpg",  # UNO Q single JPEG
+    }
+
     def start_camera(self, device: str = "/dev/video0") -> bool:
+        # Support remote URLs (HTTP MJPEG streams)
+        if device.startswith(("http://", "https://")):
+            return self.start_remote_camera(device)
         try:
             import cv2
             self._cap = cv2.VideoCapture(device)
@@ -49,6 +58,22 @@ class VisionManager:
             return self._camera_active
         except Exception as exc:
             logger.warning("Camera start failed: %s", exc)
+            return False
+
+    def start_remote_camera(self, url: str) -> bool:
+        """Connect to remote MJPEG stream (e.g. UNO Q ESP32 CAM on port 8080)."""
+        try:
+            import cv2
+            self._cap = cv2.VideoCapture(url)
+            self._camera_active = self._cap.isOpened()
+            if self._camera_active:
+                self._bus.emit(Event("camera_started", {"device": url}))
+                logger.info("Remote camera connected: %s", url)
+            else:
+                logger.warning("Remote camera failed to open: %s", url)
+            return self._camera_active
+        except Exception as exc:
+            logger.warning("Remote camera error [%s]: %s", url, exc)
             return False
 
     def stop_camera(self) -> None:

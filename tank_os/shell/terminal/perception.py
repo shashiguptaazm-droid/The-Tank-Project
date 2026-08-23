@@ -47,11 +47,13 @@ class PerceptionPipeline:
     def __init__(self, *, motion_threshold: float = 0.02,
                  lidar_threshold_mm: int = 2000,
                  cooldown_s: float = 30,
-                 phone: str = "+917860245819"):
+                 phone: str = "+917860245819",
+                 remote_camera_url: Optional[str] = None):
         self.motion_threshold = motion_threshold
         self.lidar_threshold_mm = lidar_threshold_mm
         self.cooldown_s = cooldown_s
         self.phone = phone
+        self.remote_camera_url = remote_camera_url  # e.g. "http://192.168.31.72:8080/snapshot.jpg"
 
         self._prev_frame: Optional[np.ndarray] = None
         self._last_trigger = 0.0
@@ -103,10 +105,15 @@ class PerceptionPipeline:
                     pass
 
     def _detect_motion(self) -> float:
-        """Detect motion via frame differencing. Returns 0-1 score."""
+        """Detect motion via frame differencing. Returns 0-1 score.
+
+        Tries in order:
+        1. Remote camera URL (e.g. UNO Q ESP32 CAM via HTTP)
+        2. DFRobot USB camera (agent_chat._capture_frame)
+        3. Direct cv2 camera
+        """
         try:
-            from tank_os.shell.terminal.agent_chat import _capture_frame
-            frame_path = _capture_frame()
+            frame_path = self._capture_from_any_source()
             if not frame_path:
                 return 0.0
 
@@ -142,6 +149,46 @@ class PerceptionPipeline:
             pass
         return 0.0
 
+    def _capture_from_any_source(self) -> Optional[str]:
+        """Try all available camera sources. Returns path to saved JPEG."""
+        frame_dir = Path("/tmp/perception_frames")
+        frame_dir.mkdir(parents=True, exist_ok=True)
+        out_path = str(frame_dir / "latest.jpg")
+
+        # 1. Remote camera URL (UNO Q ESP32 CAM, etc.)
+        if self.remote_camera_url:
+            try:
+                import httpx
+                resp = httpx.get(self.remote_camera_url, timeout=5)
+                if resp.status_code == 200 and len(resp.content) > 500:
+                    Path(out_path).write_bytes(resp.content)
+                    return out_path
+            except Exception:
+                pass
+
+        # 2. DFRobot USB camera (Jetson local)
+        try:
+            from tank_os.shell.terminal.agent_chat import _capture_frame
+            frame_path = _capture_frame()
+            if frame_path:
+                return frame_path
+        except Exception:
+            pass
+
+        # 3. Direct cv2 webcam
+        try:
+            cap = cv2.VideoCapture(0)
+            if cap.isOpened():
+                ret, frame = cap.read()
+                cap.release()
+                if ret:
+                    cv2.imwrite(out_path, frame)
+                    return out_path
+        except Exception:
+            pass
+
+        return None
+
     def _handle_trigger(self, motion: float, lidar_dist: float) -> PerceptionEvent:
         """Full pipeline: capture → YOLO → LLM → SMS."""
         event = PerceptionEvent(
@@ -153,10 +200,10 @@ class PerceptionPipeline:
             sms_sent=False,
         )
 
-        # 1. Capture frame + YOLO
+        # 1. Capture frame + YOLO (from any available source)
         try:
-            from tank_os.shell.terminal.agent_chat import _capture_frame, _run_yolo
-            frame = _capture_frame()
+            from tank_os.shell.terminal.agent_chat import _run_yolo
+            frame = self._capture_from_any_source()
             if frame:
                 event.yolo_detections = _run_yolo(frame)
         except Exception as e:
