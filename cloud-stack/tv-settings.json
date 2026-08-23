@@ -1,0 +1,16 @@
+{
+  "tvIp": "",
+  "tvPort": "5555",
+  "tvMac": "",
+  "castApp": "youtube",
+  "channels": [
+    {
+      "name": "Star Plus",
+      "num": "501"
+    },
+    {
+      "name": "Sony MAX",
+      "num": "502"
+    }
+  ]
+}

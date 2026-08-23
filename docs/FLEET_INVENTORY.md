@@ -48,6 +48,7 @@
 - **Docker:** `influxdb` (2.7), `ariang`, `aria2`, `torrent_cloud_db` (mariadb 11)
 - **Systemd:** `docker`, `tailscaled`, `tankos-web-embed` (localhost terminal), `tankos-web` (ttyd web terminal), `x11vnc` (display :0)
 - **Display:** XFCE on `:0` via x11vnc — USB Devices GUI launcher present
+- **📺 UNO Q TV:** cloud-stack (Node, `:8200`) — fullscreen Chromium TV kiosk + **Android TV remote** (ADB `:5555`) + torrent media hub. Desktop launcher `TV Remote` → `http://192.168.31.72:8200/remote`. See [`UNOQ_ANDROID_TV.md`](UNOQ_ANDROID_TV.md)
 
 ---
 

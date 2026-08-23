@@ -23,6 +23,7 @@ Arduino UNO Q motor/sensor firmware.
 * **Build:**       `ament_python` (every package is pure-Python — no C++)
 * **Hardware photos:** [`docs/hardware_photos/`](docs/hardware_photos/PHOTOS_README.md) (product shots) + [`images/build/`](images/build/) (real tank photos) · gallery in [HARDWARE_DEPENDENCIES.md §8](docs/HARDWARE_DEPENDENCIES.md#8-hardware-photo-gallery)
 * **Presentation:** [`PRESENTATION.md`](PRESENTATION.md) — hero banner, hardware wall, fleet map, infographics & animations
+* **📺 UNO Q → Android TV:** [`docs/UNOQ_ANDROID_TV.md`](docs/UNOQ_ANDROID_TV.md) — UNO Q TV kiosk + ADB Android TV remote + torrent media hub (screenshots in `docs/screenshots/tv/`)
 * **Fleet inventory:** [`docs/FLEET_INVENTORY.md`](docs/FLEET_INVENTORY.md) — every device, interface, usage, connection & requirement (live-audited 2026-08-23)
 * **Feature screenshots:** [`docs/screenshots/`](docs/screenshots/README.md) — all 15 TankOS GUI screens + web terminal, VPS dashboard, Nextcloud & AriaNg tested & captured (2026-08-23)
 

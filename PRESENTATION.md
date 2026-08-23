@@ -133,6 +133,22 @@ Patrol · Diagnostics · Settings · Developer · AI Manager · Power · Updates
 
 ---
 
+## 7½. 📺 UNO Q — Android TV Connection
+
+The **Arduino UNO Q** doubles as a **home media hub + Android TV controller**
+("UNO Q TV"): a fullscreen Chromium TV kiosk, a torrent media library, and an
+**ADB-based Android TV remote** (power, volume, channels, YouTube cast) all
+served from `cloud-stack` on `:8200`.
+
+| | |
+|---|---|
+| ![UNO Q TV home](docs/screenshots/tv/31_unoq_tv_home.png) | ![TV Remote](docs/screenshots/tv/32_unoq_tv_remote.png) |
+| ![Media Hub](docs/screenshots/tv/33_unoq_tv_media.png) | ![TV Settings](docs/screenshots/tv/34_unoq_tv_settings.png) |
+
+Architecture & config: [`docs/UNOQ_ANDROID_TV.md`](docs/UNOQ_ANDROID_TV.md) · app code: [`cloud-stack/`](cloud-stack/)
+
+---
+
 ## 8. Real Build Photos
 
 <p align="center">
