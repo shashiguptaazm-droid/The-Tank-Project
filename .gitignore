@@ -54,3 +54,21 @@ printables/
 # Diagnostic dumps
 diagnostics/*.txt
 diagnostics/*.json
+
+# ML / AI models (download separately, never commit)
+models/
+*.gguf
+*.bin
+*.onnx
+*.pt
+*.pth
+*.pkl
+*.safetensors
+*.tflite
+*.engine
+
+# Model caches
+.cache/
+.cache/huggingface/
+.cache/torch/
+.cache/whisper/
