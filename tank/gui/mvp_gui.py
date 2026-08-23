@@ -754,7 +754,7 @@ class TankOSMVPWindow(QMainWindow):
 
         self._motor_table = QTableWidget(4, 2)
         self._motor_table.setHorizontalHeaderLabels(["Left Track", "Right Track"])
-        self._motor_table.verticalHeaderLabels(["PWM", "Direction", "Encoder", "Current"])
+        self._motor_table.setVerticalHeaderLabels(["PWM", "Direction", "Encoder", "Current"])
         self._motor_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self._motor_table.setStyleSheet(f"""
             QTableWidget {{
