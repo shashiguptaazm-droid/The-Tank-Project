@@ -129,7 +129,7 @@ async def get_events(
 async def get_health():
     """Health check with uptime and resource usage."""
     import os
-    import psutil if hasattr(__builtins__, '__import__') else None
+    pass  # psutil optional
     try:
         import psutil
         cpu = psutil.cpu_percent(interval=0.1)
