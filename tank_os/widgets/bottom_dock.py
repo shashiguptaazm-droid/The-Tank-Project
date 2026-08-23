@@ -127,6 +127,8 @@ class BottomDock(QFrame):
         ("🤖", "System", "system"),
         # Evolution
         ("🧬", "Evolve", "evolution"),
+        # Native AI
+        ("🧠", "AI Core", "ai-native"),
     ]
 
     def __init__(self, parent: Optional[QWidget] = None) -> None:

@@ -307,3 +307,16 @@ Captured in `scripts/provision_pi5.sh`:
 - **Evolution Lab** (`windows/evolution_lab.py`) — generations timeline,
   proposal approve/reject/rollback, experiments, policy.
 - Tracker: `docs/TANKOS_EVOLUTION_PLAN.md` · Screenshot `67`.
+
+
+## Phase 21 — TankOS AI-Native Subsystem (100-feature plan) ✅
+
+- **Native AI core** (`ai/native_core.py`) — capability-based `tank.ai` facade:
+  ModelRegistry (auto-selection, health, versions, fallback), InferenceScheduler
+  (Jetson/UNO Q), ResourceGovernor, capability discovery.
+- **Perception / World / Navigation / Executive** layers — 10 perception
+  backends, semantic world model with unknown-area detection, risk/energy-aware
+  multi-route planning, NL intent → task decomposition → recovery.
+- **AI Native screen** (`windows/ai_native_screen.py`) — capability map, model
+  registry, scheduler load, budgets, fallback status.
+- Tracker: `docs/TANKOS_AI_NATIVE_PLAN.md` · Screenshot `68`.

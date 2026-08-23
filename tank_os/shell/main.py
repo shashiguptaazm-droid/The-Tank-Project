@@ -143,6 +143,7 @@ _KnowledgeMapScreen = None
 _ToolGraphScreen = None
 _TankOSSystemScreen = None
 _EvolutionLabScreen = None
+_AINativeScreen = None
 
 
 def _try_load_qt() -> None:
@@ -163,7 +164,7 @@ def _try_load_qt() -> None:
     global _AiCommandCenterScreen, _AiSafetyCenterScreen, _JudgeScreen
     global _DistributedAIScreen, _HumanControlScreen, _ConstitutionScreen
     global _KnowledgeMapScreen, _ToolGraphScreen, _TankOSSystemScreen
-    global _EvolutionLabScreen
+    global _EvolutionLabScreen, _AINativeScreen
 
     if not _USE_QT:
         return
@@ -232,6 +233,7 @@ def _try_load_qt() -> None:
     from tank_os.windows.tool_graph_screen import ToolGraphScreen as _tgs
     from tank_os.windows.tankos_system_screen import TankOSSystemScreen as _tss
     from tank_os.windows.evolution_lab import EvolutionLabScreen as _evs
+    from tank_os.windows.ai_native_screen import AINativeScreen as _ans
 
     _TopBar, _BottomDock, _NotificationsOverlay, _Dashboard = _tb, _bd, _no, _db
     _HomeScreen, _ChatScreen, _CameraScreen = _hs, _cs, _cms
@@ -253,6 +255,7 @@ def _try_load_qt() -> None:
     _HumanControlScreen, _ConstitutionScreen = _hcc, _cst
     _KnowledgeMapScreen, _ToolGraphScreen = _kms, _tgs
     _TankOSSystemScreen, _EvolutionLabScreen = _tss, _evs
+    _AINativeScreen = _ans
 
     # Build TankShellMainWindow class (depends on Qt symbols)
     _TankShellMainWindow = _build_main_window_class()
@@ -307,6 +310,7 @@ def _build_main_window_class():
         "tool-graph": _ToolGraphScreen,         # 🧠 AI Tool Graph
         "system": _TankOSSystemScreen,          # 🤖 TankOS proper (system view)
         "evolution": _EvolutionLabScreen,       # 🧬 Evolution Lab
+        "ai-native": _AINativeScreen,           # 🧠 Native AI (capability-based)
     }
 
     class TankShellMainWindow(QMainWindow):

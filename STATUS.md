@@ -216,3 +216,29 @@ Tracker: [`docs/TANKOS_EVOLUTION_PLAN.md`](docs/TANKOS_EVOLUTION_PLAN.md)
 - Screenshot `67_evolution_lab` + 29-screen contact sheet.
 
 4. **Report finalization** — Update DOCX with final specs
+
+
+---
+
+## 18. 🧠 TankOS — 100 AI-Native Features ✅
+
+Tracker: [`docs/TANKOS_AI_NATIVE_PLAN.md`](docs/TANKOS_AI_NATIVE_PLAN.md)
+
+> **Make AI a native subsystem of the OS — capability-based, not model-based.**
+> Applications ask *"give me object detection"*, not *"run YOLOv11 on Jetson"*.
+> TankOS decides: which model · which device · which precision · which
+> accelerator · what FPS · what fallback.
+
+**Shipped this pass:**
+
+| Piece | What it delivers |
+|---|---|
+| `tank_os/ai/native_core.py` | The capability facade `tank.ai` — **AI Core** (ModelRegistry with auto-selection + health monitor + versioning + fallback chains, InferenceScheduler across Jetson/UNO Q, ResourceGovernor with GPU/CPU/RAM budgets, capability discovery), **Perception Layer** (10 capability backends: detection/tracking/person/pose/gesture/scene/segmentation/depth/motion/change), **World Intelligence** (semantic world model, object + location memory, unknown-area detection, `world.query` API), **Navigation AI** (risk/energy-aware multi-route + ETA + confidence), and the **AI Executive** ("Inspect the entire room" → CHECK SYSTEM → LOCALIZE → PLAN → NAVIGATE → SCAN → CLASSIFY → INVESTIGATE → REPORT) |
+| `tank_os/windows/ai_native_screen.py` | The AI Native screen — capability map, model registry with health badges, Jetson/UNO Q scheduler load, resource budgets, fallback status |
+
+- **416 tests passing** (17 new: registry/auto-selection, health + fallback chain,
+  scheduler, governor allow/deny, capability run with model/device/precision,
+  world memory + query, unknown areas, multi-route, intent, decomposition,
+  executive run, discovery, and the **device-change-doesn't-break-apps**
+  fallback proof — `yolo-v11n` dies, the same call returns `yolo-v11n-q8`/unoq).
+- Screenshot `68_ai_native` + 30-screen contact sheet.

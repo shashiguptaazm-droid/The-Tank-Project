@@ -364,3 +364,18 @@ supervision.**
 
 Tracker: [`docs/TANKOS_EVOLUTION_PLAN.md`](docs/TANKOS_EVOLUTION_PLAN.md) ·
 Screenshot `67_evolution_lab` in [`docs/screenshots/gui/`](docs/screenshots/gui/).
+
+## 🧠 AI-Native TankOS (100-feature plan)
+
+- **Capability-based, not model-based**: apps ask *"give me object detection"*,
+  TankOS picks model / device / precision / fallback — replacing a model or
+  moving inference Jetson → UNO Q changes nothing downstream (proven by test:
+  Jetson model dies → the same call transparently returns the UNO Q int8 model).
+- AI Core (registry + auto-selection + health + fallback), InferenceScheduler,
+  ResourceGovernor, 10 perception capabilities, semantic world model with
+  unknown-area detection (`world.query("What objects are near the north
+  doorway?")`), risk/energy-aware navigation, and the AI Executive
+  ("Inspect the entire room" → CHECK SYSTEM → … → REPORT).
+
+Tracker: [`docs/TANKOS_AI_NATIVE_PLAN.md`](docs/TANKOS_AI_NATIVE_PLAN.md) ·
+Screenshot `68_ai_native` in [`docs/screenshots/gui/`](docs/screenshots/gui/).
