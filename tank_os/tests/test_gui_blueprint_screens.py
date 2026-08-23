@@ -101,3 +101,33 @@ def test_dock_exposes_core_screens() -> None:
     # Human coordination + originality screens in the dock
     assert {"human", "constitution", "knowledge-map"} <= screens
     assert {"tool-graph", "system", "evolution", "ai-native"} <= screens
+
+
+def test_settings_screen_has_language_selector() -> None:
+    """i18n — the Settings screen exposes a language combo."""
+    _app()
+    from tank_os.windows.settings_screen import SettingsScreen
+    from tank_os.core.i18n import I18nManager
+    m = I18nManager()
+    m.set_language("en")
+    s = SettingsScreen()
+    s.resize(1024, 768)
+    assert s._lang_combo.count() >= 16
+    assert s._lang_combo.itemData(0) == "en"
+    # switching language applies immediately
+    idx = s._lang_combo.findData("es")
+    s._lang_combo.setCurrentIndex(idx)
+    assert m.language == "es"
+
+
+def test_dock_applies_language() -> None:
+    """i18n — dock labels translate with the active language."""
+    _app()
+    from tank_os.widgets.bottom_dock import BottomDock
+    from tank_os.core.i18n import I18nManager
+    m = I18nManager()
+    m.set_language("es")
+    d = BottomDock()
+    assert d._buttons["home"]._text_label.text() == "Inicio"
+    assert d._buttons["settings"]._text_label.text() == "Ajustes"
+    m.set_language("en")

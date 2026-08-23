@@ -242,3 +242,30 @@ Tracker: [`docs/TANKOS_AI_NATIVE_PLAN.md`](docs/TANKOS_AI_NATIVE_PLAN.md)
   executive run, discovery, and the **device-change-doesn't-break-apps**
   fallback proof — `yolo-v11n` dies, the same call returns `yolo-v11n-q8`/unoq).
 - Screenshot `68_ai_native` + 30-screen contact sheet.
+
+
+---
+
+## 19. 🌐 TankOS i18n — Language Support for Everyone ✅
+
+Tracker: [`docs/TANKOS_I18N_PLAN.md`](docs/TANKOS_I18N_PLAN.md)
+
+> **16 languages, packs hosted on the VPS, device stays light, works offline.**
+
+**Shipped this pass:**
+
+| Piece | What it delivers |
+|---|---|
+| `tank_os/core/i18n.py` | `I18nManager` singleton — `set_language()` / `t()` lookup, `sync()` fetch from VPS + local cache, `translate_widget_tree()` walker, offline-first English fallback, `sync_async()` background sync |
+| `scripts/langgen.py` | Generates 16 language packs (45 UI keys: dock, settings, status) and uploads them to the VPS |
+| `tank_os/windows/settings_screen.py` | **Settings → 🌐 Language** — dropdown (flag + native name), ⬇ Sync from VPS button, cached-pack status |
+| `tank_os/widgets/bottom_dock.py` | Dock labels translate instantly on language change; persisted language applied at boot |
+
+- Packs live on the **VPS** (`/var/www/html/lang/`, nginx) and are fetched on
+  demand — the device stores only a small `~/.cache/tankos/lang/` cache, so
+  storage stays light and adding a language never needs a device update.
+- **Verified HTTP 200** on both the tailnet IP (`100.71.127.19/lang/…`) and
+  the public IP (`213.199.61.156/lang/…`).
+- **425 tests passing** (9 new i18n + 2 GUI language tests) — verified on
+  UNO Q **and** VPS (427 there).
+- Screenshots `69_settings_hindi` + `70_dock_languages` + 34-screen contact sheet.

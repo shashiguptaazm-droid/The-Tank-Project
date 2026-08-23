@@ -103,4 +103,6 @@ chromium --headless --no-sandbox --screenshot=X.png --timeout=30000 URL
 
 | 67 | `67_evolution_lab.png` | 🧬 Evolution Lab — generations, weakness discovery, proposal approve/reject, experiments |
 | 68 | `68_ai_native.png` | 🧠 AI-Native TankOS — capability map, model registry + health, Jetson/UNO Q scheduler, budgets, fallback |
+| 69 | [settings_hindi](gui/69_settings_hindi.png) | 🌐 **Settings — हिन्दी** | Language section with dropdown (16 languages) + Sync-from-VPS button |
+| 70 | [dock_languages](gui/70_dock_languages.png) | 🌐 **Dock — 4 languages** | Same dock in English / हिन्दी / Español / 中文 |
 

@@ -379,3 +379,17 @@ Screenshot `67_evolution_lab` in [`docs/screenshots/gui/`](docs/screenshots/gui/
 
 Tracker: [`docs/TANKOS_AI_NATIVE_PLAN.md`](docs/TANKOS_AI_NATIVE_PLAN.md) ·
 Screenshot `68_ai_native` in [`docs/screenshots/gui/`](docs/screenshots/gui/).
+
+## 🌐 Language Support (16 languages — VPS-hosted)
+
+- TankOS speaks **16 languages** (English + Hindi, Bengali, Tamil, Telugu,
+  Marathi, Gujarati, Spanish, French, German, Italian, Portuguese, Russian,
+  Chinese, Japanese, Korean, Arabic).
+- Packs are hosted on the **VPS** — the robot downloads them on demand and
+  caches locally, so storage stays light and it keeps working offline.
+- Settings → 🌐 Language dropdown with instant application; dock labels
+  translate live.
+
+Tracker: [`docs/TANKOS_I18N_PLAN.md`](docs/TANKOS_I18N_PLAN.md) ·
+Screenshot `69_settings_hindi`, `70_dock_languages` in
+[`docs/screenshots/gui/`](docs/screenshots/gui/).

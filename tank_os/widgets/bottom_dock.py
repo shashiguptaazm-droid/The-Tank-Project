@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
 )
 
 from tank_os.core.event_bus import Event, EventBus
+from tank_os.core.i18n import I18nManager
 
 logger = logging.getLogger("tank_os.widgets.dock")
 
@@ -41,6 +42,10 @@ class _DockButton(QPushButton):
         layout.addWidget(self._text_label)
 
         self.setStyleSheet(self._style_normal())
+
+    def set_label_text(self, text: str) -> None:
+        """Swap the dock label (i18n)."""
+        self._text_label.setText(text)
 
     def _style_normal(self) -> str:
         return """
@@ -147,11 +152,20 @@ class BottomDock(QFrame):
         layout.setSpacing(4)
         layout.setAlignment(Qt.AlignCenter)
 
+        self._i18n = I18nManager()
         for icon, label, screen in self.DOCK_ITEMS:
             btn = _DockButton(icon, label, screen)
             btn.clicked.connect(lambda _s=screen: self._on_dock_click(_s))
             self._buttons[screen] = btn
             layout.addWidget(btn)
+        self.apply_language(self._i18n.language)
+
+    def apply_language(self, code: str) -> None:
+        """Translate all dock labels into the given language (i18n)."""
+        self._i18n.set_language(code)
+        for screen, btn in self._buttons.items():
+            label = next((l for i, l, s in self.DOCK_ITEMS if s == screen), "")
+            btn.set_label_text(self._i18n.t(label))
 
     def _on_dock_click(self, screen: str) -> None:
         self.set_active(screen)

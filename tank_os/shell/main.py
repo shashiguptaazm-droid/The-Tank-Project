@@ -385,6 +385,15 @@ def _build_main_window_class():
             self._dock.screen_changed.connect(self._navigate_to)
             main_layout.addWidget(self._dock)
 
+            # i18n — apply the persisted language to the dock at boot
+            try:
+                from tank_os.core.i18n import I18nManager  # noqa: PLC0415
+                lang = self._settings.get("i18n.language", "en") or "en"
+                I18nManager().set_language(lang)
+                self._dock.apply_language(lang)
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("i18n boot apply skipped: %s", exc)
+
             # Notifications overlay (floating)
             self._notif_overlay = _NotificationsOverlay(self)
 
@@ -426,6 +435,7 @@ def _build_main_window_class():
             self._bus.on("hardware_connected", self._on_hardware_event)
             self._bus.on("hardware_disconnected", self._on_hardware_event)
             self._bus.on("navigate", self._on_navigate_request)
+            self._bus.on("language_changed", self._on_language_changed)
 
         def _on_battery_critical(self, event: Event) -> None:
             self._notifications.error(
@@ -452,6 +462,23 @@ def _build_main_window_class():
             screen = event.data.get("screen")
             if screen in ScreenMap:
                 self._navigate_to(screen)
+
+        def _on_language_changed(self, event: Event) -> None:
+            """Re-translate the dock + current screen (i18n)."""
+            code = event.data.get("code", "en")
+            try:
+                from tank_os.core.i18n import (  # noqa: PLC0415
+                    I18nManager, translate_widget_tree,
+                )
+                I18nManager().set_language(code)
+                self._dock.apply_language(code)
+                current = self._loaded_screens.get(self._current_screen)
+                if current is not None:
+                    translate_widget_tree(current)
+                self._settings.set("i18n.language", code)
+                self._settings.save()
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("language change apply failed: %s", exc)
 
         def _on_hardware_event(self, event: Event) -> None:
             name = event.data.get("name", "device")
