@@ -135,17 +135,18 @@ class ToolCaller:
         prov = provider or self.preferred_provider
         self.conversation_history.append({"role": "user", "content": user_message})
 
-        # Try cloud provider with tool calling
-        if prov:
-            for try_prov in [prov] + [p for p in ["groq","openrouter","cerebras","mistral","gemini"] if p != prov]:
+        # Try cloud providers with fallback
+        fallback_order = [prov, "groq", "openrouter", "cerebras", "mistral", "gemini"]
+        fallback_order = [p for p in fallback_order if p]
+        for try_prov in fallback_order:
             result = self._cloud_chat(user_message, try_prov)
-            if result: break
             if result:
                 return result
 
         # Try local model with tool calling
         result = self._local_chat(user_message)
         if result:
+            return result
 
         return "No AI provider available. Check API keys in .env file."
 

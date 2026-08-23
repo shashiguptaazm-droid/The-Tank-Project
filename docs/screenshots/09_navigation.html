@@ -1,0 +1,16 @@
+<html><body style="background:#0a0a1a;color:#e0e0e0;font-family:monospace;padding:20px">
+    <h1 style="color:#00ff88">Autonomous Navigation System</h1>
+    <h2>Features</h2>
+    <ul>
+    <li>Occupancy Grid SLAM (100x100, 0.1m resolution)</li>
+    <li>A* Path Planning with obstacle inflation</li>
+    <li>VFH Obstacle Avoidance (vector field histogram)</li>
+    <li>4 Modes: Autonomous, Go-to-Goal, Patrol, Return-Home</li>
+    <li>Encoder odometry + LiDAR fusion</li>
+    </ul>
+    <h2>Navigation Commands</h2>
+    <code>nav.go_to_goal(x, y)</code> - Navigate to coordinate<br>
+    <code>nav.return_home()</code> - Return to dock<br>
+    <code>nav.start_patrol(waypoints)</code> - Patrol mode<br>
+    <code>nav.emergency_stop()</code> - E-stop<br>
+    </body></html>
