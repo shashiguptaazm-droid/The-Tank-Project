@@ -254,3 +254,15 @@ Captured in `scripts/provision_pi5.sh`:
 - [x] **GUI wave 2** — Sensor Fusion · Hardware Topology · Testing Center · Power Dashboard ·
   Network · Security Center · Analytics · TV launcher · AI timeline — **17 screens, 318 passing**
 - [ ] Remaining ⬜/🔶 items (benchmarks §R, gamepad input, HIL rig, MCU watchdog) — tracked in the master plan
+
+## Phase 16 — 200-Item GUI + AI Features Plan ✅
+
+- **AI Command Center** (`ai_command_center.py`) — live AI decision feed, confidence /
+  uncertainty / latency / workload meters, rejected-action counter, reasoning panel.
+- **AI Safety Center** (`ai_safety_center.py`) — risk + collision + proximity bars and the
+  **safety veto visualization**: AI COMMAND → SAFETY ANALYSIS → ❌ VETOED (collision ≥ 50 %).
+- **Judge Mode** (`judge_screen.py`) — one clean competition screen backed by the live
+  RobotDoctor + PowerManager (WHAT/WHY/CONFIDENCE/SAFETY per visualization).
+- **Distributed-AI** (`distributed_ai_screen.py`) — AI task-distribution map across
+  JETSON / UNO Q / ESP32 with failover (Jetson-offline → UNO Q fallback).
+- Tracker: `docs/TANKOS_AI_200_PLAN.md` · Screenshots `58–61`.

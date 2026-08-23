@@ -49,6 +49,10 @@ SCREENS = {
     "security": "tank_os.windows.security_center.SecurityCenterScreen",
     "analytics": "tank_os.windows.analytics_screen.AnalyticsScreen",
     "tv": "tank_os.windows.tv_launcher.TvLauncherScreen",
+    "ai-command": "tank_os.windows.ai_command_center.AICommandCenterScreen",
+    "ai-safety": "tank_os.windows.ai_safety_center.AISafetyCenterScreen",
+    "judge": "tank_os.windows.judge_screen.JudgeScreen",
+    "distributed-ai": "tank_os.windows.distributed_ai_screen.DistributedAIScreen",
 }
 
 
@@ -85,3 +89,5 @@ def test_dock_exposes_core_screens() -> None:
     assert {"home", "drive", "mission", "navigation", "camera",
             "brain", "health"} <= screens
     assert {"fleet", "jetson", "competition", "events"} <= screens
+    # 200-feature plan screens must be in the dock
+    assert {"ai-command", "ai-safety", "judge", "distributed-ai"} <= screens

@@ -93,4 +93,27 @@ SENSE → PERCEIVE → FUSE → AI → DECIDE → ACT → VERIFY
 1. **Physical motor test** — Connect BTS7960 + motors + encoders
 2. **Full pipeline demo** — Camera → YOLO → Navigation → Motors
 3. **Competition dress rehearsal** — Full autonomous demo
+
+
+---
+
+## 13. 🧠 200-Item GUI + AI Features Plan ✅
+
+Living tracker: [`docs/TANKOS_AI_200_PLAN.md`](docs/TANKOS_AI_200_PLAN.md) — 20 groups × 10 features,
+each mapped to code with ✅/🔶/⬜/🧭 audit status.
+
+**Shipped this pass (4 new screens, all tested):**
+
+| Screen | Plan items | File |
+|---|---|---|
+| 🧠 AI Command Center | §1 #1–10 (live decision feed, confidence/uncertainty/latency meters, rejected actions, reasoning, active model) | `tank_os/windows/ai_command_center.py` |
+| 🔥 AI Safety Center | §16 #151–160 (real-time risk, collision probability, human proximity, **safety veto visualization** — AI COMMAND → ANALYSIS → ❌ VETOED) | `tank_os/windows/ai_safety_center.py` |
+| 🏆 Judge Mode | §20 #200 (one-screen AI system board: PERCEPTION/DECISION/LOCALIZATION/SAFETY/COMPUTE/POWER + live subsystem checks from RobotDoctor) | `tank_os/windows/judge_screen.py` |
+| 🌐 Distributed-AI | §15 #141–150 (AI task-distribution map JETSON/UNO Q/ESP32, model locations, latency comparison, Jetson-offline → UNO Q fallback) | `tank_os/windows/distributed_ai_screen.py` |
+
+- **322 tests passing** (4 new GUI smoke tests added; verified on VPS).
+- Screenshots `58–61` + updated `contact_sheet_gui.png` in `docs/screenshots/gui/`.
+- Every AI visualization exposes **WHAT / WHY / CONFIDENCE / SAFETY**; screens emit
+  EventBus commands only (one GUI → multiple backends; safety stays deterministic).
+
 4. **Report finalization** — Update DOCX with final specs

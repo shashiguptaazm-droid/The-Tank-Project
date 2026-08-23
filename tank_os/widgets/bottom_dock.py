@@ -112,6 +112,11 @@ class BottomDock(QFrame):
         ("📺", "TV", "tv"),
         ("💬", "Chat", "chat"),
         ("⚙️", "Settings", "settings"),
+        # 200-feature GUI+AI plan
+        ("🎛", "AI Cmd", "ai-command"),
+        ("🚧", "Safety", "ai-safety"),
+        ("👨⚖️", "Judge", "judge"),
+        ("🌐", "Dist AI", "distributed-ai"),
     ]
 
     def __init__(self, parent: Optional[QWidget] = None) -> None:

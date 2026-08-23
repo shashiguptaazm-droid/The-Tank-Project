@@ -133,6 +133,10 @@ _NetworkScreen = None
 _SecurityCenterScreen = None
 _AnalyticsScreen = None
 _TvLauncherScreen = None
+_AiCommandCenterScreen = None
+_AiSafetyCenterScreen = None
+_JudgeScreen = None
+_DistributedAIScreen = None
 
 
 def _try_load_qt() -> None:
@@ -150,6 +154,8 @@ def _try_load_qt() -> None:
     global _SensorsScreen, _TopologyScreen, _TestCenterScreen
     global _PowerDashboardScreen, _NetworkScreen, _SecurityCenterScreen
     global _AnalyticsScreen, _TvLauncherScreen
+    global _AiCommandCenterScreen, _AiSafetyCenterScreen, _JudgeScreen
+    global _DistributedAIScreen
 
     if not _USE_QT:
         return
@@ -208,6 +214,10 @@ def _try_load_qt() -> None:
     from tank_os.windows.security_center import SecurityCenterScreen as _scs
     from tank_os.windows.analytics_screen import AnalyticsScreen as _ans
     from tank_os.windows.tv_launcher import TvLauncherScreen as _tvs
+    from tank_os.windows.ai_command_center import AICommandCenterScreen as _acc
+    from tank_os.windows.ai_safety_center import AISafetyCenterScreen as _asc
+    from tank_os.windows.judge_screen import JudgeScreen as _jgs
+    from tank_os.windows.distributed_ai_screen import DistributedAIScreen as _das
 
     _TopBar, _BottomDock, _NotificationsOverlay, _Dashboard = _tb, _bd, _no, _db
     _HomeScreen, _ChatScreen, _CameraScreen = _hs, _cs, _cms
@@ -224,6 +234,8 @@ def _try_load_qt() -> None:
     _TestCenterScreen, _PowerDashboardScreen = _tcs, _pds
     _NetworkScreen, _SecurityCenterScreen = _nws, _scs
     _AnalyticsScreen, _TvLauncherScreen = _ans, _tvs
+    _AiCommandCenterScreen, _AiSafetyCenterScreen = _acc, _asc
+    _JudgeScreen, _DistributedAIScreen = _jgs, _das
 
     # Build TankShellMainWindow class (depends on Qt symbols)
     _TankShellMainWindow = _build_main_window_class()
@@ -266,6 +278,11 @@ def _build_main_window_class():
         "security": _SecurityCenterScreen,  # 🔐 Security Center
         "analytics": _AnalyticsScreen,  # 📊 Data / Analytics
         "tv": _TvLauncherScreen,       # 📺 TV launcher (10-foot)
+        # ── 200-feature GUI+AI plan ──────────────────────────────────
+        "ai-command": _AiCommandCenterScreen,   # 🧠 AI Command Center
+        "ai-safety": _AiSafetyCenterScreen,     # 🔥 AI Safety Center
+        "judge": _JudgeScreen,                  # 🏆 Judge Mode
+        "distributed-ai": _DistributedAIScreen, # 🌐 Distributed-AI
     }
 
     class TankShellMainWindow(QMainWindow):

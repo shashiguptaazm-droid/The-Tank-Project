@@ -87,3 +87,8 @@ All TankOS GUI screenshots are real captures of the running Qt shell (window-gra
 # Web pages (headless Chromium):
 chromium --headless --no-sandbox --screenshot=X.png --timeout=30000 URL
 ```
+
+| 58 | `58_ai_command_center.png` | 🧠 AI Command Center — live decision feed + confidence/latency meters |
+| 59 | `59_ai_safety_center.png` | 🔥 AI Safety Center — risk bars + safety veto visualization |
+| 60 | `60_judge_mode.png` | 🏆 Judge Mode — one-screen AI system board |
+| 61 | `61_distributed_ai.png` | 🌐 Distributed-AI — task distribution map JETSON/UNO Q/ESP32 |

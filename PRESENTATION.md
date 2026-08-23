@@ -269,3 +269,20 @@ Full blueprint + audit: [`docs/TANKOS_GUI_BLUEPRINT.md`](docs/TANKOS_GUI_BLUEPRI
 <p align="center">
   <sub>Built with real hardware, tested live, documented with photos — 🤖 TankOS</sub>
 </p>
+
+## 7¾¾. 🧠 200-Item GUI + AI Features Plan
+
+Four new screens turn the GUI into an AI observability + safety + competition system:
+
+- **🧠 AI Command Center** — live decision feed with confidence, uncertainty, inference
+  latency, rejected actions, reasoning summary and active model (`ai_command_center.py`).
+- **🔥 AI Safety Center** — real-time risk / collision / proximity bars plus the
+  **safety veto visualization**: `AI COMMAND → SAFETY ANALYSIS → ❌ VETOED`
+  (deterministic, collision ≥ 50 %; no LLM in the safety path).
+- **🏆 Judge Mode** — one clean screen for judging: PERCEPTION · DECISION ·
+  LOCALIZATION · SAFETY · COMPUTE · POWER + live subsystem ✓ checks (RobotDoctor).
+- **🌐 Distributed-AI** — AI task-distribution map (JETSON / UNO Q / ESP32) with
+  per-model workload bars, latency comparison and Jetson-offline → UNO Q failover.
+
+Full tracker: [`docs/TANKOS_AI_200_PLAN.md`](docs/TANKOS_AI_200_PLAN.md) ·
+Screenshots `58–61` in [`docs/screenshots/gui/`](docs/screenshots/gui/).
