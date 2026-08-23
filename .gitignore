@@ -72,3 +72,5 @@ models/
 .cache/huggingface/
 .cache/torch/
 .cache/whisper/
+firmware/dfrobot_camera/*.bin
+firmware/dfrobot_camera/temp_repo/
