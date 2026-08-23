@@ -23,6 +23,17 @@ All TankOS GUI screenshots are real captures of the running Qt shell (window-gra
 | 14 | [files](14_files.png) | Files | File browser |
 | 15 | [usb](15_usb.png) | USB Devices | **USB Devices GUI** — live scan of connected hardware |
 
+## 💻 TankOS Terminal — 25 original screenshots (LLMs + tool calling)
+
+> [**`terminal/README.md`**](terminal/README.md) — 25 screenshots captured live from the
+> **Jetson** showing the LLMs (tinyllama, phi-3-mini running on-device via llama.cpp),
+> **tool calling** (NL → JSON → shell execution), the 1,966-tool registry, AI engines,
+> and system/network/health tools.
+
+![Contact sheet](terminal/contact_sheet.png)
+
+---
+
 ## Web features
 
 | # | Screenshot | Feature | Verified |
