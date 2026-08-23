@@ -21,6 +21,7 @@ Arduino UNO Q motor/sensor firmware.
 * **Controller:**  Arduino UNO Q (real-time motor/sensor I/O)
 * **ROS distro:**  `humble`
 * **Build:**       `ament_python` (every package is pure-Python — no C++)
+* **Hardware photos:** [`docs/hardware_photos/`](docs/hardware_photos/PHOTOS_README.md) (product shots) + [`images/build/`](images/build/) (real tank photos) · gallery in [HARDWARE_DEPENDENCIES.md §8](docs/HARDWARE_DEPENDENCIES.md#8-hardware-photo-gallery)
 
 ---
 

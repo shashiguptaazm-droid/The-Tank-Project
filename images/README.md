@@ -35,4 +35,6 @@ Place real build photos here:
 - `demo/` — video thumbnails, demo screencaps
 - `competition/` — presentation slides, posters
 
-> 📸 **TODO:** Add real hardware photos once the Jetson Orin Nano + Arduino UNO Q chassis is assembled.
+> 📸 **Build photos added (2026-08-23):** real tank photos live in [`images/build/`](build/) and are
+> embedded in [HARDWARE_DEPENDENCIES.md §8](../docs/HARDWARE_DEPENDENCIES.md#8-hardware-photo-gallery).
+> Product photos for every verified component: [`docs/hardware_photos/`](../docs/hardware_photos/PHOTOS_README.md).

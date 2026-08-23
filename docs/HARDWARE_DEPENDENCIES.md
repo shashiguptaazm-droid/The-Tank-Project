@@ -45,6 +45,63 @@
 
 ---
 
+---
+
+## 8. Hardware Photo Gallery
+
+> Real product photos for the hardware verified on the fleet (unoq + Jetson) as of 2026-08-23.
+> Product shots: `docs/hardware_photos/` · Real build photos: [`images/build/`](../images/build/)
+> Full list with sources: `docs/hardware_photos/PHOTOS_README.md`
+
+### 📸 Real build photos (from the tank)
+
+| Photo | What it shows |
+|-------|---------------|
+| ![Build 2026-07-20](../images/build/20260720_180222.jpg) | Tank build photo (2026-07-20) |
+| ![Build 2026-07-21](../images/build/20260721_193849.jpg) | Tank build photo (2026-07-21) |
+| ![Build 2026-08-01](../images/build/20260801_012257.jpg) | Tank build photo (2026-08-01) |
+| ![Build 2026-08-03](../images/build/20260803_162900.jpg) | Tank build photo (2026-08-03) |
+| ![Build 2026-08-09](../images/build/20260809_232842.jpg) | Tank build photo (2026-08-09) |
+| ![Build 2026-08-13](../images/build/20260813_140304.jpg) | Tank build photo (2026-08-13) |
+
+### Core compute & brains
+
+| Photo | Component | Where it lives |
+|-------|-----------|----------------|
+| ![Jetson Orin Nano Super](hardware_photos/1_jeton_orin_nano_super.jpg) | **NVIDIA Jetson Orin Nano Super** — main tank brain (`shashi`) | Jetson `192.168.31.74` / Tailscale `100.122.31.46` |
+| ![Arduino UNO Q](hardware_photos/2_arduino_uno_q.jpg) | **Arduino UNO Q** (ABX00162, board `unoq`) — real-time controller | unoq, USB hub port 5 (LAN) |
+
+### The 3 ESP32 boards
+
+| Photo | Component | Where it lives |
+|-------|-----------|----------------|
+| ![Dual-eyes ESP32-S3](hardware_photos/6_esp32_s3_devkitc_1.png) | **Dual-eyes ESP32-S3** (drives both 1.28" round eyes over SPI, JSON over UART) | Jetson `/dev/ttyACM1` — MAC `A0:F2:62:E3:DF:F4` |
+| ![DFRobot AI Camera](hardware_photos/3_dfrobot_esp32s3_ai_camera.webp) | **DFRobot ESP32-S3 AI Camera** (SEN0611) — IMU live, flashing in progress | Jetson `/dev/ttyACM0` — MAC `28:84:85:4C:84:04` |
+| ![ESP32-S3 CAM](hardware_photos/4_esp32_s3_cam.jpg) | **ESP32-S3 CAM** — ESPHome camera, online | unoq `/dev/ttyACM0` — MAC `14:C1:9F:C1:2C:24` @ `192.168.31.145` |
+
+### Displays & eyes
+
+| Photo | Component | Where it lives |
+|-------|-----------|----------------|
+| ![Waveshare 1.28" Round LCD](hardware_photos/5_waveshare_1.28_round_lcd_gc9a01.jpg) | **Waveshare 1.28" 240×240 Round LCD ×2** (GC9A01) — the eyes | Driven by dual-eyes ESP32-S3 (Jetson) |
+| ![SH1106 OLED](hardware_photos/11_sh1106_1.3_oled.jpg) | **SH1106 1.3" 128×64 I²C OLED** — status face | I²C (addr 0x3C) |
+
+### Motion & drive
+
+| Photo | Component | Where it lives |
+|-------|-----------|----------------|
+| ![BTS7960 motor driver](hardware_photos/12_bts7960.jpg) | **BTS7960B 43A motor driver ×2** — tank drive | `tank_motion.motor_controller` |
+| ![PCA9685 servo driver](hardware_photos/10_pca9685.jpg) | **PCA9685 16-ch servo/PWM driver** — pan/tilt | I²C (addr 0x40) |
+
+### Sensors & connectivity
+
+| Photo | Component | Where it lives |
+|-------|-----------|----------------|
+| ![LDROBOT LD19 LiDAR](hardware_photos/7_ldrobot_ld19.jpg) | **LDROBOT LD19 360° LiDAR** | Jetson `/dev/ttyUSB0` — serial |
+| ![Quectel EG800AK 4G](hardware_photos/8_quectel_eg800ak.jpg) | **Quectel EG800AK-CN 4G LTE Cat 1 modem** — cellular backup | Jetson `/dev/ttyUSB1-3` — registered, 64% signal |
+| ![BNO055 IMU](hardware_photos/9_bno055_imu.jpg) | **Bosch BNO055 9-DOF IMU** | I²C (addr 0x28) |
+
+
 ## 2. Module Dependency Graph
 
 ```
