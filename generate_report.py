@@ -96,9 +96,9 @@ doc.add_paragraph(
 
 doc.add_heading('How Your Project Works', level=2)
 doc.add_paragraph(
-    'The Tank is an autonomous humanoid AI robot built for the Arduino Physical AI Challenge 2026. '
+    'The Tank is an autonomous autonomous AI robotic platform built for the Arduino Physical AI Challenge 2026. '
     'It uses a three-board architecture: an NVIDIA Jetson Orin Nano (AI brain running CUDA-accelerated '
-    'inference at 40 TOPS), an Arduino UNO Q (real-time motor and sensor controller), and six '
+    'inference at 67 TOPS), an Arduino UNO Q (real-time motor and sensor controller), and six '
     'ESP32-S3 nodes (distributed controllers for eyes, hands, and limbs). The robot perceives its '
     'environment through a multi-sensor suite — LiDAR, camera, thermal sensor, and IMU — fuses this '
     'data into unified entities, runs AI analysis, makes safety-validated decisions, and executes '
@@ -142,7 +142,7 @@ for cell in table.rows[0].cells:
 
 components = [
     ('Arduino UNO Q (ABX00087)', '1', 'Real-time motor/sensor controller'),
-    ('NVIDIA Jetson Orin Nano Dev Kit (8GB)', '1', 'AI brain — ROS2, CUDA inference, TankOS GUI'),
+    ('NVIDIA Jetson Orin Nano Super Developer Kit (8GB)', '1', 'AI brain — ROS2, CUDA inference, TankOS GUI'),
     ('ESP32-S3 DevKitC-1 (N16R8)', '6', 'Distributed nodes — eyes, hands, limbs'),
     ('RPLidar A1 360° LiDAR', '1', 'SLAM, mapping, obstacle detection'),
     ('BNO055 9-DOF IMU (I²C)', '1', 'Orientation, heading, tilt'),
@@ -195,8 +195,8 @@ doc.add_paragraph(
     'See the detailed wiring diagram and block diagrams in the repository:\n'
     '• images/wiring.svg — Full pinout schematic\n'
     '• images/architecture.svg — 6-layer system stack\n'
-    '• images/blueprint-master.svg — Complete humanoid layout\n'
-    '• hardware/catalog.svg — 42-component visual catalog\n\n'
+    '• images/blueprint-master.svg — Complete autonomous tracked layout\n'
+    '• hardware/catalog.svg — 41-component visual catalog\n\n'
     '[ Insert block diagram / circuit image here ]'
 )
 
@@ -301,11 +301,11 @@ doc.add_heading('Project Images (2–3)', level=2)
 doc.add_paragraph(
     '[ Insert 2–3 photos of your project working ]\n\n'
     'Available in repository:\n'
-    '• images/blueprint-master.svg — Full humanoid robot blueprint\n'
+    '• images/blueprint-master.svg — Full autonomous tracked robot blueprint\n'
     '• images/head-neck-closeup.svg — Head sensor array closeup\n'
     '• images/torso-power-distribution.svg — Power distribution schematic\n'
     '• images/arm-hand-actuators.svg — Arm and hand actuator chain\n'
-    '• hardware/catalog.svg — 42-component visual catalog'
+    '• hardware/catalog.svg — 41-component visual catalog'
 )
 
 doc.add_page_break()
@@ -317,10 +317,10 @@ doc.add_heading('7. Challenges, Learnings & Future Improvements', level=1)
 
 doc.add_heading('Challenges Faced', level=2)
 challenges = [
-    'Motor inrush current brownout: Motors pulling 20A for 50ms caused voltage sag on shared power rails, resetting the Jetson. Solved with 4 galvanically isolated power rails.',
+    'Motor inrush current brownout: Motors pulling 20A for 50ms caused voltage sag on shared power rails, resetting the Jetson. Solved with 4 separately managed power rails.',
     'Single AI provider failure: If one cloud API went down, the robot became brainless. Solved with 14-provider rotation and automatic circuit-breaker fallback.',
     'Real-time motor timing on Linux: Linux scheduler jitter caused uneven motor PWM. Solved by offloading all real-time I/O to Arduino UNO Q.',
-    '6 ESP32 nodes coordination: Multiple microcontrollers needed synchronized communication. Solved with ESP-NOW mesh and Jetson USB serial bridge.',
+    '5 ESP32 nodes coordination: Multiple microcontrollers needed synchronized communication. Solved with ESP-NOW mesh and Jetson USB serial bridge.',
     'Walking balance: Humanoid locomotion requires real-time balance feedback. Solved with pressure sensors in feet and IMU feedback loop.',
 ]
 for c in challenges:
@@ -334,10 +334,10 @@ doc.add_paragraph(
     'evolution system — where the robot discovers new AI models daily — was the most innovative '
     'feature, demonstrating that robots can genuinely improve over time.\n\n'
     'Future Improvements:\n'
-    '1. Gait optimization with reinforcement learning for smoother walking\n'
+    '1. Gait optimization with reinforcement learning for smoother locomotion\n'
     '2. Dexterous manipulation with force-torque sensors in finger joints\n'
     '3. Multi-robot fleet coordination for team tasks\n'
-    '4. Custom PCB to consolidate 6 ESP32 nodes into one board\n'
+    '4. Custom PCB to consolidate 5 ESP32 nodes into one board\n'
     '5. Solar charging for extended outdoor operation\n'
     '6. ROS2 Iron migration for long-term support'
 )

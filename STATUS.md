@@ -17,7 +17,7 @@ Arduino UNO Q motor/sensor firmware.
 
 * **Repo root:**   `/root/the tank project/`
 * **Workspace:**   `/root/the tank project/tank_ws/`
-* **AI Brain:**    NVIDIA Jetson Orin Nano 8 GB, JetPack 6 / Ubuntu 22.04
+* **AI Brain:**    NVIDIA Jetson Orin Nano Super 8 GB, JetPack 6 / Ubuntu 22.04
 * **Controller:**  Arduino UNO Q (real-time motor/sensor I/O)
 * **ROS distro:**  `humble`
 * **Build:**       `ament_python` (every package is pure-Python — no C++)
@@ -92,7 +92,7 @@ Arduino UNO Q motor/sensor firmware.
 | `tank_command_bridge` | **P9** bidirectional AI ↔ Pi HTTP server :8082 + external LLM client (Freebuff/OpenAI/Anthropic) | **~720** |
 | `tank_neutral`    | placeholder                                                              |       0 |
 
-Totals: **93 Python files, 7,792 lines** across 16 packages
+Totals: **93 Python files, 7,792 lines** across 23 packages
 (+ firmware + scripts).
 
 ---
@@ -324,7 +324,7 @@ These were enforced after code-review in earlier phases and should be upheld:
 | Decision DEC-007 smoke-test via the new `/meta/decision_append`    | ✅ done — `tank_meta/scripts/smoke_test_dec007.py` |
 | `tank_meta` → `tank_assistant.emotion_node` link (a successful decision-append injects a 'satisfied' valence spike) | ✅ done — see `tank_assistant.emotion_node.EmotionNode._on_decision_result` (feel-good loop) |
 | rclone cron template (`tank_nas/scripts/auto_backup.py`) — systemd timer | P3 carryover                                                  |
-| Real-hardware bring-up on Jetson + Arduino (boot, run `legacy installer`, flash Arduino firmware, launch `tank_bringup/launch/robot.launch.py`) | P7 |
+| Hardware integration — Jetson + Arduino UNO Q (boot, run `legacy installer`, flash Arduino firmware, launch `tank_bringup/launch/robot.launch.py`) | P7 |
 
 ---
 

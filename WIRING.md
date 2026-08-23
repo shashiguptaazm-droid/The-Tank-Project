@@ -6,7 +6,7 @@ on a per-robot basis without touching code.
 
 ## GPIO — Arduino UNO Q (real-time controller)
 
-> **All real-time I/O is on the Arduino.** Jetson sends high-level commands over
+> **All deterministic motor-control and safety I/O is handled by the UNO Q's real-time microcontroller subsystem.** Jetson sends high-level commands over
 > USB serial (115200 baud); Arduino handles PWM generation, encoder interrupts,
 > and sensor polling deterministically.
 

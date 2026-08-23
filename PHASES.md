@@ -40,7 +40,7 @@
 - [x] `code_indexer` (Python AST walk) → 1 row per .py file: module, purpose, functions, classes, deps, mtime
 - [x] `hardware_indexer` loading `content/hardware.json` (17 components: servos, motors, OLED, ESP32 eyes, camera, LiDAR, IMU, fingerprint, LTE, audio, battery, contactor, NVMe)
 - [x] `decisions_indexer` loading `content/decisions.json` (DEC-001 … DEC-006 with problem/reason/solution/result)
-- [x] `knowledge_indexer` walking `docs/` markdown
+- [x] `knowledge_indexer` locomotion `docs/` markdown
 - [x] `meta_node` ROS2 wrapper — JSON-over-std_msgs topics on /meta/{code_search,hardware_lookup,decision_search,knowledge_query,index_now}
 - [x] `scripts/search_meta.py` CLI with `code|hardware|decisions|knowledge|status` subcommands
 - [x] `scripts/index_workspace.py` one-shot reindex CLI

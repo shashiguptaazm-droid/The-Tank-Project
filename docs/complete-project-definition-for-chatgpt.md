@@ -502,7 +502,7 @@ Every 30s, the learner analyzes patterns and flags anomalies by priority:
 
 ### Power (Dual Rail)
 - **Jetson Rail:** USB-C PD power bank ≥ 27W → Jetson (5V/5A)
-- **Motor Rail:** 12V SLA/3S Li-ion → BTS7960 drivers → motors
+- **Motor Rail:** 4S Li-ion (14.8V) → BTS7960 drivers → motors
 - **Key Principle:** Isolated grounds to prevent motor spikes from resetting Pi
 
 ### Networking

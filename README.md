@@ -72,7 +72,7 @@ They communicate via USB serial at 115200 baud with a compact JSON protocol. The
 - 🎭 **Emotional Intelligence** — valence/arrousal/dominance emotion model, facial expression on round LCD eyes
 - 🗣️ **Voice Interface** — Whisper STT + Piper TTS + openWakeWord
 - 👁️ **Multi-Sensor Fusion** — LiDAR, IMU, thermal camera, depth camera, ultrasonic
-- 🔒 **Hybrid AI** — local models (llama.cpp) provide offline operation; 14 cloud providers are optional fallback
+- 🔒 **Hybrid AI** — local models (llama.cpp) provide primary offline operation; 14 cloud providers are optional fallback/enhancement
 - 📱 **TankOS GUI** — 13 full-screen apps on a 7" touchscreen
 - 🔧 **400+ CLI Utilities** — diagnostics, calibration, fleet management
 
@@ -82,7 +82,7 @@ They communicate via USB serial at 115200 baud with a compact JSON protocol. The
 
 The Tank's key innovations:
 
-1. **Self-Evolving AI Brain** — The robot runs a daily evolution cycle that discovers new LLM models from 14 provider APIs, tests them, and adds them to its rotation. It literally gets smarter every day.
+1. **Self-Evolving AI Brain** — The robot runs a daily evolution cycle that discovers new LLM models from 14 provider APIs, tests them, and adds them to its rotation. The system discovers, evaluates, and rotates among available model providers.
 
 2. **Circuit-Breaker Resilience** — Each AI provider has a health state machine (CLOSED → OPEN → HALF_OPEN). Three failures open the circuit; periodic probes test recovery. Zero downtime.
 
@@ -109,14 +109,14 @@ The Tank's key innovations:
 | Event Bus | 🟢 | 19/19 tests passing |
 | State Machine | 🟢 | Validated transitions |
 | Decision Engine | 🟢 | AI→validate→safety→decide pipeline |
-| Sensor Fusion | 🟢 | Camera+LiDAR+thermal tested |
-| Safety System | 🟢 | E-stop, watchdog, timeout |
+| Sensor Fusion | 🔵 | Software implemented; simulation tested |
+| Safety System | 🔵 | Software implemented; hardware validation pending |
 | Mock Sensors | 🟢 | Simulation mode fully working |
 | ESP32 Swarm | 🟢 | 5-node distributed peripheral control |
 | SQLite Storage | 🟢 | Event/telemetry logging |
 | Terminal Dashboard | 🟢 | Competition-quality display |
 | Hardware Registry | 🟢 | 41 components cataloged |
-| Full Pipeline | 🟢 | SENSE→PERCEIVE→FUSE→AI→DECIDE→ACT→VERIFY |
+| Full Pipeline | 🔵 | Software implemented; physical hardware integration pending |
 | USB Camera Driver | 🔵 | OpenCV code ready, needs hardware |
 | LiDAR Driver | 🔵 | rplidar SDK ready, needs hardware |
 | Thermal Sensor | 🔵 | MLX90640 I2C driver ready |
@@ -125,9 +125,9 @@ The Tank's key innovations:
 | Linear Actuator | 🔵 | BTS7960 H-bridge ready |
 | Finger Control | 🔵 | SG90 servo code ready |
 | VPS AI Client | 🔵 | HTTPS+auth+retry ready |
-| Humanoid Walking | 🟡 | Gait algorithm in progress |
-| 5-Finger Grasp | 🟡 | Force control in progress |
-| Competition Demo | 🟡 | Script ready, needs hardware |
+| Tracked Locomotion | 🟡 | Motor firmware implemented; physical validation pending |
+| Hand Control | 🟡 | Firmware implemented; physical validation pending |
+| Competition Demo | 🔵 | Demo software prepared; hardware validation pending |
 
 
 ## 8. Objectives
@@ -139,7 +139,7 @@ The Tank's key innovations:
 | P5 | Voice + assistant + memory | ✅ |
 | P9 | AI ↔ robot bidirectional bridge | ✅ |
 | P11 | TankOS GUI — 13 apps | ✅ |
-| P12 | Humanoid locomotion — legs, joints, walking | 🔄 In Progress |
+| P12 | Future expansion — humanoid locomotion, manipulation | 🔴 Planned |
 | P13 | Hand dexterity — 5-finger grip, force sensing | 🔄 In Progress |
 | P14 | Competition integration + demo | 📋 Planned |
 
@@ -205,7 +205,7 @@ Perception → Attention → Reasoning → Planning → Decision → Action
                Emotion · Metacognition · Curiosity · Personality
 ```
 
-22 cognitive systems working in concert. The AI doesn't just respond — it plans, reflects, and improves.
+22 cognitive systems integrated. The AI plans, reflects, and evolves through automated model discovery. The AI doesn't just respond — it plans, reflects, and improves.
 
 ---
 
@@ -213,8 +213,8 @@ Perception → Attention → Reasoning → Planning → Decision → Action
 
 Three-board distributed architecture:
 
-- **Jetson Orin Nano Super 8GB** — AI compute (CUDA 40 TOPS), M.2 NVMe 256GB, JetPack 6
-- **Arduino UNO Q** — Real-time motor/sensor I/O (Arm Cortex-M4 48MHz)
+- **Jetson Orin Nano Super 8GB** — AI compute (CUDA 67 TOPS), M.2 NVMe 256GB, JetPack 6
+- **Arduino UNO Q** — Real-time motor/sensor I/O (Qualcomm QRB2210 + STM32U585 MCU)
 - **ESP32-S3 ×5** — Distributed nodes (eyes, hands, limbs, sensors)
 
 See [`hardware/catalog.svg`](hardware/catalog.svg) for the full 41-component visual catalog.
@@ -235,13 +235,13 @@ See [`hardware/catalog.svg`](hardware/catalog.svg) for the full 41-component vis
 
 ## 15. Hardware Components
 
-42 components across 8 sections. Full catalog: [`hardware/catalog.svg`](hardware/catalog.svg)
+41 components across 8 sections. Full catalog: [`hardware/catalog.svg`](hardware/catalog.svg)
 
 ### Compute (5)
-- NVIDIA Jetson Orin Nano Dev Kit (8GB) — AI brain
+- NVIDIA Jetson Orin Nano Super Developer Kit (8GB) — AI brain
 - Arduino UNO Q — real-time controller
 - M.2 NVMe SSD 256GB — storage
-- ESP32-S3 DevKitC-1 (N16R8) ×6 — distributed nodes
+- ESP32-S3 DevKitC-1 (N16R8) ×5 — distributed nodes
 - MicroSD 64GB A2 — boot drive
 
 ### Vision & Display (4)
@@ -359,8 +359,8 @@ Full BOM with Robu.in links: [`hardware.md`](hardware.md)
 
 | Component | Spec | Role |
 |-----------|------|------|
-| Jetson Orin Nano | 8GB RAM, 1024 CUDA cores, 40 TOPS | AI inference, ROS2, TankOS |
-| Arduino UNO Q | Qualcomm QRB2210 + STM32U585, 32KB SRAM, WiFi/BLE | Motor PWM, encoder INT, I²C |
+| Jetson Orin Nano | 8GB RAM, 1024 CUDA cores, 67 TOPS | AI inference, ROS2, TankOS |
+| Arduino UNO Q | Qualcomm QRB2210 + STM32U585, STM32U585 MCU, WiFi/BLE | Motor PWM, encoder INT, I²C |
 | ESP32-S3 | 16MB Flash, 8MB PSRAM, USB-C | Eye display, hand control, limb I/O |
 | RPLidar A1 | 360°, 12m, 8000 pts/sec, USB | SLAM, mapping, obstacle detection |
 | BNO055 | 9-DOF, I²C 0x28, fusion engine | Orientation, heading, tilt |
@@ -405,7 +405,7 @@ The Tank uses 4 separately managed power rails:
 | Rail | Voltage | Powers |
 |------|---------|--------|
 | AI Rail | 19V DC | Jetson Orin Nano, Touchscreen |
-| Motor Rail | 12V Li-Ion | BTS7960 drivers, DC motors, rotary joints |
+| Motor Rail | 4S Li-ion (14.8V) | BTS7960 drivers, DC motors, rotary joints |
 | Logic Rail | 5V USB-C PD | ESP32-S3 nodes, sensors, Arduino |
 | Pebble Rail | 5V (per-node) | 3× 5000mAh power pebbles |
 
@@ -457,7 +457,7 @@ STL exports, STEP interchange, and 3MF multi-part bundles available in [`cad/cha
 - **Drive**: 2× JGB37-520 DC geared motors (30:1, 12V) with quadrature encoders
 - **Control**: BTS7960 H-bridge drivers (43A each), PWM at 1kHz
 - **Pan/Tilt**: 2× SG90 micro servos (50Hz PWM via PCA9685)
-- **Locomotion**: 8× linear DC actuators + 6× rotary joints for humanoid walking
+- **Locomotion**: Tracked chassis with 2× JGB37-520 geared DC motors
 - **Hand**: 5× micro servos (2 DOF per finger, 10 DOF total)
 
 ---
@@ -471,7 +471,7 @@ STL exports, STEP interchange, and 3MF multi-part bundles available in [`cad/cha
                                               │ USB-A
                                               ▼
 ┌──────────────────┐                ┌──────────────────┐
-│ 12V Li-Ion       │ ─────────────► │ BTS7960 ×2      │
+│ 4S Li-ion (14.8V)       │ ─────────────► │ BTS7960 ×2      │
 │ Motor Battery    │   12V/30A      │ → Drive Motors   │
 └──────────────────┘                └──────────────────┘
 
@@ -486,7 +486,7 @@ STL exports, STEP interchange, and 3MF multi-part bundles available in [`cad/cha
 ## 25. Battery & Power Management
 
 - **Jetson**: 19V barrel jack PSU (included with dev kit)
-- **Motors**: 12V Li-Ion 3S pack with BMS, XT60 connectors, 30A fuse
+- **Motors**: 4S Li-ion (14.8V) 3S pack with BMS, XT60 connectors, 30A fuse
 - **ESP32 Nodes**: 3× 20000mAh power banks (USB-C PD 27W)
 - **Power Pebbles**: 3× 5000mAh with INU2604 volt meters, replaceable USB-C
 - **Monitoring**: INA219 sensors on each rail → health_node telemetry
@@ -504,7 +504,7 @@ STL exports, STEP interchange, and 3MF multi-part bundles available in [`cad/cha
 | HC-SR04 ×2 | Ultrasonic | 4m | GPIO | Obstacle detection |
 | DS18B20 ×3 | Temperature | ±0.5°C | 1-Wire | Battery/motor heat |
 | MLX90640 | Thermal 32×24 | 2m | I²C | Human presence |
-| MPU6050 | IMU 6-DOF | — | I²C | Head stabilization |
+| BNO055 | IMU 9-DOF | UNO Q | I²C | Orientation, heading |
 | R307 | Fingerprint | — | UART | Security unlock |
 
 ---
@@ -541,7 +541,7 @@ STL exports, STEP interchange, and 3MF multi-part bundles available in [`cad/cha
 - **BNO055** (primary): 9-DOF, hardware fusion engine
   - I²C 0x28, outputs quaternion + euler angles
   - Feeds `/imu/data` topic
-- **MPU6050** (head): 6-DOF, acceleromter + gyro
+- **BNO055** (primary IMU): 9-DOF, orientation fusion engine
   - I²C 0x68, head stabilization
 - **Arduino UNO Q**: Reads both IMUs via I²C, sends fused orientation to Jetson
 

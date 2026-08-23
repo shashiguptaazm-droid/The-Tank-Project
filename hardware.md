@@ -51,8 +51,8 @@
 
 | # | Item | Photo / Google-Shopping Description | Driver / Use in The Tank | Price (₹) | Robu.in Link |
 |---|------|--------------------------------------|--------------------------|----------:|--------------------|
-| 1 | **NVIDIA Jetson Orin Nano Dev Kit (8 GB)** | Black rectangular carrier board, NVIDIA module on top with heatsink + fan, DisplayPort, 2× MIPI CSI, M.2 slot, USB-C, RJ45, 40-pin GPIO header, 19 V barrel jack | **AI Brain** — runs ROS 2 Humble, all 23 ament_python packages, TankOS GUI, on-device AI inference (CUDA-accelerated llama.cpp, Whisper, YOLOv8n, SDXL) | 25,000 – 35,000 | [robu.in/?s=jetson+orin+nano+dev+kit+8gb](https://robu.in/?s=jetson+orin+nano&post_type=product) |
-| 2 | **Arduino UNO Q** | Blue rectangular board, USB-C, 2×15-pin female headers, ESP32-S3 co-processor for Wi-Fi/BLE, 12×8 LED matrix, Qwiic I²C connector, Arm Cortex-M4 @ 48 MHz | **Real-time controller** — motor PWM, encoder tick counting (hardware interrupts), I²C sensor polling, serial bridge (115200 baud) to Jetson. Offloads all deterministic timing from Jetson. | 1,800 – 2,500 | [robu.in/?s=arduino+uno+q](https://robu.in/?s=arduino+uno+q&post_type=product) |
+| 1 | **NVIDIA Jetson Orin Nano Super Developer Kit (8 GB)** | Black rectangular carrier board, NVIDIA module on top with heatsink + fan, DisplayPort, 2× MIPI CSI, M.2 slot, USB-C, RJ45, 40-pin GPIO header, 19 V barrel jack | **AI Brain** — runs ROS 2 Humble, all 23 ament_python packages, TankOS GUI, on-device AI inference (CUDA-accelerated llama.cpp, Whisper, YOLOv8n, SDXL) | 25,000 – 35,000 | [robu.in/?s=jetson+orin+nano+dev+kit+8gb](https://robu.in/?s=jetson+orin+nano&post_type=product) |
+| 2 | **Arduino UNO Q** | Blue rectangular board, USB-C, 2×15-pin female headers, ESP32-S3 co-processor for Wi-Fi/BLE, 12×8 LED matrix, Qwiic I²C connector, Qualcomm QRB2210 + STM32U585 MCU | **Real-time controller** — motor PWM, encoder tick counting (hardware interrupts), I²C sensor polling, serial bridge (115200 baud) to Jetson. Offloads all deterministic timing from Jetson. | 1,800 – 2,500 | [robu.in/?s=arduino+uno+q](https://robu.in/?s=arduino+uno+q&post_type=product) |
 | 3 | **M.2 NVMe SSD 256 GB** (Samsung 980 / WD SN570 / Crucial P3) | Stick-shaped module ~22 × 80 mm, green PCB, gold contact edge, "NVMe" label | `/var/lib/tank` for vector memory, ROS bags, recordings, sqlite-vec db, AI model cache | 3,500 – 5,500 | [robu.in/?s=m.2+nvme+256gb](https://robu.in/?s=nvme+ssd+256gb&post_type=product) |
 | 4 | **ESP32-S3 DevKitC-1** (N16R8) | Narrow black dev board, dual-row pin headers, USB-C on one short edge, tiny PCB antenna trace, Espressif logo | Drives the 2 × round eye displays over SPI, receives JSON over UART from Jetson | 700 – 1,100 | [robu.in/?s=esp32-s3+devkitc-1+n16r8](https://robu.in/?s=esp32-s3&post_type=product) |
 | 5 | **MicroSD card 64 GB A2** | Tiny blue/black microSD card, ~15 × 11 mm | Boot drive for Jetson (JetPack 6) | 600 – 900 | [robu.in/?s=micro+sd+64gb+a2](https://robu.in/?s=micro+sd+64gb&post_type=product) |
@@ -148,7 +148,7 @@
 >
 > ┌──────────────────────┐               ┌──────────────────────┐
 > │ 12 V motor battery    │ ───────────► │ 2 × BTS7960 drivers │
-> │ (SLA or 3S Li-ion,    │   12 V /     │ → 2 × drive motors   │
+> │ (SLA or 4S Li-ion,    │   12 V /     │ → 2 × drive motors   │
 > │ already on hand)     │   30 A peak  │ (12 V each, encoder)│
 > └──────────────────────┘               └──────────────────────┘
 > ```
@@ -171,7 +171,7 @@
 
 - 🟢 **Jetson Orin Nano PSU (19 V barrel jack)** — included with dev kit.
 - 🟢 **2 × BTS7960 43 A drivers** — purchased.
-- 🟢 **12 V motor battery** — any existing 12 V SLA, 3S Li-ion, RC car pack, or bench supply ≥ 5 Ah works. Re-use what you have before buying.
+- 🟢 **12 V motor battery** — any existing 12 V SLA, 4S Li-ion, RC car pack, or bench supply ≥ 5 Ah works. Re-use what you have before buying.
 
 ### 6.3 If you really must start from zero on the motor rail (worst-case only)
 
@@ -236,7 +236,7 @@ don't already own one — that brings a *first-time builder* total to **₹ 68,9
 
 ```csv
 "#",section,item,low_inr,high_inr,robu_search_slug
-1,Compute,Jetson Orin Nano Dev Kit 8GB,25000,35000,jetson+orin+nano+dev+kit+8gb
+1,Compute,Jetson Orin Nano Super Developer Kit 8GB,25000,35000,jetson+orin+nano+dev+kit+8gb
 2,Compute,Arduino UNO Q,1800,2500,arduino+uno+q
 3,Compute,M.2 NVMe 256GB,3500,5500,m.2+nvme+256gb
 4,Compute,ESP32-S3 DevKitC-1 N16R8,700,1100,esp32-s3+devkitc-1+n16r8
@@ -306,7 +306,7 @@ don't already own one — that brings a *first-time builder* total to **₹ 68,9
 
 1. **Power architecture (revised)**: this BOM assumes the user already
    owns a USB-C PD power bank ≥ 27 W and a 12 V motor battery (SLA,
-   3S Li-ion, or bench supply). If you have neither, add **★ 30 + ★ 31**
+   4S Li-ion, or bench supply). If you have neither, add **★ 30 + ★ 31**
    (SLA + charger, ~₹ 1,150 mid).
 2. **Rail isolation**: connect Pi USB-C PD ground and motor battery
    ground **at one star point only** (typically the BTS7960 chassis
@@ -364,7 +364,7 @@ Robu.in replaces a SKU.*
 | BTS7960 × 2 | RobotManager — drive motors | Arduino PWM/DIR | ✅ |
 | PCA9685 Servo Controller | RobotManager — `pan_tilt_controller` | I²C 0x40 (Arduino), adafruit-servokit | 🟡 Planned |
 | SG90 Servo × 2 | Pan/tilt camera head | PWM 50 Hz via PCA9685 | 🟡 Planned |
-| MPU6050 IMU | `tank_sensors.imu_publisher` | I²C 0x68 (Arduino) | 🟡 Planned |
+| BNO055 IMU | `tank_sensors.imu_publisher` | I²C 0x28 (UNO Q) | 🔵 Driver ready |
 | BNO055 9-DOF IMU | `tank_sensors.imu_publisher` (upgrade) | I²C 0x28 (Arduino) | 🟡 Future |
 | HC-SR04 × 2 | Obstacle detection | GPIO trigger/echo | 🟡 Planned |
 | TF-Luna LiDAR | NavigationManager — obstacle avoidance | UART | 🟡 Considering |

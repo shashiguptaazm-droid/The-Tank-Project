@@ -22,7 +22,7 @@ sensors:
 ai:
   model: "yolov8n.pt"
   confidence_threshold: 0.5
-  local_model: "tinyllama"
+  local_model: "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
 
 control:
   motor_pwm_freq: 1000

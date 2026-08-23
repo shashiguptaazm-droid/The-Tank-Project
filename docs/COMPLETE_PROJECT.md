@@ -38,8 +38,8 @@ operator / web browser / REST client
 └────────────────────────┬─────────────────────────────┘
                          │ ROS 2 topics (std_msgs JSON)
 ┌────────────────────────┼─────────────────────────────┐
-│ Layer 2 — ROS2 Humble colcon workspace             │
-│ 16 ament_python packages (tank_motion, vision, etc.)│
+│ Layer 2 — ROS2 Jazzy colcon workspace             │
+│ 23 ament_python packages (tank_motion, vision, etc.)│
 └────────────────────────┬─────────────────────────────┘
                          │
 ┌────────────────────────┼─────────────────────────────┐
@@ -49,7 +49,7 @@ operator / web browser / REST client
 ```
 
 - **Frontend:** PySide6 desktop GUI (Tank Shell) + web dashboard served by `tank_dashboard` on :8080 via nginx reverse-proxy.
-- **Backend:** ROS 2 Humble (16 packages) exposing ~21 system topics on `/` namespace; persistent sqlite-vec memory; FastAPI for all webservices.
+- **Backend:** ROS 2 Humble (23 packages) exposing ~21 system topics on `/` namespace; persistent sqlite-vec memory; FastAPI for all webservices.
 - **Database:** SQLite everywhere (sqlite-vec for vector recall). No external DB.
 - **External services:** Optional OTA AI plugin via `tank_command_bridge` (:8082); MQTT broker for security event publishing; WireGuard/Tailscale for remote.
 
