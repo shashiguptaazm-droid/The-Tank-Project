@@ -82,8 +82,11 @@ SENSE → PERCEIVE → FUSE → AI → DECIDE → ACT → VERIFY
   → Mission (builder + 9 types) → Map → Vision → AI Brain (decision + **Why?**) → Robot Health
 - ✅ **Extras live:** ESP32 Fleet · Jetson dashboard (GPU/CPU/RAM/VRAM/AI FPS) · 🏆 Competition Mode
   (10-step DEMO) · 🚨 Event Center (filtered stream)
-- ✅ 8 new screens (`tank_os/windows/`), one GUI → EventBus → TankOS/ROS2/Hardware backends
-- ✅ 10 new tests (`test_gui_blueprint_screens.py`) — full suite **310 passing**
+- ✅ **Wave 2 — 9 more screens** (`tank_os/windows/`): Sensor Fusion topology, Hardware Topology,
+  Testing Center (12 tests → report), Power Dashboard (runtime/mission-cost/efficiency), Network,
+  Security Center, Data/Analytics (11 sparklines), TV launcher, AI timeline — one GUI → EventBus →
+  TankOS/ROS2/Hardware backends
+- ✅ **17 new screens total**; 18 tests (`test_gui_blueprint_screens.py`) — full suite **318 passing**
 
 ## 🏗️ Next Steps
 

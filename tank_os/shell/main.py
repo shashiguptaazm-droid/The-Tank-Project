@@ -125,6 +125,14 @@ _FleetScreen = None
 _JetsonScreen = None
 _CompetitionScreen = None
 _EventCenterScreen = None
+_SensorsScreen = None
+_TopologyScreen = None
+_TestCenterScreen = None
+_PowerDashboardScreen = None
+_NetworkScreen = None
+_SecurityCenterScreen = None
+_AnalyticsScreen = None
+_TvLauncherScreen = None
 
 
 def _try_load_qt() -> None:
@@ -139,6 +147,9 @@ def _try_load_qt() -> None:
     global _PowerScreen, _UpdatesScreen, _FilesScreen, _UsbScreen
     global _DriveScreen, _MissionScreen, _AIBrainScreen, _HealthScreen
     global _FleetScreen, _JetsonScreen, _CompetitionScreen, _EventCenterScreen
+    global _SensorsScreen, _TopologyScreen, _TestCenterScreen
+    global _PowerDashboardScreen, _NetworkScreen, _SecurityCenterScreen
+    global _AnalyticsScreen, _TvLauncherScreen
 
     if not _USE_QT:
         return
@@ -189,6 +200,14 @@ def _try_load_qt() -> None:
     from tank_os.windows.jetson_screen import JetsonScreen as _jts
     from tank_os.windows.competition_screen import CompetitionScreen as _cps
     from tank_os.windows.event_center import EventCenterScreen as _ecs
+    from tank_os.windows.sensors_screen import SensorsScreen as _sns
+    from tank_os.windows.topology_screen import TopologyScreen as _tps
+    from tank_os.windows.test_center import TestCenterScreen as _tcs
+    from tank_os.windows.power_dashboard import PowerDashboardScreen as _pds
+    from tank_os.windows.network_screen import NetworkScreen as _nws
+    from tank_os.windows.security_center import SecurityCenterScreen as _scs
+    from tank_os.windows.analytics_screen import AnalyticsScreen as _ans
+    from tank_os.windows.tv_launcher import TvLauncherScreen as _tvs
 
     _TopBar, _BottomDock, _NotificationsOverlay, _Dashboard = _tb, _bd, _no, _db
     _HomeScreen, _ChatScreen, _CameraScreen = _hs, _cs, _cms
@@ -201,6 +220,10 @@ def _try_load_qt() -> None:
     _AIBrainScreen, _HealthScreen = _abs, _hls
     _FleetScreen, _JetsonScreen = _flt, _jts
     _CompetitionScreen, _EventCenterScreen = _cps, _ecs
+    _SensorsScreen, _TopologyScreen = _sns, _tps
+    _TestCenterScreen, _PowerDashboardScreen = _tcs, _pds
+    _NetworkScreen, _SecurityCenterScreen = _nws, _scs
+    _AnalyticsScreen, _TvLauncherScreen = _ans, _tvs
 
     # Build TankShellMainWindow class (depends on Qt symbols)
     _TankShellMainWindow = _build_main_window_class()
@@ -234,6 +257,15 @@ def _build_main_window_class():
         "jetson": _JetsonScreen,        # 🟧 Jetson Dashboard
         "competition": _CompetitionScreen,  # 🏆 Competition Mode
         "events": _EventCenterScreen,   # 🚨 Event Center
+        # ── GUI blueprint wave 2 ─────────────────────────────────────
+        "sensors": _SensorsScreen,     # 📡 Sensor Fusion
+        "topology": _TopologyScreen,   # 🧩 Hardware Topology
+        "test-center": _TestCenterScreen,  # 🧪 Testing Center
+        "power-dash": _PowerDashboardScreen,  # 🔋 Power Dashboard
+        "network": _NetworkScreen,     # 📡 Network
+        "security": _SecurityCenterScreen,  # 🔐 Security Center
+        "analytics": _AnalyticsScreen,  # 📊 Data / Analytics
+        "tv": _TvLauncherScreen,       # 📺 TV launcher (10-foot)
     }
 
     class TankShellMainWindow(QMainWindow):

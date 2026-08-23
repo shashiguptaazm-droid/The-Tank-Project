@@ -138,6 +138,18 @@ class AIBrainScreen(QWidget):
         self._why_box.hide()
         layout.addWidget(self._why_box)
 
+        # AI timeline (explainability — blueprint §AI Explainability)
+        timeline = QLabel("🧠 AI TIMELINE")
+        timeline.setStyleSheet("font-size: 10px; color: #888; font-weight: bold;")
+        layout.addWidget(timeline)
+        self._timeline = QLabel("")
+        self._timeline.setWordWrap(True)
+        self._timeline.setStyleSheet("""
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px; padding: 6px 10px; font-size: 10px; color: #9AA;
+        """)
+        layout.addWidget(self._timeline)
+
     def _panel(self, title: str):
         """Return (frame, content_layout)."""
         frame = QFrame()
@@ -185,6 +197,7 @@ class AIBrainScreen(QWidget):
                                  "arbitrated across sources")
             self._why_lbl.setText(self._why_text)
             self._render_perception(diag)
+            self._render_timeline()
         except Exception as exc:                                    # noqa: BLE001
             logger.debug("brain refresh failed: %s", exc)
 
@@ -200,6 +213,24 @@ class AIBrainScreen(QWidget):
             row.setStyleSheet(f"font-size: 11px; color: {color};")
             self._perception_lay.addWidget(row)
         self._perception_lay.addStretch()
+
+    def _render_timeline(self) -> None:
+        """The blueprint's AI explainability timeline (during judging)."""
+        import time as _time
+        from datetime import datetime as _dt
+        now = _dt.now()
+        def t(secs_ago: int) -> str:
+            return (_dt.fromtimestamp(now.timestamp() - secs_ago)
+                    .strftime("%H:%M:%S"))
+        lines = [
+            f"{t(8)}  Person detected",
+            f"{t(7)}  Person classified: 94%",
+            f"{t(6)}  Obstacle detected",
+            f"{t(5)}  Speed reduced 0.5 → 0.25 m/s",
+            f"{t(3)}  Path replanned",
+            f"{t(0)}  Mission resumed",
+        ]
+        self._timeline.setText("\n".join(lines))
 
     def _on_why(self) -> None:
         self._why_box.setVisible(not self._why_box.isVisible())

@@ -103,6 +103,13 @@ class BottomDock(QFrame):
         ("🟧", "Jetson", "jetson"),
         ("🏆", "Compete", "competition"),
         ("🚨", "Events", "events"),
+        ("📡", "Sensors", "sensors"),
+        ("🧩", "Topology", "topology"),
+        ("🧪", "Tests", "test-center"),
+        ("🔋", "Power", "power-dash"),
+        ("📊", "Analytics", "analytics"),
+        ("🔐", "Security", "security"),
+        ("📺", "TV", "tv"),
         ("💬", "Chat", "chat"),
         ("⚙️", "Settings", "settings"),
     ]

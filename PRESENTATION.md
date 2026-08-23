@@ -193,7 +193,11 @@ plus 8 new screens with screenshots:
 | 41 | **Drive** (joystick, E-stop, 5 modes) | 46 | **Jetson Dashboard** |
 | 42 | **Mission Control** (builder) | 47 | 🏆 **Competition Mode** |
 | 43 | **AI Brain** (decision + Why?) | 48 | 🚨 **Event Center** |
-| 44 | 🩺 **Robot Health** | | |
+| 44 | 🩺 **Robot Health** | 53 | **Network** |
+| 49 | **Sensor Fusion** | 54 | **Security Center** |
+| 50 | **Hardware Topology** | 55 | **Data / Analytics** |
+| 51 | 🧪 **Testing Center** | 56 | **TV Launcher** |
+| 52 | **Power Dashboard** | 57 | **AI Brain + timeline** |
 
 | | |
 |---|---|
@@ -201,8 +205,12 @@ plus 8 new screens with screenshots:
 | ![Mission](docs/screenshots/gui/42_mission.png) | ![AI Brain](docs/screenshots/gui/43_ai_brain.png) |
 | ![Robot Health](docs/screenshots/gui/44_robot_health.png) | ![ESP32 Fleet](docs/screenshots/gui/45_esp32_fleet.png) |
 | ![Jetson](docs/screenshots/gui/46_jetson.png) | ![Competition](docs/screenshots/gui/47_competition.png) |
+| ![Sensor Fusion](docs/screenshots/gui/49_sensor_fusion.png) | ![Topology](docs/screenshots/gui/50_hardware_topology.png) |
+| ![Testing Center](docs/screenshots/gui/51_test_center.png) | ![Power Dashboard](docs/screenshots/gui/52_power_dashboard.png) |
+| ![Network](docs/screenshots/gui/53_network.png) | ![Security](docs/screenshots/gui/54_security_center.png) |
+| ![Analytics](docs/screenshots/gui/55_analytics.png) | ![TV Launcher](docs/screenshots/gui/56_tv_launcher.png) |
 
-Full blueprint + audit: [`docs/TANKOS_GUI_BLUEPRINT.md`](docs/TANKOS_GUI_BLUEPRINT.md) · **310 tests passing**.
+Full blueprint + audit: [`docs/TANKOS_GUI_BLUEPRINT.md`](docs/TANKOS_GUI_BLUEPRINT.md) · **318 tests passing**.
 
 ---
 

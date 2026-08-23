@@ -60,10 +60,15 @@ bottom dock.
 |------|--------|--------|
 | 🏆 Competition Mode | `competition` | ✅ NEW — one clean screen: THE TANK title, live subsystem checklist (✓/✗), battery, mission, status, confidence + **DEMO MODE** button (10-step walkthrough) |
 | 🚨 Event Center | `events` | ✅ NEW — unified EventBus stream with filters (ALL/SAFETY/AI/HARDWARE/NETWORK/NAVIGATION), colour-coded rows |
-| 🎬 AI Explainability | `brain` | ✅ "Why?" button renders the decision rationale |
-| 🧪 Testing Center | `tank unoq self-test` + `doctor --inject` | 🔶 CLI; GUI tab 🧭 |
-| 📊 Data / Analytics | `diagnostics` | 🔶 history exists; graphs 🧭 |
-| 🔐 Security Center | `security` | 🔶 existing |
+| 📡 Sensor Dashboard | `sensors` | ✅ NEW — fusion topology (CAMERA/LIDAR/IMU/ENCODERS → WORLD MODEL), per-sensor ONLINE/DEGRADED/OFFLINE + freq/latency/confidence/temp/errors |
+| 🧩 Hardware Topology | `topology` | ✅ NEW — THE TANK tree (JETSON: CAM/LIDAR/AI · UNO Q: MCU→MOTOR/SERVO/IMU · ESP32 fleet), clickable nodes |
+| 🧪 Testing Center | `test-center` | ✅ NEW — 12 tests (FULL SYSTEM/MOTOR/SERVO/IMU/LIDAR/CAMERA/JETSON/UNO Q/ESP32/NETWORK/E-STOP/POWER) → **THE TANK SYSTEM TEST** report (✓/⚠/✕ + timestamp) |
+| 🔋 Power Dashboard | `power-dash` | ✅ NEW — battery/voltage/current/watts + **predicted runtime · mission cost · energy efficiency** + per-device consumption bars |
+| 📡 Network | `network` | ✅ NEW — Wi-Fi/Ethernet/LTE/Tailscale interfaces + fleet connectivity probes |
+| 🔐 Security Center | `security` | ✅ NEW — SSH sessions, connected devices, Tailscale nodes, failed logins, API requests, suspicious commands |
+| 📊 Data / Analytics | `analytics` | ✅ NEW — 11 live sparkline graphs + time ranges (1 h/6 h/24 h/mission) |
+| 📺 TV Mode | `tv` | ✅ NEW — 10-foot launcher (ROBOT/MEDIA/GAMES/CAMERA/AI/SETTINGS/NETWORK/SYSTEM) → kiosk / robot screens |
+| 🎬 AI Explainability | `brain` | ✅ "Why?" button + **AI timeline** (person detected → classified → obstacle → speed reduced → replan → resume) |
 | 🎙 Voice Interface | `voice` | 🔶 existing — goes through intent → safety → action |
 
 ---
@@ -115,13 +120,22 @@ work, and the EventBus + SQLite keep history.
 | 46 | Jetson Dashboard | [`docs/screenshots/gui/46_jetson.png`](screenshots/gui/46_jetson.png) |
 | 47 | Competition Mode | [`docs/screenshots/gui/47_competition.png`](screenshots/gui/47_competition.png) |
 | 48 | Event Center | [`docs/screenshots/gui/48_event_center.png`](screenshots/gui/48_event_center.png) |
+| 49 | Sensor Fusion | [`docs/screenshots/gui/49_sensor_fusion.png`](screenshots/gui/49_sensor_fusion.png) |
+| 50 | Hardware Topology | [`docs/screenshots/gui/50_hardware_topology.png`](screenshots/gui/50_hardware_topology.png) |
+| 51 | Testing Center | [`docs/screenshots/gui/51_test_center.png`](screenshots/gui/51_test_center.png) |
+| 52 | Power Dashboard | [`docs/screenshots/gui/52_power_dashboard.png`](screenshots/gui/52_power_dashboard.png) |
+| 53 | Network | [`docs/screenshots/gui/53_network.png`](screenshots/gui/53_network.png) |
+| 54 | Security Center | [`docs/screenshots/gui/54_security_center.png`](screenshots/gui/54_security_center.png) |
+| 55 | Data / Analytics | [`docs/screenshots/gui/55_analytics.png`](screenshots/gui/55_analytics.png) |
+| 56 | TV Launcher | [`docs/screenshots/gui/56_tv_launcher.png`](screenshots/gui/56_tv_launcher.png) |
+| 57 | AI Brain + timeline | [`docs/screenshots/gui/57_ai_brain_timeline.png`](screenshots/gui/57_ai_brain_timeline.png) |
 
-Contact sheet: [`docs/screenshots/gui/contact_sheet_gui.png`](screenshots/gui/contact_sheet_gui.png)
+Contact sheet (18 screens): [`docs/screenshots/gui/contact_sheet_gui.png`](screenshots/gui/contact_sheet_gui.png)
 
 ## Proof
 
-* **10 new tests** (`test_gui_blueprint_screens.py`) — every screen builds
-  and paints offscreen; home has the 8 tiles; dock exposes core-7 + extras.
-* **Full suite: 310 passing** (300 + 10 new).
-* Shell navigation verified for all 8 new screens + home-tile EventBus
-  navigation.
+* **18 tests** (`test_gui_blueprint_screens.py`) — every screen builds and
+  paints offscreen; home has the 8 tiles; dock exposes core-7 + extras.
+* **Full suite: 318 passing** (300 + 18 new).
+* Shell navigation verified for all 17 new screens + home-tile EventBus
+  navigation; Testing Center suite runs 12 real tests against live state.

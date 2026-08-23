@@ -251,4 +251,6 @@ Captured in `scripts/provision_pi5.sh`:
 - [x] **TankOS GUI Blueprint** ([`docs/TANKOS_GUI_BLUEPRINT.md`](docs/TANKOS_GUI_BLUEPRINT.md)) — core-7
   (Home hub · Drive · Mission · AI Brain · Robot Health) + ESP32 Fleet · Jetson dashboard ·
   🏆 Competition Mode · 🚨 Event Center — 8 new screens, 10 new tests (**310 passing**)
+- [x] **GUI wave 2** — Sensor Fusion · Hardware Topology · Testing Center · Power Dashboard ·
+  Network · Security Center · Analytics · TV launcher · AI timeline — **17 screens, 318 passing**
 - [ ] Remaining ⬜/🔶 items (benchmarks §R, gamepad input, HIL rig, MCU watchdog) — tracked in the master plan

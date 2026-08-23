@@ -81,8 +81,8 @@ class HomeScreen(QWidget):
         tile_defs = [
             ("🤖", "DRIVE", "drive"), ("🧠", "AI", "brain"),
             ("🗺", "MAP", "navigation"), ("📷", "VISION", "camera"),
-            ("🎯", "MISSION", "mission"), ("📡", "SENSORS", "diagnostics"),
-            ("⚙", "SYSTEM", "settings"), ("📺", "TV", "files"),
+            ("🎯", "MISSION", "mission"), ("📡", "SENSORS", "sensors"),
+            ("⚙", "SYSTEM", "settings"), ("📺", "TV", "tv"),
         ]
         for icon, label, screen in tile_defs:
             tile = self._make_tile(icon, label, screen)

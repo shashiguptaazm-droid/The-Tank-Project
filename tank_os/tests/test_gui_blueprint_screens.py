@@ -41,6 +41,14 @@ SCREENS = {
     "jetson": "tank_os.windows.jetson_screen.JetsonScreen",
     "competition": "tank_os.windows.competition_screen.CompetitionScreen",
     "events": "tank_os.windows.event_center.EventCenterScreen",
+    "sensors": "tank_os.windows.sensors_screen.SensorsScreen",
+    "topology": "tank_os.windows.topology_screen.TopologyScreen",
+    "test-center": "tank_os.windows.test_center.TestCenterScreen",
+    "power-dash": "tank_os.windows.power_dashboard.PowerDashboardScreen",
+    "network": "tank_os.windows.network_screen.NetworkScreen",
+    "security": "tank_os.windows.security_center.SecurityCenterScreen",
+    "analytics": "tank_os.windows.analytics_screen.AnalyticsScreen",
+    "tv": "tank_os.windows.tv_launcher.TvLauncherScreen",
 }
 
 
@@ -65,7 +73,7 @@ def test_home_screen_has_launcher_tiles() -> None:
     # The blueprint's 8 launcher tiles must be registered.
     assert len(home._tiles) == 8
     for screen in ("drive", "brain", "navigation", "camera",
-                   "mission", "diagnostics", "settings", "files"):
+                   "mission", "sensors", "settings", "tv"):
         assert screen in home._tiles
 
 

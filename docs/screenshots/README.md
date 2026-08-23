@@ -51,6 +51,15 @@ All TankOS GUI screenshots are real captures of the running Qt shell (window-gra
 | 46 | [jetson](gui/46_jetson.png) | **Jetson Dashboard** | GPU/CPU/RAM/VRAM · temp · power · AI FPS |
 | 47 | [competition](gui/47_competition.png) | 🏆 **Competition Mode** | One clean screen + DEMO MODE |
 | 48 | [event_center](gui/48_event_center.png) | 🚨 **Event Center** | Filtered EventBus stream |
+| 49 | [sensor_fusion](gui/49_sensor_fusion.png) | 📡 **Sensor Fusion** | Fusion topology + per-sensor ONLINE/DEGRADED/OFFLINE |
+| 50 | [hardware_topology](gui/50_hardware_topology.png) | 🧩 **Hardware Topology** | THE TANK tree, clickable nodes |
+| 51 | [test_center](gui/51_test_center.png) | 🧪 **Testing Center** | 12 tests → THE TANK SYSTEM TEST report |
+| 52 | [power_dashboard](gui/52_power_dashboard.png) | 🔋 **Power Dashboard** | Runtime · mission cost · efficiency · per-device draw |
+| 53 | [network](gui/53_network.png) | 📡 **Network** | Interfaces + fleet connectivity |
+| 54 | [security_center](gui/54_security_center.png) | 🔐 **Security Center** | SSH · devices · Tailscale · logins · API |
+| 55 | [analytics](gui/55_analytics.png) | 📊 **Data / Analytics** | 11 live sparkline graphs + ranges |
+| 56 | [tv_launcher](gui/56_tv_launcher.png) | 📺 **TV Launcher** | 10-foot interface → kiosk / robot screens |
+| 57 | [ai_brain_timeline](gui/57_ai_brain_timeline.png) | 🧠 **AI Brain + timeline** | Decision + Why? + explainability timeline |
 
 ![Contact sheet](gui/contact_sheet_gui.png)
 
