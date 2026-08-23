@@ -151,3 +151,21 @@
 ---
 
 *Source of truth for wiring/pins: `WIRING.md` · software mapping: `docs/HARDWARE_DEPENDENCIES.md` · photos: `docs/hardware_photos/` + `images/build/`.*
+
+---
+
+## 8. Media — GIFs & Infographics
+
+> 🎬 Animated: [`assets/gifs/eyes_expressions.gif`](../assets/gifs/eyes_expressions.gif) (round-eye emotions) ·
+> [`assets/gifs/network_failover.gif`](../assets/gifs/network_failover.gif) (WiFi→LTE→Hotspot→Tailscale)
+>
+> 📊 Infographics (SVG, render on GitHub): [`assets/infographics/`](../assets/infographics/)
+
+| Asset | Preview |
+|-------|---------|
+| Eyes expressions | ![eyes](../assets/gifs/eyes_expressions.gif) |
+| Network failover | ![network](../assets/gifs/network_failover.gif) |
+| Fleet connectivity | ![fleet](../assets/infographics/fleet_connectivity.svg) |
+| Hardware inventory | ![hardware](../assets/infographics/hardware_inventory.svg) |
+| 3 ESP32 boards | ![esp32](../assets/infographics/esp32_boards.svg) |
+| TankOS architecture | ![arch](../assets/infographics/tankos_architecture.svg) |

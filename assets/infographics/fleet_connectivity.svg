@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="820" viewBox="0 0 1280 820" font-family="DejaVu Sans, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0e1b"/>
+      <stop offset="100%" stop-color="#0d1326"/>
+    </linearGradient>
+    <linearGradient id="box1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#16203a"/>
+      <stop offset="100%" stop-color="#101830"/>
+    </linearGradient>
+    <linearGradient id="wifiG" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="820" fill="url(#bg)"/>
+
+  <!-- Title -->
+  <text x="640" y="52" text-anchor="middle" font-size="30" font-weight="bold" fill="#eef2ff">TANK FLEET — LIVE CONNECTIVITY MAP</text>
+  <text x="640" y="82" text-anchor="middle" font-size="15" fill="#8b93b5">Audited 2026-08-23 · WiFi primary · Tailscale mesh fallback · LTE + hotspot failover</text>
+  <line x1="300" y1="96" x2="980" y2="96" stroke="#2a3560" stroke-width="2"/>
+
+  <!-- ===== VPS (cloud, top center) ===== -->
+  <g>
+    <rect x="470" y="120" width="340" height="150" rx="16" fill="url(#box1)" stroke="#7c3aed" stroke-width="2"/>
+    <circle cx="500" cy="158" r="20" fill="#7c3aed"/>
+    <text x="500" y="164" text-anchor="middle" font-size="20" fill="#fff">☁</text>
+    <text x="640" y="158" text-anchor="middle" font-size="20" font-weight="bold" fill="#f0abfc">VPS — medicscholar</text>
+    <text x="640" y="182" text-anchor="middle" font-size="13" fill="#c4b5fd">medigyaan.com · Ubuntu x86_64</text>
+    <text x="640" y="204" text-anchor="middle" font-size="13" fill="#93a4d8">tank-vps API :8888 · nginx · Nextcloud · webdav</text>
+    <text x="640" y="226" text-anchor="middle" font-size="13" fill="#93a4d8">Tailscale 100.71.127.19 (exit node) · OpenVPN 10.8.0.1</text>
+    <text x="640" y="252" text-anchor="middle" font-size="12" fill="#4ade80">● online — 188 ms from unoq</text>
+  </g>
+
+  <!-- ===== Jetson (left) ===== -->
+  <g>
+    <rect x="60" y="330" width="400" height="300" rx="16" fill="url(#box1)" stroke="#22d3ee" stroke-width="2"/>
+    <circle cx="92" cy="372" r="20" fill="#22d3ee"/>
+    <text x="92" y="378" text-anchor="middle" font-size="20" fill="#04283a">🖥</text>
+    <text x="260" y="372" text-anchor="middle" font-size="20" font-weight="bold" fill="#67e8f9">JETSON — shashi</text>
+    <text x="260" y="396" text-anchor="middle" font-size="13" fill="#93a4d8">NVIDIA Orin Nano Super · aarch64</text>
+    <text x="260" y="418" text-anchor="middle" font-size="13" fill="#93a4d8">WiFi 192.168.31.74 · Tailscale 100.122.31.46</text>
+    <line x1="100" y1="430" x2="420" y2="430" stroke="#1e2a4d" stroke-width="1"/>
+    <text x="110" y="452" font-size="12" fill="#67e8f9">USB / peripherals:</text>
+    <text x="110" y="474" font-size="12" fill="#cbd5f0">• DFRobot ESP32-S3 AI Cam — /dev/ttyACM0 (streaming 🎥)</text>
+    <text x="110" y="496" font-size="12" fill="#cbd5f0">• ESP32-S3 Dual-eyes — /dev/ttyACM1 👀</text>
+    <text x="110" y="518" font-size="12" fill="#cbd5f0">• LDROBOT LD19 LiDAR — /dev/ttyUSB0</text>
+    <text x="110" y="540" font-size="12" fill="#cbd5f0">• Quectel EG800AK-CN 4G LTE — ttyUSB1-3 (64%)</text>
+    <text x="110" y="562" font-size="12" fill="#cbd5f0">• WD My Passport · Bluetooth · hubs</text>
+    <text x="110" y="596" font-size="12" fill="#4ade80">● online — 3 ms from unoq (LAN direct)</text>
+  </g>
+
+  <!-- ===== unoq (right) ===== -->
+  <g>
+    <rect x="820" y="330" width="400" height="300" rx="16" fill="url(#box1)" stroke="#f59e0b" stroke-width="2"/>
+    <circle cx="852" cy="372" r="20" fill="#f59e0b"/>
+    <text x="852" y="378" text-anchor="middle" font-size="20" fill="#2b1d00">⚙</text>
+    <text x="1020" y="372" text-anchor="middle" font-size="20" font-weight="bold" fill="#fcd34d">UNOQ — this board</text>
+    <text x="1020" y="396" text-anchor="middle" font-size="13" fill="#93a4d8">Arduino UNO Q · Debian 13 · aarch64</text>
+    <text x="1020" y="418" text-anchor="middle" font-size="13" fill="#93a4d8">WiFi 192.168.31.72 · Tailscale 100.84.235.7</text>
+    <line x1="860" y1="430" x2="1180" y2="430" stroke="#1e2a4d" stroke-width="1"/>
+    <text x="870" y="452" font-size="12" fill="#fcd34d">USB / services:</text>
+    <text x="870" y="474" font-size="12" fill="#cbd5f0">• ESP32-S3 CAM (ESPHome) — /dev/ttyACM0 📷</text>
+    <text x="870" y="496" font-size="12" fill="#cbd5f0">• USB hub · USB LAN · 6-port</text>
+    <text x="870" y="518" font-size="12" fill="#cbd5f0">• TankOS web terminal (ttyd) · x11vnc :0</text>
+    <text x="870" y="540" font-size="12" fill="#cbd5f0">• Docker: influxdb · aria2 · torrent cloud</text>
+    <text x="870" y="562" font-size="12" fill="#cbd5f0">• OpenVPN tun0 10.8.0.4</text>
+    <text x="870" y="596" font-size="12" fill="#4ade80">● online — control hub</text>
+  </g>
+
+  <!-- ===== WiFi cloud (center top area) ===== -->
+  <ellipse cx="640" cy="300" rx="150" ry="46" fill="none" stroke="url(#wifiG)" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="640" y="306" text-anchor="middle" font-size="15" fill="#34d399" font-weight="bold">📶 AirFiber-X9nxU1</text>
+
+  <!-- Connections -->
+  <!-- VPS <-> wifi -->
+  <path d="M 640 270 C 640 250, 640 250, 640 250" fill="none" stroke="#7c3aed" stroke-width="2" opacity="0"/>
+  <!-- Jetson <-> wifi -->
+  <path d="M 460 380 C 540 340, 560 320, 600 305" fill="none" stroke="#34d399" stroke-width="3" opacity="0.9"/>
+  <!-- unoq <-> wifi -->
+  <path d="M 820 380 C 740 340, 720 320, 680 305" fill="none" stroke="#34d399" stroke-width="3" opacity="0.9"/>
+
+  <!-- Tailscale mesh lines -->
+  <path d="M 640 270 C 640 250, 700 300, 820 380" fill="none" stroke="#f472b6" stroke-width="2.5" stroke-dasharray="8 6"/>
+  <path d="M 640 270 C 640 250, 580 300, 460 380" fill="none" stroke="#f472b6" stroke-width="2.5" stroke-dasharray="8 6"/>
+  <path d="M 460 460 C 620 520, 660 520, 820 460" fill="none" stroke="#f472b6" stroke-width="2" stroke-dasharray="8 6" opacity="0.6"/>
+
+  <!-- labels on mesh -->
+  <text x="560" y="400" font-size="12" fill="#f472b6" transform="rotate(-20 560 400)">Tailscale 3 ms</text>
+  <text x="700" y="400" font-size="12" fill="#f472b6" transform="rotate(20 700 400)">Tailscale 188 ms</text>
+  <text x="640" y="520" text-anchor="middle" font-size="12" fill="#f472b6">mesh (boot-enabled)</text>
+
+  <!-- ===== ESP32 row (bottom) ===== -->
+  <text x="640" y="672" text-anchor="middle" font-size="18" font-weight="bold" fill="#eef2ff">THE 3 ESP32 BOARDS</text>
+  <line x1="380" y1="686" x2="900" y2="686" stroke="#2a3560" stroke-width="1"/>
+
+  <!-- CAM -->
+  <g>
+    <rect x="80" y="700" width="340" height="100" rx="12" fill="#101830" stroke="#22d3ee" stroke-width="1.5"/>
+    <text x="250" y="728" text-anchor="middle" font-size="14" font-weight="bold" fill="#67e8f9">ESP32-S3 CAM 📷</text>
+    <text x="250" y="752" text-anchor="middle" font-size="12" fill="#cbd5f0">unoq /dev/ttyACM0 · ESPHome</text>
+    <text x="250" y="774" text-anchor="middle" font-size="12" fill="#4ade80">● online 192.168.31.145 · 14:C1:9F:C1:2C:24</text>
+    <text x="250" y="792" text-anchor="middle" font-size="11" fill="#93a4d8">HTTP sleeps in power-save (normal)</text>
+  </g>
+  <!-- Eyes -->
+  <g>
+    <rect x="470" y="700" width="340" height="100" rx="12" fill="#101830" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="640" y="728" text-anchor="middle" font-size="14" font-weight="bold" fill="#fcd34d">ESP32-S3 DUAL-EYES 👀</text>
+    <text x="640" y="752" text-anchor="middle" font-size="12" fill="#cbd5f0">Jetson /dev/ttyACM1 · 1.28" round LCDs</text>
+    <text x="640" y="774" text-anchor="middle" font-size="12" fill="#4ade80">● online · A0:F2:62:E3:DF:F4</text>
+    <text x="640" y="792" text-anchor="middle" font-size="11" fill="#93a4d8">JSON: happy / alert / blink / gaze</text>
+  </g>
+  <!-- DFRobot -->
+  <g>
+    <rect x="860" y="700" width="340" height="100" rx="12" fill="#101830" stroke="#7c3aed" stroke-width="1.5"/>
+    <text x="1030" y="728" text-anchor="middle" font-size="14" font-weight="bold" fill="#f0abfc">DFROBOT AI CAMERA 🎥</text>
+    <text x="1030" y="752" text-anchor="middle" font-size="12" fill="#cbd5f0">Jetson /dev/ttyACM0 · SEN0611</text>
+    <text x="1030" y="774" text-anchor="middle" font-size="12" fill="#4ade80">● flash complete — streaming 640×480</text>
+    <text x="1030" y="792" text-anchor="middle" font-size="11" fill="#93a4d8">28:84:85:4C:84:04 · OV3660 3MP</text>
+  </g>
+
+  <!-- Legend -->
+  <text x="640" y="816" text-anchor="middle" font-size="11" fill="#6b739a">Full audit: docs/FLEET_INVENTORY.md · photos: docs/hardware_photos/ · eyes GIF: assets/gifs/eyes_expressions.gif</text>
+</svg>

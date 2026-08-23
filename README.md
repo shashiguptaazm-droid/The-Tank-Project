@@ -18,6 +18,28 @@
 
 ---
 
+## 🎬 Presentation — GIFs & Infographics
+
+<p align="center">
+  <img src="assets/gifs/eyes_expressions.gif" width="360" alt="Tank eyes expressions"/>
+  <img src="assets/gifs/network_failover.gif" width="320" alt="Network failover"/>
+</p>
+
+<p align="center">
+  <a href="assets/infographics/fleet_connectivity.svg"><img src="assets/infographics/fleet_connectivity.svg" width="46%" alt="Fleet connectivity"/></a>
+  <a href="assets/infographics/hardware_inventory.svg"><img src="assets/infographics/hardware_inventory.svg" width="46%" alt="Hardware inventory"/></a>
+</p>
+
+<p align="center">
+  <a href="assets/infographics/esp32_boards.svg"><img src="assets/infographics/esp32_boards.svg" width="46%" alt="3 ESP32 boards"/></a>
+  <a href="assets/infographics/tankos_architecture.svg"><img src="assets/infographics/tankos_architecture.svg" width="46%" alt="TankOS architecture"/></a>
+</p>
+
+> 📄 Docs: [`docs/FLEET_INVENTORY.md`](docs/FLEET_INVENTORY.md) (live device audit) ·
+> [`docs/HARDWARE_DEPENDENCIES.md §8`](docs/HARDWARE_DEPENDENCIES.md#8-hardware-photo-gallery) (photo gallery) ·
+> [`assets/README.md`](assets/README.md) (media index)
+
+
 ## 1. Project Title
 
 **The Tank** — An Autonomous AI Robotic Platform with Cognitive Architecture
