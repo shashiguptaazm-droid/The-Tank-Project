@@ -40,7 +40,7 @@ doc.add_paragraph()
 table = doc.add_table(rows=5, cols=2)
 table.style = 'Table Grid'
 data = [
-    ('Project Title', 'The Tank — Autonomous Humanoid AI Robot'),
+    ('Project Title', 'The Tank — Autonomous AI Robotic Platform'),
     ('Team Name', 'TankBuild'),
     ('Registration / Team ID', 'APC-2026-RJ-75818'),
     ('Contest Track', 'Physical AI — Autonomous Navigation & Perception'),
@@ -96,9 +96,9 @@ doc.add_paragraph(
 
 doc.add_heading('How Your Project Works', level=2)
 doc.add_paragraph(
-    'The Tank is an autonomous autonomous AI robotic platform built for the Arduino Physical AI Challenge 2026. '
+    'The Tank is an autonomous AI robotic platform built for the Arduino Physical AI Challenge 2026. '
     'It uses a three-board architecture: an NVIDIA Jetson Orin Nano (AI brain running CUDA-accelerated '
-    'inference at 67 TOPS), an Arduino UNO Q (real-time motor and sensor controller), and six '
+    'inference at 67 TOPS), an Arduino UNO Q (real-time motor and sensor controller), and five '
     'ESP32-S3 nodes (distributed controllers for eyes, hands, and limbs). The robot perceives its '
     'environment through a multi-sensor suite — LiDAR, camera, thermal sensor, and IMU — fuses this '
     'data into unified entities, runs AI analysis, makes safety-validated decisions, and executes '
@@ -143,7 +143,7 @@ for cell in table.rows[0].cells:
 components = [
     ('Arduino UNO Q (ABX00087)', '1', 'Real-time motor/sensor controller'),
     ('NVIDIA Jetson Orin Nano Super Developer Kit (8GB)', '1', 'AI brain — ROS2, CUDA inference, TankOS GUI'),
-    ('ESP32-S3 DevKitC-1 (N16R8)', '6', 'Distributed nodes — eyes, hands, limbs'),
+    ('ESP32-S3 DevKitC-1 (N16R8)', '5', 'Distributed nodes — eyes, hands, limbs'),
     ('RPLidar A1 360° LiDAR', '1', 'SLAM, mapping, obstacle detection'),
     ('BNO055 9-DOF IMU (I²C)', '1', 'Orientation, heading, tilt'),
     ('USB Camera (IMX219/C920)', '1', 'Object detection, face recognition'),
@@ -151,7 +151,7 @@ components = [
     ('Waveshare 1.28" Round LCD (GC9A01)', '2', 'Animated eye expressions'),
     ('SH1106 OLED 1.3" (I²C)', '1', 'Status display'),
     ('BTS7960 43A Motor Driver', '2', 'H-bridge for dual drive motors'),
-    ('JGB37-520 DC Geared Motors (12V)', '2', 'Left + right track drive'),
+    ('JGB37-520 DC Geared Motors', '2', 'Left + right track drive'),
     ('TowerPro SG90 Micro Servo', '2', 'Pan/tilt camera head'),
     ('PCA9685 16ch PWM Servo Driver', '1', 'I²C servo controller'),
     ('ReSpeaker 4-Mic Array (USB)', '1', 'Wake word + voice input'),
@@ -321,7 +321,7 @@ challenges = [
     'Single AI provider failure: If one cloud API went down, the robot became brainless. Solved with 14-provider rotation and automatic circuit-breaker fallback.',
     'Real-time motor timing on Linux: Linux scheduler jitter caused uneven motor PWM. Solved by offloading all real-time I/O to Arduino UNO Q.',
     '5 ESP32 nodes coordination: Multiple microcontrollers needed synchronized communication. Solved with ESP-NOW mesh and Jetson USB serial bridge.',
-    'Walking balance: Humanoid locomotion requires real-time balance feedback. Solved with pressure sensors in feet and IMU feedback loop.',
+    'Tracked locomotion precision: Differential drive requires precise motor speed matching. Solved with quadrature encoder feedback and PID control loops on Arduino UNO Q.',
 ]
 for c in challenges:
     doc.add_paragraph(f'• {c}')
@@ -334,12 +334,12 @@ doc.add_paragraph(
     'evolution system — where the robot discovers new AI models daily — was the most innovative '
     'feature, demonstrating that robots can genuinely improve over time.\n\n'
     'Future Improvements:\n'
-    '1. Gait optimization with reinforcement learning for smoother locomotion\n'
-    '2. Dexterous manipulation with force-torque sensors in finger joints\n'
+    '1. Advanced obstacle avoidance with predictive path planning\n'
+    '2. Multi-sensor fusion improvements with深度 camera integration\n'
     '3. Multi-robot fleet coordination for team tasks\n'
-    '4. Custom PCB to consolidate 5 ESP32 nodes into one board\n'
+    '4. Custom PCB to consolidate ESP32 nodes into one board\n'
     '5. Solar charging for extended outdoor operation\n'
-    '6. ROS2 Iron migration for long-term support'
+    '6. ROS2 Jazzy long-term support and Nav2 integration'
 )
 
 doc.add_page_break()
