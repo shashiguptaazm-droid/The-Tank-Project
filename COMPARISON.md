@@ -239,3 +239,16 @@
 
 *Compiled by Dr. Shashi's Tank AI — August 2026*
 *Prices are approximate and subject to change*
+
+---
+
+## API Key Requirements
+
+The Tank AI evolution system uses 14 cloud providers + 6 local models.
+
+Configured (9/14): OpenRouter, Groq, Gemini, Mistral, Cerebras, Cohere, Replicate, HuggingFace, Cloudflare
+Missing (5/14 optional): OpenAI, Anthropic, Together, DeepInfra, SambaNova
+
+Add keys: nano ~/The-Tank-Project/.env
+Evolution prompts for missing keys at runtime with setup URLs.
+
