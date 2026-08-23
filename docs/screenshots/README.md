@@ -98,3 +98,5 @@ chromium --headless --no-sandbox --screenshot=X.png --timeout=30000 URL
 | 64 | `64_robot_knowledge_map.png` | 🧠 Robot Knowledge Map — environment + knowledge confidence + health |
 
 | 65 | `65_ai_tool_graph.png` | 🧠 AI Tool Graph — typed tool-calling flow, composer readiness, audit log |
+
+| 66 | `66_tankos_system.png` | 🤖 TankOS System — distributed nodes, state machine, device lifecycle, health, traces |

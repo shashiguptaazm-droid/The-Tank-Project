@@ -285,3 +285,15 @@ Captured in `scripts/provision_pi5.sh`:
   audit log, chaining, recovery, ownership map, AI Tool Composer.
 - **AI Tool Graph** (`windows/tool_graph_screen.py`) — live tool-call visualization.
 - Tracker: `docs/TANK_TOOL_CALLING_PLAN.md` · Screenshot `65`.
+
+## Phase 19 — Proper TankOS Architecture (30-part plan) ✅
+
+- **TankOS canonical core** (`core/tankos_core.py`) — DeviceManager with device
+  lifecycle, StateManager robot state machine, CommandBus (source/priority +
+  validate→safety→execute + traces), HealthManager (signal-derived), MissionEngine
+  (first-class missions), and the `tank.*` API facade.
+- **`tank` CLI** (`cli/tankos_cli.py`) — status/health/devices/sensors/motors/
+  battery/mission/state/command/safety/events/api.
+- **TankOS System screen** (`windows/tankos_system_screen.py`) — distributed node
+  map, state machine, device lifecycle, health, command observability.
+- Tracker: `docs/TANKOS_ARCHITECTURE_PLAN.md` · Screenshot `66`.

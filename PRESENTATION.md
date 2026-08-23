@@ -325,3 +325,23 @@ UNO Q/Jetson/ESP32/STM32 → Result → AI`.
 
 Tracker: [`docs/TANK_TOOL_CALLING_PLAN.md`](docs/TANK_TOOL_CALLING_PLAN.md) ·
 Screenshot `65_ai_tool_graph` in [`docs/screenshots/gui/`](docs/screenshots/gui/).
+
+## 7¾¾¾¾¾. 🤖 Proper TankOS — one operating system, many nodes
+
+TankOS is the product. Jetson, UNO Q, STM32 and ESP32 are compute/device nodes
+underneath it — **ONE STATE · ONE EVENT BUS · ONE COMMAND BUS · ONE DEVICE
+REGISTRY · ONE SAFETY AUTHORITY · ONE TOOL REGISTRY · ONE API**.
+
+- **Canonical core** — `tank.device / tank.state / tank.command / tank.mission /
+  tank.health`: device lifecycle (DISCOVERING→READY→DEGRADED→FAULT→RECOVERING),
+  the authoritative robot state machine (BOOT→SELF_TEST→READY→MANUAL/AUTONOMOUS/
+  MISSION, any→EMERGENCY_STOP/FAULT/SAFE_MODE→RECOVERY), and a Command Bus where
+  E-STOP > HUMAN > SAFETY > MISSION > AI — apps never touch hardware directly.
+- **`tank` CLI** — `tank status`, `tank health`, `tank devices`, `tank mission
+  start patrol`, `tank safety estop`, `tank api`.
+- **TankOS System screen** — the distributed system at a glance: node map,
+  state machine, device lifecycle, health from measurable signals, and
+  end-to-end command traces.
+
+Tracker: [`docs/TANKOS_ARCHITECTURE_PLAN.md`](docs/TANKOS_ARCHITECTURE_PLAN.md) ·
+Screenshot `66_tankos_system` in [`docs/screenshots/gui/`](docs/screenshots/gui/).

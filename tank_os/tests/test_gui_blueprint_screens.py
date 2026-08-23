@@ -57,6 +57,7 @@ SCREENS = {
     "constitution": "tank_os.windows.constitution_screen.ConstitutionScreen",
     "knowledge-map": "tank_os.windows.knowledge_map_screen.KnowledgeMapScreen",
     "tool-graph": "tank_os.windows.tool_graph_screen.ToolGraphScreen",
+    "system": "tank_os.windows.tankos_system_screen.TankOSSystemScreen",
 }
 
 
@@ -97,4 +98,4 @@ def test_dock_exposes_core_screens() -> None:
     assert {"ai-command", "ai-safety", "judge", "distributed-ai"} <= screens
     # Human coordination + originality screens in the dock
     assert {"human", "constitution", "knowledge-map"} <= screens
-    assert "tool-graph" in screens
+    assert {"tool-graph", "system"} <= screens

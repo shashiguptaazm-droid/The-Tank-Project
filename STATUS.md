@@ -167,4 +167,27 @@ Safety → Tool Executor → UNO Q/Jetson/ESP32/STM32 → Result → AI`. Never
 - **363 tests passing** (18 new tool-engine tests; verified on VPS).
 - Screenshot `65_ai_tool_graph` + 27-screen contact sheet in `docs/screenshots/gui/`.
 
+
+
+---
+
+## 16. 🤖 Proper TankOS Architecture (30-part plan) ✅
+
+Tracker: [`docs/TANKOS_ARCHITECTURE_PLAN.md`](docs/TANKOS_ARCHITECTURE_PLAN.md)
+
+TankOS is the product; UNO Q / Jetson / STM32 / ESP32 are nodes underneath it.
+**ONE STATE · ONE EVENT BUS · ONE COMMAND BUS · ONE DEVICE REGISTRY · ONE
+SAFETY AUTHORITY · ONE CONFIGURATION · ONE TOOL REGISTRY · ONE API.**
+
+**Shipped this pass:**
+
+| Piece | What it delivers |
+|---|---|
+| `tank_os/core/tankos_core.py` | The canonical core — `TankOS` facade with `tank.device / state / command / mission / health`: **DeviceManager** (17 devices, lifecycle DISCOVERING→…→FAULT→RECOVERING→READY), **StateManager** (robot state machine BOOT→SELF_TEST→READY→MANUAL/ASSISTED/AUTONOMOUS/MISSION, any→EMERGENCY_STOP/FAULT/SAFE_MODE→RECOVERY), **CommandBus** (source+priority: E-STOP>HUMAN>SAFETY>MISSION>AI>BACKGROUND; validate→safety→execute with end-to-end traces), **HealthManager** (health from measurable signals), **MissionEngine** (first-class missions with CREATED→…→COMPLETED/ABORTED) |
+| `tank_os/cli/tankos_cli.py` | The **`tank` CLI**: status, health, devices, sensors, motors, battery, mission list/start, state, command, safety (estop/clear), events, api |
+| `tank_os/windows/tankos_system_screen.py` | The top-level system GUI — distributed node map (UNO Q/Jetson/STM32/ESP32/VPS), canonical state machine, device registry with lifecycle, health dashboard, command observability |
+
+- **380 tests passing** (17 new; verified on VPS) + CLI verified live.
+- Screenshot `66_tankos_system` + 28-screen contact sheet.
+
 4. **Report finalization** — Update DOCX with final specs

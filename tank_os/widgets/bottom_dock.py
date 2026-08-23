@@ -123,6 +123,8 @@ class BottomDock(QFrame):
         ("🧠", "Know Map", "knowledge-map"),
         # Tool-calling architecture
         ("🔧", "Tools", "tool-graph"),
+        # TankOS proper
+        ("🤖", "System", "system"),
     ]
 
     def __init__(self, parent: Optional[QWidget] = None) -> None:
