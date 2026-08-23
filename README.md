@@ -476,7 +476,7 @@ STL exports, STEP interchange, and 3MF multi-part bundles available in [`cad/cha
 └──────────────────┘                └──────────────────┘
 
 ┌──────────────────┐                ┌──────────────────┐
-│ 20000mAh Banks   │ ─────────────► │ ESP32 Nodes ×6   │
+│ 20000mAh Banks   │ ─────────────► │ ESP32 Nodes ×5   │
 │ ×3 (USB-C PD)    │   5V/3A each   │ + Sensors        │
 └──────────────────┘                └──────────────────┘
 ```
