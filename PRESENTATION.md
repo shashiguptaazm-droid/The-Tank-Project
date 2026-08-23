@@ -306,3 +306,22 @@ The Tank is a **human-collaborative** robot:
 Trackers: [`docs/HUMAN_COORDINATION_PLAN.md`](docs/HUMAN_COORDINATION_PLAN.md) ·
 [`docs/TANK_ORIGINALITY_PLAN.md`](docs/TANK_ORIGINALITY_PLAN.md) ·
 Screenshots `62–64` in [`docs/screenshots/gui/`](docs/screenshots/gui/).
+
+## 7¾¾¾¾. 🧠 Proper AI Tool-Calling — the tool-using robot executive
+
+The AI never touches hardware directly. Every call passes a typed, permissioned
+pipeline: `AI → Tool Selection → Validator → Permission + Safety → Executor →
+UNO Q/Jetson/ESP32/STM32 → Result → AI`.
+
+- **Risk tiers** — read-only auto-runs · low auto-executes · controlled validates
+  (battery, motors, E-stop, obstacles) · high needs explicit approval
+  (`system.reboot → [APPROVE] [CANCEL]`) · emergency is deterministic (never LLM-gated).
+- **Agent permission profiles** — Observer / Assistant / Navigator / Maintenance /
+  Admin; even Admin cannot bypass the safety controller.
+- **Sandbox** — `speed = 100` is rejected; the AI cannot invent values.
+- **AI Tool Composer** — the AI builds its own workflow ("prepare for patrol" →
+  6 tools → **PATROL READINESS: 94%**).
+- **Audit log** — every call: validation/safety/execution stages + latency.
+
+Tracker: [`docs/TANK_TOOL_CALLING_PLAN.md`](docs/TANK_TOOL_CALLING_PLAN.md) ·
+Screenshot `65_ai_tool_graph` in [`docs/screenshots/gui/`](docs/screenshots/gui/).

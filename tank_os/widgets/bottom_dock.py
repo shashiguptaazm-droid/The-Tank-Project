@@ -121,6 +121,8 @@ class BottomDock(QFrame):
         ("👤", "Human", "human"),
         ("🌟", "Const", "constitution"),
         ("🧠", "Know Map", "knowledge-map"),
+        # Tool-calling architecture
+        ("🔧", "Tools", "tool-graph"),
     ]
 
     def __init__(self, parent: Optional[QWidget] = None) -> None:

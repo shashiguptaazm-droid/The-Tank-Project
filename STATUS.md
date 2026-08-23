@@ -144,4 +144,27 @@ Trackers: [`docs/HUMAN_COORDINATION_PLAN.md`](docs/HUMAN_COORDINATION_PLAN.md) �
   ask-the-human, 5 constitution veto classes, debate, command chain; verified on VPS).
 - Screenshots `62–64` + contact sheet (26 screens) in `docs/screenshots/gui/`.
 
+
+
+---
+
+## 15. 🧠 Proper AI Tool-Calling Architecture (20-part plan) ✅
+
+Tracker: [`docs/TANK_TOOL_CALLING_PLAN.md`](docs/TANK_TOOL_CALLING_PLAN.md)
+
+**The fundamental rule (enforced):** `Human → AI → Tool Validator → Permission +
+Safety → Tool Executor → UNO Q/Jetson/ESP32/STM32 → Result → AI`. Never
+`LLM → arbitrary shell command → motor`.
+
+**Shipped this pass:**
+
+| Piece | What it delivers |
+|---|---|
+| `tank_os/core/tool_engine.py` | Typed, permissioned pipeline: `ToolSpec` registry (risk tiers read-only/low/controlled/high/emergency), agent roles (Observer/Assistant/Navigator/Maintenance/Admin), schema + **sandbox validator** (`max_speed_mps ≤ 0.5`, `distance ≤ 5 m` — rejects invented values), safety interlocks, high-risk `NEEDS_APPROVAL` gate, deterministic emergency path, standardized `ToolResult`, failure recovery (`OBSTACLE_DETECTED → replan`), audit log, tool chaining, discovery/capabilities, ownership map (vision→Jetson, robot→UNO Q, sensor→ESP32, motor→STM32), and the **AI Tool Composer** |
+| `tank_os/windows/tool_graph_screen.py` | Live tool graph — USER REQUEST → AI → tool nodes ✓ + audit log + composer readiness demo ("PATROL READINESS: 94%") |
+| Binding | Adopts the existing `agent_framework.ToolRegistry` (1,966 script tools discovered) |
+
+- **363 tests passing** (18 new tool-engine tests; verified on VPS).
+- Screenshot `65_ai_tool_graph` + 27-screen contact sheet in `docs/screenshots/gui/`.
+
 4. **Report finalization** — Update DOCX with final specs

@@ -140,6 +140,7 @@ _DistributedAIScreen = None
 _HumanControlScreen = None
 _ConstitutionScreen = None
 _KnowledgeMapScreen = None
+_ToolGraphScreen = None
 
 
 def _try_load_qt() -> None:
@@ -159,7 +160,7 @@ def _try_load_qt() -> None:
     global _AnalyticsScreen, _TvLauncherScreen
     global _AiCommandCenterScreen, _AiSafetyCenterScreen, _JudgeScreen
     global _DistributedAIScreen, _HumanControlScreen, _ConstitutionScreen
-    global _KnowledgeMapScreen
+    global _KnowledgeMapScreen, _ToolGraphScreen
 
     if not _USE_QT:
         return
@@ -225,6 +226,7 @@ def _try_load_qt() -> None:
     from tank_os.windows.human_control_center import HumanControlCenterScreen as _hcc
     from tank_os.windows.constitution_screen import ConstitutionScreen as _cst
     from tank_os.windows.knowledge_map_screen import KnowledgeMapScreen as _kms
+    from tank_os.windows.tool_graph_screen import ToolGraphScreen as _tgs
 
     _TopBar, _BottomDock, _NotificationsOverlay, _Dashboard = _tb, _bd, _no, _db
     _HomeScreen, _ChatScreen, _CameraScreen = _hs, _cs, _cms
@@ -244,7 +246,7 @@ def _try_load_qt() -> None:
     _AiCommandCenterScreen, _AiSafetyCenterScreen = _acc, _asc
     _JudgeScreen, _DistributedAIScreen = _jgs, _das
     _HumanControlScreen, _ConstitutionScreen = _hcc, _cst
-    _KnowledgeMapScreen = _kms
+    _KnowledgeMapScreen, _ToolGraphScreen = _kms, _tgs
 
     # Build TankShellMainWindow class (depends on Qt symbols)
     _TankShellMainWindow = _build_main_window_class()
@@ -296,6 +298,7 @@ def _build_main_window_class():
         "human": _HumanControlScreen,           # 👤 Human Control Center
         "constitution": _ConstitutionScreen,    # 🌟 Robot Constitution + AI Debate
         "knowledge-map": _KnowledgeMapScreen,   # 🧠 Robot Knowledge Map
+        "tool-graph": _ToolGraphScreen,         # 🧠 AI Tool Graph
     }
 
     class TankShellMainWindow(QMainWindow):

@@ -277,3 +277,11 @@ Captured in `scripts/provision_pi5.sh`:
 - **3 new screens**: 👤 Human Control Center (62) · 🌟 Constitution + AI Debate (63) ·
   🧠 Robot Knowledge Map (64).
 - Trackers: `docs/HUMAN_COORDINATION_PLAN.md` · `docs/TANK_ORIGINALITY_PLAN.md`.
+
+## Phase 18 — Proper AI Tool-Calling Architecture ✅
+
+- **ToolEngine** (`core/tool_engine.py`) — typed, permissioned tool pipeline:
+  risk tiers, agent roles, sandbox validator, safety interlocks, approval gate,
+  audit log, chaining, recovery, ownership map, AI Tool Composer.
+- **AI Tool Graph** (`windows/tool_graph_screen.py`) — live tool-call visualization.
+- Tracker: `docs/TANK_TOOL_CALLING_PLAN.md` · Screenshot `65`.

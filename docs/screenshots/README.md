@@ -96,3 +96,5 @@ chromium --headless --no-sandbox --screenshot=X.png --timeout=30000 URL
 | 62 | `62_human_control_center.png` | 👤 Human Control Center — person card, modes, control authority, AI request, ask-the-human |
 | 63 | `63_constitution_debate.png` | 🌟 Robot Constitution + AI Debate — 8 articles, debate votes, command chain |
 | 64 | `64_robot_knowledge_map.png` | 🧠 Robot Knowledge Map — environment + knowledge confidence + health |
+
+| 65 | `65_ai_tool_graph.png` | 🧠 AI Tool Graph — typed tool-calling flow, composer readiness, audit log |
