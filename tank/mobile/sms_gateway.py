@@ -1,183 +1,209 @@
 """
-sms_gateway.py - SMS Messaging via Quectel LTE Modem
-Send/receive SMS through the AT command interface on /dev/ttyUSB2
+sms_gateway.py - SMS Messaging via mmcli (ModemManager)
+Send/receive SMS through the ModemManager D-Bus interface.
+Falls back to AT commands if ModemManager is not running.
 """
-import serial
+import subprocess
 import time
 import threading
 import queue
 import logging
+import glob
+import os
 from datetime import datetime
 
 logger = logging.getLogger("tank.sms")
 
 MODEM_PORT = "/dev/ttyUSB2"
 BAUD = 115200
+SUDO_PASS = "1234"
 
 
 class SMSGateway:
-    """Two-way SMS gateway over Quectel EG800AK AT commands"""
+    """Two-way SMS gateway via ModemManager or AT commands"""
 
     def __init__(self, port=MODEM_PORT, baud=BAUD):
         self.port = port
         self.baud = baud
-        self.modem = None
-        self.running = False
+        self.connected = False
+        self.use_mmcli = True
         self.incoming_queue = queue.Queue()
         self._callbacks = []
-        self._reader_thread = None
+        self._modem_id = None
 
     def connect(self):
+        """Detect connection method"""
+        # Try mmcli first
         try:
+            r = subprocess.run(
+                ["mmcli", "-m", "0"],
+                capture_output=True, text=True, timeout=5,
+            )
+            if r.returncode == 0 and "EG800" in r.stdout:
+                self.use_mmcli = True
+                self.connected = True
+                self._modem_id = "0"
+                logger.info("SMS Gateway: Using mmcli (ModemManager)")
+                return True
+        except:
+            pass
+
+        # Fallback to AT commands
+        try:
+            import serial
             self.modem = serial.Serial(self.port, self.baud, timeout=3)
-            time.sleep(0.5)
+            time.sleep(0.3)
             self.modem.read(self.modem.in_waiting)
+            self.modem.write(b"AT\r\n")
+            time.sleep(0.5)
+            resp = self.modem.read(self.modem.in_waiting).decode("utf-8", errors="replace")
+            if "OK" in resp:
+                self.use_mmcli = False
+                self.connected = True
+                logger.info("SMS Gateway: Using AT commands")
+                return True
+            self.modem.close()
+        except:
+            pass
 
-            # Init sequence
-            for cmd in ["AT", "ATE0", "AT+CMGF=1", "AT+CNMI=2,2,0,0,0", "AT+CMEE=2"]:
-                self._send(cmd)
-                time.sleep(0.3)
-
-            logger.info(f"SMS Gateway connected on {self.port}")
-            return True
-        except Exception as e:
-            logger.error(f"Modem connection failed: {e}")
-            return False
-
-    def _send(self, cmd, timeout=3):
-        if not self.modem:
-            return ""
-        self.modem.read(self.modem.in_waiting)
-        self.modem.write((cmd + "\r\n").encode())
-        time.sleep(0.3)
-        resp = b""
-        deadline = time.time() + timeout
-        while time.time() < deadline:
-            chunk = self.modem.read(1024)
-            if chunk:
-                resp += chunk
-            else:
-                break
-        return resp.decode("utf-8", errors="replace").strip()
+        logger.error("SMS Gateway: No connection method available")
+        return False
 
     def send_sms(self, phone_number, message):
         """Send an SMS message"""
         if not phone_number.startswith("+"):
             phone_number = "+91" + phone_number
 
-        # Set text mode
-        self._send("AT+CMGF=1")
-        time.sleep(0.2)
+        if self.use_mmcli:
+            return self._send_mmcli(phone_number, message)
+        else:
+            return self._send_at(phone_number, message)
 
-        # Send SMS
-        self.modem.write(f'AT+CMGS="{phone_number}"\r\n'.encode())
-        time.sleep(0.5)
-        self.modem.write(message.encode() + b"\x1a")  # Ctrl+Z to send
-        time.sleep(3)
+    def _send_mmcli(self, phone, message):
+        """Send SMS via mmcli"""
+        try:
+            # URL encode the message for shell
+            safe_msg = message.replace("'", "'\\''")
 
-        resp = self._send("")
-        success = "OK" in resp or "CMGS" in resp
-        logger.info(f"SMS to {phone_number}: {'OK' if success else 'FAILED'}")
-        return success, resp
+            # Create SMS
+            r = subprocess.run(
+                ["bash", "-c",
+                 f"echo '{SUDO_PASS}' | sudo -S mmcli -m 0 "
+                 f"--messaging-create-sms='number={phone},text={safe_msg}'"],
+                capture_output=True, text=True, timeout=10,
+            )
+
+            if r.returncode != 0:
+                logger.error(f"SMS create failed: {r.stderr}")
+                return False, r.stderr
+
+            # Extract SMS path
+            for line in r.stdout.split("\n"):
+                if "created sms:" in line:
+                    sms_path = line.split("created sms:")[1].strip()
+                    sms_id = sms_path.split("/")[-1]
+
+                    # Send SMS
+                    r2 = subprocess.run(
+                        ["bash", "-c",
+                         f"echo '{SUDO_PASS}' | sudo -S mmcli -s {sms_id} --send"],
+                        capture_output=True, text=True, timeout=15,
+                    )
+
+                    if "successfully sent" in r2.stdout:
+                        logger.info(f"SMS sent to {phone}")
+                        return True, "Sent"
+                    else:
+                        logger.error(f"SMS send failed: {r2.stdout} {r2.stderr}")
+                        return False, r2.stdout + r2.stderr
+
+            return False, "No SMS path found"
+        except Exception as e:
+            logger.error(f"mmcli send error: {e}")
+            return False, str(e)
+
+    def _send_at(self, phone, message):
+        """Send SMS via AT commands"""
+        try:
+            import serial
+            if not hasattr(self, 'modem') or not self.modem.is_open:
+                self.modem = serial.Serial(self.port, self.baud, timeout=5)
+                time.sleep(0.3)
+            self.modem.read(self.modem.in_waiting)
+            self.modem.write(b"AT+CMGF=1\r\n")
+            time.sleep(0.5)
+            self.modem.read(self.modem.in_waiting)
+            self.modem.write(f'AT+CMGS="{phone}"\r\n'.encode())
+            time.sleep(3)
+            prompt = self.modem.read(self.modem.in_waiting)
+            if b">" in prompt:
+                self.modem.write(message.encode() + b"\x1a")
+                time.sleep(8)
+                resp = self.modem.read(self.modem.in_waiting).decode("utf-8", errors="replace")
+                return "CMGS" in resp or "OK" in resp, resp
+            return False, "No > prompt"
+        except Exception as e:
+            return False, str(e)
 
     def get_signal_quality(self):
         """Get current signal quality"""
-        resp = self._send("AT+CSQ")
-        for line in resp.split("\n"):
-            if "+CSQ" in line:
-                try:
-                    parts = line.split(":")[1].strip().split(",")
-                    rssi = int(parts[0])
-                    # Convert to dBm: rssi * 2 - 113
-                    dbm = rssi * 2 - 113 if rssi > 0 else -113
-                    return {"rssi": rssi, "dbm": dbm, "quality": f"{rssi}/31"}
-                except:
-                    pass
-        return {"rssi": 0, "dbm": -113, "quality": "unknown"}
+        try:
+            r = subprocess.run(
+                ["mmcli", "-m", "0", "--signal"],
+                capture_output=True, text=True, timeout=5,
+            )
+            for line in r.stdout.split("\n"):
+                if "quality:" in line:
+                    q = int(line.split(":")[1].strip().replace("%", ""))
+                    return {"rssi": q, "quality": f"{q}%"}
+        except:
+            pass
+        return {"rssi": 0, "quality": "unknown"}
 
     def get_network_info(self):
         """Get network operator info"""
-        resp = self._send("AT+COPS?")
-        info = {"operator": "unknown", "technology": "unknown"}
-        for line in resp.split("\n"):
-            if "+COPS" in line:
-                try:
-                    parts = line.split(":")[1].strip().split(",")
-                    info["operator"] = parts[2].strip('"')
-                    tech_map = {"7": "LTE", "2": "2G", "3": "3G"}
-                    info["technology"] = tech_map.get(parts[3].strip(), "unknown")
-                except:
-                    pass
-        return info
+        try:
+            r = subprocess.run(
+                ["mmcli", "-m", "0"],
+                capture_output=True, text=True, timeout=5,
+            )
+            info = {"operator": "unknown", "technology": "unknown"}
+            for line in r.stdout.split("\n"):
+                if "operator" in line.lower():
+                    info["operator"] = line.split(":")[-1].strip()
+                if "lte" in line.lower():
+                    info["technology"] = "LTE"
+            return info
+        except:
+            return {"operator": "unknown", "technology": "unknown"}
 
     def get_battery_status(self):
         """Get battery level"""
-        resp = self._send("AT+CBC")
-        for line in resp.split("\n"):
-            if "+CBC" in line:
-                try:
-                    parts = line.split(":")[1].strip().split(",")
-                    return {"level": int(parts[0]), "mv": int(parts[1])}
-                except:
-                    pass
+        try:
+            r = subprocess.run(
+                ["mmcli", "-m", "0"],
+                capture_output=True, text=True, timeout=5,
+            )
+            for line in r.stdout.split("\n"):
+                if "battery" in line.lower():
+                    parts = line.split(":")
+                    if len(parts) > 1:
+                        pct = parts[1].strip().replace("%", "")
+                        try:
+                            return {"level": int(pct), "mv": int(pct) * 42}
+                        except:
+                            pass
+        except:
+            pass
         return {"level": -1, "mv": 0}
 
     def on_message(self, callback):
-        """Register callback for incoming SMS"""
         self._callbacks.append(callback)
 
-    def start_listening(self):
-        """Start background thread to listen for incoming SMS"""
-        self.running = True
-
-        def _listen():
-            logger.info("SMS listener started")
-            while self.running:
-                try:
-                    if self.modem and self.modem.in_waiting:
-                        data = self.modem.read(self.modem.in_waiting).decode(
-                            "utf-8", errors="replace"
-                        )
-                        # Parse incoming SMS: +CMT: "+91...","...",,"26/08/23,07:30:00+22"\nMessage body
-                        if "+CMT:" in data:
-                            lines = data.split("\n")
-                            for i, line in enumerate(lines):
-                                if "+CMT:" in line:
-                                    try:
-                                        phone = line.split('"')[1]
-                                        body = lines[i + 1].strip() if i + 1 < len(lines) else ""
-                                        msg = {
-                                            "phone": phone,
-                                            "message": body,
-                                            "timestamp": datetime.now().isoformat(),
-                                        }
-                                        self.incoming_queue.put(msg)
-                                        for cb in self._callbacks:
-                                            cb(msg)
-                                        logger.info(f"Incoming SMS from {phone}: {body[:50]}")
-                                    except Exception as e:
-                                        logger.error(f"Parse error: {e}")
-                    time.sleep(0.5)
-                except Exception as e:
-                    if self.running:
-                        logger.error(f"Listener error: {e}")
-                    time.sleep(1)
-
-        self._reader_thread = threading.Thread(target=_listen, daemon=True)
-        self._reader_thread.start()
-
-    def stop(self):
-        self.running = False
-        if self.modem:
-            try:
-                self.modem.close()
-            except:
-                pass
-
     def get_status(self):
-        """Full modem status"""
         return {
-            "connected": self.modem is not None and self.modem.is_open,
+            "connected": self.connected,
+            "method": "mmcli" if self.use_mmcli else "AT",
             "signal": self.get_signal_quality(),
             "network": self.get_network_info(),
             "battery": self.get_battery_status(),
@@ -188,5 +214,6 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     gw = SMSGateway()
     if gw.connect():
-        print("Modem status:", gw.get_status())
-    gw.stop()
+        print("Status:", gw.get_status())
+        ok, resp = gw.send_sms("+917860245819", "TankOS SMS test")
+        print(f"Send: {ok} {resp}")
