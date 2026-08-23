@@ -1,0 +1,65 @@
+esphome:
+  name: tank-esp32cam
+  friendly_name: "Tank ESP32-S3 CAM"
+
+esp32:
+  board: esp32-cam
+  variant: esp32s3
+  framework:
+    type: esp-idf
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+logger:
+
+api:
+  encryption:
+    key: "NytaDrawrmOKgwt7pq2GJhVocjp4AAtpAczOba6OdHQ="
+
+ota:
+  - platform: esphome
+    password: "tank2026"
+
+wifi:
+  ssid: "AirFiber-X9nxU1"
+  fast_connect: true
+
+web_server:
+  port: 80
+
+esp32_camera:
+  id: tank_camera
+  name: "Tank Camera"
+
+  # DFRobot ESP32-S3 AI Camera v1.1 — 8 data pins (Y2–Y9)
+  data_pins: [GPIO16, GPIO18, GPIO21, GPIO17, GPIO14, GPIO7, GPIO6, GPIO4]
+  vsync_pin: GPIO1
+  href_pin: GPIO2
+  pixel_clock_pin: GPIO15
+
+  i2c_pins:
+    sda: GPIO8
+    scl: GPIO9
+
+  external_clock:
+    pin: GPIO5
+    frequency: 20MHz
+
+  resolution: 640X480
+  jpeg_quality: 12
+  max_framerate: 15fps
+
+switch:
+  - platform: gpio
+    pin: GPIO47
+    name: "Tank Camera Flash"
+
+sensor:
+  - platform: wifi_signal
+    name: "ESP32-S3 CAM WiFi Signal"
+    update_interval: 30s
+
+  - platform: uptime
+    name: "ESP32-S3 CAM Uptime"

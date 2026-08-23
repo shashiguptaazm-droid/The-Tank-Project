@@ -786,40 +786,13 @@ class TankShell:
 
     def _run_simulation_loop(self) -> None:
         """Interactive CLI loop for dev/CI — demonstrates all screens."""
-        print("\n" + "=" * 56)
-        print("  ╔══════════════════════════════════════╗")
-        print("  ║       🤖  TankOS Shell v1.0.0       ║")
-        print("  ║    Graphical AI Operating Environment ║")
-        print("  ╚══════════════════════════════════════╝")
-        print("=" * 56)
-        print()
-        print("  🖥 Available Screens:")
-        print("     home       — Command Center Dashboard")
-        print("     chat       — AI Assistant Chat")
-        print("     camera     — Live Camera & Vision")
-        print("     nav        — Navigation & SLAM Map")
-        print("     memory     — Memory Explorer")
-        print("     security   — Security & Surveillance")
-        print("     patrol     — Patrol & Missions")
-        print("     diag       — System Diagnostics")
-        print("     settings   — System Settings")
-        print("     dev        — Developer Tools")
-        print("     ai         — AI Engine Dashboard")
-        print("     power      — Power & Battery Management")
-        print("     updates    — Software Updates")
-        print("     files      — Files & Storage")
-        print("     usb        — USB Devices")
-        print()
-        print("  💻 Commands: terminal — drop into the AI terminal REPL")
-        print("  🌊 Commands: torrent <query> — search torrents → pick → download")
-        print("  🧠 AI Engines: curiosity, knowledge, learning (enable: TANKOS_FULL=1)")
-        print("  📦 Tools: tools, tool <name> (list ~1,166 Agent Framework tools)")
-        print("  🔍 Commands: search <q>, find <q> — search everywhere (torrent, web, GitHub, YouTube)")
-        print("  🔮 Commands: discover <topic> — search + learn from GitHub in one step")
-        print("  🧠 Commands: learn <topic> — AI learns scripts/tools from GitHub READMEs")
-        print("  🧬 Commands: evolve — daily self-evolution cycle")
-        print("  🔧 Commands: apply — install discovered tools from learned knowledge")
-        print("  📋 Commands: status, preload (deps), help, quit")
+        # Launch directly into agent chat mode
+        try:
+            from tank_os.shell.terminal.agent_chat import AgentChat
+            AgentChat().run()
+        except (KeyboardInterrupt, EOFError):
+            print("\n  Goodbye!")
+        return
 
         try:
             import cmd as _cmd
@@ -846,14 +819,14 @@ class TankShell:
                 self._last_screen = name
 
             def do_terminal(self, _arg):
-                """Drop into the AI-powered terminal REPL (type `exit` to
-                return to the TankOS shell)."""
-                print("  🤖 Dropping into AI Terminal — type `exit` to return.\n")
+                """Drop into AI chat — talk naturally, tools auto-selected."""
                 try:
-                    from tank_os.shell.terminal.cli import TerminalREPL
-                    TerminalREPL().cmdloop()
+                    from tank_os.shell.terminal.agent_chat import AgentChat
+                    AgentChat().run()
                 except (KeyboardInterrupt, EOFError):
                     print("\n  ↩ returning to TankOS shell.")
+
+            do_agent = do_terminal  # alias
 
             def do_home(self, _):
                 self._show_screen("home", "🏠", "Command Center Dashboard")

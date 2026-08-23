@@ -27,9 +27,11 @@ from typing import Any, Dict, List, Optional, Tuple
 
 PREFIX = "[torrent-search]"
 
-ARIA2_RPC = os.environ.get("ARIA2_RPC", "http://127.0.0.1:6800/jsonrpc")
+ARIA2_RPC = os.environ.get("ARIA2_RPC", "http://100.71.127.19:6800/jsonrpc")
 ARIA2_SECRET = os.environ.get("ARIA2_SECRET", "")
 WORKER_PATH = "/opt/edulabs-torrent-cloud/torrent-search-worker.cjs"
+# If worker not found locally, try VPS via SSH or HTTP fallback
+VPS_TORRENT_SEARCH = "http://100.71.127.19:9100"
 DEFAULT_PROVIDERS = ["ThePirateBay", "Limetorrents", "TorrentProject", "Eztv"]
 VALID_CATEGORIES = ["All", "Movies", "TV", "Games", "Music", "Applications", "Anime", "Books"]
 
@@ -62,28 +64,45 @@ def _bytes_fmt(n: int | str) -> str:
 
 
 def search_provider(provider: str, query: str, category: str = "All", limit: int = 12) -> List[Dict[str, Any]]:
-    """Search a single torrent provider via the Node.js worker."""
-    if not os.path.exists(WORKER_PATH):
-        _err(f"Worker not found: {WORKER_PATH}")
-        return []
+    """Search a single torrent provider via the Node.js worker or web fallback."""
+    # Try local worker first
+    if os.path.exists(WORKER_PATH):
+        try:
+            result = subprocess.run(
+                ["node", WORKER_PATH, "search", provider, query, category, str(limit)],
+                capture_output=True,
+                text=True,
+                timeout=15,
+            )
+            if result.returncode == 0:
+                data = json.loads(result.stdout or "[]")
+                if isinstance(data, list) and data:
+                    return data
+        except Exception:
+            pass
 
+    # Fallback: web search for torrents
     try:
-        result = subprocess.run(
-            ["node", WORKER_PATH, "search", provider, query, category, str(limit)],
-            capture_output=True,
-            text=True,
-            timeout=15,
-        )
-        if result.returncode != 0:
-            return []
-        data = json.loads(result.stdout or "[]")
-        if not isinstance(data, list):
-            return []
-        return data
-    except subprocess.TimeoutExpired:
-        return []
-    except json.JSONDecodeError:
-        return []
+        import urllib.parse
+        encoded = urllib.parse.quote(f"{query} torrent {provider}")
+        url = f"https://api.duckduckgo.com/?q={encoded}&format=json&no_html=1"
+        req = urllib.request.Request(url, headers={"User-Agent": "TankOS/1.0"})
+        resp = urllib.request.urlopen(req, timeout=10)
+        data = json.loads(resp.read())
+        results = []
+        for topic in data.get("RelatedTopics", [])[:limit]:
+            if "Text" in topic and "FirstURL" in topic:
+                results.append({
+                    "title": topic["Text"][:120],
+                    "link": topic["FirstURL"],
+                    "magnet": "",
+                    "seeds": 0,
+                    "peers": 0,
+                    "size": "?",
+                    "provider": f"DDG-{provider}",
+                    "_provider": f"DDG-{provider}",
+                })
+        return results
     except Exception:
         return []
 

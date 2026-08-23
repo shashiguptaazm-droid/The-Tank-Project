@@ -24,6 +24,21 @@ ai:
   confidence_threshold: 0.5
   local_model: "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
 
+# 3rd Perception Node — ESP32-S3 CAM on UNO Q
+unoq_detection:
+  esp32cam_host: "192.168.31.145"
+  esp32cam_port_capture: 80
+  esp32cam_port_stream: 81
+  model: "yolov8n.pt"
+  confidence: 0.5
+  device: "cpu"  # UNO Q ARM64, no GPU
+  report_interval_s: 5.0
+  jetson_api: "http://100.122.31.46:8085"
+  vps_api: "http://100.71.127.19:8888"
+  tailscale_ip: "100.84.235.7"
+  lte_fallback: true
+  lte_modem: "Quectel EG800AK"
+
 control:
   motor_pwm_freq: 1000
   max_speed: 1.0

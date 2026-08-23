@@ -44,6 +44,7 @@ tank_ws/src/tank_bringup/urdf/tank.urdf
 
 # Secrets — never commit
 .env
+.env.keys
 config/secrets.yaml
 config/*.local.yaml
 
@@ -66,6 +67,7 @@ models/
 *.safetensors
 *.tflite
 *.engine
+*.caffemodel
 
 # Model caches
 .cache/
@@ -74,3 +76,7 @@ models/
 .cache/whisper/
 firmware/dfrobot_camera/*.bin
 firmware/dfrobot_camera/temp_repo/
+
+# Runtime data (not source)
+data/frames/
+data/faces/*.caffemodel
