@@ -63,3 +63,71 @@ python3 -m esptool --port /dev/ttyACM0 --baud 460800 write_flash \
   0x10000 USBVideoCamera.ino.bin
 ```
 
+
+---
+
+## 📱 Mobile Command Center (v2.0)
+
+### Architecture
+
+
+### Mobile Access Methods
+| Method | URL/Contact | Features |
+|--------|-------------|----------|
+| 🌐 PWA Dashboard | http://100.71.127.19:8891 | Full control, 8 tabs |
+| 📱 Telegram Bot | @tankos_bot | Alerts, commands, photos |
+| 💬 SMS Gateway | Send SMS to SIM card | Remote commands |
+| 🤖 AI Chat | Via any method above | Natural language commands |
+
+### PWA Dashboard Tabs
+1. 🏠 Dashboard — System status, quick actions, alerts
+2. 📷 Camera — USB video feed, capture, stream, save
+3. 🎮 Drive — Joystick, D-pad, servo controls, speed slider
+4. 📡 Sensors — IMU, distance, temp, light, sound, voltage
+5. 🧠 AI Chat — Natural language conversation with TankOS
+6. 🔔 Alerts — Real-time alert feed
+7. 💬 SMS — Send/receive SMS, broadcast alerts
+8. 🗺️ LiDAR — Radar view of environment
+
+### SMS Commands
+| Command | Description |
+|---------|-------------|
+| STATUS | Full robot status |
+| HELP | List all commands |
+| CAMERA | Capture photo |
+| MOVE F/B/L/R | Move direction |
+| STOP | Emergency stop |
+| WHERE | Current position |
+| BATTERY | Power status |
+| SCAN | LiDAR scan |
+| AI <msg> | Chat with AI |
+| Any text | AI processes it |
+
+### AI Powers
+- Local LLM (Phi-3 or TinyLlama) for offline response
+- Cloud AI fallback (OpenRouter, Groq, etc.)
+- Automatic threat detection and alerts
+- Natural language command processing
+- Camera-based object detection
+- Smart response formatting for SMS (160 chars)
+
+### Running Services
+| Service | Port | Status |
+|---------|------|--------|
+| Tank Mobile API | 8090 | Running (Jetson) |
+| nginx proxy | 8891 | Running (VPS) |
+| SMS Gateway | /dev/ttyUSB2 | Active |
+| Telegram Bot | API | Active (with token) |
+| WebSocket | /ws | Real-time |
+
+### Install Telegram Bot
+1. Message @BotFather on Telegram
+2. Create new bot: /newbot → TankOS
+3. Get token
+4. Set env: export TANK_TELEGRAM_TOKEN=your_token
+5. Get chat ID: message bot, then visit https://api.telegram.org/bot<TOKEN>/getUpdates
+
+### Open on Phone
+http://100.71.127.19:8891
+Add to Home Screen for PWA install
+
