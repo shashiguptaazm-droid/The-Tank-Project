@@ -29,7 +29,7 @@ static const CamPins CONFIGS[] = {
   {5, 15, 1, 2,  8, 9,   16,18,21,17,14,7,6,4,  -1,-1},
   // Config 1: Generic ESP32-S3 (GPIO4/5 I2C)  
   {15, 13, 6, 7,  4, 5,   14,47,13,21,48,11,12,16,  -1,-1},
-  // Config 2: AI-Thinker ESP32-S3 style
+  // Config 2: AI-Thinker / DevKitC-1 style (GPIO40/39 I2C — common for OV5640 boards)
   {10, 13, 38, 47, 40, 39,  12,11,15,16,17,18,14,48, -1,-1},
 };
 
@@ -51,10 +51,10 @@ void setup_camera(int idx) {
   cfg.pin_pwdn = p.pwdn;     cfg.pin_reset = p.reset;
   cfg.xclk_freq_hz = 20000000;
   cfg.pixel_format = PIXFORMAT_JPEG;
-  cfg.frame_size = FRAMESIZE_QVGA;   // 320x240
-  cfg.jpeg_quality = 12;
-  cfg.fb_count = 2;                   // need 2 buffers for GRAB_WHEN_EMPTY
-  cfg.fb_location = CAMERA_FB_IN_DRAM;   // try DRAM if PSRAM not available
+  cfg.frame_size = FRAMESIZE_VGA;    // 640x480 — plenty of PSRAM (8MB)
+  cfg.jpeg_quality = 10;             // 0-63, 10 = good quality
+  cfg.fb_count = 2;
+  cfg.fb_location = CAMERA_FB_IN_PSRAM;  // N16R8 has 8MB octal PSRAM
   cfg.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
 
   esp_camera_deinit();
@@ -62,9 +62,11 @@ void setup_camera(int idx) {
   if (err == ESP_OK) {
     found_config = idx;
     sensor_t *s = esp_camera_sensor_get();
-    Serial.printf("OK: Camera ready (%s, %dx%d, pins=%d, psram=%d)\n",
-      s->id.PID == OV2640_PID ? "OV2640" : 
-      s->id.PID == OV3660_PID ? "OV3660" : "unknown",
+    Serial.printf("OK: Camera ready (%s %dMP, %dx%d, pins=%d, psram=%d)\n",
+      s->id.PID == OV5640_PID ? "OV5640" : 
+      s->id.PID == OV3660_PID ? "OV3660" :
+      s->id.PID == OV2640_PID ? "OV2640" : "unknown",
+      s->id.PID == OV5640_PID ? 5 : s->id.PID == OV3660_PID ? 3 : 2,
       resolution[s->status.framesize].width,
       resolution[s->status.framesize].height, idx,
       heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
@@ -120,8 +122,9 @@ void loop() {
     } else {
       sensor_t *s = esp_camera_sensor_get();
       Serial.printf("OK: %s %dx%d config=%d\n",
-        s->id.PID == OV2640_PID ? "OV2640" : 
-        s->id.PID == OV3660_PID ? "OV3660" : "?",
+        s->id.PID == OV5640_PID ? "OV5640" :
+        s->id.PID == OV3660_PID ? "OV3660" :
+        s->id.PID == OV2640_PID ? "OV2640" : "?",
         resolution[s->status.framesize].width,
         resolution[s->status.framesize].height, found_config);
     }
