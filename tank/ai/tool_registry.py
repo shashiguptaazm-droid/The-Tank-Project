@@ -601,3 +601,50 @@ def get_tools_for_local():
         params = json.dumps(f["parameters"], indent=2) if f["parameters"].get("properties") else "none"
         tools_desc.append(f"- {f['name']}: {f['description']}\n  Parameters: {params}")
     return "\n".join(tools_desc)
+
+
+class TankToolRegistry:
+    """Unified tool registry for LLM-callable robot functions.
+
+    Wraps the file-level TANK_TOOLS list and (when available) delegates
+    to the agent_framework ToolRegistry for script-discovered tools.
+    """
+
+    def __init__(self, scripts_dir=None):
+        self._tools = {t["function"]["name"]: t for t in TANK_TOOLS}
+        self._executor = ToolExecutor()
+        # Optionally bridge to the agent framework registry
+        self._agent_registry = None
+        if scripts_dir is not None:
+            try:
+                from tank_os.agent_framework.registry import ToolRegistry
+                self._agent_registry = ToolRegistry(scripts_dir=scripts_dir)
+            except Exception:
+                pass
+
+    def get(self, name: str) -> dict | None:
+        """Look up a tool by name."""
+        return self._tools.get(name)
+
+    def list_tools(self) -> list[str]:
+        """Return all registered tool names."""
+        return sorted(self._tools.keys())
+
+    def execute(self, tool_name: str, arguments: dict | None = None) -> dict:
+        """Execute a tool by name with optional arguments."""
+        return self._executor.execute(tool_name, arguments or {})
+
+    def get_tools_for_llm(self) -> list[dict]:
+        """Return tools in OpenAI function-calling format."""
+        return get_tools_for_llm()
+
+    def get_tools_for_local(self) -> str:
+        """Return tools in human-readable format for local models."""
+        return get_tools_for_local()
+
+    def __repr__(self) -> str:
+        n = len(self._tools)
+        return f"<TankToolRegistry {n} tools>"
+
+    def __len__(self) -> int:
+        return len(self._tools)
