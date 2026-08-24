@@ -37,6 +37,51 @@ Challenge 2026**. It combines:
 | 📡 **Senses** | LD19 360° LiDAR · BNO055 IMU · cameras · mic array | Perception stack |
 | 🌐 **Connectivity** | WiFi → 4G LTE (EG800AK) → Hotspot → Tailscale mesh | Never offline |
 
+### Complete System Overviews
+
+<p align="center">
+  <a href="images/overviews/Autonomous Robot System Architecture Overview.png">
+    <img src="images/overviews/Autonomous Robot System Architecture Overview.png" width="49%" alt="Autonomous Robot System Architecture">
+  </a>
+  <a href="images/overviews/Autonomous Robotics Architecture Overview.png">
+    <img src="images/overviews/Autonomous Robotics Architecture Overview.png" width="49%" alt="Autonomous Robotics Architecture">
+  </a>
+</p>
+
+<p align="center">
+  <a href="images/overviews/AI Autonomous Robotics Project Overview.png">
+    <img src="images/overviews/AI Autonomous Robotics Project Overview.png" width="100%" alt="AI Autonomous Robotics Project Overview">
+  </a>
+</p>
+
+> 📊 **Competition slide deck:** [NotebookLM Presentation](https://notebooklm.google.com/notebook/6ac7ab31-c422-475f-9a2a-075d689c2345/artifact/87b4614f-3cb0-4bb2-8844-22a303d7815c)
+
+### All 11 Slides (Individual Images)
+
+<p align="center">
+  <a href="images/slides/slide_01.png"><img src="images/slides/slide_01.png" width="18%" alt="Slide 1"></a>
+  <a href="images/slides/slide_02.png"><img src="images/slides/slide_02.png" width="18%" alt="Slide 2"></a>
+  <a href="images/slides/slide_03.png"><img src="images/slides/slide_03.png" width="18%" alt="Slide 3"></a>
+  <a href="images/slides/slide_04.png"><img src="images/slides/slide_04.png" width="18%" alt="Slide 4"></a>
+  <a href="images/slides/slide_05.png"><img src="images/slides/slide_05.png" width="18%" alt="Slide 5"></a>
+</p>
+
+<p align="center">
+  <a href="images/slides/slide_06.png"><img src="images/slides/slide_06.png" width="18%" alt="Slide 6"></a>
+  <a href="images/slides/slide_07.png"><img src="images/slides/slide_07.png" width="18%" alt="Slide 7"></a>
+  <a href="images/slides/slide_08.png"><img src="images/slides/slide_08.png" width="18%" alt="Slide 8"></a>
+  <a href="images/slides/slide_09.png"><img src="images/slides/slide_09.png" width="18%" alt="Slide 9"></a>
+  <a href="images/slides/slide_10.png"><img src="images/slides/slide_10.png" width="18%" alt="Slide 10"></a>
+</p>
+
+<p align="center">
+  <a href="images/slides/slide_11.png"><img src="images/slides/slide_11.png" width="18%" alt="Slide 11"></a>
+</p>
+
+<p align="center">
+  <a href="images/slides/tank_project_slides.pdf">📥 Download 11-slide PDF</a> · <a href="images/slides/">📂 Browse all slides</a>
+</p>
+
 ---
 
 ## 2. Hardware Inventory

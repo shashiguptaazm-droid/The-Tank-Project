@@ -41,7 +41,14 @@ impaired users**. A chest-mounted ESP32 camera captures surroundings; the UNO Q
 routes frames to the Jetson for YOLO + LLM + OCR analysis; spoken guidance is
 delivered through a shoulder-mounted speaker. [See below ↓](#-blind-assistance-external-module)
 
-**APC-2026-RJ-75818 · 146,000+ lines of Python · 427 tests · 55+ infographics · ₹67,850 (~$850)**
+**APC-2026-RJ-75818 · 146,000+ lines of Python · 427 tests · 58+ infographics · ₹67,850 (~$850)**
+
+<p align="center">
+  <a href="images/overviews/AI Autonomous Robotics Project Overview.png">
+    <img src="images/overviews/AI Autonomous Robotics Project Overview.png" width="100%" alt="AI Autonomous Robotics — complete project overview">
+  </a>
+  <br><sub>Complete project overview — AI pipeline, hardware, networking, and deployment architecture</sub>
+</p>
 
 ---
 
@@ -86,6 +93,20 @@ delivered through a shoulder-mounted speaker. [See below ↓](#-blind-assistance
 ---
 
 ## 🏗️ Architecture
+
+<p align="center">
+  <a href="images/overviews/Autonomous Robot System Architecture Overview.png">
+    <img src="images/overviews/Autonomous Robot System Architecture Overview.png" width="100%" alt="Autonomous Robot System Architecture — complete hardware, software, and network architecture">
+  </a>
+  <br><sub>Complete system architecture — hardware layers, software stack, AI pipeline, networking, and deployment</sub>
+</p>
+
+<p align="center">
+  <a href="images/overviews/Autonomous Robotics Architecture Overview.png">
+    <img src="images/overviews/Autonomous Robotics Architecture Overview.png" width="100%" alt="Autonomous Robotics Architecture — comprehensive component diagram">
+  </a>
+  <br><sub>Comprehensive autonomous robotics architecture — component diagram, data flow, and subsystem integration</sub>
+</p>
 
 <p align="center">
   <a href="assets/infographics/01_system_overview.svg">
@@ -245,14 +266,73 @@ Demo video uploaded August 2026.
 
 ---
 
-## 🧠 All 55+ Infographics
+## 📊 NotebookLM Competition Slide Deck
 
 <p align="center">
-  <sub>Every architecture diagram, pipeline, and comparison chart — all SVG, dark theme</sub>
+  <sub>11-slide presentation deck — each slide rendered as a standalone image below</sub>
+</p>
+
+<p align="center">
+  <a href="images/slides/slide_01.png">
+    <img src="images/slides/slide_01.png" width="18%" alt="Slide 1">
+  </a>
+  <a href="images/slides/slide_02.png">
+    <img src="images/slides/slide_02.png" width="18%" alt="Slide 2">
+  </a>
+  <a href="images/slides/slide_03.png">
+    <img src="images/slides/slide_03.png" width="18%" alt="Slide 3">
+  </a>
+  <a href="images/slides/slide_04.png">
+    <img src="images/slides/slide_04.png" width="18%" alt="Slide 4">
+  </a>
+  <a href="images/slides/slide_05.png">
+    <img src="images/slides/slide_05.png" width="18%" alt="Slide 5">
+  </a>
+</p>
+
+<p align="center">
+  <a href="images/slides/slide_06.png">
+    <img src="images/slides/slide_06.png" width="18%" alt="Slide 6">
+  </a>
+  <a href="images/slides/slide_07.png">
+    <img src="images/slides/slide_07.png" width="18%" alt="Slide 7">
+  </a>
+  <a href="images/slides/slide_08.png">
+    <img src="images/slides/slide_08.png" width="18%" alt="Slide 8">
+  </a>
+  <a href="images/slides/slide_09.png">
+    <img src="images/slides/slide_09.png" width="18%" alt="Slide 9">
+  </a>
+  <a href="images/slides/slide_10.png">
+    <img src="images/slides/slide_10.png" width="18%" alt="Slide 10">
+  </a>
+</p>
+
+<p align="center">
+  <a href="images/slides/slide_11.png">
+    <img src="images/slides/slide_11.png" width="18%" alt="Slide 11">
+  </a>
+</p>
+
+<p align="center">
+  <a href="images/slides/tank_project_slides.pdf">📥 Download full 11-slide PDF</a>
+  ·
+  <a href="https://notebooklm.google.com/notebook/6ac7ab31-c422-475f-9a2a-075d689c2345/artifact/87b4614f-3cb0-4bb2-8844-22a303d7815c">🌐 View on NotebookLM</a>
+  ·
+  <a href="images/slides/">📂 All 11 slide images</a>
+</p>
+
+---
+
+## 🧠 All Infographics & Diagrams
+
+<p align="center">
+  <sub>Every architecture diagram, pipeline, and comparison chart — all SVG, dark theme. Plus 3 comprehensive PNG overviews</sub>
 </p>
 
 | Row | Infographics |
 |-----|-------------|
+| **📊 Overviews** | [AI Autonomous Robotics Project Overview](images/overviews/AI%20Autonomous%20Robotics%20Project%20Overview.png) · [Autonomous Robot System Architecture](images/overviews/Autonomous%20Robot%20System%20Architecture%20Overview.png) · [Autonomous Robotics Architecture](images/overviews/Autonomous%20Robotics%20Architecture%20Overview.png) |
 | **System** | [Overview](assets/infographics/01_system_overview.svg) · [Hardware](assets/infographics/02_hardware_architecture.svg) · [GPU](assets/infographics/03_gpu_foundation.svg) · [Camera](assets/infographics/04_camera_intelligence.svg) |
 | **Vision** | [Detection](assets/infographics/05_object_detection.svg) · [Tracking](assets/infographics/06_object_tracking.svg) · [Semantic](assets/infographics/07_semantic_vision.svg) · [Depth](assets/infographics/08_depth_spatial.svg) |
 | **SLAM & Nav** | [SLAM](assets/infographics/09_slam_mapping.svg) · [Fusion](assets/infographics/10_sensor_fusion.svg) · [Navigation](assets/infographics/11_navigation_ai.svg) · [Predictive](assets/infographics/12_predictive_ai.svg) |
@@ -351,7 +431,8 @@ Observe → Find weaknesses → Generate improvement
 | Hardware components | **25+** |
 | ESP32 nodes | **6** |
 | ROS2 packages | **23** (Jazzy) |
-| SVG infographics | **55+** |
+| Infographics & diagrams | **58+** |
+| Slide deck images | **11** (NotebookLM) |
 | Documentation pages | **40+** |
 | Total BOM cost | **₹67,850 (~$850)** |
 | Registration | **APC-2026-RJ-75818** |
@@ -400,6 +481,7 @@ python3 -m tank.blind_assist.main --mode full
 | [`docs/COMPLETE_PROJECT.md`](docs/COMPLETE_PROJECT.md) | End-to-end project walkthrough |
 | [`docs/screenshots/`](docs/screenshots/) | 70+ live screenshots |
 | [`docs/infographics/`](assets/infographics/) | 55+ SVG architecture diagrams |
+| [`docs/overviews/`](images/overviews/) | 3 architecture overview diagrams (PNG) |
 | [`docs/hardware_photos/`](docs/hardware_photos/) | Individual component photos |
 
 ---
@@ -419,6 +501,6 @@ python3 -m tank.blind_assist.main --mode full
 
 **🏆 Arduino Physical AI Challenge 2026 · APC-2026-RJ-75818 · Dr. Shashi Gupta**
 
-[Report](https://github.com/shashiguptaazm-droid/The-Tank-Project) · [JUDGE.md](JUDGE.md) · [PRESENTATION.md](PRESENTATION.md) · [BLIND_ASSIST.md](docs/BLIND_ASSIST.md)
+[Report](https://github.com/shashiguptaazm-droid/The-Tank-Project) · [JUDGE.md](JUDGE.md) · [PRESENTATION.md](PRESENTATION.md) · [BLIND_ASSIST.md](docs/BLIND_ASSIST.md) · [NotebookLM Slide](https://notebooklm.google.com/notebook/6ac7ab31-c422-475f-9a2a-075d689c2345/artifact/87b4614f-3cb0-4bb2-8844-22a303d7815c)
 
 </div>
