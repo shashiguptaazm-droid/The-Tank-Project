@@ -12,13 +12,13 @@
 
 1. **Jetson Orin Nano Super** (67 TOPS, 8GB RAM) — AI brain
 2. **Arduino UNO Q 4GB** (QRB2210 + STM32U585) — real-time controller
-3. **ESP32-S3 ×3 + DFRobot AI Camera** — distributed peripherals
+3. **6× ESP32-S3 + DFRobot AI Camera** — distributed peripherals
 
 **The Tank also ships with a detachable external module — a blind-assistance wearable**
 that reconfigures the same UNO Q + Jetson + ESP32 hardware into a portable AI guide
 device for visually impaired users. See [docs/BLIND_ASSIST.md](docs/BLIND_ASSIST.md).
 
-**88,000+ lines of Python · 425+ tests · 70 screenshots · 23 ROS2 packages**
+**146,000+ lines of Python · 427 tests · 70+ screenshots · 23 ROS2 packages**
 
 ---
 
@@ -32,7 +32,7 @@ device for visually impaired users. See [docs/BLIND_ASSIST.md](docs/BLIND_ASSIST
 | **100 AI Providers** | Auto-discovers and selects the best AI model for each task |
 | **Robot Constitution** | 8-article policy engine — AI proposes, safety vetoes, humans decide |
 | **Controlled Evolution** | Benchmarks, ranks, and only deploys proven improvements |
-| **3 Perception Nodes** | DFRobot AI Camera + LiDAR + ESP32-S3 CAM (on UNO Q) |
+| **3 Perception Nodes** | DFRobot AI Camera + LiDAR + ESP32-S3 CAM |
 | **Never-Offline Connectivity** | WiFi → 4G LTE → Hotspot → Tailscale mesh |
 | **SMS Control** | Text message commands via Quectel LTE modem |
 | **Blind-Assistance Module** | Detachable wearable — AI vision → spoken guidance via UNO Q |
@@ -57,7 +57,7 @@ device for visually impaired users. See [docs/BLIND_ASSIST.md](docs/BLIND_ASSIST
 | IMU | BNO055 | 9-DOF orientation | 🔵 I²C ready |
 | Servo Driver | PCA9685 | 16-channel servo PWM | 🔵 I²C ready |
 
-**Total Cost: ₹64,050 (~$800 USD)**
+**Total Cost: ₹67,850 (~$850 USD)**
 
 ---
 
@@ -120,7 +120,7 @@ tank_task · tank_text · tank_vision
 - TankOS 327-module LLM-callable registry
 - Robot Constitution + AI Debate
 - 16-language i18n support
-- 425+ tests passing
+- 427 tests passing
 - 23 ROS2 packages built (Jazzy)
 
 ### ✅ Blind-Assistance Module (Demo Video Uploaded)
@@ -204,7 +204,7 @@ tank_task · tank_text · tank_vision
 
 | | The Tank | Unitree Go2 | Boston Dynamics Spot |
 |---|---------|-------------|---------------------|
-| Price | ₹64,050 ($800) | ₹2,35,000 ($2,800) | ₹62,50,000 ($74,500) |
+| Price | ₹67,850 (~$850) | ₹2,35,000 ($2,800) | ₹62,50,000 ($74,500) |
 | Savings | — | **72% cheaper** | **99.9% cheaper** |
 | AI Brain | 67 TOPS GPU | Limited CPU | Custom |
 | Battery | 2-3 hours | 40 minutes | 90 minutes |
@@ -228,7 +228,7 @@ tank_task · tank_text · tank_vision
 | [COMPARISON.md](COMPARISON.md) | TankOS vs competitors |
 | [docs/BLIND_ASSIST.md](docs/BLIND_ASSIST.md) | Blind-assistance wearable module |
 | [docs/screenshots/](docs/screenshots/) | 70+ live screenshots |
-| [docs/infographics/](docs/infographics/) | 51 SVG architecture diagrams |
+| [docs/infographics/](docs/infographics/) | 58+ SVG architecture diagrams |
 
 ---
 

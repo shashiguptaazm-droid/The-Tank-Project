@@ -129,7 +129,7 @@ SENSE → PERCEIVE → FUSE → AI → DECIDE → ACT → VERIFY → LEARN
 | **AI Providers** | 100 |
 | **GUI Screens** | 70+ |
 | **Screenshots** | 70+ |
-| **SVG Infographics** | 51 |
+| **SVG Infographics** | 58+ |
 | **Git Commits** | 81+ |
 | **Total Cost** | ₹67,850 (~$850) with blind module |
 

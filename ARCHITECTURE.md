@@ -14,7 +14,7 @@
 │  GPU Foundation │ Camera │ Detection │ Tracking  │
 │  Semantic │ Depth │ SLAM │ Fusion │ Navigation   │
 │  Predictive │ VLM │ Edge-AI │ Resource Manager  │
-│  ROS2 Humble │ Nav2 │ SLAM Toolbox │ TF2        │
+│  ROS2 Jazzy │ Nav2 │ SLAM Toolbox │ TF2        │
 │  TankOS │ Tool Registry │ Evolution │ SMS/GSM   │
 └───────────────────┬─────────────────────────────┘
                     │ USB Serial 115200
@@ -116,7 +116,7 @@ Camera (USB)  LiDAR (USB)  IMU (I²C)  Encoders (GPIO)
 | TensorRT | NVIDIA TensorRT | 10.3 |
 | cuDNN | NVIDIA cuDNN | 9.3 |
 | VPI | NVIDIA VPI | 3.2 |
-| ROS2 | ROS2 Humble | Latest |
+| ROS2 | ROS2 Jazzy | Latest |
 | Nav2 | ROS Navigation | Latest |
 | SLAM | SLAM Toolbox | Latest |
 | Python | CPython | 3.10+ |
@@ -133,8 +133,8 @@ Camera (USB)  LiDAR (USB)  IMU (I²C)  Encoders (GPIO)
 |-------|----------|---------|--------|
 | Jetson Orin Nano Super | 200 | 12 AI modules | 🟢 12/12 tested |
 | Arduino UNO Q 4GB | 100 | 10 system modules | 🟢 10/10 tested |
-| TankOS Core | 74 | 9 core modules | 🟢 9/9 tested |
-| **Total** | **374** | **31 modules** | **31/31 tested** |
+| TankOS Core | 27 | 5 core modules | 🟢 5/5 tested |
+| **Total** | **327** | **27 modules** | **27/27 tested** |
 
 ---
 

@@ -56,7 +56,7 @@
 
 | Component | Model | Interface | Price (₹) |
 |-----------|-------|-----------|-----------|
-| IMU | QMI8658 | I²C | 500 |
+| IMU | BNO055 | I²C | 500 |
 | Battery Monitor | INA219 ×2 | I²C | 400 |
 | Servo Controller | PCA9685 | I²C | 300 |
 | **Subtotal** | | | **1,200** |
@@ -67,7 +67,7 @@
 
 | Component | Model | Specs | Price (₹) |
 |-----------|-------|-------|-----------|
-| 4G LTE Modem | Quectel EG800K | Airtel SIM | 2,500 |
+| 4G LTE Modem | Quectel EG800AK | Airtel SIM | 2,500 |
 | Tailscale | Software | Mesh VPN | Free |
 | **Subtotal** | | | **2,500** |
 
@@ -132,4 +132,4 @@
 
 ## 📦 Component Images
 
-See `images/` directory for hardware photos (including `20260823_235016.jpg` and `20260823_235019.jpg` — blind-assistance module setup) and `assets/infographics/` for visual documentation.
+See `images/` and `assets/infographics/` for hardware photos and visual documentation.

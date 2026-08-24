@@ -66,7 +66,7 @@
 | USB-A 1 | LDROBOT LD19 LiDAR | USB-UART | 115200 baud |
 | USB-A 2 | DFRobot AI Camera | USB-C | Serial 921600 |
 | USB-A 3 | Arduino UNO Q | USB-C | Serial 115200 |
-| USB-A 4 | Quectel EG800K LTE | USB | AT commands |
+| USB-A 4 | Quectel EG800AK LTE | USB | AT commands |
 | USB-C | Power (5V/4A) | USB-C | Power delivery |
 
 ---

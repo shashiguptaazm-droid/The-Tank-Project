@@ -11,7 +11,7 @@
 | Category | Unitree Go2 (Pro) | Dr. Shashi Tank | Winner |
 |----------|-------------------|-----------------|--------|
 | **Base Price (USA)** | $1,600 – $2,800 | ~$800 ($64,450 mid) | 🏆 Tank (60% cheaper) |
-| **Base Price (India)** | ₹1,34,000 – ₹2,35,000 (imported) | ₹64,450 (mid) | 🏆 Tank (52% cheaper) |
+| **Base Price (India)** | ₹1,34,000 – ₹2,35,000 (imported) | ₹67,850 (mid) | 🏆 Tank (52% cheaper) |
 | **AI Brain** | Qualcomm (limited) | Jetson Orin Nano (67 TOPS) | 🏆 Tank (CUDA GPU) |
 | **Top Speed** | 3.5 m/s (12.6 km/h) | ~1.5 m/s (tracks) | Go2 (legged) |
 | **DoF (Degrees of Freedom)** | 12 (4 legs × 3 joints) | 2 (tracked) + 2 servos | Go2 (legged) |
@@ -20,7 +20,7 @@
 | **Battery Life** | ~40 min active | ~2–3 hours | 🏆 Tank (3× longer) |
 | **AI Models On-Device** | Limited | Phi-3, TinyLlama, YOLOv8n | 🏆 Tank |
 | **Cloud AI Providers** | Unitree cloud only | 9 providers + local | 🏆 Tank |
-| **ROS2 Support** | Yes (ROS2 Humble) | Yes (ROS2 Humble, 23 pkgs) | 🏆 Tank |
+| **ROS2 Support** | Yes (ROS2 Jazzy) | Yes (ROS2 Jazzy, 23 pkgs) | 🏆 Tank |
 | **Customizability** | Low (closed ecosystem) | Full (open hardware+software) | 🏆 Tank |
 | **Repair Cost** | High (proprietary parts) | Low (off-the-shelf parts) | 🏆 Tank |
 | **Weight** | ~12 kg | ~8 kg | Tank (lighter) |
@@ -42,7 +42,7 @@
 5. **3D LiDAR Built-in** — solid-state LiDAR on the head, no extra purchase
 6. **Stereo Depth Camera** — Intel D435i equivalent, real-time depth + RGB
 7. **IMU + Joint Encoders** — 12 joint encoders + 9-axis IMU, fused in firmware
-8. **Python/ROS2 Ready** — official ROS2 Humble packages, launch files included
+8. **Python/ROS2 Ready** — official ROS2 Jazzy packages, launch files included
 9. **Tutorials & Community** — thousands of YouTube tutorials, active Discord/Forum
 10. **Compact & Portable** — folds to ~60 × 30 × 40 cm, easy to transport
 
@@ -74,7 +74,7 @@
 ## 🤖 Dr. Shashi's Tank — What You Get
 
 ### Pros ✅
-1. **60–70% Cheaper** — full AI robot for ₹64,450 vs ₹1,34,000+ for Go2 base
+1. **60–70% Cheaper** — full AI robot for ₹67,850 vs ₹1,34,000+ for Go2 base
 2. **Jetson Orin Nano Super** — 67 TOPS CUDA GPU; runs Phi-3, YOLOv8n, Whisper locally
 3. **Fully Offline AI** — local LLMs work without internet; cloud providers are optional
 4. **4G LTE Built-in** — Quectel EG800AK modem with SIM; control from anywhere
@@ -111,7 +111,7 @@
 | 5-DOF Robotic Arm | ₹8,000 | Manipulator for grasping |
 | Thermal Camera (MLX90640) | ₹5,000 | Heat detection, night vision |
 | GPS Module (NEO-M8N) | ₹3,000 | Outdoor navigation |
-| More ESP32-S3 ×3 | ₹3,000 | Additional peripheral nodes |
+| More 6× ESP32-S3 | ₹3,000 | Additional peripheral nodes |
 | Extra Battery 4S Li-ion | ₹2,500 | Double runtime to 5+ hours |
 | Solar Panel + Charge Controller | ₹4,000 | Autonomous recharging |
 | LIDAR 3D (Intel L515) | ₹35,000 | 3D point cloud mapping |
@@ -123,7 +123,7 @@
 
 | Cost Item | Unitree Go2 Pro | Dr. Shashi Tank |
 |-----------|-----------------|-----------------|
-| **Purchase Price** | ₹2,35,000 | ₹64,450 |
+| **Purchase Price** | ₹2,35,000 | ₹67,850 |
 | **Import Duties (30%)** | ₹70,500 | ₹0 (Indian parts) |
 | **Batteries (3 years)** | ₹50,400 (3 × ₹16,800) | ₹5,000 (2 replacements) |
 | **Repairs (3 years)** | ₹45,000 (servo replacements) | ₹3,000 (off-the-shelf parts) |

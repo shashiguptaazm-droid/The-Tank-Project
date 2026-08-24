@@ -10,8 +10,8 @@
 
 <p align="center">
   <a href="https://github.com/shashiguptaazm-droid/The-Tank-Project/blob/main/docs/FLEET_INVENTORY.md"><img src="https://img.shields.io/badge/fleet-live%20inventory-38bdf8?style=flat-square" alt="Fleet"></a>
-  <a href="https://github.com/shashiguptaazm-droid/The-Tank-Project/blob/main/docs/screenshots/README.md"><img src="https://img.shields.io/badge/screenshots-20%20captured-38bdf8?style=flat-square" alt="Screenshots"></a>
-  <a href="https://github.com/shashiguptaazm-droid/The-Tank-Project/blob/main/docs/HARDWARE_DEPENDENCIES.md"><img src="https://img.shields.io/badge/hardware-12%20components-38bdf8?style=flat-square" alt="Hardware"></a>
+  <a href="https://github.com/shashiguptaazm-droid/The-Tank-Project/blob/main/docs/screenshots/README.md"><img src="https://img.shields.io/badge/screenshots-70%20captured-38bdf8?style=flat-square" alt="Screenshots"></a>
+  <a href="https://github.com/shashiguptaazm-droid/The-Tank-Project/blob/main/docs/HARDWARE_DEPENDENCIES.md"><img src="https://img.shields.io/badge/hardware-25%20components-38bdf8?style=flat-square" alt="Hardware"></a>
   <a href="https://github.com/shashiguptaazm-droid/The-Tank-Project/blob/main/docs/HARDWARE_DEPENDENCIES.md#8-hardware-photo-gallery"><img src="https://img.shields.io/badge/gallery-photos-38bdf8?style=flat-square" alt="Gallery"></a>
 </p>
 
@@ -178,7 +178,7 @@ Patrol · Diagnostics · Settings · Developer · AI Manager · Power · Updates
 
 ---
 
-## 7½. 🦯 UNO Q — Blind-Assistance External Module
+## 8. 🦯 UNO Q — Blind-Assistance External Module
 
 <p align="center">
   <b>The Tank reconfigures into a wearable AI guide for the visually impaired</b>
@@ -223,7 +223,7 @@ which runs YOLOv8n + Phi-3 + OCR, returning spoken guidance through a speaker.
 
 ---
 
-## 7½. 📺 UNO Q — Android TV Connection
+## 9. 📺 UNO Q — Android TV Connection
 
 The **Arduino UNO Q** doubles as a **home media hub + Android TV controller**
 ("UNO Q TV"): a fullscreen Chromium TV kiosk, a torrent media library, and an
@@ -239,7 +239,7 @@ Architecture & config: [`docs/UNOQ_ANDROID_TV.md`](docs/UNOQ_ANDROID_TV.md) · a
 
 ---
 
-## 7¾. 🟦 UNO Q — 400-Item Upgrade Master Plan
+## 10. 🟦 UNO Q — 400-Item Upgrade Master Plan
 
 The whole repo was audited against **400 UNO Q upgrade targets**; the top
 **P0/P1 gaps** were implemented and shipped with proof:
@@ -255,7 +255,7 @@ The whole repo was audited against **400 UNO Q upgrade targets**; the top
 
 ---
 
-## 7¾½. 🧠 UNO Q — Local AI (150-feature plan)
+## 11. 🧠 UNO Q — Local AI (150-feature plan)
 
 Lightweight AI on the UNO Q's QRB2210 Linux side — the STM32 stays
 deterministic and safety-critical. Two competition features shipped:
@@ -270,7 +270,7 @@ Full tracker: [`docs/UNOQ_AI_PLAN.md`](docs/UNOQ_AI_PLAN.md) — all 150 items m
 
 ---
 
-## 7¾¾. 🖥 TankOS — One GUI, 15 Modes (Robot OS Blueprint)
+## 12. 🖥 TankOS — One GUI, 15 Modes (Robot OS Blueprint)
 
 The TankOS GUI now behaves like a **robot operating system**, not a pile of
 dashboards — one shell, one EventBus, many backends. The blueprint's
@@ -304,7 +304,7 @@ Full blueprint + audit: [`docs/TANKOS_GUI_BLUEPRINT.md`](docs/TANKOS_GUI_BLUEPRI
 
 ---
 
-## 8. Real Build Photos
+## 📸 Real Build Photos
 
 <p align="center">
   <a href="hardware.md">
@@ -323,12 +323,12 @@ Full blueprint + audit: [`docs/TANKOS_GUI_BLUEPRINT.md`](docs/TANKOS_GUI_BLUEPRI
 
 ---
 
-## 9. Key Stats
+## 📊 Key Stats
 
 | Metric | Value |
 |--------|-------|
 | AI compute | **67 TOPS INT8** (Jetson Orin Nano Super) |
-| ROS2 packages | **16** (Python + C++) |
+| ROS2 packages | **23** (Python + C++) |
 | ESP32 boards | **3** (CAM · Dual-eyes · DFRobot AI Cam) |
 | AI systems | **22** (cognition, vision, voice, memory, learning) |
 | CLI tools | **1,166** across **12 AI providers** |
@@ -356,11 +356,7 @@ Full blueprint + audit: [`docs/TANKOS_GUI_BLUEPRINT.md`](docs/TANKOS_GUI_BLUEPRI
 
 ---
 
-<p align="center">
-  <sub>Built with real hardware, tested live, documented with photos — 🤖 TankOS</sub>
-</p>
-
-## 7¾¾. 🧠 200-Item GUI + AI Features Plan
+## 13. 🧠 200-Item GUI + AI Features Plan
 
 Four new screens turn the GUI into an AI observability + safety + competition system:
 
@@ -377,7 +373,7 @@ Four new screens turn the GUI into an AI observability + safety + competition sy
 Full tracker: [`docs/TANKOS_AI_200_PLAN.md`](docs/TANKOS_AI_200_PLAN.md) ·
 Screenshots `58–61` in [`docs/screenshots/gui/`](docs/screenshots/gui/).
 
-## 7¾¾¾. 👤 Human Coordination + 🌟 Robot Constitution
+## 14. 👤 Human Coordination + 🌟 Robot Constitution
 
 The Tank is a **human-collaborative** robot:
 
@@ -397,7 +393,7 @@ Trackers: [`docs/HUMAN_COORDINATION_PLAN.md`](docs/HUMAN_COORDINATION_PLAN.md) �
 [`docs/TANK_ORIGINALITY_PLAN.md`](docs/TANK_ORIGINALITY_PLAN.md) ·
 Screenshots `62–64` in [`docs/screenshots/gui/`](docs/screenshots/gui/).
 
-## 7¾¾¾¾. 🧠 Proper AI Tool-Calling — the tool-using robot executive
+## 15. 🧠 Proper AI Tool-Calling — the tool-using robot executive
 
 The AI never touches hardware directly. Every call passes a typed, permissioned
 pipeline: `AI → Tool Selection → Validator → Permission + Safety → Executor →
@@ -416,7 +412,7 @@ UNO Q/Jetson/ESP32/STM32 → Result → AI`.
 Tracker: [`docs/TANK_TOOL_CALLING_PLAN.md`](docs/TANK_TOOL_CALLING_PLAN.md) ·
 Screenshot `65_ai_tool_graph` in [`docs/screenshots/gui/`](docs/screenshots/gui/).
 
-## 7¾¾¾¾¾. 🤖 Proper TankOS — one operating system, many nodes
+## 16. 🤖 Proper TankOS — one operating system, many nodes
 
 TankOS is the product. Jetson, UNO Q, STM32 and ESP32 are compute/device nodes
 underneath it — **ONE STATE · ONE EVENT BUS · ONE COMMAND BUS · ONE DEVICE
@@ -436,7 +432,7 @@ REGISTRY · ONE SAFETY AUTHORITY · ONE TOOL REGISTRY · ONE API**.
 Tracker: [`docs/TANKOS_ARCHITECTURE_PLAN.md`](docs/TANKOS_ARCHITECTURE_PLAN.md) ·
 Screenshot `66_tankos_system` in [`docs/screenshots/gui/`](docs/screenshots/gui/).
 
-## 7¾¾¾¾¾¾. 🧬 TankOS Evolution Engine (TEE)
+## 17. 🧬 TankOS Evolution Engine (TEE)
 
 The Tank is not just an autonomous robot — TankOS **continuously measures its
 performance, identifies weaknesses, tests candidate improvements in replay and
@@ -483,3 +479,8 @@ Screenshot `68_ai_native` in [`docs/screenshots/gui/`](docs/screenshots/gui/).
 Tracker: [`docs/TANKOS_I18N_PLAN.md`](docs/TANKOS_I18N_PLAN.md) ·
 Screenshot `69_settings_hindi`, `70_dock_languages` in
 [`docs/screenshots/gui/`](docs/screenshots/gui/).
+
+
+<p align="center">
+  <sub>Built with real hardware, tested live, documented with photos — 🤖 TankOS</sub>
+</p>

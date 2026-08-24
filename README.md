@@ -39,7 +39,7 @@ safety-gated modules) — with **deterministic hardware safety that no AI can ov
 The same UNO Q + ESP32 + Jetson hardware becomes a **portable AI guide for visually
 impaired users**. A chest-mounted ESP32 camera captures surroundings; the UNO Q
 routes frames to the Jetson for YOLO + LLM + OCR analysis; spoken guidance is
-delivered through a shoulder-mounted speaker. [See below ↓](#-blind-assistance-external-module)
+delivered through a shoulder-mounted speaker. [See below ↓](#blind-assistance-external-module)
 
 **APC-2026-RJ-75818 · 146,000+ lines of Python · 427 tests · 58+ infographics · ₹67,850 (~$850)**
 
@@ -480,7 +480,7 @@ python3 -m tank.blind_assist.main --mode full
 | [`docs/AI.md`](docs/AI.md) | Full AI pipeline — routing, models, evolution |
 | [`docs/COMPLETE_PROJECT.md`](docs/COMPLETE_PROJECT.md) | End-to-end project walkthrough |
 | [`docs/screenshots/`](docs/screenshots/) | 70+ live screenshots |
-| [`docs/infographics/`](assets/infographics/) | 55+ SVG architecture diagrams |
+| [`docs/infographics/`](assets/infographics/) | 58+ SVG architecture diagrams |
 | [`docs/overviews/`](images/overviews/) | 3 architecture overview diagrams (PNG) |
 | [`docs/hardware_photos/`](docs/hardware_photos/) | Individual component photos |
 
