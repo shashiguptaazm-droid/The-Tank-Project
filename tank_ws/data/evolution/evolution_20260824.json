@@ -1,0 +1,45 @@
+{
+  "timestamp": "2026-08-24T03:03:55.781382",
+  "phases": [
+    {
+      "phase": "learn",
+      "success": true,
+      "duration_s": 140.8
+    },
+    {
+      "phase": "discover",
+      "new_categories": 0,
+      "total_repos": 0,
+      "abilities": {},
+      "added_to_map": 0
+    },
+    {
+      "phase": "expand",
+      "topics_learned": 0
+    },
+    {
+      "phase": "apply",
+      "success": false,
+      "duration_s": 76.4
+    }
+  ],
+  "summary": {
+    "learn": {
+      "success": true,
+      "duration_s": 140.8
+    },
+    "discover": {
+      "new_categories": 0,
+      "total_repos": 0,
+      "abilities": {},
+      "added_to_map": 0
+    },
+    "expand": {
+      "topics_learned": 0
+    },
+    "apply": {
+      "success": false,
+      "duration_s": 76.4
+    }
+  }
+}

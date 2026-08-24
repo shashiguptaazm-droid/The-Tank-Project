@@ -5,8 +5,8 @@ Hosts 10 features (F001-F010) for one-shot health checks:
 
 * ``battery``  — battery state via I2C (INA219) or sysfs fallback
 * ``imu``      — BNO055 zero offsets + temperature
-* ``lidar``    — RPLidar frame sanity
-* ``camera``   — single frame grab + size report
+* ``lidar``    — LDROBOT LD14/LD19 (aa55) frame sanity on /dev/ttyUSB0
+* ``camera``   — ESP32-S3 bridge snapshot (V4L2 fallback)
 * ``wifi``     — SSID / RSSI / channel
 * ``audio``    — input / output device dump
 * ``watchdog`` — heartbeat liveness probe (parses /health/state on the wire)
@@ -32,9 +32,11 @@ import json
 import os
 import shutil
 import socket
+import struct
 import subprocess
 import sys
 import time
+import urllib.request
 from pathlib import Path
 
 
@@ -136,44 +138,215 @@ def _run_imu_placeholder() -> int:
 
 
 # ---------------------------------------------------------------------------
-# F003 — lidar
+# F003 — lidar (LDROBOT LD14/LD19 — aa55 protocol on /dev/ttyUSB0)
 # ---------------------------------------------------------------------------
-def cmd_lidar(args: argparse.Namespace) -> int:
-    """F003 — LiDAR frame verification."""
-    port = args.port or os.environ.get("RPLIDAR_PORT", "/dev/rplidar")
+def _parse_ldrobot_packet(data: bytes) -> list:
+    """Parse one LD14/LD19 packet into distance points (aa55 protocol)."""
+    points = []
+    if len(data) < 10:
+        return points
     try:
-        from rplidar import RPLidar  # type: ignore
+        start_angle = struct.unpack_from("<H", data, 2)[0] / 100.0  # centidegrees
+        for i in range(12):
+            offset = 4 + i * 3  # 2-byte distance + 1-byte confidence
+            if offset + 3 > len(data):
+                break
+            dist = struct.unpack_from("<H", data, offset)[0]  # mm
+            conf = data[offset + 2]
+            angle = start_angle + (i * 3.0)
+            if angle >= 360:
+                angle -= 360
+            points.append({"angle": angle, "distance": dist, "confidence": conf})
+    except struct.error:
+        pass
+    return points
+
+
+def _read_ldrobot_scan(port: str, baud: int, timeout_s: float = 2.0):
+    """Read one LDROBOT scan and summarize it. Returns None on failure."""
+    import serial  # type: ignore
+    s = serial.Serial(port, baud, timeout=0.1)
+    all_points: list = []
+    buf = b""
+    deadline = time.monotonic() + timeout_s
+    try:
+        while time.monotonic() < deadline:
+            chunk = s.read(200)
+            if not chunk:
+                continue
+            buf += chunk
+            while True:
+                idx = buf.find(b"\xaa\x55")
+                if idx == -1:
+                    buf = buf[-10:]  # keep tail bytes for re-alignment
+                    break
+                if idx > 0:
+                    buf = buf[idx:]
+                if len(buf) < 18:
+                    break
+                packet = buf[:18]
+                buf = buf[18:]
+                all_points.extend(_parse_ldrobot_packet(packet))
+    finally:
+        s.close()
+
+    if not all_points:
+        return None
+
+    valid = [p for p in all_points if p["distance"] > 0 and p["confidence"] > 50]
+    if not valid:
+        valid = [p for p in all_points if p["distance"] > 0]
+
+    if not valid:
+        return {
+            "point_count": len(all_points),
+            "min_distance": 0,
+            "min_angle": 0.0,
+            "nearest_object": "nothing in range",
+        }
+
+    nearest = min(valid, key=lambda p: p["distance"])
+    angle = nearest["angle"]
+    if angle >= 345 or angle <= 15:
+        direction = "directly ahead"
+    elif angle <= 45:
+        direction = "slightly right"
+    elif angle <= 135:
+        direction = "to the right"
+    elif angle <= 180:
+        direction = "behind right"
+    elif angle <= 225:
+        direction = "behind left"
+    elif angle <= 315:
+        direction = "to the left"
+    else:
+        direction = "slightly left"
+
+    return {
+        "point_count": len(all_points),
+        "min_distance": nearest["distance"],
+        "min_angle": nearest["angle"],
+        "nearest_object": (
+            f"{nearest['distance'] / 1000.0:.2f}m {direction} "
+            f"(angle={angle:.0f}°, confidence={nearest['confidence']})"
+        ),
+    }
+
+
+def cmd_lidar(args: argparse.Namespace) -> int:
+    """F003 — LiDAR frame verification (LDROBOT LD14/LD19 aa55 protocol)."""
+    port = args.port or os.environ.get("LIDAR_PORT", "/dev/ttyUSB0")
+    baud = int(os.environ.get("LIDAR_BAUD", "115200"))
+    try:
+        import serial  # type: ignore
     except ImportError:
-        _err(f"rplidar not installed; would scan {port} -- "
-             "run scripts/legacy installer --apply first")
+        _err(f"pyserial not installed; cannot read LDROBOT lidar on {port}")
         return 1
     try:
-        lidar = RPLidar(port)
-        info = lidar.get_info()
-        health = lidar.get_health()
-        _ok(json.dumps({
-            "model":   info["model"],
-            "firmware": info["firmware"],
-            "health": list(health),
-        }, indent=2))
-        lidar.stop()
-        lidar.disconnect()
-        return 0
-    except Exception as exc:
+        scan = _read_ldrobot_scan(port, baud, timeout_s=2.0)
+    except serial.SerialException as exc:
         _err(f"lidar {port} failed: {exc}")
         return 1
+    except Exception as exc:
+        _err(f"lidar {port} read failed: {exc}")
+        return 1
+    if scan is None:
+        _err(f"no LDROBOT frames received on {port} (baud {baud})")
+        return 1
+    _ok(json.dumps({
+        "port": port,
+        "baud": baud,
+        "points": scan["point_count"],
+        "min_distance_mm": scan["min_distance"],
+        "min_angle_deg": round(scan["min_angle"], 2),
+        "nearest_object": scan["nearest_object"],
+    }, indent=2))
+    return 0
 
 
 # ---------------------------------------------------------------------------
 # F004 — camera
 # ---------------------------------------------------------------------------
+def _jpeg_dims(data: bytes):
+    """Best-effort JPEG width/height (cv2 first, then SOF marker scan)."""
+    try:
+        import cv2  # type: ignore
+        import numpy as np  # type: ignore
+        img = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_UNCHANGED)
+        if img is not None:
+            h, w = img.shape[:2]
+            return w, h
+    except Exception:
+        pass
+    # Manual SOF marker scan (no cv2 needed).
+    try:
+        i = 2
+        n = len(data)
+        while i + 4 < n:
+            if data[i] != 0xFF:
+                i += 1
+                continue
+            marker = data[i + 1]
+            if marker == 0xFF:
+                i += 1
+                continue
+            if marker in (0xD8, 0xD9) or 0xD0 <= marker <= 0xD7 or marker == 0x01:
+                i += 2
+                continue
+            seg_len = struct.unpack_from(">H", data, i + 2)[0]
+            if marker in (0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7,
+                          0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF):
+                height = struct.unpack_from(">H", data, i + 5)[0]
+                width = struct.unpack_from(">H", data, i + 7)[0]
+                return width, height
+            i += 2 + seg_len
+    except (struct.error, IndexError):
+        pass
+    return None
+
+
 def cmd_camera(args: argparse.Namespace) -> int:
-    """F004 — single-frame grab + size report."""
+    """F004 — camera frame grab (ESP32-S3 bridge, V4L2 fallback)."""
+    out = Path(args.out or "/tmp/tank_diag_frame.jpg")
+    # Candidate bridge URLs: explicit flag, env, UNO Q LAN, UNO Q Tailscale.
+    candidates: list = []
+    if args.url:
+        candidates.append(args.url)
+    if os.environ.get("TANK_CAMERA_URL"):
+        candidates.append(os.environ["TANK_CAMERA_URL"])
+    candidates += [
+        "http://192.168.31.72:8080/snapshot.jpg",
+        "http://100.84.235.7:8080/snapshot.jpg",
+    ]
+    last_err = None
+    for url in dict.fromkeys(candidates):  # de-dup, preserve order
+        try:
+            with urllib.request.urlopen(url, timeout=5) as resp:
+                data = resp.read()
+            if not data:
+                raise ValueError("empty response")
+            out.write_bytes(data)
+            dims = _jpeg_dims(data)
+            report = {
+                "source": "esp32-s3-bridge",
+                "url": url,
+                "path": str(out),
+                "bytes": len(data),
+                "ok": True,
+            }
+            if dims:
+                report["width"], report["height"] = dims
+            _ok(json.dumps(report, indent=2))
+            return 0
+        except Exception as exc:  # noqa: BLE001 — try next candidate
+            last_err = exc
+            _log(f"bridge {url} failed ({exc})")
+    _log(f"all bridge URLs failed ({last_err}); "
+         f"falling back to V4L2 device {args.device}")
     try:
         import cv2  # type: ignore
     except ImportError:
-        _err("opencv not installed; load 'calendar.py' trading card images "
-             "instead, or `pip install opencv-python-headless`")
+        _err("opencv not installed and ESP32-S3 bridge unreachable")
         return 1
     cap = cv2.VideoCapture(args.device)
     if not cap.isOpened():
@@ -185,10 +358,10 @@ def cmd_camera(args: argparse.Namespace) -> int:
         cap.release()
         return 1
     h, w = frame.shape[:2]
-    out = Path(args.out or "/tmp/tank_diag_frame.jpg")
     cv2.imwrite(str(out), frame)
     cap.release()
-    _ok(json.dumps({"path": str(out), "width": w, "height": h, "ok": True}))
+    _ok(json.dumps({"source": "v4l2", "device": args.device,
+                    "path": str(out), "width": w, "height": h, "ok": True}))
     return 0
 
 
@@ -380,10 +553,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("battery",  help="F001 — battery state probe")
     sub.add_parser("imu",      help="F002 — IMU sanity test")
-    pl = sub.add_parser("lidar",  help="F003 — LiDAR frame verification")
-    pl.add_argument("--port", default="")
+    pl = sub.add_parser("lidar",  help="F003 — LiDAR frame verification (LDROBOT LD14/LD19)")
+    pl.add_argument("--port", default="",
+                    help="serial port (default: $LIDAR_PORT or /dev/ttyUSB0)")
     pc = sub.add_parser("camera", help="F004 — camera frame grab")
     pc.add_argument("--device", type=int, default=0)
+    pc.add_argument("--url",    default="",
+                    help="ESP32-S3 bridge snapshot URL "
+                         "(default: $TANK_CAMERA_URL or UNO Q bridge)")
     pc.add_argument("--out",    default="")
     sub.add_parser("wifi",     help="F005 — WiFi SSID / RSSI")
     pa = sub.add_parser("audio", help="F006 — audio device list")
