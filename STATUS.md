@@ -27,6 +27,7 @@
 | 327 LLM-callable modules | 18 categories | ✅ Typed + permissioned |
 | Robot Constitution | 8-article safety policy | ✅ AI Debate works |
 | 16-language i18n | Packs on VPS, cached locally | ✅ HTTP 200 verified |
+| **Blind-Assistance Module** | Wearable AI vision → spoken guidance | ✅ Demo video uploaded |
 | 23 ROS2 packages | Jazzy (built on Jetson) | ✅ colcon build |
 | Face recognition | OpenCV DNN + embeddings | ✅ Pipeline ready |
 
@@ -120,17 +121,17 @@ SENSE → PERCEIVE → FUSE → AI → DECIDE → ACT → VERIFY → LEARN
 
 | Metric | Value |
 |--------|-------|
-| **Lines of Code** | 88,000+ |
-| **Python Files** | 127+ |
-| **Tests Passing** | 425+ |
+| **Lines of Code** | 146,000+ |
+| **Python Files** | 848+ |
+| **Tests Passing** | 427+ |
 | **ROS2 Packages** | 23 (Jazzy) |
 | **LLM Modules** | 327 |
 | **AI Providers** | 100 |
 | **GUI Screens** | 70+ |
 | **Screenshots** | 70+ |
 | **SVG Infographics** | 51 |
-| **Git Commits** | 70+ |
-| **Total Cost** | ₹64,050 (~$800) |
+| **Git Commits** | 81+ |
+| **Total Cost** | ₹67,850 (~$850) with blind module |
 
 ---
 

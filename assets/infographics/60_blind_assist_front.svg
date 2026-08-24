@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900" width="800" height="900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22D3EE"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+    <linearGradient id="warm" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FB923C"/>
+      <stop offset="100%" stop-color="#F472B6"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="900" fill="url(#bg)" rx="16"/>
+
+  <!-- Title -->
+  <text x="400" y="38" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="bold" fill="url(#accent)">🦯 BLIND-ASSISTANCE MODULE — Front View (Wearable)</text>
+  <text x="400" y="58" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#64748B">Arduino Physical AI Challenge 2026 · Dr. Shashi Gupta · APC-2026-RJ-75818</text>
+
+  <!-- ===== PERSON SILHOUETTE ===== -->
+  <!-- Head -->
+  <circle cx="400" cy="120" r="50" fill="#1E293B" stroke="#475569" stroke-width="2"/>
+  <!-- Sunglasses (blind) -->
+  <rect x="367" y="105" width="28" height="14" rx="7" fill="#0F172A" stroke="#22D3EE" stroke-width="1.5"/>
+  <rect x="405" y="105" width="28" height="14" rx="7" fill="#0F172A" stroke="#22D3EE" stroke-width="1.5"/>
+  <line x1="395" y1="112" x2="405" y2="112" stroke="#22D3EE" stroke-width="1.5"/>
+  <!-- White cane -->
+  <line x1="340" y1="130" x2="300" y2="320" stroke="#FBBF24" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="300" cy="325" r="6" fill="none" stroke="#FBBF24" stroke-width="2"/>
+  <!-- Body -->
+  <rect x="340" y="180" width="120" height="180" rx="20" fill="#1E293B" stroke="#475569" stroke-width="2"/>
+  <!-- Arms -->
+  <line x1="340" y1="200" x2="290" y2="300" stroke="#475569" stroke-width="14" stroke-linecap="round"/>
+  <line x1="460" y1="200" x2="510" y2="300" stroke="#475569" stroke-width="14" stroke-linecap="round"/>
+  <!-- Legs -->
+  <rect x="360" y="370" width="35" height="120" rx="12" fill="#1E293B" stroke="#475569" stroke-width="1.5"/>
+  <rect x="405" y="370" width="35" height="120" rx="12" fill="#1E293B" stroke="#475569" stroke-width="1.5"/>
+  <!-- Shoes -->
+  <rect x="352" y="485" width="50" height="20" rx="10" fill="#0F172A" stroke="#475569" stroke-width="1"/>
+  <rect x="398" y="485" width="50" height="20" rx="10" fill="#0F172A" stroke="#475569" stroke-width="1"/>
+
+  <!-- ===== WEARABLE COMPONENTS ON BODY ===== -->
+
+  <!-- 1. ESP32 CAM on chest -->
+  <rect x="382" y="195" width="36" height="28" rx="6" fill="#E44D26" stroke="#FB923C" stroke-width="1.5" filter="url(#glow)"/>
+  <circle cx="400" cy="207" r="4" fill="#0F172A"/>
+  <circle cx="400" cy="207" r="2.5" fill="#22D3EE"/>
+  <text x="400" y="236" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="bold" fill="#FB923C">CAM</text>
+
+  <!-- 2. Shoulder harness straps -->
+  <line x1="382" y1="185" x2="360" y2="210" stroke="#6366F1" stroke-width="3" stroke-dasharray="6,3"/>
+  <line x1="418" y1="185" x2="440" y2="210" stroke="#6366F1" stroke-width="3" stroke-dasharray="6,3"/>
+
+  <!-- 3. UNO Q on belt (waist) -->
+  <rect x="338" y="305" width="124" height="48" rx="10" fill="#1E293B" stroke="#00979D" stroke-width="2.5" filter="url(#glow)"/>
+  <text x="400" y="325" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#00979D">Arduino UNO Q 4GB</text>
+  <text x="400" y="342" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">QRB2210 + STM32U585</text>
+
+  <!-- 4. ESP32 Dual Screen on left shoulder strap -->
+  <circle cx="355" cy="270" r="14" fill="#1E293B" stroke="#A78BFA" stroke-width="2"/>
+  <circle cx="355" cy="270" r="10" fill="#A78BFA" opacity="0.3"/>
+  <text x="355" y="274" text-anchor="middle" font-size="12">👁️</text>
+  <text x="328" y="292" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="#A78BFA">Screen</text>
+
+  <!-- 5. Speaker on right shoulder strap -->
+  <circle cx="448" cy="270" r="14" fill="#1E293B" stroke="#34D399" stroke-width="2"/>
+  <text x="448" y="274" text-anchor="middle" font-size="12">🔊</text>
+  <text x="465" y="292" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="#34D399">Speaker</text>
+
+  <!-- 6. LTE Modem on right hip -->
+  <rect x="445" y="305" width="28" height="40" rx="6" fill="#1E293B" stroke="#F472B6" stroke-width="1.5"/>
+  <text x="459" y="322" text-anchor="middle" font-size="10">📶</text>
+  <text x="459" y="355" text-anchor="middle" font-family="Arial,sans-serif" font-size="7" fill="#F472B6">LTE</text>
+
+  <!-- 7. Power Bank on left hip -->
+  <rect x="327" y="305" width="38" height="24" rx="6" fill="#1E293B" stroke="#FBBF24" stroke-width="1.5"/>
+  <text x="346" y="314" text-anchor="middle" font-size="8">🔋</text>
+  <text x="346" y="337" text-anchor="middle" font-family="Arial,sans-serif" font-size="7" fill="#FBBF24">10K mAh</text>
+
+  <!-- 8. Microphone on collar -->
+  <rect x="392" y="170" width="16" height="10" rx="4" fill="#1E293B" stroke="#818CF8" stroke-width="1.5"/>
+  <text x="400" y="177" text-anchor="middle" font-size="7">🎤</text>
+
+  <!-- ===== CALLOUT BOXES (right side) ===== -->
+
+  <!-- Callout: ESP32 CAM -->
+  <line x1="418" y1="209" x2="530" y2="520" stroke="#FB923C" stroke-width="1" stroke-dasharray="4,4"/>
+  <rect x="530" y="500" width="245" height="85" rx="10" fill="#1E293B" stroke="#FB923C" stroke-width="1.5"/>
+  <text x="652" y="520" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" font-weight="bold" fill="#FB923C">ESP32-S3 CAM (Chest)</text>
+  <text x="652" y="538" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">640×480 @ 8.9fps · Night Vision</text>
+  <text x="652" y="554" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">Captures surroundings in real-time</text>
+  <text x="652" y="572" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#64748B">WiFi → UNO Q over USB-C</text>
+
+  <!-- Callout: UNO Q belt -->
+  <line x1="338" y1="330" x2="270" y2="620" stroke="#00979D" stroke-width="1" stroke-dasharray="4,4"/>
+  <rect x="30" y="600" width="255" height="100" rx="10" fill="#1E293B" stroke="#00979D" stroke-width="2"/>
+  <text x="157" y="620" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" font-weight="bold" fill="#00979D">Arduino UNO Q — System Coordinator</text>
+  <text x="157" y="640" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">• Receives camera frames from ESP32</text>
+  <text x="157" y="656" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">• Routes to Jetson AI via Tailscale/LTE</text>
+  <text x="157" y="672" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">• Controls dual screens + speaker output</text>
+  <text x="157" y="688" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">• Emergency SMS via LTE modem</text>
+
+  <!-- Callout: Dual Screen -->
+  <line x1="355" y1="284" x2="540" y2="620" stroke="#A78BFA" stroke-width="1" stroke-dasharray="4,4"/>
+  <rect x="530" y="600" width="245" height="75" rx="10" fill="#1E293B" stroke="#A78BFA" stroke-width="1.5"/>
+  <text x="652" y="620" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" font-weight="bold" fill="#A78BFA">ESP32 Dual Screen + Speaker</text>
+  <text x="652" y="638" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">2× 1.28″ Round LCD (GC9A01)</text>
+  <text x="652" y="654" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">Eye expressions + scrolling text alerts</text>
+  <text x="652" y="670" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">3W speaker for spoken feedback</text>
+
+  <!-- ===== BOTTOM: CONNECTION ARROWS ===== -->
+  <rect x="30" y="730" width="740" height="60" rx="10" fill="#0F172A" stroke="#334155" stroke-width="1"/>
+  <text x="400" y="752" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#94A3B8">CAM captures scene → UNO Q routes to Jetson/VPS → AI analyzes → spoken guidance via speaker</text>
+  <text x="400" y="772" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#64748B">WiFi → 4G LTE (Quectel EG800AK) → Hotspot → Tailscale mesh | 42 local AI models for offline use</text>
+
+  <!-- Connection lines overlay -->
+  <path d="M400 223 L400 305" stroke="#22D3EE" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <path d="M355 284 L355 305" stroke="#A78BFA" stroke-width="1" stroke-dasharray="3,3"/>
+  <path d="M448 284 L448 305" stroke="#34D399" stroke-width="1" stroke-dasharray="3,3"/>
+  <path d="M459 305 L459 345" stroke="#F472B6" stroke-width="1" stroke-dasharray="3,3"/>
+  <path d="M346 305 L346 329" stroke="#FBBF24" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- E-STOP button on chest strap -->
+  <circle cx="370" cy="230" r="8" fill="#DC2626" stroke="#FCA5A5" stroke-width="1.5"/>
+  <text x="370" y="233" text-anchor="middle" font-size="7" fill="white" font-weight="bold">!</text>
+  <text x="355" y="250" text-anchor="middle" font-family="Arial,sans-serif" font-size="7" fill="#DC2626">E-STOP</text>
+
+  <!-- Footer -->
+  <text x="400" y="830" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#475569">The Tank Project · Blind-Assistance External Module · APC-2026-RJ-75818</text>
+</svg>

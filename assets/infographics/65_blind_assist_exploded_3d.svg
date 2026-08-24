@@ -1,0 +1,276 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 900" width="1100" height="900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A0F1A"/>
+      <stop offset="100%" stop-color="#131C2E"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22D3EE"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow3d">
+      <feDropShadow dx="-6" dy="8" stdDeviation="6" flood-color="#000" flood-opacity="0.7"/>
+    </filter>
+  </defs>
+
+  <rect width="1100" height="900" fill="url(#bg)" rx="16"/>
+
+  <!-- Grid on floor -->
+  <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+    <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#1E293B" stroke-width="0.5"/>
+  </pattern>
+  <rect width="1100" height="900" fill="url(#grid)" opacity="0.3"/>
+
+  <!-- Title -->
+  <text x="550" y="38" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="bold" fill="url(#accent)">🔧 EXPLODED 3D HARDWARE VIEW — Blind-Assistance External Module</text>
+  <text x="550" y="58" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#64748B">All 10 components disassembled · Connector paths shown · BOM ₹3,800 (uses core UNO Q + Jetson + LTE)</text>
+
+  <!-- === ISOMETRIC BASE PLANE === -->
+  <polygon points="100,800 550,720 1000,800 550,880" fill="#0F172A" stroke="#1E293B" stroke-width="1.5"/>
+
+  <!-- ================================================================ -->
+  <!-- COMPONENT 1 — ESP32-S3 CAM (top, exploded upward) -->
+  <!-- ================================================================ -->
+  <g filter="url(#shadow3d)">
+    <!-- 3D box: front, top, side -->
+    <polygon points="350,240 420,220 440,235 370,255" fill="#E44D26" stroke="#FB923C" stroke-width="2"/>
+    <polygon points="420,220 490,200 510,215 440,235" fill="#C03D1E" stroke="#FB923C" stroke-width="1.5"/>
+    <polygon points="490,200 560,180 580,195 510,215" fill="#D94D30" stroke="#FB923C" stroke-width="1.5"/>
+    <!-- Lens -->
+    <circle cx="450" cy="225" r="14" fill="#0F172A" stroke="#22D3EE" stroke-width="2"/>
+    <circle cx="450" cy="225" r="8" fill="#0A0F1A" stroke="#22D3EE" stroke-width="1"/>
+    <circle cx="448" cy="222" r="3" fill="#22D3EE" opacity="0.8"/>
+    <!-- LED -->
+    <circle cx="405" cy="232" r="3" fill="#34D399"/>
+    <!-- Antenna -->
+    <line x1="530" y1="195" x2="550" y2="170" stroke="#475569" stroke-width="2"/>
+  </g>
+
+  <!-- Label -->
+  <text x="490" y="170" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="#FB923C">📷 ESP32-S3 CAM</text>
+  <text x="490" y="185" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">640×480 · 8.9fps · Night Vision</text>
+  <text x="490" y="198" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#64748B">Chest-mounted · WiFi capture</text>
+  <text x="490" y="211" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FBBF24">₹600</text>
+
+  <!-- Connector line to UNO Q -->
+  <line x1="490" y1="300" x2="520" y2="480" stroke="#22D3EE" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.6"/>
+
+  <!-- ================================================================ -->
+  <!-- COMPONENT 2 — Arduino UNO Q (center-right, main component) -->
+  <!-- ================================================================ -->
+  <g filter="url(#shadow3d)">
+    <!-- 3D isometric box -->
+    <polygon points="550,480 650,450 750,480 650,510" fill="#1E293B" stroke="#00979D" stroke-width="3"/>
+    <polygon points="650,450 750,420 850,450 750,480" fill="#0F172A" stroke="#00979D" stroke-width="2"/>
+    <polygon points="750,420 850,390 950,420 850,450" fill="#131C2E" stroke="#00979D" stroke-width="1.5"/>
+    <!-- USB ports (front face) -->
+    <rect x="565" y="468" width="18" height="8" rx="2" fill="#334155" stroke="#475569" stroke-width="1"/>
+    <rect x="598" y="465" width="18" height="8" rx="2" fill="#334155" stroke="#475569" stroke-width="1"/>
+    <rect x="631" y="468" width="18" height="8" rx="2" fill="#334155" stroke="#475569" stroke-width="1"/>
+    <!-- GPIO header dots -->
+    <circle cx="675" cy="455" r="2" fill="#475569"/>
+    <circle cx="685" cy="452" r="2" fill="#475569"/>
+    <circle cx="695" cy="449" r="2" fill="#475569"/>
+    <!-- Brand label -->
+    <text x="710" y="440" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="bold" fill="#00979D">ARDUINO</text>
+    <text x="710" y="453" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">UNO Q 4GB</text>
+  </g>
+
+  <!-- Label -->
+  <text x="720" y="398" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="#00979D">⚡ Arduino UNO Q 4GB</text>
+  <text x="720" y="413" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">QRB2210 + STM32U585 · System Coordinator</text>
+  <text x="720" y="426" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#64748B">Belt-mounted · Routes all data</text>
+  <text x="720" y="439" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FBBF24">₹12,500 (from core BOM)</text>
+
+  <!-- ================================================================ -->
+  <!-- COMPONENT 3 — ESP32 Dual Screen (left, exploded outward) -->
+  <!-- ================================================================ -->
+  <g filter="url(#shadow3d)">
+    <polygon points="200,340 260,320 310,340 250,360" fill="#1E293B" stroke="#A78BFA" stroke-width="2"/>
+    <polygon points="260,320 320,300 370,320 310,340" fill="#0F172A" stroke="#A78BFA" stroke-width="1.5"/>
+    <circle cx="260" cy="335" r="22" fill="#A78BFA" opacity="0.15"/>
+    <circle cx="260" cy="335" r="16" fill="#1E293B" stroke="#A78BFA" stroke-width="1.5"/>
+    <text x="260" y="340" text-anchor="middle" font-size="16">👁️</text>
+    <!-- Second screen -->
+    <circle cx="310" cy="330" r="22" fill="#A78BFA" opacity="0.15"/>
+    <circle cx="310" cy="330" r="16" fill="#1E293B" stroke="#A78BFA" stroke-width="1.5"/>
+    <text x="310" y="335" text-anchor="middle" font-size="16">👁️</text>
+  </g>
+
+  <text x="280" y="308" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="#A78BFA">👁️ ESP32 Dual Screen</text>
+  <text x="280" y="323" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">2× GC9A01 Round LCD 240×240</text>
+  <text x="280" y="336" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#64748B">Shoulder strap · Eye expressions</text>
+  <text x="280" y="349" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FBBF24">₹500</text>
+
+  <line x1="280" y1="360" x2="550" y2="480" stroke="#A78BFA" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+
+  <!-- ================================================================ -->
+  <!-- COMPONENT 4 — Speaker (right, exploded outward) -->
+  <!-- ================================================================ -->
+  <g filter="url(#shadow3d)">
+    <polygon points="760,340 810,320 850,340 800,360" fill="#1E293B" stroke="#34D399" stroke-width="2"/>
+    <polygon points="810,320 860,300 900,320 850,340" fill="#0F172A" stroke="#34D399" stroke-width="1.5"/>
+    <!-- Speaker grille -->
+    <circle cx="810" cy="335" r="18" fill="#34D399" opacity="0.1"/>
+    <circle cx="810" cy="335" r="14" fill="none" stroke="#34D399" stroke-width="1"/>
+    <circle cx="810" cy="335" r="6" fill="#34D399" opacity="0.3"/>
+    <!-- Sound waves -->
+    <path d="M795 320 Q790 335 795 350" fill="none" stroke="#34D399" stroke-width="2" opacity="0.6">
+      <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M828 318 Q833 335 828 352" fill="none" stroke="#34D399" stroke-width="2" opacity="0.4">
+      <animate attributeName="opacity" values="0.4;0.9;0.4" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <text x="830" y="306" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="#34D399">🔊 3W Mini Speaker</text>
+  <text x="830" y="321" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">Audio Feedback · Piper TTS</text>
+  <text x="830" y="334" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#64748B">Shoulder-mounted</text>
+  <text x="830" y="347" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FBBF24">₹200</text>
+
+  <line x1="830" y1="360" x2="720" y2="480" stroke="#34D399" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+
+  <!-- ================================================================ -->
+  <!-- COMPONENT 5 — LTE Modem (far right) -->
+  <!-- ================================================================ -->
+  <g filter="url(#shadow3d)">
+    <polygon points="820,500 860,485 900,500 860,515" fill="#1E293B" stroke="#F472B6" stroke-width="2"/>
+    <polygon points="860,485 900,470 940,485 900,500" fill="#0F172A" stroke="#F472B6" stroke-width="1.5"/>
+    <polygon points="900,470 940,455 980,470 940,485" fill="#131C2E" stroke="#F472B6" stroke-width="1"/>
+    <!-- Antenna stub -->
+    <line x1="940" y1="460" x2="960" y2="440" stroke="#475569" stroke-width="2"/>
+    <circle cx="960" cy="438" r="3" fill="#475569"/>
+    <!-- Signal bars -->
+    <rect x="830" y="492" width="4" height="5" fill="#F472B6" opacity="0.4"/>
+    <rect x="836" y="490" width="4" height="7" fill="#F472B6" opacity="0.6"/>
+    <rect x="842" y="488" width="4" height="9" fill="#F472B6" opacity="0.8"/>
+    <rect x="848" y="486" width="4" height="11" fill="#F472B6"/>
+  </g>
+
+  <text x="890" y="452" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="#F472B6">📶 Quectel EG800AK LTE</text>
+  <text x="890" y="467" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">4G Cellular · SMS · GPS · 64% signal</text>
+  <text x="890" y="480" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#64748B">Hip/pocket · Always online</text>
+  <text x="890" y="493" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FBBF24">₹2,500</text>
+
+  <line x1="890" y1="510" x2="750" y2="480" stroke="#F472B6" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
+
+  <!-- ================================================================ -->
+  <!-- COMPONENT 6 — Power Bank -->
+  <!-- ================================================================ -->
+  <g filter="url(#shadow3d)">
+    <polygon points="620,580 680,565 720,580 660,595" fill="#1E293B" stroke="#FBBF24" stroke-width="2"/>
+    <polygon points="680,565 740,550 780,565 720,580" fill="#0F172A" stroke="#FBBF24" stroke-width="1.5"/>
+    <polygon points="740,550 800,535 840,550 780,565" fill="#131C2E" stroke="#FBBF24" stroke-width="1"/>
+    <text x="720" y="570" text-anchor="middle" font-size="16">🔋</text>
+    <!-- Capacity label -->
+    <text x="720" y="585" text-anchor="middle" font-family="Arial,sans-serif" font-size="7" fill="#FBBF24">10K mAh</text>
+  </g>
+
+  <text x="720" y="540" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="#FBBF24">🔋 Power Bank</text>
+  <text x="720" y="555" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">10,000mAh USB-C PD 5V/3A</text>
+  <text x="720" y="568" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#64748B">Back belt · 8+ hours runtime</text>
+  <text x="720" y="581" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FBBF24">₹1,200</text>
+
+  <line x1="720" y1="595" x2="720" y2="510" stroke="#FBBF24" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+
+  <!-- ================================================================ -->
+  <!-- COMPONENT 7 — Microphone -->
+  <!-- ================================================================ -->
+  <g filter="url(#shadow3d)">
+    <ellipse cx="420" cy="360" rx="10" ry="18" fill="#1E293B" stroke="#818CF8" stroke-width="2" transform="rotate(20, 420, 360)"/>
+    <circle cx="422" cy="348" r="4" fill="#818CF8" opacity="0.4"/>
+  </g>
+
+  <text x="420" y="336" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="#818CF8">🎤 USB Mini Mic</text>
+  <text x="420" y="351" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">Voice Commands via Whisper</text>
+  <text x="420" y="364" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#64748B">Collar clip</text>
+  <text x="420" y="377" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FBBF24">₹300</text>
+
+  <line x1="420" y1="385" x2="580" y2="490" stroke="#818CF8" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"/>
+
+  <!-- ================================================================ -->
+  <!-- COMPONENT 8 — Harness -->
+  <!-- ================================================================ -->
+  <g opacity="0.7">
+    <path d="M280 360 Q350 340 450 400 Q550 460 720 480" fill="none" stroke="#6366F1" stroke-width="4" stroke-dasharray="12,6"/>
+    <path d="M280 360 Q300 420 400 500" fill="none" stroke="#6366F1" stroke-width="4" stroke-dasharray="12,6"/>
+  </g>
+
+  <text x="340" y="460" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="#6366F1">🎒 Wearable Harness</text>
+  <text x="340" y="475" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">Belt + Shoulder Mount</text>
+  <text x="340" y="490" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FBBF24">₹500</text>
+
+  <!-- ================================================================ -->
+  <!-- COMPONENT 9 — E-STOP button -->
+  <!-- ================================================================ -->
+  <g filter="url(#glow)">
+    <circle cx="600" cy="400" r="14" fill="#DC2626" stroke="#FCA5A5" stroke-width="2.5"/>
+    <text x="600" y="404" text-anchor="middle" font-size="12" fill="white" font-weight="bold">!</text>
+  </g>
+
+  <text x="600" y="388" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="#DC2626">⛔ E-STOP Button</text>
+  <text x="600" y="403" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">Triple-tap → Emergency SMS</text>
+  <text x="600" y="416" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#64748B">Chest strap · D9 pin</text>
+
+  <line x1="600" y1="414" x2="650" y2="450" stroke="#DC2626" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+
+  <!-- ================================================================ -->
+  <!-- COMPONENT 10 — Jetson (shown at top as remote AI brain) -->
+  <!-- ================================================================ -->
+  <g filter="url(#shadow3d)">
+    <rect x="120" y="80" width="180" height="90" rx="10" fill="#1E293B" stroke="#76B900" stroke-width="2"/>
+    <rect x="120" y="80" width="180" height="20" rx="10" fill="#76B900" opacity="0.15"/>
+    <text x="210" y="95" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#76B900">NVIDIA Jetson</text>
+    <text x="210" y="120" text-anchor="middle" font-family="Arial,sans-serif" font-size="20">🧠</text>
+    <text x="210" y="145" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">Orin Nano Super 8GB</text>
+    <text x="210" y="160" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#64748B">67 TOPS · CUDA · 42 models</text>
+  </g>
+
+  <text x="210" y="68" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#76B900">🧠 Jetson Orin Nano (Backpack/Home)</text>
+  <text x="210" y="80" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#FBBF24">₹25,000 (core BOM)</text>
+
+  <!-- ================================================================ -->
+  <!-- BOTTOM: BOM SUMMARY -->
+  <!-- ================================================================ -->
+  <rect x="60" y="750" width="980" height="115" rx="14" fill="#0F172A" stroke="#334155" stroke-width="1.5"/>
+
+  <text x="550" y="778" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="url(#accent)">💰 Blind-Assistance External Module — Bill of Materials</text>
+
+  <!-- BOM table -->
+  <text x="90" y="800" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">Item</text>
+  <text x="350" y="800" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">Component</text>
+  <text x="650" y="800" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">Purpose</text>
+  <text x="900" y="800" font-family="Arial,sans-serif" font-size="10" fill="#CBD5E1">Cost (₹)</text>
+
+  <line x1="90" y1="805" x2="990" y2="805" stroke="#334155" stroke-width="0.5"/>
+
+  <text x="90" y="820" font-family="Arial,sans-serif" font-size="9" fill="#64748B">1</text>
+  <text x="100" y="820" font-family="Arial,sans-serif" font-size="9" fill="#FB923C">ESP32-S3 CAM</text>
+  <text x="350" y="820" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">Vision capture</text>
+  <text x="900" y="820" font-family="Arial,sans-serif" font-size="9" fill="#34D399">600</text>
+
+  <text x="90" y="835" font-family="Arial,sans-serif" font-size="9" fill="#64748B">2</text>
+  <text x="100" y="835" font-family="Arial,sans-serif" font-size="9" fill="#A78BFA">ESP32 Dual Screen</text>
+  <text x="350" y="835" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">Visual alerts</text>
+  <text x="900" y="835" font-family="Arial,sans-serif" font-size="9" fill="#34D399">500</text>
+
+  <text x="90" y="850" font-family="Arial,sans-serif" font-size="9" fill="#64748B">3</text>
+  <text x="100" y="850" font-family="Arial,sans-serif" font-size="9" fill="#34D399">Speaker</text>
+  <text x="350" y="850" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">Audio output</text>
+  <text x="900" y="850" font-family="Arial,sans-serif" font-size="9" fill="#34D399">200</text>
+
+  <text x="90" y="865" font-family="Arial,sans-serif" font-size="9" fill="#64748B">4</text>
+  <text x="100" y="865" font-family="Arial,sans-serif" font-size="9" fill="#818CF8">Microphone</text>
+  <text x="350" y="865" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">Voice input</text>
+  <text x="900" y="865" font-family="Arial,sans-serif" font-size="9" fill="#34D399">300</text>
+
+  <text x="350" y="865" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">+ Harness ₹500 + Cables ₹500</text>
+  <text x="900" y="865" font-family="Arial,sans-serif" font-size="10" font-weight="bold" fill="#FBBF24">₹3,800</text>
+
+  <!-- Uses from core -->
+  <text x="550" y="882" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#475569">Uses from core BOM: UNO Q ₹12,500 · Jetson ₹25,000 · LTE ₹2,500 = Total effective cost: ₹43,800 (wearable) / ₹67,850 (full Tank)</text>
+</svg>

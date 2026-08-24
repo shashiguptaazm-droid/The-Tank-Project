@@ -133,6 +133,51 @@ Patrol · Diagnostics · Settings · Developer · AI Manager · Power · Updates
 
 ---
 
+## 7½. 🦯 UNO Q — Blind-Assistance External Module
+
+<p align="center">
+  <b>The Tank reconfigures into a wearable AI guide for the visually impaired</b>
+</p>
+
+<p align="center">
+  <img src="images/blind_assist/20260823_235016.jpg" width="45%" alt="Blind-assistance module: UNO Q + ESP32 CAM + LTE + Dual Screen">
+  <img src="images/blind_assist/20260823_235019.jpg" width="45%" alt="Blind-assistance module: wearable configuration">
+</p>
+
+The same UNO Q + ESP32 + Jetson hardware becomes a portable blind-assistance
+device. The ESP32 CAM is worn on the chest, capturing the user's surroundings.
+The UNO Q routes frames over LTE/WiFi through Tailscale to the Jetson AI brain,
+which runs YOLOv8n + Phi-3 + OCR, returning spoken guidance through a speaker.
+
+| Feature | Description |
+|---------|-------------|
+| Real-time scene description | AI narrates surroundings |
+| Obstacle detection | YOLO + LiDAR → audio warnings |
+| Face recognition | Identifies known people |
+| Text reading (OCR) | Reads signs and documents aloud |
+| Voice commands | "What's around me?" · "Read that sign" · "Find my keys" |
+| Emergency alert | Triple-tap → SMS with GPS |
+| Never offline | WiFi → 4G LTE → Hotspot → Tailscale mesh |
+| Locomotion follower | Optional — AI assistant physically walks with user |
+
+**Demo video uploaded August 2026.** Full docs: [docs/BLIND_ASSIST.md](docs/BLIND_ASSIST.md)
+
+### Blind-Assistance Infographics
+
+<p align="center">
+  <a href="assets/infographics/60_blind_assist_front.svg">
+    <img src="assets/infographics/60_blind_assist_front.svg" width="32%" alt="Front view — person wearing the module">
+  </a>
+  <a href="assets/infographics/61_blind_assist_side.svg">
+    <img src="assets/infographics/61_blind_assist_side.svg" width="32%" alt="Side view — component placement">
+  </a>
+  <a href="assets/infographics/62_blind_assist_pipeline.svg">
+    <img src="assets/infographics/62_blind_assist_pipeline.svg" width="32%" alt="AI pipeline — data flow">
+  </a>
+</p>
+
+---
+
 ## 7½. 📺 UNO Q — Android TV Connection
 
 The **Arduino UNO Q** doubles as a **home media hub + Android TV controller**

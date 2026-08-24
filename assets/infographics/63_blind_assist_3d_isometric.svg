@@ -1,0 +1,228 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 850" width="1000" height="850">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A0F1A"/>
+      <stop offset="100%" stop-color="#131C2E"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22D3EE"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#22D3EE" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#22D3EE" stop-opacity="0.05"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="3" dy="5" stdDeviation="4" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+    <filter id="neon">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background with grid -->
+  <rect width="1000" height="850" fill="url(#bg)" rx="16"/>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1E293B" stroke-width="0.5"/>
+  </pattern>
+  <rect width="1000" height="850" fill="url(#grid)" rx="16" opacity="0.4"/>
+
+  <!-- Title -->
+  <text x="500" y="38" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="bold" fill="url(#accent)">🦯 3D ISOMETRIC — Blind-Assistance Module in Action</text>
+  <text x="500" y="58" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#64748B">Person wearing The Tank external module · All components labeled · Data paths shown</text>
+
+  <!-- === GROUND PLANE (isometric floor) === -->
+  <polygon points="200,750 500,680 800,750 500,820" fill="#0F172A" stroke="#1E293B" stroke-width="1.5"/>
+  <polygon points="200,750 500,680 500,820" fill="#0D1520" stroke="#1E293B" stroke-width="0.5"/>
+
+  <!-- === 3D PERSON (isometric — facing right-forward) === -->
+
+  <!-- Shadow -->
+  <ellipse cx="500" cy="750" rx="140" ry="30" fill="#000" opacity="0.5"/>
+
+  <!-- Body (torso — isometric box) -->
+  <g filter="url(#shadow)">
+    <!-- Front face of torso -->
+    <polygon points="430,530 570,500 570,650 430,680" fill="#1A2540" stroke="#334155" stroke-width="2"/>
+    <!-- Right side face -->
+    <polygon points="570,500 600,520 600,670 570,650" fill="#131C2E" stroke="#334155" stroke-width="1.5"/>
+    <!-- Top face -->
+    <polygon points="430,530 460,510 600,520 570,500" fill="#1E2D50" stroke="#334155" stroke-width="1"/>
+
+    <!-- Shoulders -->
+    <ellipse cx="430" cy="530" rx="30" ry="12" fill="#1A2540" stroke="#475569" stroke-width="2"/>
+    <ellipse cx="570" cy="500" rx="30" ry="12" fill="#131C2E" stroke="#475569" stroke-width="2"/>
+  </g>
+
+  <!-- Head (3D sphere-ish) -->
+  <g filter="url(#shadow)">
+    <circle cx="485" cy="460" r="55" fill="#1A2540" stroke="#475569" stroke-width="2"/>
+    <!-- 3D depth on head -->
+    <ellipse cx="485" cy="460" rx="55" ry="15" fill="#0F172A" opacity="0.4"/>
+    <circle cx="470" cy="450" r="40" fill="#1E2D50" opacity="0.5"/>
+  </g>
+
+  <!-- Sunglasses (3D angle) -->
+  <g>
+    <rect x="455" y="445" width="30" height="14" rx="7" fill="#0A0F1A" stroke="#22D3EE" stroke-width="2" transform="rotate(-5, 470, 452)"/>
+    <rect x="490" y="445" width="30" height="14" rx="7" fill="#0A0F1A" stroke="#22D3EE" stroke-width="2" transform="rotate(-5, 505, 452)"/>
+    <line x1="485" y1="452" x2="490" y2="452" stroke="#22D3EE" stroke-width="2"/>
+  </g>
+
+  <!-- Hair -->
+  <path d="M430 440 Q440 400 485 400 Q530 400 540 440" fill="#0F172A" stroke="#475569" stroke-width="1.5"/>
+
+  <!-- Left arm (swinging forward — 3D) -->
+  <g filter="url(#shadow)">
+    <polygon points="400,540 425,555 390,660 370,650" fill="#1A2540" stroke="#475569" stroke-width="2"/>
+    <!-- White cane -->
+    <line x1="385" y1="655" x2="340" y2="780" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="340" cy="785" r="7" fill="none" stroke="#FBBF24" stroke-width="2.5"/>
+    <circle cx="385" cy="655" r="6" fill="#FBBF24"/>
+  </g>
+
+  <!-- Right arm (swinging back — 3D) -->
+  <polygon points="580,540 605,555 640,660 620,670" fill="#131C2E" stroke="#334155" stroke-width="1.5" opacity="0.7"/>
+
+  <!-- Legs (walking — 3D) -->
+  <g filter="url(#shadow)">
+    <polygon points="450,675 465,685 440,780 425,770" fill="#1A2540" stroke="#475569" stroke-width="2"/>
+    <polygon points="515,670 530,680 560,780 545,775" fill="#131C2E" stroke="#475569" stroke-width="2"/>
+    <!-- Shoes -->
+    <ellipse cx="430" cy="785" rx="25" ry="9" fill="#0F172A" stroke="#475569" stroke-width="1.5"/>
+    <ellipse cx="555" cy="780" rx="25" ry="9" fill="#0A0F1A" stroke="#334155" stroke-width="1.5"/>
+  </g>
+
+  <!-- === WEARABLE COMPONENTS (3D isometric on body) === -->
+
+  <!-- 1. ESP32 CAM on chest (3D box) -->
+  <g filter="url(#glow)">
+    <polygon points="475,545 505,538 515,548 485,555" fill="#E44D26" stroke="#FB923C" stroke-width="1.5"/>
+    <polygon points="505,538 515,528 525,538 515,548" fill="#C03D1E" stroke="#FB923C" stroke-width="1"/>
+    <polygon points="515,528 525,538 535,528 525,518" fill="#D94D30" stroke="#FB923C" stroke-width="1"/>
+    <circle cx="510" cy="538" r="4" fill="#0F172A"/>
+    <circle cx="510" cy="538" r="2.5" fill="#22D3EE"/>
+  </g>
+
+  <!-- CAM label -->
+  <text x="505" y="565" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="bold" fill="#FB923C">📷 ESP32 CAM</text>
+
+  <!-- 2. Harness straps (3D) -->
+  <line x1="465" y1="525" x2="430" y2="580" stroke="#6366F1" stroke-width="3" stroke-dasharray="8,4" opacity="0.8"/>
+  <line x1="530" y1="520" x2="570" y2="570" stroke="#6366F1" stroke-width="3" stroke-dasharray="8,4" opacity="0.8"/>
+
+  <!-- 3. UNO Q on belt (3D box) -->
+  <g filter="url(#glow)">
+    <polygon points="445,665 490,655 555,665 510,675" fill="#1E293B" stroke="#00979D" stroke-width="2.5"/>
+    <polygon points="490,655 520,645 585,655 555,665" fill="#0F172A" stroke="#00979D" stroke-width="1.5"/>
+    <polygon points="520,645 550,635 615,645 585,655" fill="#131C2E" stroke="#00979D" stroke-width="1"/>
+    <text x="500" y="672" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="bold" fill="#00979D">Arduino UNO Q 4GB</text>
+  </g>
+
+  <!-- 4. ESP32 Dual Screen on left shoulder -->
+  <g filter="url(#glow)">
+    <circle cx="410" cy="560" r="18" fill="#1A2540" stroke="#A78BFA" stroke-width="2.5"/>
+    <circle cx="410" cy="560" r="13" fill="#A78BFA" opacity="0.2"/>
+    <text x="410" y="564" text-anchor="middle" font-size="14">👁️</text>
+  </g>
+  <text x="390" y="590" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="#A78BFA">Screen</text>
+
+  <!-- 5. Speaker on right shoulder -->
+  <g filter="url(#glow)">
+    <circle cx="595" cy="555" r="18" fill="#1A2540" stroke="#34D399" stroke-width="2.5"/>
+    <text x="595" y="559" text-anchor="middle" font-size="14">🔊</text>
+  </g>
+  <text x="610" y="585" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="#34D399">Speaker</text>
+
+  <!-- 6. LTE Modem (3D box on hip) -->
+  <g filter="url(#shadow)">
+    <polygon points="558,660 575,655 590,660 573,665" fill="#1E293B" stroke="#F472B6" stroke-width="1.5"/>
+    <polygon points="575,655 585,650 600,655 590,660" fill="#0F172A" stroke="#F472B6" stroke-width="1"/>
+    <text x="580" y="668" text-anchor="middle" font-size="8">📶</text>
+  </g>
+  <text x="582" y="680" text-anchor="middle" font-family="Arial,sans-serif" font-size="7" fill="#F472B6">LTE</text>
+
+  <!-- 7. Power Bank (3D on back belt) -->
+  <g filter="url(#shadow)">
+    <polygon points="435,660 455,655 475,660 455,665" fill="#1E293B" stroke="#FBBF24" stroke-width="1.5"/>
+    <polygon points="455,655 462,650 482,655 475,660" fill="#0F172A" stroke="#FBBF24" stroke-width="1"/>
+    <text x="458" y="668" text-anchor="middle" font-size="7">🔋</text>
+  </g>
+  <text x="450" y="680" text-anchor="middle" font-family="Arial,sans-serif" font-size="7" fill="#FBBF24">10K mAh</text>
+
+  <!-- 8. Microphone (collar) -->
+  <g filter="url(#shadow)">
+    <ellipse cx="490" cy="540" rx="8" ry="12" fill="#1E293B" stroke="#818CF8" stroke-width="1.5" transform="rotate(15, 490, 540)"/>
+    <text x="490" y="543" text-anchor="middle" font-size="8">🎤</text>
+  </g>
+
+  <!-- 9. E-STOP button -->
+  <g>
+    <circle cx="425" cy="600" r="9" fill="#DC2626" stroke="#FCA5A5" stroke-width="2" filter="url(#neon)"/>
+    <text x="425" y="603" text-anchor="middle" font-size="7" fill="white" font-weight="bold">!</text>
+  </g>
+  <text x="415" y="620" text-anchor="middle" font-family="Arial,sans-serif" font-size="6" fill="#DC2626">E-STOP</text>
+
+  <!-- === SIGNAL WAVES (animated with CSS would be ideal, SMIL fallback) === -->
+  <!-- From CAM to UNO Q -->
+  <path d="M515 545 Q530 580 515 620 Q500 655 510 665" fill="none" stroke="#22D3EE" stroke-width="2" stroke-dasharray="6,4" opacity="0.8">
+    <animate attributeName="stroke-dashoffset" from="20" to="0" dur="1s" repeatCount="indefinite"/>
+  </path>
+
+  <!-- From UNO Q to cloud -->
+  <path d="M555 660 Q620 650 650 580 Q680 500 700 450" fill="none" stroke="#6366F1" stroke-width="2.5" stroke-dasharray="8,6" opacity="0.7">
+    <animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.5s" repeatCount="indefinite"/>
+  </path>
+
+  <!-- Cloud AI -->
+  <g filter="url(#shadow)">
+    <ellipse cx="720" cy="420" rx="70" ry="40" fill="#1E293B" stroke="#6366F1" stroke-width="2"/>
+    <text x="720" y="418" text-anchor="middle" font-size="22">☁️</text>
+    <text x="720" y="440" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="bold" fill="#6366F1">Jetson / VPS</text>
+  </g>
+
+  <!-- Return signal -->
+  <path d="M700 460 Q650 500 620 540" fill="none" stroke="#34D399" stroke-width="2.5" stroke-dasharray="8,6" opacity="0.7">
+    <animate attributeName="stroke-dashoffset" from="28" to="0" dur="1.5s" repeatCount="indefinite"/>
+  </path>
+
+  <!-- === DATA PACKETS (animated particles) === -->
+  <circle cx="0" cy="0" r="3" fill="#22D3EE" filter="url(#neon)">
+    <animateMotion dur="2s" repeatCount="indefinite" path="M515 545 Q530 580 515 620 Q500 655 510 665"/>
+  </circle>
+  <circle cx="0" cy="0" r="3" fill="#6366F1" filter="url(#neon)">
+    <animateMotion dur="2.5s" repeatCount="indefinite" path="M555 660 Q620 650 650 580 Q680 500 700 450"/>
+  </circle>
+  <circle cx="0" cy="0" r="3" fill="#34D399" filter="url(#neon)">
+    <animateMotion dur="2.5s" repeatCount="indefinite" path="M700 460 Q650 500 620 540"/>
+  </circle>
+
+  <!-- === LEGEND PANEL (bottom) === -->
+  <rect x="30" y="795" width="940" height="42" rx="10" fill="#0F172A" stroke="#334155" stroke-width="1"/>
+  <text x="50" y="821" font-family="Arial,sans-serif" font-size="11" fill="#94A3B8">🟦</text>
+  <text x="75" y="821" font-family="Arial,sans-serif" font-size="10" fill="#22D3EE">Camera→UNO Q (WiFi)</text>
+  <text x="250" y="821" font-family="Arial,sans-serif" font-size="10" fill="#6366F1">🟣 UNO Q→Jetson (Tailscale)</text>
+  <text x="450" y="821" font-family="Arial,sans-serif" font-size="10" fill="#34D399">🟢 Jetson→Speaker (Response)</text>
+  <text x="680" y="821" font-family="Arial,sans-serif" font-size="10" fill="#F87171">🔴 Emergency SMS (LTE)</text>
+
+  <!-- === CALLOUT BOXES === -->
+  <!-- UNO Q callout -->
+  <line x1="490" y1="660" x2="160" y2="720" stroke="#00979D" stroke-width="1" stroke-dasharray="4,4"/>
+  <rect x="30" y="700" width="170" height="55" rx="8" fill="#1E293B" stroke="#00979D" stroke-width="1.5"/>
+  <text x="115" y="720" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="bold" fill="#00979D">System Coordinator</text>
+  <text x="115" y="736" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">Routes all signals</text>
+  <text x="115" y="750" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#64748B">Manages 4G failover</text>
+
+  <!-- Jetson callout -->
+  <line x1="720" y1="420" x2="780" y2="460" stroke="#6366F1" stroke-width="1" stroke-dasharray="4,4"/>
+  <rect x="750" y="440" width="210" height="70" rx="8" fill="#1E293B" stroke="#6366F1" stroke-width="1.5"/>
+  <text x="855" y="460" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="bold" fill="#6366F1">Jetson Orin Nano Super</text>
+  <text x="855" y="476" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">67 TOPS · CUDA GPU</text>
+  <text x="855" y="492" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">YOLOv8n · Phi-3 · OCR · Whisper</text>
+  <text x="855" y="506" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" fill="#64748B">Backpack or home · Tailscale mesh</text>
+</svg>

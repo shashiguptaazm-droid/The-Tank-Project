@@ -14,6 +14,10 @@
 2. **Arduino UNO Q 4GB** (QRB2210 + STM32U585) — real-time controller
 3. **ESP32-S3 ×3 + DFRobot AI Camera** — distributed peripherals
 
+**The Tank also ships with a detachable external module — a blind-assistance wearable**
+that reconfigures the same UNO Q + Jetson + ESP32 hardware into a portable AI guide
+device for visually impaired users. See [docs/BLIND_ASSIST.md](docs/BLIND_ASSIST.md).
+
 **88,000+ lines of Python · 425+ tests · 70 screenshots · 23 ROS2 packages**
 
 ---
@@ -31,6 +35,7 @@
 | **3 Perception Nodes** | DFRobot AI Camera + LiDAR + ESP32-S3 CAM (on UNO Q) |
 | **Never-Offline Connectivity** | WiFi → 4G LTE → Hotspot → Tailscale mesh |
 | **SMS Control** | Text message commands via Quectel LTE modem |
+| **Blind-Assistance Module** | Detachable wearable — AI vision → spoken guidance via UNO Q |
 | **PWA Dashboard** | Phone-based 8-tab control center |
 
 ---
@@ -43,7 +48,9 @@
 | Arduino UNO Q 4GB | QRB2210 + STM32U585 | Motor/sensor/safety control | ✅ Online |
 | DFRobot AI Camera | SEN0611, ESP32-S3 | RGB + night vision, 640×480 | ✅ Streaming |
 | LDROBOT LiDAR LD19 | 360° laser scanning | 12m range, 5kHz scan | ✅ Live |
-| ESP32-S3 CAM | ESPHome firmware | 3rd perception node on UNO Q | ✅ Online |
+| ESP32-S3 CAM | ESPHome firmware | 3rd perception node on UNO Q + blind-assist camera | ✅ Online |
+| ESP32 Dual Screen | 2× GC9A01 Round LCD | Visual alerts + speaker for blind module | ✅ Working |
+| USB Speaker + Mic | 3W speaker, mini mic | Audio feedback + voice commands | ✅ Working |
 | 4G Modem | Quectel EG800AK | SMS + data backup | ✅ 64% signal |
 | Motors | JGB37-520 ×2 | Tracked locomotion | 🔵 Firmware ready |
 | Motor Driver | BTS7960 ×2 | H-bridge control | 🔵 Firmware ready |
@@ -116,6 +123,17 @@ tank_task · tank_text · tank_vision
 - 425+ tests passing
 - 23 ROS2 packages built (Jazzy)
 
+### ✅ Blind-Assistance Module (Demo Video Uploaded)
+
+- Wearable configuration: UNO Q + ESP32 CAM + LTE + Dual Screen + Speaker → worn by user
+- AI vision pipeline: ESP32 CAM → UNO Q → Tailscale → Jetson → YOLO + LLM → spoken guidance
+- Voice commands: "What's around me?" · "Read that sign" · "Find my keys" · "Call emergency"
+- Obstacle detection with audio alerts + screen warnings
+- Emergency triple-tap E-STOP → SMS with GPS to contacts
+- Optional locomotion follower: "Follow me" mode guides the user physically
+- Full offline capability: 42 local AI models — works without internet
+- LTE failover: WiFi → 4G → Hotspot → Tailscale — never disconnected
+
 ### 🔵 Code Complete, Needs Physical Wiring
 
 - Motor control (BTS7960)
@@ -130,6 +148,7 @@ tank_task · tank_text · tank_vision
 - Full autonomous pipeline: SENSE → PERCEIVE → FUSE → UNDERSTAND → DECIDE → ACT → VERIFY → LEARN
 - Judge Mode: one-screen subsystem verification
 - Human Control Center: follow/stop/escort modes
+- **Blind-Assistance Demo**: live wearable demo — scene description, obstacle warning, voice interaction
 
 ---
 
@@ -207,6 +226,7 @@ tank_task · tank_text · tank_vision
 | [hardware.md](hardware.md) | Complete BOM with pricing |
 | [WIRING.md](WIRING.md) | Pin connections, I²C addresses |
 | [COMPARISON.md](COMPARISON.md) | TankOS vs competitors |
+| [docs/BLIND_ASSIST.md](docs/BLIND_ASSIST.md) | Blind-assistance wearable module |
 | [docs/screenshots/](docs/screenshots/) | 70+ live screenshots |
 | [docs/infographics/](docs/infographics/) | 51 SVG architecture diagrams |
 
@@ -224,6 +244,7 @@ tank_task · tank_text · tank_vision
 8. **SMS control** — text your robot
 9. **Open source** — MIT license
 10. **Indian parts** — available on Robu.in
+11. **Blind-assistance wearable** — same hardware, life-changing use case
 
 ---
 

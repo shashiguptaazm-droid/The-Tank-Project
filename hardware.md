@@ -92,6 +92,26 @@
 
 ---
 
+## 🦯 Blind-Assistance External Module
+
+> Detachable wearable module that extends the Tank for visually impaired users.
+> See [docs/BLIND_ASSIST.md](docs/BLIND_ASSIST.md) for full documentation.
+
+| Component | Model | Specs | Price (₹) |
+|-----------|-------|-------|-----------|
+| ESP32-S3 CAM | ESPHome, WiFi | 640×480, 8.9fps, night vision | 600 |
+| ESP32 Dual Screen | 2× GC9A01 Round LCD | 240×240, speaker driver | 500 |
+| Speaker | 3W mini | 3.5mm / USB | 200 |
+| Microphone | USB mini mic | Voice command input | 300 |
+| Power Bank | 10,000 mAh USB-C PD | 8+ hour runtime | 1,200 |
+| Wearable Harness | Belt + shoulder mount | Ergonomic wear | 500 |
+| Cables & Connectors | USB-C, jumpers | | 500 |
+| **Module Subtotal** | | | **3,800** |
+
+**Module uses UNO Q + Jetson + LTE from core BOM.** Total effective cost when used as blind-assistance device: **₹56,300**.
+
+---
+
 ## 💰 Total Cost
 
 | Category | Amount (₹) |
@@ -104,11 +124,12 @@
 | Power | 3,200 |
 | ESP32 | 1,800 |
 | Chassis | 5,000 |
+| Blind-Assist Module | 3,800 |
 | Misc (wires, connectors) | 2,000 |
-| **GRAND TOTAL** | **₹64,050 (~$800)** |
+| **GRAND TOTAL (with blind module)** | **₹67,850 (~$850)** |
 
 ---
 
 ## 📦 Component Images
 
-See `images/` directory for hardware photos and `assets/infographics/` for visual documentation.
+See `images/` directory for hardware photos (including `20260823_235016.jpg` and `20260823_235019.jpg` — blind-assistance module setup) and `assets/infographics/` for visual documentation.

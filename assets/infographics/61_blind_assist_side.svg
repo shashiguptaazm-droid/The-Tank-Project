@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="800" height="700">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22D3EE"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+    <linearGradient id="signal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22D3EE"/>
+      <stop offset="100%" stop-color="#76B900"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="700" fill="url(#bg)" rx="16"/>
+
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="bold" fill="url(#accent)">🦯 BLIND-ASSISTANCE MODULE — Side View &amp; Component Map</text>
+  <text x="400" y="55" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#64748B">Where each component sits on the body · Cable routing · Signal paths</text>
+
+  <!-- ===== PERSON PROFILE (side view, walking right) ===== -->
+  <!-- Head (facing right) -->
+  <circle cx="420" cy="110" r="45" fill="#1E293B" stroke="#475569" stroke-width="2"/>
+  <!-- Ear -->
+  <ellipse cx="460" cy="110" rx="6" ry="10" fill="#1E293B" stroke="#475569" stroke-width="1"/>
+  <!-- Sunglasses -->
+  <path d="M395 102 Q420 98 440 102" fill="none" stroke="#22D3EE" stroke-width="3" stroke-linecap="round"/>
+  <rect x="408" y="98" width="32" height="12" rx="6" fill="#0F172A" stroke="#22D3EE" stroke-width="1.5"/>
+  <!-- Nose -->
+  <path d="M440 110 Q448 118 440 122" fill="none" stroke="#475569" stroke-width="1.5"/>
+  <!-- Hair -->
+  <path d="M375 95 Q390 65 420 65 Q455 65 465 95" fill="#0F172A" stroke="#475569" stroke-width="1.5"/>
+
+  <!-- Body (torso side view) -->
+  <path d="M390 160 L375 380 Q370 400 395 420 L400 420 L400 160 Z" fill="#1E293B" stroke="#475569" stroke-width="2"/>
+  <!-- Chest curve -->
+  <path d="M385 180 Q375 220 380 280 Q385 320 375 380" fill="none" stroke="#334155" stroke-width="1"/>
+
+  <!-- Right arm (swinging forward, holding cane) -->
+  <path d="M390 190 Q350 250 310 310 Q300 330 310 340" fill="none" stroke="#475569" stroke-width="12" stroke-linecap="round"/>
+  <!-- Cane in hand -->
+  <line x1="310" y1="340" x2="280" y2="520" stroke="#FBBF24" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="280" cy="525" r="6" fill="none" stroke="#FBBF24" stroke-width="2"/>
+  <circle cx="310" cy="340" r="5" fill="#FBBF24"/>
+
+  <!-- Left arm (swinging back) -->
+  <path d="M390 200 Q430 250 460 310" fill="none" stroke="#334155" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Legs (walking pose) -->
+  <path d="M385 400 L370 520 L360 545" fill="none" stroke="#475569" stroke-width="16" stroke-linecap="round"/>
+  <path d="M400 400 L430 520 L440 545" fill="none" stroke="#475569" stroke-width="16" stroke-linecap="round"/>
+  <!-- Shoes -->
+  <ellipse cx="358" cy="550" rx="25" ry="8" fill="#0F172A" stroke="#475569" stroke-width="1"/>
+  <ellipse cx="445" cy="550" rx="25" ry="8" fill="#0F172A" stroke="#475569" stroke-width="1"/>
+
+  <!-- ===== WEARABLE COMPONENTS (side view placement) ===== -->
+
+  <!-- 1. ESP32 CAM on chest -->
+  <rect x="380" y="210" width="22" height="32" rx="5" fill="#E44D26" stroke="#FB923C" stroke-width="1.5" filter="url(#glow)"/>
+  <circle cx="391" cy="224" r="3" fill="#0F172A"/>
+  <circle cx="391" cy="224" r="2" fill="#22D3EE"/>
+  <text x="380" y="255" font-family="Arial,sans-serif" font-size="7" font-weight="bold" fill="#FB923C">CAM</text>
+
+  <!-- 2. Harness strap -->
+  <path d="M380 185 Q370 200 375 250 Q378 280 375 320 Q372 360 380 400" fill="none" stroke="#6366F1" stroke-width="4" stroke-dasharray="8,4" opacity="0.7"/>
+
+  <!-- 3. UNO Q on belt -->
+  <rect x="365" y="365" width="50" height="65" rx="8" fill="#1E293B" stroke="#00979D" stroke-width="2.5" filter="url(#glow)"/>
+  <text x="390" y="383" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" font-weight="bold" fill="#00979D">Arduino</text>
+  <text x="390" y="396" text-anchor="middle" font-family="Arial,sans-serif" font-size="8" font-weight="bold" fill="#00979D">UNO Q</text>
+  <text x="390" y="412" text-anchor="middle" font-family="Arial,sans-serif" font-size="6" fill="#CBD5E1">4GB</text>
+  <text x="390" y="424" text-anchor="middle" font-family="Arial,sans-serif" font-size="5" fill="#64748B">QRB2210+</text>
+
+  <!-- 4. Power bank on back belt -->
+  <rect x="370" y="440" width="40" height="25" rx="6" fill="#1E293B" stroke="#FBBF24" stroke-width="1.5"/>
+  <text x="390" y="456" text-anchor="middle" font-size="10">🔋</text>
+  <text x="390" y="475" text-anchor="middle" font-family="Arial,sans-serif" font-size="6" fill="#FBBF24">10K mAh</text>
+
+  <!-- 5. LTE Modem (hip pocket) -->
+  <rect x="415" y="380" width="22" height="45" rx="5" fill="#1E293B" stroke="#F472B6" stroke-width="1.5"/>
+  <text x="426" y="400" text-anchor="middle" font-size="8">📶</text>
+  <text x="426" y="435" text-anchor="middle" font-family="Arial,sans-serif" font-size="6" fill="#F472B6">4G</text>
+
+  <!-- 6. E-STOP button on strap -->
+  <circle cx="378" cy="340" r="7" fill="#DC2626" stroke="#FCA5A5" stroke-width="1.5"/>
+  <text x="378" y="343" text-anchor="middle" font-size="6" fill="white" font-weight="bold">!</text>
+
+  <!-- ===== RIGHT SIDE: EXPLODED COMPONENT VIEW ===== -->
+  <rect x="540" y="80" width="235" height="640" rx="12" fill="#0F172A" stroke="#334155" stroke-width="1.5"/>
+  <text x="657" y="105" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="url(#accent)">Component Detail</text>
+
+  <!-- Component 1 -->
+  <rect x="555" y="120" width="205" height="55" rx="8" fill="#1E293B" stroke="#FB923C" stroke-width="1"/>
+  <text x="570" y="140" font-size="16">📷</text>
+  <text x="592" y="140" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#FB923C">ESP32-S3 CAM</text>
+  <text x="592" y="155" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">WiFi 640×480, Night Vision</text>
+  <text x="592" y="168" font-family="Arial,sans-serif" font-size="8" fill="#64748B">Chest-mounted · USB-C power</text>
+
+  <!-- Component 2 -->
+  <rect x="555" y="185" width="205" height="55" rx="8" fill="#1E293B" stroke="#00979D" stroke-width="1"/>
+  <text x="570" y="205" font-size="16">⚡</text>
+  <text x="592" y="205" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#00979D">Arduino UNO Q 4GB</text>
+  <text x="592" y="220" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">QRB2210 Linux + STM32 MCU</text>
+  <text x="592" y="233" font-family="Arial,sans-serif" font-size="8" fill="#64748B">Belt-mounted · All data routes here</text>
+
+  <!-- Component 3 -->
+  <rect x="555" y="250" width="205" height="55" rx="8" fill="#1E293B" stroke="#A78BFA" stroke-width="1"/>
+  <text x="570" y="270" font-size="16">👁️</text>
+  <text x="592" y="270" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#A78BFA">ESP32 Dual Screen</text>
+  <text x="592" y="285" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">2× GC9A01 Round LCD 240×240</text>
+  <text x="592" y="298" font-family="Arial,sans-serif" font-size="8" fill="#64748B">Shoulder strap · LED expressions</text>
+
+  <!-- Component 4 -->
+  <rect x="555" y="315" width="205" height="55" rx="8" fill="#1E293B" stroke="#34D399" stroke-width="1"/>
+  <text x="570" y="335" font-size="16">🔊</text>
+  <text x="592" y="335" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#34D399">3W Mini Speaker</text>
+  <text x="592" y="350" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">Audio feedback + TTS output</text>
+  <text x="592" y="363" font-family="Arial,sans-serif" font-size="8" fill="#64748B">Shoulder · Spoken guidance</text>
+
+  <!-- Component 5 -->
+  <rect x="555" y="380" width="205" height="55" rx="8" fill="#1E293B" stroke="#F472B6" stroke-width="1"/>
+  <text x="570" y="400" font-size="16">📶</text>
+  <text x="592" y="400" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#F472B6">Quectel EG800AK LTE</text>
+  <text x="592" y="415" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">4G Cellular · SMS · GPS</text>
+  <text x="592" y="428" font-family="Arial,sans-serif" font-size="8" fill="#64748B">Hip/pocket · Always online</text>
+
+  <!-- Component 6 -->
+  <rect x="555" y="445" width="205" height="55" rx="8" fill="#1E293B" stroke="#818CF8" stroke-width="1"/>
+  <text x="570" y="465" font-size="16">🎤</text>
+  <text x="592" y="465" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#818CF8">USB Mini Microphone</text>
+  <text x="592" y="480" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">Voice commands via Whisper AI</text>
+  <text x="592" y="493" font-family="Arial,sans-serif" font-size="8" fill="#64748B">Collar clip · Voice input</text>
+
+  <!-- Component 7 -->
+  <rect x="555" y="510" width="205" height="55" rx="8" fill="#1E293B" stroke="#FBBF24" stroke-width="1"/>
+  <text x="570" y="530" font-size="16">🔋</text>
+  <text x="592" y="530" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#FBBF24">Power Bank 10,000mAh</text>
+  <text x="592" y="545" font-family="Arial,sans-serif" font-size="9" fill="#CBD5E1">USB-C PD 5V/3A · 8+ hours</text>
+  <text x="592" y="558" font-family="Arial,sans-serif" font-size="8" fill="#64748B">Back belt · All devices powered</text>
+
+  <!-- Component 8 (optional locomotion) -->
+  <rect x="555" y="575" width="205" height="55" rx="8" fill="#1E293B" stroke="#475569" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="570" y="595" font-size="16">🚶</text>
+  <text x="592" y="595" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#64748B">Locomotion (optional)</text>
+  <text x="592" y="610" font-family="Arial,sans-serif" font-size="9" fill="#64748B">Tracked follower · Escort mode</text>
+  <text x="592" y="623" font-family="Arial,sans-serif" font-size="8" fill="#475569">Physical AI assistant walking</text>
+
+  <!-- ===== WIRELESS SIGNAL WAVES ===== -->
+  <!-- From CAM to UNO Q -->
+  <path d="M410 226 Q440 226 440 380" fill="none" stroke="#22D3EE" stroke-width="1" stroke-dasharray="4,4"/>
+  <circle cx="418" cy="240" r="12" fill="none" stroke="#22D3EE" stroke-width="0.5" opacity="0.5"/>
+  <circle cx="418" cy="240" r="8" fill="none" stroke="#22D3EE" stroke-width="0.5" opacity="0.7"/>
+  <circle cx="418" cy="240" r="4" fill="none" stroke="#22D3EE" stroke-width="0.5"/>
+
+  <!-- From UNO Q to cloud -->
+  <path d="M390 365 Q390 340 460 340 Q520 340 520 280" fill="none" stroke="#6366F1" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="455" y="332" font-family="Arial,sans-serif" font-size="8" fill="#6366F1">Tailscale/LTE ↑</text>
+
+  <!-- Cloud AI -->
+  <rect x="510" y="240" width="100" height="40" rx="20" fill="#1E293B" stroke="#6366F1" stroke-width="1.5"/>
+  <text x="560" y="265" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="bold" fill="#6366F1">☁️ Jetson / VPS</text>
+
+  <!-- Return path -->
+  <path d="M560 280 Q560 340 440 340 Q425 340 425 365" fill="none" stroke="#34D399" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="500" y="338" font-family="Arial,sans-serif" font-size="8" fill="#34D399">AI response ↓</text>
+
+  <!-- ===== PRICING BOX ===== -->
+  <rect x="30" y="575" width="270" height="85" rx="10" fill="#1E293B" stroke="#34D399" stroke-width="1.5"/>
+  <text x="165" y="598" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" font-weight="bold" fill="#34D399">💰 Module BOM Cost</text>
+  <text x="165" y="617" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#CBD5E1">ESP32 CAM ₹600 · Dual Screen ₹500</text>
+  <text x="165" y="633" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#CBD5E1">Speaker ₹200 · Mic ₹300 · Bank ₹1200</text>
+  <text x="165" y="649" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="#CBD5E1">Harness ₹500 · Cables ₹500</text>
+  <text x="165" y="655" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="#34D399">Total Module: ₹3,800</text>
+
+  <!-- Footer -->
+  <text x="400" y="685" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#475569">The Tank Project · Blind-Assistance Wearable · Side View · APC-2026-RJ-75818</text>
+</svg>

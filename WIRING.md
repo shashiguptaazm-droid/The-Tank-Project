@@ -85,10 +85,54 @@
 
 ---
 
+## 🦯 Blind-Assistance External Module Wiring
+
+> See [docs/BLIND_ASSIST.md](docs/BLIND_ASSIST.md) for full module documentation.
+
+### UNO Q ↔ Wearable Peripherals
+
+| UNO Q Port | Peripheral | Cable | Protocol |
+|-----------|------------|-------|----------|
+| USB-C (PD) | Power Bank 10,000mAh | USB-C | 5V/3A PD |
+| USB-C (data 1) | ESP32-S3 CAM (chest camera) | USB-C | WiFi/Serial |
+| USB-C (data 2) | ESP32 Dual Screen + Speaker | USB-C | JSON/UART |
+| USB-A 1 | Quectel EG800AK LTE Modem | USB-A | AT commands |
+| USB-A 2 | USB Mini Microphone | USB-A | Audio input |
+| USB-A 3 | Jetson Orin Nano (AI brain) | USB-C to USB-A | Serial 115200 |
+| USB-A 4 | LDROBOT LD19 LiDAR (optional) | USB-UART | 115200 baud |
+
+### ESP32 Dual Screen Pin Map (to GC9A01 ×2 + Speaker)
+
+| ESP32-S3 Pin | Function | Wire | Destination |
+|-------------|----------|------|-------------|
+| GPIO 4 | Left LCD CS | Yellow | GC9A01 #1 CS |
+| GPIO 5 | Right LCD CS | Orange | GC9A01 #2 CS |
+| GPIO 6 | SPI SCK | Green | Both LCDs SCK |
+| GPIO 7 | SPI MOSI | Blue | Both LCDs SDA |
+| GPIO 8 | DC | Purple | Both LCDs DC |
+| GPIO 9 | RST | Gray | Both LCDs RST |
+| GPIO 10 | Backlight | White | Both LCDs BL |
+| GPIO 11 | Speaker PWM | Red | 3W Speaker + |
+| GND | Common GND | Black | All devices |
+
+### E-STOP (Emergency Button)
+
+| UNO Q Pin | Function | Wire | Destination |
+|-----------|----------|------|-------------|
+| D9 | E-STOP Input (pull-up) | Red | Momentary button (NC) |
+| GND | Ground | Black | Button GND |
+| D8 | Status LED | Yellow | Red LED + 220Ω → GND |
+
+**Triple-tap within 2 seconds** triggers emergency SMS + alarm.
+
+---
+
 ## ⚠️ Safety Notes
 
 1. **Common ground** — All boards MUST share a common GND
-2. **E-STOP** — Hardware button cuts power to motors immediately
+2. **E-STOP** — Hardware button cuts power to motors immediately; triple-tap triggers emergency SMS in blind-assist mode
 3. **No Jetson GPIO to motors** — Jetson NEVER touches motor wires
 4. **USB serial only** — Jetson ↔ UNO Q communication via USB
 5. **Current sensing** — INA219 monitors both motor and logic rails
+6. **Power bank must support USB-C PD 5V/3A** — insufficient power causes camera dropouts
+7. **LTE modem needs active SIM** — test with `mmcli -m 0 --command="AT+CSQ"` before demo
