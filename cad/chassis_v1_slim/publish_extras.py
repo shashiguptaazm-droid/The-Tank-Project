@@ -364,7 +364,7 @@ def generate_dxfs(stl_dir: pathlib.Path) -> int:
 
 POCKETS = [
     # (display_label, x_mm, y_mm, z_mm, color_hex, brief)
-    ("Jetson,                  0,   0,   10, "#ffa500", "Jetson Orin Nano, NVMe SSD"),
+    ("Jetson",                  0,   0,   10, "#ffa500", "Jetson Orin Nano, NVMe SSD"),
     ("ESP32-S3",              0, -28,   10, "#22ddaa", "ESP32-S3 DevKitC-1 N16R8 (USB)"),
     ("BNO055",               -35,  25,    4, "#cc66ff", "9-DOF IMU (i²c 0x29)"),
     ("INA219 #1",            -65,  30,    4, "#ff6699", "Pi-rail current/voltage monitor"),
