@@ -44,6 +44,8 @@ tank_ws/src/tank_bringup/urdf/tank.urdf
 
 # Secrets — never commit
 .env
+.env.*
+.env.jetson
 .env.keys
 config/secrets.yaml
 config/*.local.yaml
@@ -51,6 +53,9 @@ config/*.local.yaml
 # 3D-print profiles / per-printer state (Bambu)
 .creality_print/
 printables/
+
+# Temp downloads
+downloadfile.PDF
 
 # Diagnostic dumps
 diagnostics/*.txt
@@ -80,3 +85,9 @@ firmware/dfrobot_camera/temp_repo/
 # Runtime data (not source)
 data/frames/
 data/faces/*.caffemodel
+
+# Embedded git repos (submodules or vendored)
+tank_ws/tools/visdom/
+
+# Backup files — never commit
+*.bak
