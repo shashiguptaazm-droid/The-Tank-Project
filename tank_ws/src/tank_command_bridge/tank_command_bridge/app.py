@@ -810,21 +810,25 @@ def start_bridge_thread() -> Optional[BridgeNode]:
 
 
 # ---------------------------------------------------------------------------
-# ---------------------------------------------------------------------------
-# Real Agent Chat Endpoint — routes through LLM providers
-# ---------------------------------------------------------------------------
+# ===========================================================================
+# Full Coding Agent Endpoint — ports agent_chat.py tools to bridge
+# ===========================================================================
 
 import os as _os
 import json as _json
 import urllib.request
 import urllib.error
 import re as _re
+import subprocess as _subprocess
+import time as _time
 
 _agent_history = []
 
 
+# ---- LLM Providers ----
+
 def _call_openai_compat(base_url, api_key, model, messages, max_tokens=1024, retries=3):
-    """Call an OpenAI-compatible API with retry on DNS failures."""
+    """Call OpenAI-compatible API with DNS retry."""
     url = f"{base_url}/chat/completions"
     payload = _json.dumps({
         "model": model,
@@ -839,32 +843,32 @@ def _call_openai_compat(base_url, api_key, model, messages, max_tokens=1024, ret
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json"
             })
-            with urllib.request.urlopen(req, timeout=30) as resp:
+            with urllib.request.urlopen(req, timeout=60) as resp:
                 data = _json.loads(resp.read().decode())
             return data["choices"][0]["message"]["content"]
         except (urllib.error.URLError, socket.gaierror, OSError) as e:
             if attempt < retries - 1:
-                import time as _time
-                _time.sleep(2 * (attempt + 1))  # Backoff: 2s, 4s
+                _time.sleep(2 * (attempt + 1))
             else:
                 raise
 
 
-def _call_gemini(api_key, model, text, max_tokens=1024):
+def _call_gemini(api_key, model, messages, max_tokens=1024):
     """Call Google Gemini API."""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+    text = "\n".join(m["content"] for m in messages if m.get("role") == "user")
     payload = _json.dumps({
         "contents": [{"parts": [{"text": text}]}],
         "generationConfig": {"temperature": 0.7, "maxOutputTokens": max_tokens}
     }).encode()
     req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=30) as resp:
+    with urllib.request.urlopen(req, timeout=60) as resp:
         data = _json.loads(resp.read().decode())
     return data["candidates"][0]["content"]["parts"][0]["text"]
 
 
 def _rotate_llm(messages):
-    """Try providers in rotation, return (reply, provider_name) or (None, None)."""
+    """Try providers in rotation, return (reply, provider_name)."""
     providers = [
         ("mistral", "https://api.mistral.ai/v1", "MISTRAL_API_KEY", "mistral-small-latest", "openai"),
         ("groq_compound", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "groq/compound", "openai"),
@@ -876,7 +880,10 @@ def _rotate_llm(messages):
         if not api_key:
             continue
         try:
-            reply = _call_openai_compat(base_url, api_key, model, messages)
+            if kind == "openai":
+                reply = _call_openai_compat(base_url, api_key, model, messages)
+            else:
+                reply = _call_gemini(api_key, model, messages)
             return reply, name
         except Exception as e:
             _LOG.warning("Agent provider %s failed: %s", name, e)
@@ -884,10 +891,146 @@ def _rotate_llm(messages):
     return None, None
 
 
+# ---- Tool Catalog ----
+
+def _load_tool_catalog():
+    """Load tool catalog from registry."""
+    try:
+        import sys as _sys
+        project = "/home/shashi/The-Tank-Project"
+        ws_src = f"{project}/tank_ws/src"
+        for p in [project, ws_src] + [f"{ws_src}/{d}" for d in _os.listdir(ws_src)]:
+            if p not in _sys.path:
+                _sys.path.insert(0, p)
+        from tank_os.agent_framework.registry import ToolRegistry
+        from pathlib import Path
+        reg = ToolRegistry(scripts_dir=Path(project) / "scripts")
+        reg.discover()
+        tools = reg.list()
+        cats = {}
+        for t in tools[:400]:
+            cats.setdefault(t.category, []).append(t)
+        lines = []
+        for cat, cat_tools in sorted(cats.items()):
+            lines.append(f"\n[{cat}]")
+            for t in cat_tools[:6]:
+                desc = (t.description or "").strip()[:55]
+                lines.append(f"  {t.name} -- {desc}")
+        lines.append(f"\n({len(tools)} tools total)")
+        return "\n".join(lines)
+    except Exception as e:
+        _LOG.warning("Failed to load tool catalog: %s", e)
+        return "(tool catalog unavailable)"
+
+
+# ---- Tool Execution ----
+
+def _run_shell(cmd, timeout=15):
+    """Run shell command on Jetson."""
+    try:
+        r = _subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
+        parts = []
+        if r.stdout:
+            parts.append(r.stdout.strip())
+        if r.stderr:
+            parts.append(f"[stderr] {r.stderr.strip()}")
+        return "\n".join(parts) if parts else "(no output)"
+    except _subprocess.TimeoutExpired:
+        return f"TIMEOUT: {cmd}"
+    except Exception as e:
+        return f"ERROR: {e}"
+
+
+def _invoke_tool(tool_name, args):
+    """Invoke a registered tool."""
+    try:
+        import sys as _sys
+        project = "/home/shashi/The-Tank-Project"
+        ws_src = f"{project}/tank_ws/src"
+        for p in [project, ws_src] + [f"{ws_src}/{d}" for d in _os.listdir(ws_src)]:
+            if p not in _sys.path:
+                _sys.path.insert(0, p)
+        from tank_os.agent_framework.registry import ToolRegistry
+        from tank_os.agent_framework.invoker import ToolInvoker
+        from tank_os.agent_framework.schemas import ToolCallRequest
+        from pathlib import Path
+        reg = ToolRegistry(scripts_dir=Path(project) / "scripts")
+        reg.discover()
+        tool_def = reg.get(tool_name)
+        if tool_def is None:
+            # Fallback: search scripts
+            scripts_dir = Path(project) / "scripts"
+            for cat_dir in scripts_dir.iterdir():
+                if cat_dir.is_dir():
+                    for script in cat_dir.glob("*.py"):
+                        if tool_name.replace(".", "_") in script.name or tool_name.split(".")[-1] in script.name:
+                            result = _run_shell(f"python3 {script} {' '.join(f'--{k} {v}' for k, v in args.items()) if args else ''}")
+                            return result
+            return f"Tool '{tool_name}' not found"
+        invoker = ToolInvoker(reg)
+        req = ToolCallRequest(tool_name=tool_name, args=args, timeout_s=30)
+        resp = invoker.invoke(req)
+        parts = []
+        if resp.stdout:
+            parts.append(resp.stdout.strip())
+        if resp.stderr:
+            parts.append(f"[stderr] {resp.stderr.strip()}")
+        return "\n".join(parts) if parts else f"(status={resp.status}, exit={resp.exit_code})"
+    except Exception as e:
+        return f"Tool error: {e}"
+
+
+def _capture_camera():
+    """Capture from DFRobot USB camera + YOLO."""
+    try:
+        import sys as _sys
+        project = "/home/shashi/The-Tank-Project"
+        ws_src = f"{project}/tank_ws/src"
+        for p in [project, ws_src] + [f"{ws_src}/{d}" for d in _os.listdir(ws_src)]:
+            if p not in _sys.path:
+                _sys.path.insert(0, p)
+        from tank_os.shell.terminal.agent_chat import _camera_vision
+        return _camera_vision()
+    except Exception as e:
+        # Fallback: direct camera capture
+        try:
+            import cv2
+            cap = cv2.VideoCapture(0)
+            ret, frame = cap.read()
+            cap.release()
+            if ret:
+                path = "/tmp/capture.jpg"
+                cv2.imwrite(path, frame)
+                size = _os.path.getsize(path)
+                return f"Camera captured: {path} ({size} bytes)"
+            return "Camera: failed to capture"
+        except:
+            return f"Camera error: {e}"
+
+
+def _run_opencode(task, timeout=120):
+    """Run OpenCode for coding tasks."""
+    try:
+        import sys as _sys
+        project = "/home/shashi/The-Tank-Project"
+        ws_src = f"{project}/tank_ws/src"
+        for p in [project, ws_src] + [f"{ws_src}/{d}" for d in _os.listdir(ws_src)]:
+            if p not in _sys.path:
+                _sys.path.insert(0, p)
+        from tank_os.shell.terminal.agent_chat import _run_opencode as _oc
+        return _oc(task, timeout=timeout)
+    except:
+        # Fallback: write code directly
+        return _run_shell(f"cd /home/shashi/The-Tank-Project && python3 -c \"import subprocess; subprocess.run(['opencode', 'run', '{task}'], timeout={timeout})\"", timeout=timeout+5)
+
+
+# ---- Action Parsing ----
+
 def _parse_action(text):
-    """Extract JSON action from LLM reply (handles code blocks and plain text)."""
+    """Extract action from LLM reply (handles JSON, code blocks, plain text)."""
+    # Strip thinking tags
+    cleaned = _re.sub(r'<think>.*?</think>', '', text, flags=_re.DOTALL)
     # Strip markdown code blocks
-    cleaned = text
     code_blocks = _re.findall(r'```(?:json)?\s*\n?(.*?)\n?```', cleaned, _re.DOTALL)
     if code_blocks:
         cleaned = ' '.join(code_blocks)
@@ -913,123 +1056,148 @@ def _parse_action(text):
     return None
 
 
-
-
-def _exec_tool(action, bridge_url="http://localhost:8082"):
-    """Execute a tool action and return the result as a string."""
-    import urllib.request
+def _exec_action(action):
+    """Execute an action and return the result string."""
     act_type = action.get("action", "")
-    try:
-        if act_type == "camera":
-            req = urllib.request.Request(
-                f"{bridge_url}/api/camera/snapshot?max_px=480",
-                headers={"Authorization": "Bearer bench-key"}
-            )
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                data = _json.loads(resp.read().decode())
-                durl = data.get("data_url", "")
-                if durl and len(durl) > 100:
-                    return f"[camera] Photo captured. Base64 length: {len(durl)} chars. Image shows what the DFRobot USB serial camera sees."
-                return "[camera] No frame available from camera hardware."
-        elif act_type == "lidar":
-            req = urllib.request.Request(
-                f"{bridge_url}/api/lidar/scan",
-                headers={"Authorization": "Bearer bench-key"}
-            )
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                data = _json.loads(resp.read().decode())
-                pts = data.get("points", [])
-                min_d = data.get("min_distance_mm", 0)
-                max_d = data.get("max_distance_mm", 0)
-                return f"[lidar] {len(pts)} points scanned. Range: {min_d/1000:.1f}m - {max_d/1000:.1f}m. Closest obstacle at {min_d/1000:.1f}m."
-        elif act_type == "telemetry":
-            req = urllib.request.Request(
-                f"{bridge_url}/api/cmd/telemetry",
-                method="POST",
-                data=b'{"params":{}}',
-                headers={"Authorization": "Bearer bench-key", "Content-Type": "application/json"}
-            )
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                data = _json.loads(resp.read().decode())
-                result = data.get("result", {})
-                bat = result.get("battery_v", 0)
-                pct = int(result.get("battery_pct", 0) * 100)
-                cpu = result.get("cpu_c", 0)
-                estop = result.get("estop", False)
-                emotion = result.get("emotion", "neutral")
-                return f"[telemetry] Battery: {bat:.2f}V ({pct}%), CPU: {cpu:.1f}C, E-Stop: {'LATCHED' if estop else 'disarmed'}, Emotion: {emotion}"
-        elif act_type == "move":
-            vx = action.get("vx", 0)
-            wz = action.get("wz", 0)
-            dur = action.get("duration_s", 1)
-            body = _json.dumps({"params": {"vx": vx, "wz": wz, "duration_s": dur}}).encode()
-            req = urllib.request.Request(
-                f"{bridge_url}/api/cmd/move",
-                method="POST",
-                data=body,
-                headers={"Authorization": "Bearer bench-key", "Content-Type": "application/json"}
-            )
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                data = _json.loads(resp.read().decode())
-                result = data.get("result", {})
-                return f"[move] Tank drove vx={result.get('vx_eff',vx)} wz={result.get('wz_eff',wz)} for {result.get('duration_s_eff',dur)}s"
-        elif act_type == "estop":
-            state = action.get("state", True)
-            body = _json.dumps({"params": {"state": state}}).encode()
-            req = urllib.request.Request(
-                f"{bridge_url}/api/cmd/estop",
-                method="POST",
-                data=body,
-                headers={"Authorization": "Bearer bench-key", "Content-Type": "application/json"}
-            )
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                data = _json.loads(resp.read().decode())
-                return f"[estop] {'EMERGENCY STOP LATCHED' if state else 'E-Stop released'}"
-        elif act_type == "shell":
-            cmd = action.get("cmd", "echo hello")
-            body = _json.dumps({"params": {"text": f"run: {cmd}", "use_external_llm": False}}).encode()
-            req = urllib.request.Request(
-                f"{bridge_url}/api/cmd/chat",
-                method="POST",
-                data=body,
-                headers={"Authorization": "Bearer bench-key", "Content-Type": "application/json"}
-            )
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                data = _json.loads(resp.read().decode())
-                reply = data.get("result", {}).get("reply", "no output")
-                return f"[shell] {reply}"
-        elif act_type == "reply":
-            return None  # Final reply, no tool execution needed
-        else:
-            return f"[unknown] Unknown action: {act_type}"
-    except Exception as e:
-        return f"[error] Tool execution failed: {e}"
+    if act_type == "camera":
+        return _capture_camera()
+    elif act_type == "shell":
+        cmd = action.get("cmd", "echo 'no command'")
+        return _run_shell(cmd)
+    elif act_type == "tool":
+        tool_name = action.get("tool", "")
+        args = action.get("args", {})
+        return _invoke_tool(tool_name, args)
+    elif act_type == "modem":
+        fn = action.get("function", "")
+        args = action.get("args", {})
+        try:
+            import sys as _sys
+            project = "/home/shashi/The-Tank-Project"
+            ws_src = f"{project}/tank_ws/src"
+            for p in [project, ws_src] + [f"{ws_src}/{d}" for d in _os.listdir(ws_src)]:
+                if p not in _sys.path:
+                    _sys.path.insert(0, p)
+            modem_mod = __import__("tank_os.shell.terminal.modem_tools", fromlist=[fn])
+            fn_obj = getattr(modem_mod, fn, None)
+            if fn_obj:
+                return fn_obj(**args)
+            return f"Unknown modem function: {fn}"
+        except Exception as e:
+            return f"Modem error: {e}"
+    elif act_type == "opencode":
+        task = action.get("task", "")
+        return _run_opencode(task) if task else "No task specified"
+    elif act_type == "telemetry":
+        try:
+            resp = urllib.request.urlopen(
+                urllib.request.Request("http://localhost:8082/api/cmd/telemetry",
+                    headers={"Authorization": "Bearer bench-key"}),
+                timeout=10)
+            return _json.loads(resp.read().decode()).get("result", "No telemetry")
+        except Exception as e:
+            return f"Telemetry error: {e}"
+    elif act_type == "move":
+        vx = action.get("vx", 0)
+        wz = action.get("wz", 0)
+        dur = action.get("duration_s", 1)
+        try:
+            data = _json.dumps({"vx": vx, "wz": wz, "duration_s": dur}).encode()
+            req = urllib.request.Request("http://localhost:8082/api/move",
+                data=data, headers={"Authorization": "Bearer bench-key", "Content-Type": "application/json"})
+            resp = urllib.request.urlopen(req, timeout=30)
+            return _json.loads(resp.read().decode()).get("result", "Moved")
+        except Exception as e:
+            return f"Move error: {e}"
+    elif act_type == "estop":
+        try:
+            req = urllib.request.Request("http://localhost:8082/api/estop",
+                headers={"Authorization": "Bearer bench-key"})
+            resp = urllib.request.urlopen(req, timeout=10)
+            return "Emergency stop engaged"
+        except Exception as e:
+            return f"Estop error: {e}"
+    elif act_type == "lidar":
+        try:
+            resp = urllib.request.urlopen(
+                urllib.request.Request("http://localhost:8082/api/lidar/scan",
+                    headers={"Authorization": "Bearer bench-key"}),
+                timeout=15)
+            data = _json.loads(resp.read().decode())
+            pts = data.get("points", [])
+            if pts:
+                dists = [p.get("distance_mm", 0) for p in pts]
+                return f"LIDAR: {len(pts)} points, min={min(dists)}mm max={max(dists)}mm"
+            return "LIDAR: no points"
+        except Exception as e:
+            return f"LIDAR error: {e}"
+    elif act_type == "reply":
+        return None  # No tool result needed
+    else:
+        return f"Unknown action: {act_type}"
 
+
+# ---- Agent Chat Endpoint ----
+
+_TOOL_CATALOG = None  # Lazy-loaded
 
 _SYSTEM_PROMPT = (
-    "You are TankOS Agent controlling a real robot tank."
-    " Available tools (use the EXACT action name):"
-    " camera - capture photo from USB camera."
-    " lidar - 360-degree distance scan."
-    " telemetry - get battery voltage and CPU temp."
-    " move - drive the tank (params: vx, wz, duration_s)."
-    " estop - emergency stop."
-    " shell - run a shell command (params: cmd)."
-    " reply - conversational text response."
-    ""
-    " RULES:"
-    ' - To use a tool, respond with ONLY: {"action": "camera"}'
-    ' - For move: {"action": "move", "vx": 0.3, "wz": 0, "duration_s": 2}'
-    ' - For shell: {"action": "shell", "cmd": "ls"}'
-    " - For chat, reply with plain text (no JSON)."
-    " - Never output markdown code blocks. Just raw JSON or plain text."
+    "You are TankOS Agent -- an autonomous AI with FULL system access on a Jetson Orin Nano robot tank.\n"
+    "You can install packages, run commands, use tools, capture camera, read LiDAR, send SMS, make calls.\n"
+    "\n"
+    "CRITICAL RULES:\n"
+    "1. ALWAYS respond with EXACTLY ONE JSON object. Nothing else. No markdown. No explanation.\n"
+    "2. When you receive [camera], [tool], [shell], [modem], [opencode], [telemetry], [lidar], [move], [estop] results, you MUST describe them with {\"action\":\"reply\",\"text\":\"...\"}. NEVER request the same action again.\n"
+    "3. You have full sudo access. Password is 1234.\n"
+    "4. NEVER say 'I cannot' or 'I am unable'. You have full access. Just do it.\n"
+    "\n"
+    "ACTIONS (respond with exactly ONE):\n"
+    "\n"
+    "Shell command:\n"
+    '{"action":"shell","cmd":"<bash command>"}\n'
+    "\n"
+    "Registered tool:\n"
+    '{"action":"tool","tool":"<tool.name>","args":{}}\n'
+    "\n"
+    "DFRobot camera + YOLO:\n"
+    '{"action":"camera"}\n'
+    "\n"
+    "Battery/CPU status:\n"
+    '{"action":"telemetry"}\n'
+    "\n"
+    "LiDAR scan:\n"
+    '{"action":"lidar"}\n'
+    "\n"
+    "Drive the tank:\n"
+    '{"action":"move","vx":0.3,"wz":0,"duration_s":2}\n'
+    "\n"
+    "Emergency stop:\n"
+    '{"action":"estop"}\n'
+    "\n"
+    "Answer/describe results:\n"
+    '{"action":"reply","text":"<your answer>"}\n'
+    "\n"
+    "MODEM:\n"
+    '{"action":"modem","function":"send_sms","args":{"message":"Hi!","to":"shashi"}}\n'
+    '{"action":"modem","function":"get_sms_messages","args":{}}\n'
+    '{"action":"modem","function":"list_contacts","args":{}}\n'
+    '{"action":"modem","function":"call_number","args":{"number_or_name":"shashi"}}\n'
+    "\n"
+    "OPENCODE (for coding/debugging/software tasks):\n"
+    '{"action":"opencode","task":"<description>"}\n'
+    "\n"
+    "EXAMPLES:\n"
+    "- Camera see: {\"action\":\"camera\"}\n"
+    "- System info: {\"action\":\"shell\",\"cmd\":\"uname -a && free -h && df -h\"}\n"
+    "- After seeing results: {\"action\":\"reply\",\"text\":\"The system shows...\"}\n"
 )
 
 
 @app.post("/api/agent/chat")
 async def agent_chat(request: Request,
                authorization: Optional[str] = Header(default=None)) -> dict:
-    """Agentic loop: LLM thinks -> executes tools -> feeds results -> repeats until done."""
+    """Full coding agent: LLM thinks -> executes tools -> feeds results -> repeats."""
+    global _TOOL_CATALOG
     try:
         token_hash, role = authenticate(authorization)
     except AuthError as e:
@@ -1042,60 +1210,65 @@ async def agent_chat(request: Request,
     if not text:
         raise HTTPException(status_code=400, detail="text required")
 
+    # Lazy-load tool catalog
+    if _TOOL_CATALOG is None:
+        _TOOL_CATALOG = _load_tool_catalog()
+
+    system = _SYSTEM_PROMPT + "\n\nAVAILABLE TOOLS:\n" + _TOOL_CATALOG
+
     _agent_history.append({"role": "user", "content": text})
 
-    MAX_ROUNDS = 5
+    MAX_ROUNDS = 10
     all_actions = []
     final_reply = None
     provider_used = None
 
     for round_num in range(MAX_ROUNDS):
-        messages = [{"role": "system", "content": _SYSTEM_PROMPT}] + _agent_history[-10:]
+        messages = [{"role": "system", "content": system}] + _agent_history[-12:]
         reply_text, provider_used = _rotate_llm(messages)
 
         if reply_text is None:
-            # If we already executed some tools, summarize what we did
             if all_actions:
                 acts = ", ".join(a["action"] for a in all_actions)
-                final_reply = f"I executed {len(all_actions)} actions ({acts}) successfully."
+                final_reply = f"Executed {len(all_actions)} actions ({acts}) successfully."
             else:
-                final_reply = "All LLM providers are unavailable. Please try again later."
-            # Clear history on failure to prevent cascading issues
+                final_reply = "All LLM providers are unavailable."
             _agent_history.clear()
             break
 
         _agent_history.append({"role": "assistant", "content": reply_text})
 
-        # Parse action from reply
         action = _parse_action(reply_text)
 
-        if action is None or action.get("action") == "reply":
-            # No action or explicit reply — this is the final response
+        if action is None:
+            # Plain text response
             final_reply = reply_text
-            if action and action.get("text"):
-                final_reply = action["text"]
             break
 
-        # Execute the tool
-        act_type = action.get("action", "")
-        all_actions.append({"action": act_type, "args": {k: v for k, v in action.items() if k != "action"}})
-        _LOG.info("Agent round %d: executing %s", round_num + 1, act_type)
+        at = action.get("action", "")
 
-        tool_result = _exec_tool(action)
-        if tool_result:
-            # Truncate tool results - camera base64 is ~50KB, limit to 500 chars
-            max_result_len = 500
-            truncated = tool_result[:max_result_len]
-            if len(tool_result) > max_result_len:
-                truncated += f" ... ({len(tool_result) - max_result_len} chars truncated)"
-            _agent_history.append({"role": "user", "content": f"[Tool result for {act_type}]: {truncated}"})
+        if at == "reply":
+            final_reply = action.get("text", reply_text)
+            break
+
+        # Execute tool
+        all_actions.append({"action": at, "args": {k: v for k, v in action.items() if k != "action"}})
+        _LOG.info("Agent round %d: executing %s", round_num + 1, at)
+
+        result = _exec_action(action)
+        if result is not None:
+            # Truncate to prevent history bloat
+            truncated = result[:500]
+            if len(result) > 500:
+                truncated += f" ... ({len(result) - 500} chars truncated)"
+            _agent_history.append({"role": "user", "content": f"[{at} result]: {truncated}"})
         else:
-            # reply action — no tool result needed
+            # reply action
             final_reply = action.get("text", reply_text)
             break
 
     if final_reply is None:
-        final_reply = reply_text if reply_text else "Task completed."
+        final_reply = "Task completed."
 
     # Keep history manageable
     if len(_agent_history) > 20:
@@ -1110,22 +1283,22 @@ async def agent_chat(request: Request,
     }
 
 
+@app.post("/api/agent/clear")
+async def agent_clear(authorization: Optional[str] = Header(default=None)) -> dict:
+    """Clear agent conversation history."""
+    _agent_history.clear()
+    return {"cleared": True}
+
 
 @app.get("/api/agent/debug")
 async def agent_debug():
     """Debug: check env vars and test LLM providers."""
     import os
-    import json as _json
-    import urllib.request
-    
     result = {}
-    
-    # Check env vars
     for key in ["MISTRAL_API_KEY", "GROQ_API_KEY", "GEMINI_API_KEY"]:
         val = os.environ.get(key, "")
         result[f"env_{key}"] = f"SET ({len(val)} chars)" if val else "MISSING"
-    
-    # Test Mistral directly
+    # Test Mistral
     mistral_key = os.environ.get("MISTRAL_API_KEY", "")
     if mistral_key:
         try:
@@ -1144,7 +1317,6 @@ async def agent_debug():
                 result["mistral_test"] = "OK: " + data["choices"][0]["message"]["content"]
         except Exception as e:
             result["mistral_test"] = f"FAIL: {type(e).__name__}: {e}"
-    
     # Test _rotate_llm
     try:
         test_messages = [{"role": "user", "content": "say hi in 5 words"}]
@@ -1152,17 +1324,8 @@ async def agent_debug():
         result["rotate_test"] = f"OK via {provider}: {reply[:100] if reply else 'None'}"
     except Exception as e:
         result["rotate_test"] = f"FAIL: {type(e).__name__}: {e}"
-    
     return result
 
-
-@app.post("/api/agent/clear")
-async def agent_clear(authorization: Optional[str] = Header(default=None)) -> dict:
-    _agent_history.clear()
-    return {"cleared": True}
-
-
-    return {"cleared": True}
 
 
 def main(host: str = "0.0.0.0", port: int = DEFAULT_PORT) -> int:
