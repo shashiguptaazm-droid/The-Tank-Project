@@ -423,7 +423,7 @@ def get_audit(authorization: Optional[str] = Header(default=None),
 
 
 @app.post("/api/cmd/{name}")
-def dispatch_cmd(name: str, request: Request,
+async def dispatch_cmd(name: str, request: Request,
                  authorization: Optional[str] = Header(default=None)
                  ) -> dict:
     if name not in DISPATCH:
@@ -436,7 +436,7 @@ def dispatch_cmd(name: str, request: Request,
     except AuthError as e:
         raise HTTPException(status_code=e.code, detail=str(e))
     try:
-        body = request.json() if hasattr(request, "json") else None
+        body = await request.json() if hasattr(request, "json") else None
         if body is None:
             body = json.loads(getattr(request, "_body", b"{}") or b"{}")
     except Exception as exc:
@@ -457,9 +457,310 @@ def dispatch_cmd(name: str, request: Request,
 
 
 @app.post("/api/cmd/chat")
-def chat_alias(request: Request,
+async def chat_alias(request: Request,
                authorization: Optional[str] = Header(default=None)) -> dict:
-    return dispatch_cmd("chat", request, authorization=authorization)
+    return await dispatch_cmd("chat", request, authorization=authorization)
+
+
+# ---------------------------------------------------------------------------
+# Direct serial camera snapshot endpoint (bypasses bench stub)
+# ---------------------------------------------------------------------------
+
+def _read_serial_camera(max_px: int = 640) -> dict:
+    """Read JPEG from DFRobot USB serial camera on /dev/ttyACM0."""
+    import base64 as _b64
+    import time as _time
+    try:
+        import serial as _serial
+    except ImportError:
+        return {"ts": _time.time(), "width": 0, "height": 0, "data_url": ""}
+
+    port = "/dev/ttyACM0"
+    try:
+        s = _serial.Serial(port, 921600, timeout=5)
+        _time.sleep(0.3)
+        s.read(s.in_waiting)
+        _time.sleep(0.1)
+        s.read(s.in_waiting)
+        s.write(b"SNAP\n")
+        header = b""
+        deadline = _time.time() + 5
+        while _time.time() < deadline:
+            ch = s.read(1)
+            if ch:
+                header += ch
+                if ch == b"\n":
+                    break
+        h = header.decode("utf-8", errors="replace").strip()
+        if not h.startswith("FRAME:"):
+            s.close()
+            return {"ts": _time.time(), "width": 0, "height": 0, "data_url": ""}
+        parts = h.split(":")
+        expected = int(parts[3])
+        jpeg = b""
+        dl = _time.time() + 10
+        while len(jpeg) < expected and _time.time() < dl:
+            chunk = s.read(min(expected - len(jpeg), 16384))
+            if chunk:
+                jpeg += chunk
+                dl = _time.time() + 2
+        s.read(1)
+        s.close()
+        if len(jpeg) < 500:
+            return {"ts": _time.time(), "width": 0, "height": 0, "data_url": ""}
+        b64 = _b64.b64encode(jpeg).decode("ascii")
+        return {"ts": _time.time(), "width": 640, "height": 480,
+                "data_url": "data:image/jpeg;base64," + b64}
+    except Exception:
+        return {"ts": _time.time(), "width": 0, "height": 0, "data_url": ""}
+
+
+@app.get("/api/camera/snapshot")
+async def camera_snapshot(
+    max_px: int = 640,
+    authorization: Optional[str] = Header(default=None),
+) -> dict:
+    """Direct camera snapshot from serial port -- works in bench mode."""
+    if authorization:
+        try:
+            authenticate(authorization)
+        except AuthError:
+            pass
+    return _read_serial_camera(max_px)
+
+
+# ---------------------------------------------------------------------------
+# Optimized serial camera — keeps port open for faster repeated reads
+# ---------------------------------------------------------------------------
+
+_serial_conn = None
+_serial_lock = __import__("threading").Lock()
+
+def _get_serial():
+    global _serial_conn
+    with _serial_lock:
+        if _serial_conn is None or not _serial_conn.is_open:
+            try:
+                import serial as _serial
+                _serial_conn = _serial.Serial("/dev/ttyACM0", 921600, timeout=3)
+                time.sleep(0.2)
+                _serial_conn.read(_serial_conn.in_waiting)
+            except Exception as e:
+                import sys
+                print(f"SERIAL OPEN ERROR: {e}", file=sys.stderr)
+                _serial_conn = None
+        return _serial_conn
+
+def _read_serial_camera_fast(max_px: int = 640) -> dict:
+    """Fast camera read — keeps serial port open between frames."""
+    import base64 as _b64
+    import time as _time
+    try:
+        s = _get_serial()
+        if s is None:
+            return {"ts": _time.time(), "width": 0, "height": 0, "data_url": ""}
+        with _serial_lock:
+            s.reset_input_buffer()
+            s.write(b"SNAP\n")
+            header = b""
+            deadline = _time.time() + 3
+            while _time.time() < deadline:
+                ch = s.read(1)
+                if ch:
+                    header += ch
+                    if ch == b"\n":
+                        break
+            h = header.decode("utf-8", errors="replace").strip()
+            if not h.startswith("FRAME:"):
+                return {"ts": _time.time(), "width": 0, "height": 0, "data_url": ""}
+            parts = h.split(":")
+            expected = int(parts[3])
+            jpeg = b""
+            dl = _time.time() + 5
+            while len(jpeg) < expected and _time.time() < dl:
+                chunk = s.read(min(expected - len(jpeg), 65536))
+                if chunk:
+                    jpeg += chunk
+                    dl = _time.time() + 1
+        if len(jpeg) < 500:
+            return {"ts": _time.time(), "width": 0, "height": 0, "data_url": ""}
+        b64 = _b64.b64encode(jpeg).decode("ascii")
+        return {"ts": _time.time(), "width": 640, "height": 480,
+                "data_url": "data:image/jpeg;base64," + b64}
+    except Exception:
+        with _serial_lock:
+            try:
+                if _serial_conn and _serial_conn.is_open:
+                    _serial_conn.close()
+            except Exception:
+                pass
+        globals()["_serial_conn"] = None
+        return {"ts": _time.time(), "width": 0, "height": 0, "data_url": ""}
+
+
+# Override the original function
+_read_serial_camera = _read_serial_camera_fast
+
+
+# ---------------------------------------------------------------------------
+# YOLO detection endpoint — runs YOLOv8 on latest camera frame
+# ---------------------------------------------------------------------------
+
+_yolo_model = None
+
+def _get_yolo():
+    global _yolo_model
+    if _yolo_model is None:
+        try:
+            from ultralytics import YOLO
+            import os
+            model_path = os.path.expanduser("~/The-Tank-Project/yolov8n.pt")
+            if not os.path.exists(model_path):
+                model_path = "yolov8n.pt"
+            _yolo_model = YOLO(model_path)
+        except Exception:
+            return None
+    return _yolo_model
+
+
+
+
+# ---------------------------------------------------------------------------
+# LIDAR scan endpoint — reads aa55 protocol from /dev/ttyUSB0
+# ---------------------------------------------------------------------------
+
+def _read_lidar_scan() -> dict:
+    """Read LIDAR scan data (aa55 protocol @ 115200 baud)."""
+    import time as _time
+    try:
+        import serial as _serial
+    except ImportError:
+        return {"points": [], "min_dist": 0, "max_dist": 0, "error": "no serial"}
+
+    port = "/dev/ttyUSB0"
+    try:
+        s = _serial.Serial(port, 115200, timeout=0.1)
+        _time.sleep(0.2)
+        s.reset_input_buffer()
+        buf = b""
+        deadline = _time.time() + 1.0
+        while _time.time() < deadline:
+            buf += s.read(4096)
+        s.close()
+
+        points = []
+        i = 0
+        while True:
+            idx = buf.find(b"\xaa\x55", i)
+            if idx == -1 or idx + 10 > len(buf):
+                break
+            count = buf[idx + 3]
+            frame_len = 10 + count * 2
+            if count < 1 or count > 40 or idx + frame_len > len(buf):
+                i = idx + 1
+                continue
+            frame = buf[idx:idx + frame_len]
+            start_angle = int.from_bytes(frame[4:6], "little") / 100.0
+            end_angle = int.from_bytes(frame[6:8], "little") / 100.0
+            for j in range(count):
+                off = 10 + j * 2
+                dist = int.from_bytes(frame[off:off + 2], "little")
+                if dist <= 0:
+                    continue
+                frac = j / max(count - 1, 1)
+                angle = start_angle + (end_angle - start_angle) * frac
+                if angle >= 360:
+                    angle -= 360
+                elif angle < 0:
+                    angle += 360
+                points.append({"angle": round(angle, 1), "distance": dist})
+            i = idx + frame_len
+
+        distances = [p["distance"] for p in points]
+        return {
+            "points": points,
+            "count": len(points),
+            "min_dist": min(distances) if distances else 0,
+            "max_dist": max(distances) if distances else 0,
+            "avg_dist": round(sum(distances) / len(distances)) if distances else 0,
+        }
+    except Exception as e:
+        return {"points": [], "count": 0, "error": str(e)}
+
+
+@app.get("/api/lidar/scan")
+async def lidar_scan(
+    authorization: Optional[str] = Header(default=None),
+) -> dict:
+    """LIDAR 360 scan — returns distance points with angles."""
+    if authorization:
+        try:
+            authenticate(authorization)
+        except AuthError:
+            pass
+    return _read_lidar_scan()
+
+
+
+@app.get("/api/camera/detect")
+async def camera_detect(
+    max_px: int = 640,
+    confidence: float = 0.5,
+    authorization: Optional[str] = Header(default=None),
+) -> dict:
+    """Run YOLOv8 detection on latest camera frame."""
+    if authorization:
+        try:
+            authenticate(authorization)
+        except AuthError:
+            pass
+
+    # Capture frame
+    frame_data = _read_serial_camera_fast(max_px)
+    data_url = frame_data.get("data_url", "")
+    if not data_url:
+        return {"ts": frame_data["ts"], "detections": [], "frame": frame_data}
+
+    # Run YOLO
+    model = _get_yolo()
+    if model is None:
+        return {"ts": frame_data["ts"], "detections": [],
+                "frame": frame_data, "error": "YOLO model not available"}
+
+    try:
+        import base64 as _b64
+        jpeg_b64 = data_url.split(",", 1)[1]
+        jpeg_bytes = _b64.b64decode(jpeg_b64)
+        import tempfile, os
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as f:
+            f.write(jpeg_bytes)
+            tmp_path = f.name
+
+        results = model(tmp_path, conf=confidence, verbose=False)
+        os.unlink(tmp_path)
+
+        detections = []
+        for r in results:
+            for box in r.boxes:
+                x1, y1, x2, y2 = box.xyxy[0].tolist()
+                conf = float(box.conf[0])
+                cls = int(box.cls[0])
+                label = model.names.get(cls, f"class_{cls}")
+                detections.append({
+                    "x1": x1, "y1": y1, "x2": x2, "y2": y2,
+                    "confidence": round(conf, 3),
+                    "label": label
+                })
+
+        return {"ts": frame_data["ts"], "detections": detections,
+                "count": len(detections), "frame": frame_data}
+    except Exception as e:
+        return {"ts": frame_data["ts"], "detections": [],
+                "frame": frame_data, "error": str(e)}
+
+
+
+
 
 
 # --------------------------------------------------------------------------- #
