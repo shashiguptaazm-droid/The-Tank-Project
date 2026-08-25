@@ -2614,54 +2614,90 @@ fun MainScreen(client: OkHttpClient) {
                 }
             }
             5 -> {
-                // ═══ TAB 6: FULL-SCREEN MAP (LIDAR Radar + YOLO + Motion) ═══
+                // ═══ TAB 6: FULL-SCREEN VISUAL MAP ═══
+                // Camera feed + LIDAR radar + YOLO + Motion + Sweep + Controls + HUD
+                var sweepAngle by remember { mutableFloatStateOf(0f) }
+                var mapShowLidar by remember { mutableStateOf(true) }
+                var mapShowYolo by remember { mutableStateOf(true) }
+                var mapShowMotion by remember { mutableStateOf(true) }
+                var mapShowCamera by remember { mutableStateOf(true) }
+                var mapShowObstacles by remember { mutableStateOf(true) }
+                var mapShowSweep by remember { mutableStateOf(true) }
+
+                // Sweep animation
+                LaunchedEffect(Unit) {
+                    while (true) {
+                        sweepAngle = (sweepAngle + 2f) % 360f
+                        delay(16) // ~60fps
+                    }
+                }
+
+                // Auto-enable LIDAR
+                LaunchedEffect(Unit) {
+                    if (!isLidarActive) isLidarActive = true
+                }
+
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                        .background(CyberTheme.BG)
+                        .background(Color.Black)
                 ) {
-                    // Full-screen LIDAR Radar Map
-                    Canvas(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
+                    Canvas(modifier = Modifier.fillMaxSize()) {
                         val canvasW = size.width
                         val canvasH = size.height
                         val cx = canvasW / 2f
                         val cy = canvasH / 2f
-                        val maxRadius = minOf(cx, cy) * 0.85f
+                        val maxRadius = minOf(cx, cy) * 0.82f
                         val maxDisplayMm = 5000f
 
                         // Dark background
                         drawContext.canvas.nativeCanvas.drawColor(
-                            android.graphics.Color.argb(255, 10, 10, 16)
+                            android.graphics.Color.argb(255, 8, 8, 14)
                         )
 
-                        // Distance rings (1m to 5m)
+                        // ═══ CAMERA FEED BACKGROUND (dimmed) ═══
+                        if (mapShowCamera && cameraBitmap != null) {
+                            val bmp = cameraBitmap!!
+                            val bmpScale = maxOf(canvasW / bmp.width, canvasH / bmp.height)
+                            val bmpW = bmp.width * bmpScale
+                            val bmpH = bmp.height * bmpScale
+                            val paint = Paint().apply { alpha = 35 } // very dim
+                            drawContext.canvas.nativeCanvas.drawBitmap(
+                                bmp, null,
+                                android.graphics.RectF(
+                                    (canvasW - bmpW) / 2f, (canvasH - bmpH) / 2f,
+                                    (canvasW + bmpW) / 2f, (canvasH + bmpH) / 2f
+                                ),
+                                paint
+                            )
+                        }
+
+                        // ═══ DISTANCE RINGS (1m to 5m) ═══
                         for (m in 1..5) {
                             val r = (m * 1000f / maxDisplayMm) * maxRadius
                             drawContext.canvas.nativeCanvas.drawCircle(
                                 cx, cy, r,
                                 Paint().apply {
-                                    color = android.graphics.Color.argb(40, 0, 200, 255)
+                                    color = android.graphics.Color.argb(35, 0, 200, 255)
                                     style = Paint.Style.STROKE
-                                    strokeWidth = 1f
+                                    strokeWidth = if (m % 2 == 0) 1.2f else 0.8f
                                 }
                             )
                             drawContext.canvas.nativeCanvas.drawText(
                                 "${m}m",
-                                cx + 4f, cy - r + 14f,
+                                cx + 5f, cy - r + 13f,
                                 Paint().apply {
-                                    color = android.graphics.Color.argb(120, 0, 200, 255)
-                                    textSize = 12f
+                                    color = android.graphics.Color.argb(100, 0, 200, 255)
+                                    textSize = 11f
                                     typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
                                 }
                             )
                         }
 
-                        // Cross-hair lines
+                        // ═══ CROSS-HAIR + DIAGONALS ═══
                         val crossPaint = Paint().apply {
-                            color = android.graphics.Color.argb(30, 0, 200, 255)
+                            color = android.graphics.Color.argb(25, 0, 200, 255)
                             strokeWidth = 1f
                         }
                         drawContext.canvas.nativeCanvas.drawLine(
@@ -2670,10 +2706,8 @@ fun MainScreen(client: OkHttpClient) {
                         drawContext.canvas.nativeCanvas.drawLine(
                             cx, cy - maxRadius, cx, cy + maxRadius, crossPaint
                         )
-
-                        // Diagonal lines
                         val diagPaint = Paint().apply {
-                            color = android.graphics.Color.argb(15, 0, 200, 255)
+                            color = android.graphics.Color.argb(12, 0, 200, 255)
                             strokeWidth = 0.5f
                         }
                         for (angle in 30..330 step 30) {
@@ -2681,169 +2715,402 @@ fun MainScreen(client: OkHttpClient) {
                             val ex = cx + (maxRadius * Math.sin(rad)).toFloat()
                             val ey = cy - (maxRadius * Math.cos(rad)).toFloat()
                             drawContext.canvas.nativeCanvas.drawLine(cx, cy, ex, ey, diagPaint)
+                            // Angle labels
+                            drawContext.canvas.nativeCanvas.drawText(
+                                "${angle}\u00b0",
+                                cx + (maxRadius + 8f) * Math.sin(rad).toFloat() - 8f,
+                                cy - (maxRadius + 8f) * Math.cos(rad).toFloat() + 4f,
+                                Paint().apply {
+                                    color = android.graphics.Color.argb(50, 0, 200, 255)
+                                    textSize = 8f
+                                    typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
+                                }
+                            )
                         }
 
-                        // LIDAR points as green dots with trails
-                        lidarPoints.forEach { pt ->
-                            if (pt.distance in 1..maxDisplayMm.toInt()) {
-                                val r = (pt.distance.toFloat() / maxDisplayMm) * maxRadius
-                                val rad = Math.toRadians(pt.angle.toDouble())
-                                val px = cx + (r * Math.sin(rad)).toFloat()
-                                val py = cy - (r * Math.cos(rad)).toFloat()
-                                // Glow
-                                drawContext.canvas.nativeCanvas.drawCircle(
-                                    px, py, 5f,
+                        // ═══ RADAR SWEEP LINE ═══
+                        if (mapShowSweep && lidarPointCount > 0) {
+                            val sweepRad = Math.toRadians(sweepAngle.toDouble())
+                            val sweepEndX = cx + (maxRadius * Math.sin(sweepRad)).toFloat()
+                            val sweepEndY = cy - (maxRadius * Math.cos(sweepRad)).toFloat()
+                            // Sweep trail (fading arc)
+                            for (trail in 0..30) {
+                                val trailAngle = sweepAngle - trail * 3f
+                                if (trailAngle < 0) continue
+                                val trailRad = Math.toRadians(trailAngle.toDouble())
+                                val trailX = cx + (maxRadius * Math.sin(trailRad)).toFloat()
+                                val trailY = cy - (maxRadius * Math.cos(trailRad)).toFloat()
+                                val alpha = (30 - trail) * 2
+                                drawContext.canvas.nativeCanvas.drawLine(
+                                    cx, cy, trailX, trailY,
                                     Paint().apply {
-                                        color = android.graphics.Color.argb(60, 0, 255, 100)
-                                        style = Paint.Style.FILL
-                                    }
-                                )
-                                // Point
-                                drawContext.canvas.nativeCanvas.drawCircle(
-                                    px, py, 2.5f,
-                                    Paint().apply {
-                                        color = android.graphics.Color.GREEN
-                                        style = Paint.Style.FILL
+                                        color = android.graphics.Color.argb(alpha, 0, 255, 150)
+                                        strokeWidth = 1f
                                     }
                                 )
                             }
+                            // Main sweep line
+                            drawContext.canvas.nativeCanvas.drawLine(
+                                cx, cy, sweepEndX, sweepEndY,
+                                Paint().apply {
+                                    color = android.graphics.Color.argb(200, 0, 255, 150)
+                                    strokeWidth = 2f
+                                    setShadowLayer(6f, 0f, 0f, android.graphics.Color.GREEN)
+                                }
+                            )
                         }
 
-                        // YOLO objects as red markers with labels + distance
-                        detectedBoxes.forEach { box ->
-                            val boxCx = (box.x1 + box.x2) / 2f
-                            val normX = if (frameW > 0) boxCx / frameW else 0.5f
-                            val objAngle = (normX * 360f - 180f + 360f) % 360f
-                            var closestDist = 0
-                            var minAngleDiff = 999f
+                        // ═══ LIDAR OBSTACLE OUTLINE ═══
+                        if (mapShowObstacles && lidarPoints.size > 5) {
+                            val obstaclePath = android.graphics.Path()
+                            var started = false
+                            lidarPoints.filter { it.distance in 100..maxDisplayMm.toInt() }
+                                .sortedBy { it.angle }
+                                .forEach { pt ->
+                                    val r = (pt.distance.toFloat() / maxDisplayMm) * maxRadius
+                                    val rad = Math.toRadians(pt.angle.toDouble())
+                                    val px = cx + (r * Math.sin(rad)).toFloat()
+                                    val py = cy - (r * Math.cos(rad)).toFloat()
+                                    if (!started) {
+                                        obstaclePath.moveTo(px, py)
+                                        started = true
+                                    } else {
+                                        obstaclePath.lineTo(px, py)
+                                    }
+                                }
+                            obstaclePath.close()
+                            // Filled obstacle area
+                            drawContext.canvas.nativeCanvas.drawPath(
+                                obstaclePath,
+                                Paint().apply {
+                                    color = android.graphics.Color.argb(20, 0, 255, 100)
+                                    style = Paint.Style.FILL
+                                }
+                            )
+                            // Outline
+                            drawContext.canvas.nativeCanvas.drawPath(
+                                obstaclePath,
+                                Paint().apply {
+                                    color = android.graphics.Color.argb(80, 0, 255, 100)
+                                    style = Paint.Style.STROKE
+                                    strokeWidth = 1.5f
+                                }
+                            )
+                        }
+
+                        // ═══ LIDAR POINTS ═══
+                        if (mapShowLidar) {
                             lidarPoints.forEach { pt ->
-                                val diff = kotlin.math.abs(pt.angle - objAngle)
-                                val minDiff = minOf(diff, 360f - diff)
-                                if (minDiff < minAngleDiff && pt.distance in 100..5000) {
-                                    minAngleDiff = minDiff
-                                    closestDist = pt.distance
+                                if (pt.distance in 1..maxDisplayMm.toInt()) {
+                                    val r = (pt.distance.toFloat() / maxDisplayMm) * maxRadius
+                                    val rad = Math.toRadians(pt.angle.toDouble())
+                                    val px = cx + (r * Math.sin(rad)).toFloat()
+                                    val py = cy - (r * Math.cos(rad)).toFloat()
+                                    // Outer glow
+                                    drawContext.canvas.nativeCanvas.drawCircle(
+                                        px, py, 4f,
+                                        Paint().apply {
+                                            color = android.graphics.Color.argb(50, 0, 255, 100)
+                                            style = Paint.Style.FILL
+                                        }
+                                    )
+                                    // Core dot
+                                    drawContext.canvas.nativeCanvas.drawCircle(
+                                        px, py, 2f,
+                                        Paint().apply {
+                                            color = android.graphics.Color.GREEN
+                                            style = Paint.Style.FILL
+                                        }
+                                    )
                                 }
                             }
-                            val distText = if (closestDist > 0) "${closestDist / 1000.0f}m" else "?"
-                            if (closestDist > 0 && closestDist <= maxDisplayMm.toInt()) {
-                                val r = (closestDist.toFloat() / maxDisplayMm) * maxRadius
-                                val rad = Math.toRadians(objAngle.toDouble())
-                                val px = cx + (r * Math.sin(rad)).toFloat()
-                                val py = cy - (r * Math.cos(rad)).toFloat()
-                                // Red marker
+                        }
+
+                        // ═══ YOLO DETECTIONS ═══
+                        if (mapShowYolo) {
+                            detectedBoxes.forEach { box ->
+                                val boxCx = (box.x1 + box.x2) / 2f
+                                val normX = if (frameW > 0) boxCx / frameW else 0.5f
+                                val objAngle = (normX * 360f - 180f + 360f) % 360f
+                                var closestDist = 0
+                                var minAngleDiff = 999f
+                                lidarPoints.forEach { pt ->
+                                    val diff = kotlin.math.abs(pt.angle - objAngle)
+                                    val minDiff = minOf(diff, 360f - diff)
+                                    if (minDiff < minAngleDiff && pt.distance in 100..5000) {
+                                        minAngleDiff = minDiff
+                                        closestDist = pt.distance
+                                    }
+                                }
+                                val distText = if (closestDist > 0) "${closestDist / 1000.0f}m" else "?"
+                                if (closestDist > 0 && closestDist <= maxDisplayMm.toInt()) {
+                                    val r = (closestDist.toFloat() / maxDisplayMm) * maxRadius
+                                    val rad = Math.toRadians(objAngle.toDouble())
+                                    val px = cx + (r * Math.sin(rad)).toFloat()
+                                    val py = cy - (r * Math.cos(rad)).toFloat()
+                                    // Red outer ring
+                                    drawContext.canvas.nativeCanvas.drawCircle(
+                                        px, py, 10f,
+                                        Paint().apply {
+                                            color = android.graphics.Color.argb(60, 255, 0, 0)
+                                            style = Paint.Style.FILL
+                                        }
+                                    )
+                                    // Red inner dot
+                                    drawContext.canvas.nativeCanvas.drawCircle(
+                                        px, py, 4f,
+                                        Paint().apply {
+                                            color = android.graphics.Color.RED
+                                            style = Paint.Style.FILL
+                                        }
+                                    )
+                                    // Line from center to object
+                                    drawContext.canvas.nativeCanvas.drawLine(
+                                        cx, cy, px, py,
+                                        Paint().apply {
+                                            color = android.graphics.Color.argb(40, 255, 80, 80)
+                                            strokeWidth = 1f
+                                            pathEffect = android.graphics.DashPathEffect(floatArrayOf(6f, 6f), 0f)
+                                        }
+                                    )
+                                    // Label with background
+                                    val label = "${box.label} $distText"
+                                    val labelPaint = Paint().apply {
+                                        color = android.graphics.Color.RED
+                                        textSize = 12f
+                                        typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
+                                    }
+                                    val labelW = labelPaint.measureText(label)
+                                    drawContext.canvas.nativeCanvas.drawRect(
+                                        px + 8f, py - 14f, px + 12f + labelW, py + 2f,
+                                        Paint().apply {
+                                            color = android.graphics.Color.argb(160, 0, 0, 0)
+                                            style = Paint.Style.FILL
+                                        }
+                                    )
+                                    drawContext.canvas.nativeCanvas.drawText(
+                                        label, px + 10f, py - 2f, labelPaint
+                                    )
+                                }
+                            }
+                        }
+
+                        // ═══ MOTION REGIONS ═══
+                        if (mapShowMotion) {
+                            motionBoxes.forEach { box ->
+                                val boxCx = (box.x1 + box.x2) / 2f
+                                val normX = if (frameW > 0) boxCx / frameW else 0.5f
+                                val motAngle = (normX * 360f - 180f + 360f) % 360f
+                                val motRadius = maxRadius * 0.65f
+                                val rad = Math.toRadians(motAngle.toDouble())
+                                val px = cx + (motRadius * Math.sin(rad)).toFloat()
+                                val py = cy - (motRadius * Math.cos(rad)).toFloat()
+                                // Yellow glow
                                 drawContext.canvas.nativeCanvas.drawCircle(
                                     px, py, 8f,
                                     Paint().apply {
-                                        color = android.graphics.Color.argb(80, 255, 0, 0)
+                                        color = android.graphics.Color.argb(70, 255, 255, 0)
                                         style = Paint.Style.FILL
                                     }
                                 )
+                                // Yellow dot
                                 drawContext.canvas.nativeCanvas.drawCircle(
-                                    px, py, 4f,
+                                    px, py, 3f,
                                     Paint().apply {
-                                        color = android.graphics.Color.RED
+                                        color = android.graphics.Color.YELLOW
                                         style = Paint.Style.FILL
                                     }
                                 )
-                                // Label
+                                // Motion label
                                 drawContext.canvas.nativeCanvas.drawText(
-                                    "${box.label} $distText",
-                                    px + 10f, py + 4f,
+                                    "MOTION",
+                                    px + 8f, py - 4f,
                                     Paint().apply {
-                                        color = android.graphics.Color.RED
-                                        textSize = 14f
+                                        color = android.graphics.Color.argb(180, 255, 255, 0)
+                                        textSize = 9f
                                         typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
-                                        setShadowLayer(4f, 1f, 1f, android.graphics.Color.BLACK)
                                     }
                                 )
                             }
                         }
 
-                        // Motion regions as yellow wedges
-                        motionBoxes.forEach { box ->
-                            val boxCx = (box.x1 + box.x2) / 2f
-                            val normX = if (frameW > 0) boxCx / frameW else 0.5f
-                            val motAngle = (normX * 360f - 180f + 360f) % 360f
-                            val motRadius = maxRadius * 0.7f
-                            val rad = Math.toRadians(motAngle.toDouble())
-                            val px = cx + (motRadius * Math.sin(rad)).toFloat()
-                            val py = cy - (motRadius * Math.cos(rad)).toFloat()
-                            drawContext.canvas.nativeCanvas.drawCircle(
-                                px, py, 6f,
-                                Paint().apply {
-                                    color = android.graphics.Color.argb(100, 255, 255, 0)
-                                    style = Paint.Style.FILL
-                                }
-                            )
-                            drawContext.canvas.nativeCanvas.drawCircle(
-                                px, py, 3f,
-                                Paint().apply {
-                                    color = android.graphics.Color.YELLOW
-                                    style = Paint.Style.FILL
-                                }
-                            )
-                        }
-
-                        // Center tank icon
-                        drawContext.canvas.nativeCanvas.drawCircle(
-                            cx, cy, 6f,
+                        // ═══ CENTER TANK ═══
+                        // Tank body
+                        drawContext.canvas.nativeCanvas.drawRect(
+                            cx - 8f, cy - 5f, cx + 8f, cy + 5f,
                             Paint().apply {
                                 color = android.graphics.Color.CYAN
                                 style = Paint.Style.FILL
                             }
                         )
+                        // Tank turret
+                        drawContext.canvas.nativeCanvas.drawCircle(
+                            cx, cy - 8f, 5f,
+                            Paint().apply {
+                                color = android.graphics.Color.CYAN
+                                style = Paint.Style.FILL
+                            }
+                        )
+                        // Tank barrel
+                        drawContext.canvas.nativeCanvas.drawLine(
+                            cx, cy - 8f, cx, cy - 18f,
+                            Paint().apply {
+                                color = android.graphics.Color.CYAN
+                                strokeWidth = 3f
+                            }
+                        )
+                        // Label
                         drawContext.canvas.nativeCanvas.drawText(
                             "TANK",
-                            cx + 10f, cy + 4f,
+                            cx + 14f, cy + 4f,
                             Paint().apply {
                                 color = android.graphics.Color.CYAN
                                 textSize = 10f
                                 typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
+                                setShadowLayer(3f, 0f, 0f, android.graphics.Color.BLACK)
                             }
                         )
 
-                        // HUD: stats at top
+                        // ═══ TOP HUD ═══
+                        // Background bar
+                        drawContext.canvas.nativeCanvas.drawRect(
+                            0f, 0f, canvasW, 56f,
+                            Paint().apply {
+                                color = android.graphics.Color.argb(180, 8, 8, 14)
+                            }
+                        )
+                        // Title
                         drawContext.canvas.nativeCanvas.drawText(
-                            "YOLO:${detectedBoxes.size}  LIDAR:${lidarPointCount}pts  MOTION:${motionBoxes.size}",
-                            12f, 24f,
+                            "TANK OS VISUAL MAP",
+                            12f, 18f,
                             Paint().apply {
                                 color = android.graphics.Color.CYAN
-                                textSize = 16f
+                                textSize = 14f
                                 typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
-                                setShadowLayer(4f, 1f, 1f, android.graphics.Color.BLACK)
+                                setShadowLayer(3f, 0f, 0f, android.graphics.Color.BLACK)
                             }
                         )
-
-                        // Range info
+                        // Stats line 1
+                        drawContext.canvas.nativeCanvas.drawText(
+                            "YOLO:${detectedBoxes.size}  LIDAR:${lidarPointCount}pts  MOTION:${motionBoxes.size}",
+                            12f, 34f,
+                            Paint().apply {
+                                color = android.graphics.Color.GREEN
+                                textSize = 12f
+                                typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
+                            }
+                        )
+                        // Stats line 2
                         if (lidarPointCount > 0) {
                             drawContext.canvas.nativeCanvas.drawText(
-                                "Range: ${lidarMinDist / 1000}m - ${lidarMaxDist / 1000}m",
-                                12f, 44f,
+                                "Range: ${lidarMinDist / 1000}m - ${lidarMaxDist / 1000}m  |  ${batteryText}  |  ${cpuTempText}",
+                                12f, 50f,
                                 Paint().apply {
-                                    color = android.graphics.Color.argb(180, 0, 255, 100)
-                                    textSize = 13f
-                                    typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
-                                    setShadowLayer(3f, 1f, 1f, android.graphics.Color.BLACK)
+                                    color = android.graphics.Color.argb(160, 0, 255, 100)
+                                    textSize = 11f
+                                    typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
                                 }
                             )
                         }
 
-                        // Legend at bottom
-                        val legendY = canvasH - 20f
-                        drawContext.canvas.nativeCanvas.drawText(
-                            "\u25CF LIDAR  \u25CF YOLO  \u25CF MOTION  \u25CF TANK",
-                            12f, legendY,
+                        // ═══ BOTTOM LEGEND ═══
+                        drawContext.canvas.nativeCanvas.drawRect(
+                            0f, canvasH - 36f, canvasW, canvasH,
                             Paint().apply {
-                                color = android.graphics.Color.argb(150, 200, 200, 200)
-                                textSize = 11f
-                                typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)
+                                color = android.graphics.Color.argb(180, 8, 8, 14)
                             }
                         )
+                        val legY = canvasH - 16f
+                        // Green = LIDAR
+                        drawContext.canvas.nativeCanvas.drawCircle(20f, legY - 3f, 5f, Paint().apply { color = android.graphics.Color.GREEN; style = Paint.Style.FILL })
+                        drawContext.canvas.nativeCanvas.drawText("LIDAR", 30f, legY, Paint().apply { color = android.graphics.Color.WHITE; textSize = 10f; typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD) })
+                        // Red = YOLO
+                        drawContext.canvas.nativeCanvas.drawCircle(95f, legY - 3f, 5f, Paint().apply { color = android.graphics.Color.RED; style = Paint.Style.FILL })
+                        drawContext.canvas.nativeCanvas.drawText("YOLO", 105f, legY, Paint().apply { color = android.graphics.Color.WHITE; textSize = 10f; typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD) })
+                        // Yellow = MOTION
+                        drawContext.canvas.nativeCanvas.drawCircle(155f, legY - 3f, 5f, Paint().apply { color = android.graphics.Color.YELLOW; style = Paint.Style.FILL })
+                        drawContext.canvas.nativeCanvas.drawText("MOTION", 165f, legY, Paint().apply { color = android.graphics.Color.WHITE; textSize = 10f; typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD) })
+                        // Cyan = TANK
+                        drawContext.canvas.nativeCanvas.drawCircle(240f, legY - 3f, 5f, Paint().apply { color = android.graphics.Color.CYAN; style = Paint.Style.FILL })
+                        drawContext.canvas.nativeCanvas.drawText("TANK", 250f, legY, Paint().apply { color = android.graphics.Color.WHITE; textSize = 10f; typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD) })
                     }
 
-                    // Auto-enable LIDAR when Map tab is opened
-                    LaunchedEffect(Unit) {
-                        if (!isLidarActive) isLidarActive = true
+                    // ═══ CONTROL PANEL (top-right floating) ═══
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 60.dp, end = 8.dp)
+                            .background(Color(0xCC0A0A10), RoundedCornerShape(12.dp))
+                            .border(1.dp, CyberTheme.DIM.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                            .padding(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        listOf(
+                            "📷 Camera" to mapShowCamera,
+                            "📡 LIDAR" to mapShowLidar,
+                            "🟢 Obstacles" to mapShowObstacles,
+                            "🔴 YOLO" to mapShowYolo,
+                            "🟡 Motion" to mapShowMotion,
+                            "〰️ Sweep" to mapShowSweep
+                        ).forEach { (label, state) ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.clickable {
+                                    when (label) {
+                                        "📷 Camera" -> mapShowCamera = !mapShowCamera
+                                        "📡 LIDAR" -> mapShowLidar = !mapShowLidar
+                                        "🟢 Obstacles" -> mapShowObstacles = !mapShowObstacles
+                                        "🔴 YOLO" -> mapShowYolo = !mapShowYolo
+                                        "🟡 Motion" -> mapShowMotion = !mapShowMotion
+                                        "〰️ Sweep" -> mapShowSweep = !mapShowSweep
+                                    }
+                                }
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(10.dp)
+                                        .background(
+                                            if (state) Color(0xFF00FF00) else Color(0xFF333333),
+                                            RoundedCornerShape(3.dp)
+                                        )
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    label,
+                                    color = if (state) CyberTheme.TEXT else CyberTheme.DIM,
+                                    fontSize = 9.sp,
+                                    fontFamily = FontFamily.Monospace,
+                                    fontWeight = if (state) FontWeight.Bold else FontWeight.Normal
+                                )
+                            }
+                        }
+                    }
+
+                    // ═══ CAMERA SOURCE TOGGLE (bottom-left) ═══
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(start = 8.dp, bottom = 42.dp)
+                            .background(Color(0xCC0A0A10), RoundedCornerShape(8.dp))
+                            .border(1.dp, CyberTheme.DIM.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("CAM:", color = CyberTheme.DIM, fontSize = 9.sp, fontFamily = FontFamily.Monospace)
+                        listOf("JETSON", "ARDUINO").forEach { src ->
+                            Text(
+                                text = if (activeCameraSource == src) "> $src" else "  $src",
+                                color = if (activeCameraSource == src) CyberTheme.ACCENT_CYAN else CyberTheme.DIM,
+                                fontSize = 9.sp,
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = if (activeCameraSource == src) FontWeight.Bold else FontWeight.Normal,
+                                modifier = Modifier.clickable {
+                                    activeCameraSource = src
+                                    detectedBoxes.clear()
+                                }
+                            )
+                        }
                     }
                 }
             }
