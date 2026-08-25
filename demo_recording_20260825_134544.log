@@ -1,0 +1,1452 @@
+Script started on 2026-08-25 13:45:44+02:00 [COMMAND="python3 scripts/demo_runner.py" <not executed on terminal>]
+
+══════════════════════════════════════════════════════════════
+  🤖 TankOS AI Terminal — Full Demo
+══════════════════════════════════════════════════════════════
+
+  Jetson Orin Nano 8GB | 1,966 Tools | 5 AI Engines
+  Running 15 module demonstrations...
+
+──────────────────────────────────────────────────────────────
+  [1] 📊 System Status Dashboard
+──────────────────────────────────────────────────────────────
+
+  tankos> status
+
+
+  ┌──────────────────────────────────────────────────┐
+  │           🖥  System Status Dashboard            │
+  └──────────────────────────────────────────────────┘
+
+  🏠 Host:     shashi
+  🕐 Time:     2026-08-25 13:45:45
+
+  🧠 CPU:      █░░░░░░░░░░░░░░░░░░░ 8% (6 cores)
+     Load:     0.79 0.64 0.49
+  💾 RAM:      ██████░░░░░░░░░░░░░░ 33% (2.4 GB / 7.3 GB)
+  💿 Disk:     ██████████░░░░░░░░░░ 54% (50.9 GB / 94.1 GB)
+  🌡 Temp:     soc1-thermal: 48.0°C, soc2-thermal: 47.7°C, tj-thermal: 50.5°C, gpu: 48.8°C
+  ⏱ Uptime:    0d 4h 42m
+
+  🌐 Network:  shashi → 192.168.31.74
+  📦 Tools:    1966 tools in 74 categories
+
+
+──────────────────────────────────────────────────────────────
+  [2] 💻 System Information
+──────────────────────────────────────────────────────────────
+
+  tankos> system
+
+
+  ┌──────────────────────────────────────────────────┐
+  │           💻  System Information                │
+  └──────────────────────────────────────────────────┘
+
+  OS:        Linux 6.8.12-1021-tegra
+  Version:   #1 SMP PREEMPT Thu Aug  6 21:56:04 PDT 2026
+  Machine:   aarch64
+  Processor: aarch64
+  Hostname:  shashi
+  Python:    3.12.3
+  CWD:       /home/shashi/The-Tank-Project
+  Home:      /home/shashi
+  Shell:     /bin/bash
+
+  PYTHONPATH:
+    /opt/ros/jazzy/lib/python3.12/site-packages
+
+
+──────────────────────────────────────────────────────────────
+  [3] 🌐 Network Status
+──────────────────────────────────────────────────────────────
+
+  tankos> network
+
+
+  ┌──────────────────────────────────────────────────┐
+  │           🌐  Network Status                    │
+  └──────────────────────────────────────────────────┘
+
+  Hostname:    shashi
+  IP:          192.168.31.74
+  Internet:    ✅ Connected
+
+  Interfaces:
+    enP8p1s0: 🔴 down 
+    can0: 🔴 down 
+    wlP1p1s0: 🟢 up 
+    enx00e04c360b2c: 🔴 down 10Mbps
+    l4tbr0: 🔴 down 
+    usb0: 🔴 down 
+    usb1: 🔴 down 
+    tailscale0: 🟢 up 
+    docker0: 🔴 down 
+
+  TankOS services:
+    :8080  🔴 Dashboard
+    :8082  🔴 Cmd Bridge
+    :8083  🔴 Meta API
+    :8084  🔴 Personalize
+    :8900  🔴 Simple Internet
+    :2223  🔴 TCP Terminal
+
+
+──────────────────────────────────────────────────────────────
+  [4] 🩺 Health Diagnostics
+──────────────────────────────────────────────────────────────
+
+  tankos> health
+
+
+  ┌──────────────────────────────────────────────────┐
+  │           🏥  Health Diagnostics                │
+  └──────────────────────────────────────────────────┘
+
+  🌡 Temps:     soc1-thermal: 48.0°C, soc2-thermal: 47.7°C, tj-thermal: 50.5°C, gpu: 49.0°C
+  💾 Memory:    33% used (4.9 GB free)
+  💿 Disk:       54% used — OK
+  🐍 Python:    2 processes
+  🔄 ROS2:      2 topics active
+  🤖 AI:        1/1 providers healthy
+
+
+──────────────────────────────────────────────────────────────
+  [5] 📦 Tool Registry — 1,966 Tools
+──────────────────────────────────────────────────────────────
+
+  tankos> tools --count
+
+
+  📦  Tool Registry — 1966 total tools in 74 categories
+
+    general                   ██████████████████████████████ 94
+    maker                     ██████████████████████████████ 70
+    productivity              ██████████████████████████████ 63
+    download-data             ██████████████████████████████ 50
+    download-music            ██████████████████████████████ 50
+    download-video            ██████████████████████████████ 50
+    vision                    ██████████████████████████████ 45
+    voice                     ██████████████████████████████ 38
+    maintenance               ██████████████████████████████ 34
+    cloud-infra               ██████████████████████████████ 34
+    dev-tools                 ██████████████████████████████ 34
+    download-ai-features      ██████████████████████████████ 34
+    education-tools           ██████████████████████████████ 34
+    email-messaging           ██████████████████████████████ 34
+    energy                    ██████████████████████████████ 34
+    monitoring-health         ██████████████████████████████ 34
+    network-web               ██████████████████████████████ 34
+    raspberry-pi              ██████████████████████████████ 34
+    ai-ml-tools               ██████████████████████████████ 33
+    api-integration           ██████████████████████████████ 33
+    diagnostics               ██████████████████████████████ 33
+    backup-restore            ██████████████████████████████ 33
+    data-science              ██████████████████████████████ 33
+    database-tools            ██████████████████████████████ 33
+    docker-ops                ██████████████████████████████ 33
+    document-tools            ██████████████████████████████ 33
+    download-control          ██████████████████████████████ 33
+    download-torrent-search   ██████████████████████████████ 33
+    gaming-tools              ██████████████████████████████ 33
+    iot-home                  ██████████████████████████████ 33
+    media-streaming           ██████████████████████████████ 33
+    security-hardening        ██████████████████████████████ 33
+    sysadmin-tools            ██████████████████████████████ 33
+    voice-audio               ██████████████████████████████ 33
+    creativity                ██████████████████████████████ 30
+    outdoor-security          ██████████████████████████████ 30
+    home-automation           █████████████████████████ 25
+    media                     █████████████████████████ 25
+    mobility                  █████████████████████████ 25
+    personality               █████████████████████████ 25
+    security                  ████████████████████████ 24
+    comm                      ████████████████████ 20
+    download-data-2           ████████████████████ 20
+    download-deepweb-2        ████████████████████ 20
+    download-ebooks-2         ████████████████████ 20
+    download-images-2         ████████████████████ 20
+    download-misc-2           ████████████████████ 20
+    download-music-2          ████████████████████ 20
+    download-scheduled-2      ████████████████████ 20
+    download-software-2       ████████████████████ 20
+    download-torrent          ████████████████████ 20
+    download-torrent-2        ████████████████████ 20
+    download-video-2          ████████████████████ 20
+    environment               ████████████████████ 20
+    gaming                    ████████████████████ 20
+    health                    ████████████████████ 20
+    download-ai-3             ███████████████ 15
+    download-deepweb          ███████████████ 15
+    download-power-3          ███████████████ 15
+    download-scheduled        ███████████████ 15
+    education                 ███████████████ 15
+    kitchen                   ███████████████ 15
+    download-cloud-3          ██████████ 10
+    download-community-3      ██████████ 10
+    meta                      ██████████ 10
+    calibrate                 ██████ 6
+    mission                   ██████ 6
+    recorder                  █████ 5
+    hardware                  ████ 4
+    training                  ████ 4
+    networking                ███ 3
+    notify                    ██ 2
+    prefs                     ██ 2
+    ui                        ██ 2
+
+
+──────────────────────────────────────────────────────────────
+  [6] 🔎 Search: Vision Tools
+──────────────────────────────────────────────────────────────
+
+  tankos> search vision
+
+
+  ┌──────────────────────────────────────────────────┐
+  │       🔎  Search Results: 'vision'        │
+  └──────────────────────────────────────────────────┘
+
+  54 matching tools
+
+  🟢 vision_smoketest.yolo
+     [diagnostics] F030 — YOLO detector probe.
+
+  🟢 vision_smoketest.apriltag
+     [diagnostics] F031 — AprilTag detector (tag36h11).
+
+  🟢 vision_ops.yolo-tune
+     [general] F112 — YOLO threshold tune.
+
+  🟢 vision_ops.tracker-state
+     [general] F113 — tracker state dump.
+
+  🟢 vision_ops.depth-estimate
+     [general] F114 — depth estimate (offline placeholder).
+
+  🟢 vision_ops.color-space
+     [general] F115 — color-space probe (HSV histograms).
+
+  🟢 vision_ar.virtualtape
+     [vision] F442 - on-screen virtual measuring tape.
+
+  🟢 vision_ar.sun-tracker
+     [vision] F456 - sun tracker.
+
+  🔴 vision_ar.resistor-color
+     [vision] F455 - resistor color-band reader.
+
+  🟢 vision_ar.puzzle-solver
+     [vision] F449 - Sudoku/crossword solver.
+
+  🟢 vision_ar.plant-species
+     [vision] F446 - plant species identifier.
+
+  🔴 vision_ar.monopoly-banker
+     [vision] F452 - vision-based Monopoly banker.
+
+  🟢 vision_ar.insect-id
+     [vision] F447 - insect identifier.
+
+  🟢 vision_ar.handwritten-ocr
+     [vision] F451 - handwriting OCR.
+
+  🟢 vision_ar.fashion-consult
+     [vision] F444 - fashion consultant.
+
+  🟢 vision_ar.color-detect
+     [vision] F443 - color detector (color-blind aid).
+
+  🟢 vision_ar.card-assistant
+     [vision] F453 - card-game assistant.
+
+  🟢 vision_ar.calorie-estimate
+     [vision] F448 - rough calorie estimate.
+
+  🟢 vision_ar.breadboard-verify
+     [vision] F454 - wiring verifier.
+
+  🟢 vision_ar.artwork-id
+     [vision] F445 - artwork identifier.
+
+  🟢 vision_ar.ar-furniture
+     [vision] F450 - AR furniture placement.
+
+  🟢 raspberry_pi.pi-model
+     [raspberry-pi] F1566 - Detect Jetson model, revision, and RAM.
+
+  🔴 cloud_infra.terraform-apply
+     [cloud-infra] F1468 - Apply Terraform changes to provision infrastructure.
+
+  🟢 cloud_infra.ssl-provision
+     [cloud-infra] F1490 - Provision SSL certificate via ACME/LetsEncrypt for a domain.
+
+  🟢 ai_vision.wildlife
+     [vision] F234 — Bird / wildlife classifier (model = wildlife-classifier).
+
+  ... and 29 more (use --all to show all)
+
+  (try 'tool <name>' for details, 'invoke <name>' to run)
+
+
+──────────────────────────────────────────────────────────────
+  [7] 🔎 Search: Diagnostics Tools
+──────────────────────────────────────────────────────────────
+
+  tankos> search diagnostics --category diagnostics
+
+
+  ┌──────────────────────────────────────────────────┐
+  │       🔎  Search Results: 'diagnostics'        │
+  └──────────────────────────────────────────────────┘
+
+  Category: diagnostics
+  33 matching tools
+
+  🟢 vision_smoketest.yolo
+     [diagnostics] F030 — YOLO detector probe.
+
+  🟢 vision_smoketest.apriltag
+     [diagnostics] F031 — AprilTag detector (tag36h11).
+
+  🟢 prom.metrics
+     [diagnostics] F049 — pull /metrics and print matching samples.
+
+  🟢 prom.health
+     [diagnostics] F050 — health scrape.
+
+  🟢 phase_runner.seed
+     [diagnostics] F154 — seed a tiny demo ``log.db`` so `run` has data to inspect.
+
+  🟢 phase_runner.run
+     [diagnostics] F156 — walk every phase sequentially.
+
+  🟢 phase_runner.phases
+     [diagnostics] F151 — list registered phases.
+
+  🟢 phase_runner.logs
+     [diagnostics] F152 — list data/ contents with sizes + sqlite table counts.
+
+  🟢 phase_runner.examine
+     [diagnostics] F153 — peek into a single file.
+
+  🟢 phase_runner.check
+     [diagnostics] F155 — run the checks for one phase.
+
+  🟢 gamma_lint.func-len
+     [diagnostics] F085 — function-length lint.
+
+  🟢 gamma_lint.dead-imports
+     [diagnostics] F086 — dead-imports detector.
+
+  🟢 drift.scheduler-replay
+     [diagnostics] F095 — scheduler replay.
+
+  🟢 drift.heatmap
+     [diagnostics] F094 — hour-bucket ASCII heatmap.
+
+  🟢 drift.drift-24h
+     [diagnostics] F093 — 24h drift summary.
+
+  🟢 diagnostics.wifi
+     [diagnostics] F005 — Wi-Fi diagnostic.
+
+  🟢 diagnostics.watchdog
+     [diagnostics] F007 — heartbeat liveness test.
+
+  🔴 diagnostics.strobe
+     [diagnostics] F010 — E-STOP strobe via lgpio + LED toggle.
+
+  🟢 diagnostics.ros
+     [diagnostics] F008 — topic / node liveness rollup (no daemon required).
+
+  🟢 diagnostics.power
+     [diagnostics] F009 — 5 V / 12 V rail probe via sysfs + vcgencmd.
+
+  🟢 diagnostics.lidar
+     [diagnostics] F003 — LiDAR frame verification (LDROBOT LD14/LD19 aa55 protocol).
+
+  🟢 diagnostics.imu
+     [diagnostics] F002 — IMU sanity test.
+
+  🟡 diagnostics.camera
+     [diagnostics] F004 — camera frame grab (ESP32-S3 bridge, V4L2 fallback).
+
+  🟢 diagnostics.battery
+     [diagnostics] F001 — battery health probe.
+
+  🟢 diagnostics.audio
+     [diagnostics] F006 — audio device dump.
+
+  ... and 8 more (use --all to show all)
+
+  (try 'tool <name>' for details, 'invoke <name>' to run)
+
+
+──────────────────────────────────────────────────────────────
+  [8] 🔍 Tool Detail: vision_smoketest.yolo
+──────────────────────────────────────────────────────────────
+
+  tankos> tool vision_smoketest.yolo
+
+
+  ┌─ vision_smoketest.yolo
+  │
+  │  F030 — YOLO detector probe.
+  │
+  │  Category:    diagnostics
+  │  Risk tier:   🟢 low
+  │  Script:      /home/shashi/The-Tank-Project/scripts/vision_smoketest.py
+  │  Subcommand:  yolo
+  │  F-IDs:       F30
+  │
+  │  Arguments (JSON Schema):
+  │    --dry_run  <boolean>  If true, return synthetic payload only (no actual side-effects). (default: False)
+  │    --out  <string>  Override the default output directory for this invocation.
+  │
+  │  Examples:
+  │    $ python3 vision_smoketest.py yolo
+  │
+  └─  (try 'invoke vision_smoketest.yolo ...' to run)
+
+
+──────────────────────────────────────────────────────────────
+  [9] 🔍 Tool Detail: diagnostics.ros
+──────────────────────────────────────────────────────────────
+
+  tankos> tool diagnostics.ros
+
+
+  ┌─ diagnostics.ros
+  │
+  │  F008 — topic / node liveness rollup (no daemon required).
+  │
+  │  Category:    diagnostics
+  │  Risk tier:   🟢 low
+  │  Script:      /home/shashi/The-Tank-Project/scripts/diagnostics.py
+  │  Subcommand:  ros
+  │  F-IDs:       F8
+  │
+  │  Arguments (JSON Schema):
+  │    --dry_run  <boolean>  If true, return synthetic payload only (no actual side-effects). (default: False)
+  │    --out  <string>  Override the default output directory for this invocation.
+  │
+  │  Examples:
+  │    $ python3 diagnostics.py ros
+  │
+  └─  (try 'invoke diagnostics.ros ...' to run)
+
+
+──────────────────────────────────────────────────────────────
+  [10] 🔍 Tool Detail: ai_vision.wildlife
+──────────────────────────────────────────────────────────────
+
+  tankos> tool ai_vision.wildlife
+
+
+  ┌─ ai_vision.wildlife
+  │
+  │  F234 — Bird / wildlife classifier (model = wildlife-classifier).
+  │
+  │  Category:    vision
+  │  Risk tier:   🟢 low
+  │  Script:      /home/shashi/The-Tank-Project/scripts/ai_vision.py
+  │  Subcommand:  wildlife
+  │  F-IDs:       F234
+  │
+  │  Arguments (JSON Schema):
+  │    --dry_run  <boolean>  If true, return synthetic payload only (no actual side-effects). (default: False)
+  │    --out  <string>  Override the default output directory for this invocation.
+  │
+  │  Examples:
+  │    $ python3 ai_vision.py wildlife
+  │
+  └─  (try 'invoke ai_vision.wildlife ...' to run)
+
+
+──────────────────────────────────────────────────────────────
+  [11] 🧠 Search: AI & ML Tools
+──────────────────────────────────────────────────────────────
+
+  tankos> search ai --category general
+
+
+  ┌──────────────────────────────────────────────────┐
+  │       🔎  Search Results: 'ai'        │
+  └──────────────────────────────────────────────────┘
+
+  Category: general
+  1 matching tools
+
+  🟢 tracing_ops.tail-logs
+     [general] F196 — tail the last N lines of a file (works on raw or JSONL).
+
+  (try 'tool <name>' for details, 'invoke <name>' to run)
+
+
+──────────────────────────────────────────────────────────────
+  [12] 🚗 Search: Mobility & Navigation
+──────────────────────────────────────────────────────────────
+
+  tankos> search mobility
+
+
+  ┌──────────────────────────────────────────────────┐
+  │       🔎  Search Results: 'mobility'        │
+  └──────────────────────────────────────────────────┘
+
+  25 matching tools
+
+  🟢 mobility_nav.weather-kit
+     [mobility] mobility_nav weather-kit
+
+  🟢 mobility_nav.waypoint
+     [mobility] mobility_nav waypoint
+
+  🟢 mobility_nav.wall-follow
+     [mobility] mobility_nav wall-follow
+
+  🟢 mobility_nav.virtual-leash
+     [mobility] mobility_nav virtual-leash
+
+  🟢 mobility_nav.tank-turn
+     [mobility] mobility_nav tank-turn
+
+  🟢 mobility_nav.stair
+     [mobility] mobility_nav stair
+
+  🟢 mobility_nav.soccer
+     [mobility] mobility_nav soccer
+
+  🟢 mobility_nav.snow
+     [mobility] mobility_nav snow
+
+  🟢 mobility_nav.smooth-accel
+     [mobility] mobility_nav smooth-accel
+
+  🟢 mobility_nav.ramp
+     [mobility] mobility_nav ramp
+
+  🟢 mobility_nav.path-record
+     [mobility] mobility_nav path-record
+
+  🟢 mobility_nav.outdoor
+     [mobility] mobility_nav outdoor
+
+  🟢 mobility_nav.obstacle-memory
+     [mobility] mobility_nav obstacle-memory
+
+  🟢 mobility_nav.nav-auto
+     [mobility] mobility_nav nav-auto
+
+  🟢 mobility_nav.magnetic
+     [mobility] mobility_nav magnetic
+
+  🟢 mobility_nav.leash
+     [mobility] mobility_nav leash
+
+  🟢 mobility_nav.joystick-web
+     [mobility] mobility_nav joystick-web
+
+  🟢 mobility_nav.gps-waypoint
+     [mobility] mobility_nav gps-waypoint
+
+  🟢 mobility_nav.gamepad
+     [mobility] mobility_nav gamepad
+
+  🟢 mobility_nav.dyn-speed
+     [mobility] mobility_nav dyn-speed
+
+  🟢 mobility_nav.doorway
+     [mobility] mobility_nav doorway
+
+  🔴 mobility_nav.dock-return
+     [mobility] mobility_nav dock-return
+
+  🟢 mobility_nav.dance
+     [mobility] mobility_nav dance
+
+  🟢 mobility_nav.crowd
+     [mobility] mobility_nav crowd
+
+  🟢 mobility_nav.cliff
+     [mobility] mobility_nav cliff
+
+  (try 'tool <name>' for details, 'invoke <name>' to run)
+
+
+──────────────────────────────────────────────────────────────
+  [13] 🔐 Search: Security Tools
+──────────────────────────────────────────────────────────────
+
+  tankos> search security --category security-hardening
+
+
+  ┌──────────────────────────────────────────────────┐
+  │       🔎  Search Results: 'security'        │
+  └──────────────────────────────────────────────────┘
+
+  Category: security-hardening
+  33 matching tools
+
+  🟢 security_hardening.umask-audit
+     [security-hardening] F1159 - Audit default umask settings in profile, bashrc, systemd.
+
+  🟢 security_hardening.sysctl-security
+     [security-hardening] F1160 - Check security-related sysctl settings (ASLR, rp_filter, SYN cookies).
+
+  🟢 security_hardening.suid-find
+     [security-hardening] F1141 - Find all SUID/SGID binaries on the system.
+
+  🟢 security_hardening.sudoers-audit
+     [security-hardening] F1139 - Audit sudoers: who has sudo, NOPASSWD entries, included files.
+
+  🟢 security_hardening.startup-services-audit
+     [security-hardening] F1154 - Audit enabled systemd services for unnecessary ones.
+
+  🟢 security_hardening.ssl-tls-check
+     [security-hardening] F1158 - Check SSL/TLS configuration for services (Apache, nginx, MariaDB).
+
+  🟢 security_hardening.ssh-keys-list
+     [security-hardening] F1138 - List all authorized SSH keys for all users.
+
+  🟢 security_hardening.ssh-harden
+     [security-hardening] F1137 - Apply SSH hardening: disable root, key-only auth, change port.
+
+  🟢 security_hardening.ssh-audit
+     [security-hardening] F1136 - Audit SSH config: root login, password auth, port, key-only, protocol version.
+
+  🟢 security_hardening.security-score-card
+     [security-hardening] F1162 - Generate a security scorecard: grade A-F across all audit areas.
+
+  🟢 security_hardening.security-report
+     [security-hardening] F1164 - Generate comprehensive security audit report (HTML/JSON).
+
+  🟢 security_hardening.rootkit-check
+     [security-hardening] F1149 - Run rkhunter to check for rootkits and backdoors.
+
+  🟢 security_hardening.password-policy-check
+     [security-hardening] F1155 - Check password policy: min length, complexity, expiry, history.
+
+  🟡 security_hardening.package-vuln-scan
+     [security-hardening] F1152 - Scan installed packages for known vulnerabilities (debsecan).
+
+  🟢 security_hardening.open-ports-audit
+     [security-hardening] F1142 - Audit open ports: list listening services, check against allowlist.
+
+  🟢 security_hardening.malware-scan-quick
+     [security-hardening] F1148 - Quick malware scan with clamscan on critical directories.
+
+  🟢 security_hardening.lyniz-audit
+     [security-hardening] F1150 - Run Lynis security audit on the system.
+
+  🟢 security_hardening.login-history
+     [security-hardening] F1147 - Show recent user logins and login failures (last, lastb).
+
+  🟢 security_hardening.kernel-vuln-check
+     [security-hardening] F1151 - Check kernel version against known CVEs.
+
+  🟡 security_hardening.intrusion-detection
+     [security-hardening] F1165 - Set up AIDE or tripwire for file integrity monitoring.
+
+  🔴 security_hardening.firewall-unblock-ip
+     [security-hardening] F1145 - Unblock a previously blocked IP address.
+
+  🔴 security_hardening.firewall-block-ip
+     [security-hardening] F1144 - Block an IP address via iptables.
+
+  🔴 security_hardening.firewall-audit
+     [security-hardening] F1143 - Audit iptables/nftables: default policy, open ports, rules count.
+
+  🔴 security_hardening.file-perms-audit
+     [security-hardening] F1140 - Audit file permissions: world-writable files, SUID/SGID binaries, /etc/shadow.
+
+  🔴 security_hardening.fail2ban-unban
+     [security-hardening] F1135 - Unban an IP address from fail2ban.
+
+  ... and 8 more (use --all to show all)
+
+  (try 'tool <name>' for details, 'invoke <name>' to run)
+
+
+──────────────────────────────────────────────────────────────
+  [14] 🏠 Search: Home Automation & IoT
+──────────────────────────────────────────────────────────────
+
+  tankos> search home --category iot-home
+
+
+  ┌──────────────────────────────────────────────────┐
+  │       🔎  Search Results: 'home'        │
+  └──────────────────────────────────────────────────┘
+
+  Category: iot-home
+  33 matching tools
+
+  🟢 iot_home.zwave-scan
+     [iot-home] F1343 - Scan for Z-Wave devices and show node list.
+
+  🟢 iot_home.zigbee-scan
+     [iot-home] F1341 - Scan for Zigbee devices and show network map.
+
+  🟢 iot_home.zigbee-pair
+     [iot-home] F1342 - Pair a new Zigbee device to the network.
+
+  🟢 iot_home.ultrasonic-distance
+     [iot-home] F1356 - Measure distance with HC-SR04 ultrasonic sensor.
+
+  🟡 iot_home.stepper-control
+     [iot-home] F1360 - Control a stepper motor: steps, direction, speed.
+
+  🟢 iot_home.spi-transfer
+     [iot-home] F1352 - SPI data transfer with a connected device.
+
+  🟡 iot_home.smart-plug-control
+     [iot-home] F1363 - Control smart plugs: on/off, schedule, energy monitoring.
+
+  🟡 iot_home.servo-control
+     [iot-home] F1359 - Control a servo motor: angle, speed, position.
+
+  🟢 iot_home.sensor-dashboard
+     [iot-home] F1362 - Real-time sensor dashboard: temperature, humidity, motion, light.
+
+  🟡 iot_home.rgb-led-control
+     [iot-home] F1358 - Control RGB LED strip: color, brightness, effects.
+
+  🟡 iot_home.relay-control
+     [iot-home] F1357 - Control a relay module (on/off) for appliances.
+
+  🟢 iot_home.pir-motion
+     [iot-home] F1355 - Monitor PIR motion sensor state.
+
+  🟢 iot_home.mqtt-topic-list
+     [iot-home] F1336 - List all active MQTT topics on the broker.
+
+  🟢 iot_home.mqtt-subscribe
+     [iot-home] F1335 - Subscribe to an MQTT topic and listen for messages.
+
+  🟡 iot_home.mqtt-publish
+     [iot-home] F1334 - Publish a message to an MQTT topic.
+
+  🟢 iot_home.mqtt-broker-status
+     [iot-home] F1333 - Check MQTT broker status: connected clients, topics, messages.
+
+  🟢 iot_home.i2c-scan
+     [iot-home] F1350 - Scan I2C bus for connected devices.
+
+  🟢 iot_home.i2c-read
+     [iot-home] F1351 - Read data from an I2C sensor.
+
+  🟢 iot_home.home-automation-scene
+     [iot-home] F1365 - Activate a home automation scene (movie night, away, bedtime).
+
+  🟢 iot_home.home-assistant-status
+     [iot-home] F1337 - Check Home Assistant status: version, entities, automations.
+
+  🟢 iot_home.ha-service-call
+     [iot-home] F1339 - Call a Home Assistant service (light.turn_on, switch.toggle, etc.).
+
+  🟢 iot_home.ha-entity-list
+     [iot-home] F1338 - List all Home Assistant entities with states.
+
+  🟢 iot_home.ha-automation-trigger
+     [iot-home] F1340 - Trigger a Home Assistant automation.
+
+  🟡 iot_home.gpio-write
+     [iot-home] F1348 - Write HIGH/LOW to a Arduino GPIO pin.
+
+  🟢 iot_home.gpio-read
+     [iot-home] F1347 - Read value from a Arduino GPIO pin.
+
+  ... and 8 more (use --all to show all)
+
+  (try 'tool <name>' for details, 'invoke <name>' to run)
+
+
+──────────────────────────────────────────────────────────────
+  [15] 🤖 AI Provider Status
+──────────────────────────────────────────────────────────────
+
+  tankos> providers
+
+
+  ┌──────────────────────────────────────────────────────────┐
+  │              🤖  AI Provider Status                     │
+  └──────────────────────────────────────────────────────────┘
+
+  Default: local-stub
+  Online:  0 providers
+
+  Provider           Model                               Health    
+  ────────────────── ─────────────────────────────────── ──────────
+  📋 local-stub      ★ —                                   stub      
+
+  (try 'ask <prompt>' to chat with local-stub, 'model' to switch)
+
+
+──────────────────────────────────────────────────────────────
+  [16] 🧠 AI Models & Provider Switching
+──────────────────────────────────────────────────────────────
+
+  tankos> model
+
+
+  ┌──────────────────────────────────────────────────────────┐
+  │              🤖  AI Models & Providers                  │
+  └──────────────────────────────────────────────────────────┘
+
+  Default provider: local-stub ★
+
+  Provider           Model                               Status    
+  ────────────────── ─────────────────────────────────── ──────────
+  📋 local-stub      ★ —                                   fallback  
+
+  Switch: model <name>   (e.g. 'model rotation', 'model local-llama')
+  Chat:   ask -p <name> <prompt>
+
+
+──────────────────────────────────────────────────────────────
+  [17] 🧬 AI Engine Overview (5 Engines)
+──────────────────────────────────────────────────────────────
+
+  tankos> ai
+
+
+  ┌──────────────────────────────────────────────────┐
+  │             🧠  AI Engine Overview              │
+  └──────────────────────────────────────────────────┘
+
+  🤖 AI Providers
+     Total:     1
+     Online:    1
+     Default:   local-stub
+
+  📊 Knowledge Graph
+     Entities:  0
+     Relations: 0
+     Types:     none
+
+  🔍 Curiosity Engine  💤 idle
+     Explorations: 0
+     Gaps:         0 open
+     Discoveries:  0 total
+
+  📈 Learning Engine
+     Patterns:    0
+     Preferences: 0
+     Insights:    0
+     Cycles:      0
+
+  ⏰ Scheduler  🔴 stopped
+     Tasks:     0
+     Active:    —
+     Budget:    0.0h used
+
+  📝 Experience Engine
+     Total:     0
+     Today:     0
+     Success:   0%
+
+
+──────────────────────────────────────────────────────────────
+  [18] 📊 Knowledge Graph Status
+──────────────────────────────────────────────────────────────
+
+  tankos> knowledge
+
+
+  ┌──────────────────────────────────────────────────┐
+  │             📊  Knowledge Graph                │
+  └──────────────────────────────────────────────────┘
+
+  Total entities:    0
+  Relationships:     0
+  Avg strength:      0.0
+  Communities:       0
+
+  (try 'knowledge <keyword>' to search entities)
+
+
+──────────────────────────────────────────────────────────────
+  [19] 🔍 Curiosity Engine
+──────────────────────────────────────────────────────────────
+
+  tankos> curiosity
+
+
+  ┌──────────────────────────────────────────────────┐
+  │             🔍  Curiosity Engine               │
+  └──────────────────────────────────────────────────┘
+
+  Explorations:     0
+  Successful:       0
+  Interrupted:      0
+  Auto-mode:        ✅ on
+
+
+  Open gaps:        0
+  Filled gaps:      0
+  Discoveries:      0 total, 0 working
+
+  (try 'curiosity explore' or 'curiosity gaps')
+
+
+──────────────────────────────────────────────────────────────
+  [20] ⏰ Learning Scheduler
+──────────────────────────────────────────────────────────────
+
+  tankos> learning
+
+
+  ┌──────────────────────────────────────────────────┐
+  │             ⏰  Learning Scheduler              │
+  └──────────────────────────────────────────────────┘
+
+  Status:           🔴 stopped (idle)
+  Scheduled tasks:  0 (0 enabled)
+  Active now:       —
+
+  Daily budget:     [░░░░░░░░░░░░░░░░░░░░] 0.0h / 4h
+  Tasks today:      0 done, 0 failed
+
+
+  Learning window:  🟢 0:00 – 23:00
+
+
+──────────────────────────────────────────────────────────────
+  [21] ⚡ Invoke: vision_smoketest.yolo
+──────────────────────────────────────────────────────────────
+
+  tankos> invoke vision_smoketest.yolo
+
+  🟢 Invoking: vision_smoketest.yolo
+  Script:   /home/shashi/The-Tank-Project/scripts/vision_smoketest.py yolo
+
+  ❌ Status:    err (exit 2)
+  ⏱  Duration:  116 ms
+
+  stderr: usage: vision_smoketest.py yolo [-h] [--model MODEL] [--conf CONF]
+                                [--save SAVE]
+                                frame
+vision_smoketest.py yolo: error: the following arguments are required: frame
+
+
+
+──────────────────────────────────────────────────────────────
+  [22] ⚡ Invoke: diagnostics.ros
+──────────────────────────────────────────────────────────────
+
+  tankos> invoke diagnostics.ros
+
+  🟢 Invoking: diagnostics.ros
+  Script:   /home/shashi/The-Tank-Project/scripts/diagnostics.py ros
+
+  ⏰ Status:    timeout (exit 124)
+  ⏱  Duration:  30011 ms
+
+  stderr: timed out after 30s
+
+
+──────────────────────────────────────────────────────────────
+  [23] ⚡ Invoke: hardware.io.pinout
+──────────────────────────────────────────────────────────────
+
+  tankos> invoke hardware.io.pinout
+
+  ❌ Unknown tool: 'hardware.io.pinout'
+  Did you mean: hardware_io.spi-probe, hardware_io.gpio-readback, hardware_io.i2c-pullup, hardware_io.servo-sweep, calibrate.pantilt?
+
+
+──────────────────────────────────────────────────────────────
+  [24] 📥 Search: Download Tools
+──────────────────────────────────────────────────────────────
+
+  tankos> search download --category download-music
+
+
+  ┌──────────────────────────────────────────────────┐
+  │       🔎  Search Results: 'download'        │
+  └──────────────────────────────────────────────────┘
+
+  Category: download-music
+  0 matching tools
+
+  (no matches — try a broader keyword)
+
+
+──────────────────────────────────────────────────────────────
+  [25] 🎬 Search: Media & Streaming
+──────────────────────────────────────────────────────────────
+
+  tankos> search media --category media-streaming
+
+
+  ┌──────────────────────────────────────────────────┐
+  │       🔎  Search Results: 'media'        │
+  └──────────────────────────────────────────────────┘
+
+  Category: media-streaming
+  33 matching tools
+
+  🟢 media_streaming.upgrade-quality
+     [media-streaming] F1218 - Find low-quality media and upgrade to 4K/1080p versions.
+
+  🟢 media_streaming.transcode-video
+     [media-streaming] F1203 - Transcode video with ffmpeg: change codec, resolution, bitrate.
+
+  🔴 media_streaming.transcode-audio
+     [media-streaming] F1204 - Transcode audio files: convert format, change bitrate, normalize.
+
+  🔴 media_streaming.rename-media
+     [media-streaming] F1210 - Rename media files to standard format (Name Year Quality.ext).
+
+  🟡 media_streaming.remove-black-bars
+     [media-streaming] F1220 - Auto-crop black bars from video files.
+
+  🟢 media_streaming.plex-status
+     [media-streaming] F1200 - Check Plex Media Server status: running, version, active streams.
+
+  🟢 media_streaming.plex-library-export
+     [media-streaming] F1231 - Export Plex library as CSV/JSON for backup or migration.
+
+  🟡 media_streaming.optimize-for-streaming
+     [media-streaming] F1230 - Optimize media for streaming: create optimized versions.
+
+  🔴 media_streaming.normalize-audio
+     [media-streaming] F1223 - Normalize audio loudness across media library (EBU R128).
+
+  🟢 media_streaming.monitor-watch-folder
+     [media-streaming] F1228 - Monitor a folder and auto-import new media to library.
+
+  🟢 media_streaming.merge-video-audio
+     [media-streaming] F1221 - Merge separate video and audio tracks into one file.
+
+  🟢 media_streaming.media-stats
+     [media-streaming] F1229 - Media library statistics: total movies, shows, episodes, size, runtime.
+
+  🟢 media_streaming.media-server-setup
+     [media-streaming] F1232 - Interactive media server setup wizard (Plex/Jellyfin/Emby).
+
+  🟢 media_streaming.media-quality-report
+     [media-streaming] F1217 - Report media quality: count by resolution, codec, audio quality.
+
+  🟢 media_streaming.media-organize
+     [media-streaming] F1209 - Organize media files into Movies/TV/Music folder structure.
+
+  🟢 media_streaming.media-library-scan
+     [media-streaming] F1202 - Trigger a media library scan for new content.
+
+  🟢 media_streaming.media-info
+     [media-streaming] F1208 - Show detailed media info: codec, bitrate, resolution, audio tracks, subs.
+
+  🟢 media_streaming.jellyfin-status
+     [media-streaming] F1201 - Check Jellyfin server status and active sessions.
+
+  🟢 media_streaming.generate-thumbnails
+     [media-streaming] F1213 - Generate thumbnail sprites for video seeking preview.
+
+  🟢 media_streaming.fix-metadata
+     [media-streaming] F1216 - Fix incorrect metadata: correct titles, years, episode numbers.
+
+  🟢 media_streaming.find-duplicate-media
+     [media-streaming] F1211 - Find duplicate media files by checksum or perceptual hash.
+
+  🟡 media_streaming.fetch-metadata
+     [media-streaming] F1215 - Fetch movie/TV metadata from TMDB/TVDB API.
+
+  🟢 media_streaming.extract-subtitles
+     [media-streaming] F1206 - Extract embedded subtitles from video files.
+
+  🟢 media_streaming.extract-audio
+     [media-streaming] F1222 - Extract audio track from video as MP3/AAC/FLAC.
+
+  🟡 media_streaming.download-subtitles
+     [media-streaming] F1207 - Download subtitles from OpenSubtitles for media files.
+
+  ... and 8 more (use --all to show all)
+
+  (try 'tool <name>' for details, 'invoke <name>' to run)
+
+
+──────────────────────────────────────────────────────────────
+  [26] 🎤 Search: Voice & Audio
+──────────────────────────────────────────────────────────────
+
+  tankos> search voice --category voice
+
+
+  ┌──────────────────────────────────────────────────┐
+  │       🔎  Search Results: 'voice'        │
+  └──────────────────────────────────────────────────┘
+
+  Category: voice
+  38 matching tools
+
+  🟡 voice_ops.voice-rotate
+     [voice] F075 — voice rotate.
+
+  🔴 voice_ops.sentiment-warmup
+     [voice] F076 — sentiment warmup.
+
+  🟢 voice_ops.emotion-wheel
+     [voice] F077 — emotion wheel (ASCII).
+
+  🟢 ai_voice.whisper-mode
+     [voice] F425 - whisper-to-whisper mode.
+
+  🟢 ai_voice.wake-word
+     [voice] F422 - custom wake word.
+
+  🟢 ai_voice.voice-timer
+     [voice] F434 - voice-based timer.
+
+  🟢 ai_voice.voice-disguise
+     [voice] F429 - voice disguise.
+
+  🟢 ai_voice.voice-clone
+     [voice] F424 - voice cloning.
+
+  🟢 ai_voice.voice-calc
+     [voice] F438 - voice calculator.
+
+  🟢 ai_voice.unit-convert
+     [voice] F439 - voice unit converter.
+
+  🟢 ai_voice.tongue-twisters
+     [voice] F441 - tongue-twister rater.
+
+  🟢 ai_voice.time-capsule
+     [voice] F421 - scheduled playback capsule.
+
+  🟢 ai_voice.therapist
+     [voice] F410 - active-listening therapist.
+
+  🟢 ai_voice.teleprompter
+     [voice] F433 - teleprompter mode.
+
+  🟡 ai_voice.story-cowrite
+     [voice] F415 - AI story co-writer.
+
+  🟢 ai_voice.spelling-bee
+     [voice] F440 - spelling bee.
+
+  🟢 ai_voice.soundeffect
+     [voice] F432 - sound-effect recognition.
+
+  🟢 ai_voice.singing
+     [voice] F430 - singing mode.
+
+  🟢 ai_voice.riddle
+     [voice] F414 - riddle master with hints.
+
+  🟢 ai_voice.read-aloud
+     [voice] F437 - read aloud from camera.
+
+  🟢 ai_voice.other-robot
+     [voice] F436 - two-robot conversation.
+
+  🟢 ai_voice.multistep
+     [voice] F435 - multi-step compound commands.
+
+  🟢 ai_voice.multi-wake
+     [voice] F423 - multi-wake-word triggers.
+
+  🟢 ai_voice.mood-journal
+     [voice] F409 - mood journal + trends.
+
+  🟢 ai_voice.memory-palace
+     [voice] F418 - method-of-loci memoriser.
+
+  ... and 13 more (use --all to show all)
+
+  (try 'tool <name>' for details, 'invoke <name>' to run)
+
+
+──────────────────────────────────────────────────────────────
+  [27] 📚 Search: Education Tools
+──────────────────────────────────────────────────────────────
+
+  tankos> search education --category education-tools
+
+
+  ┌──────────────────────────────────────────────────┐
+  │       🔎  Search Results: 'education'        │
+  └──────────────────────────────────────────────────┘
+
+  Category: education-tools
+  34 matching tools
+
+  🟢 education_tools.typing-tutor
+     [education-tools] F1687 - Typing tutor: lessons, WPM tracking, accuracy stats.
+
+  🟢 education_tools.tutorial-generate
+     [education-tools] F1680 - Generate a step-by-step tutorial from a topic.
+
+  🟢 education_tools.study-timer
+     [education-tools] F1682 - Study timer with Pomodoro technique and break reminders.
+
+  🟡 education_tools.study-plan
+     [education-tools] F1681 - Create a personalized study plan with schedule and milestones.
+
+  🟢 education_tools.spelling-bee
+     [education-tools] F1691 - Spelling practice: listen and spell, difficulty levels.
+
+  🟢 education_tools.speed-reading
+     [education-tools] F1690 - Speed reading practice: RSVP, chunking, comprehension tests.
+
+  🟢 education_tools.science-experiments
+     [education-tools] F1694 - Virtual science experiments: physics, chemistry, biology.
+
+  🟢 education_tools.research-paper-help
+     [education-tools] F1696 - Research paper assistant: outline, citations, structure.
+
+  🟢 education_tools.quiz-take
+     [education-tools] F1671 - Take a quiz with timer, scoring, and explanations.
+
+  🟢 education_tools.quiz-leaderboard
+     [education-tools] F1673 - Quiz leaderboard: top scores, fastest times, streaks.
+
+  🟢 education_tools.quiz-generate
+     [education-tools] F1672 - Generate quiz questions from text or notes using AI.
+
+  🟡 education_tools.quiz-create
+     [education-tools] F1670 - Create a quiz: multiple choice, true/false, fill-in-the-blank.
+
+  🟡 education_tools.mind-map
+     [education-tools] F1689 - Create and visualize mind maps from topics.
+
+  🟢 education_tools.memory-palace
+     [education-tools] F1688 - Memory palace technique: loci, associations, recall practice.
+
+  🟢 education_tools.math-solver
+     [education-tools] F1683 - Solve math problems: algebra, calculus, linear algebra, stats.
+
+  🟢 education_tools.math-graph
+     [education-tools] F1684 - Plot mathematical functions and equations.
+
+  🟢 education_tools.learning-path
+     [education-tools] F1698 - Generate a learning path: prerequisites, courses, projects, timeline.
+
+  🟡 education_tools.language-vocab-list
+     [education-tools] F1675 - Manage vocabulary lists: add, review, test.
+
+  🟢 education_tools.language-translate
+     [education-tools] F1676 - Translate text between any two languages.
+
+  🟢 education_tools.language-pronounce
+     [education-tools] F1677 - Text-to-speech pronunciation practice for language learning.
+
+  🟢 education_tools.language-learn
+     [education-tools] F1674 - Language learning: vocabulary, phrases, grammar exercises.
+
+  🟢 education_tools.history-timeline
+     [education-tools] F1693 - Interactive history timeline: events, figures, eras.
+
+  🟢 education_tools.geography-quiz
+     [education-tools] F1692 - Geography quiz: countries, capitals, flags, maps.
+
+  🟢 education_tools.flashcard-stats
+     [education-tools] F1669 - Flashcard stats: cards reviewed, retention rate, streaks.
+
+  🟢 education_tools.flashcard-review
+     [education-tools] F1667 - Review flashcards with spaced repetition (SM-2 algorithm).
+
+  ... and 9 more (use --all to show all)
+
+  (try 'tool <name>' for details, 'invoke <name>' to run)
+
+
+──────────────────────────────────────────────────────────────
+  [28] ☁️ Search: Cloud & DevOps
+──────────────────────────────────────────────────────────────
+
+  tankos> search docker --category docker-ops
+
+
+  ┌──────────────────────────────────────────────────┐
+  │       🔎  Search Results: 'docker'        │
+  └──────────────────────────────────────────────────┘
+
+  Category: docker-ops
+  33 matching tools
+
+  🔴 docker_ops.volume-list
+     [docker-ops] F1020 - List Docker volumes with mount points.
+
+  🔴 docker_ops.tag-image
+     [docker-ops] F1023 - Tag an existing Docker image.
+
+  🔴 docker_ops.registry-list-tags
+     [docker-ops] F1031 - List available tags for an image on Docker Hub.
+
+  🔴 docker_ops.push-image
+     [docker-ops] F1024 - Push an image to a Docker registry.
+
+  🔴 docker_ops.pull-image
+     [docker-ops] F1021 - Pull a Docker image from a registry.
+
+  🔴 docker_ops.prune-volumes
+     [docker-ops] F1016 - Remove unused Docker volumes (caution: data loss).
+
+  🟢 docker_ops.prune-system
+     [docker-ops] F1017 - Full system prune: containers, images, networks, build cache.
+
+  🔴 docker_ops.prune-images
+     [docker-ops] F1015 - Remove unused/dangling Docker images.
+
+  🔴 docker_ops.prune-containers
+     [docker-ops] F1014 - Remove all stopped containers (docker container prune).
+
+  🔴 docker_ops.network-list
+     [docker-ops] F1019 - List Docker networks.
+
+  🔴 docker_ops.image-list
+     [docker-ops] F1002 - List all Docker images with size and tags.
+
+  🔴 docker_ops.disk-usage
+     [docker-ops] F1018 - Docker disk usage breakdown (images, containers, volumes).
+
+  🟢 docker_ops.container-top
+     [docker-ops] F1026 - Show running processes inside a container.
+
+  🔴 docker_ops.container-stop
+     [docker-ops] F1005 - Gracefully stop a running container.
+
+  🟢 docker_ops.container-stats
+     [docker-ops] F1001 - Live resource usage stats for all containers (CPU/RAM/IO).
+
+  🔴 docker_ops.container-start
+     [docker-ops] F1004 - Start a stopped container by name or ID.
+
+  🟢 docker_ops.container-shell
+     [docker-ops] F1032 - Open an interactive shell inside a running container.
+
+  🟢 docker_ops.container-restart
+     [docker-ops] F1006 - Restart a container.
+
+  🔴 docker_ops.container-remove
+     [docker-ops] F1007 - Remove a stopped container.
+
+  🟢 docker_ops.container-port
+     [docker-ops] F1027 - Show port mappings for a container.
+
+  🟢 docker_ops.container-logs
+     [docker-ops] F1003 - Tail logs from a specific container (--tail N, --follow).
+
+  🔴 docker_ops.container-list
+     [docker-ops] F1000 - List all Docker containers with status, ports, names.
+
+  🟢 docker_ops.container-inspect
+     [docker-ops] F1009 - Detailed inspect of a container (config, mounts, network, env).
+
+  🟢 docker_ops.container-health
+     [docker-ops] F1025 - Check health status of all containers (healthy/unhealthy).
+
+  🟢 docker_ops.container-export
+     [docker-ops] F1029 - Export a container filesystem as a tar archive.
+
+  ... and 8 more (use --all to show all)
+
+  (try 'tool <name>' for details, 'invoke <name>' to run)
+
+
+──────────────────────────────────────────────────────────────
+  [29] 📋 Running Processes
+──────────────────────────────────────────────────────────────
+
+  tankos> ps
+
+
+  Running processes (Python + TankOS):
+
+  PID      NAME         CPU%     MEM%     CMD
+  ──────────────────────────────────────────────────────────────────────
+  2150     ttyd         0.0      0.1      /usr/bin/ttyd -p 7682 -i lo -t titleFixed TankOS python3 /home/shashi/The-Tank-P
+  2151     ttyd         0.0      0.1      /usr/bin/ttyd -p 7681 -c arduino:9936468425 -t titleFixed TankOS python3 /home/s
+  2356     tank-network 0.0      0.0      /bin/bash /usr/local/bin/tank-network start
+  2373     tank-network 0.0      0.0      /bin/bash /usr/local/bin/tank-network start
+  2374     tank-network 0.0      0.0      /bin/bash /usr/local/bin/tank-network start
+  2375     tank-network 0.0      0.0      /bin/bash /usr/local/bin/tank-network start
+  2378     tank-network 0.0      0.0      /bin/bash /usr/local/bin/tank-network start
+  212088   python3      0.0      18.1     python3 -m tank_os.shell.terminal.agent_chat
+  214122   bash         0.0      0.0      bash -c cd The-Tank-Project && bash scripts/record_demo.sh 2>&1
+  214127   python3      0.0      0.5      python3 scripts/demo_runner.py
+  214198   python3      0.0      0.9      /usr/bin/python3 -c from ros2cli.daemon.daemonize import main; main() --name ros
+
+
+──────────────────────────────────────────────────────────────
+  [30] 🔧 Environment Variables
+──────────────────────────────────────────────────────────────
+
+  tankos> env
+
+
+  Environment variables:
+
+  AMENT_PREFIX_PATH=/opt/ros/jazzy
+  CMAKE_PREFIX_PATH=/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_se...
+  CODEBUFF_LAUNCHER_PID=198194
+  CODEBUFF_RG_PATH=/home/shashi/.config/manicode/rg
+  CODEBUFF_TREE_SITTER_WASM_PATH=/home/shashi/.config/manicode/tree-sitter.wasm
+  DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+  DEBUGINFOD_URLS=https://debuginfod.ubuntu.com 
+  GZ_CONFIG_PATH=/opt/ros/jazzy/opt/gz_sim_vendor/share/gz:/opt/ros/jazzy/...
+  HOME=/home/shashi
+  LANG=en_US.UTF-8
+  LANGUAGE=en
+  LC_ADDRESS=en_US.UTF-8
+  LC_ALL=en_US.UTF-8
+  LC_IDENTIFICATION=en_US.UTF-8
+  LC_MEASUREMENT=en_US.UTF-8
+  LC_MONETARY=en_US.UTF-8
+  LC_NAME=en_US.UTF-8
+  LC_NUMERIC=en_US.UTF-8
+  LC_PAPER=en_US.UTF-8
+  LC_TELEPHONE=en_US.UTF-8
+  LC_TIME=en_US.UTF-8
+  LD_LIBRARY_PATH=/opt/ros/jazzy/opt/gz_sim_vendor/lib:/opt/ros/jazzy/opt/g...
+  LESSCLOSE=/usr/bin/lesspipe %s %s
+  LESSOPEN=| /usr/bin/lesspipe %s
+  LOGNAME=shashi
+  LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:b...
+  OLDPWD=/home/shashi/The-Tank-Project
+  PAPERSIZE=letter
+  PATH=/home/shashi/.local/bin:/home/shashi/bin:/home/shashi/.op...
+  PWD=/home/shashi/The-Tank-Project
+  PYTHONPATH=/opt/ros/jazzy/lib/python3.12/site-packages
+  ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET
+  ROS_DISTRO=jazzy
+  ROS_DOMAIN_ID=0
+  ROS_PYTHON_VERSION=3
+  ROS_VERSION=2
+  SHELL=/bin/bash
+  SHLVL=3
+  SSH_CLIENT=192.168.31.64 37900 22
+  SSH_CONNECTION=192.168.31.64 37900 192.168.31.74 22
+  SSH_TTY=/dev/pts/0
+  TERM=xterm-256color
+  USER=shashi
+  XDG_DATA_DIRS=/usr/share/gnome:/usr/local/share:/usr/share:/var/lib/sna...
+  XDG_RUNTIME_DIR=/run/user/1000
+  XDG_SESSION_CLASS=user
+  XDG_SESSION_ID=15
+  XDG_SESSION_TYPE=tty
+  _=/usr/bin/python3
+
+
+══════════════════════════════════════════════════════════════
+  ✅ Demo Complete — All 30 Sections Run
+══════════════════════════════════════════════════════════════
+
+  Modules demonstrated:
+    ✓ System Status, Info, Network, Health
+    ✓ Tool Registry (1,966 tools, 74 categories)
+    ✓ Tool Search, Detail, Invocation
+    ✓ AI Providers, Models, Engines
+    ✓ Knowledge Graph, Curiosity, Learning
+    ✓ Vision, Diagnostics, Hardware, Security
+    ✓ Mobility, IoT, Media, Voice, Education
+    ✓ Cloud, Docker, Downloads, Processes
+
+
+Script done on 2026-08-25 13:47:03+02:00 [COMMAND_EXIT_CODE="0"]

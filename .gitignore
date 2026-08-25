@@ -91,3 +91,7 @@ tank_ws/tools/visdom/
 
 # Backup files — never commit
 *.bak
+
+# Build artifacts
+firmware/dfrobot_camera/VoiceCam/build/
+tank_ws/data/

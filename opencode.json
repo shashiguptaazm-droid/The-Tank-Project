@@ -1,0 +1,18 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "tankos": {
+      "type": "local",
+      "command": ["python3", "tank_os/agent_framework/mcp_server.py"],
+      "enabled": true,
+      "cwd": ".",
+      "environment": {
+        "PYTHONPATH": "."
+      },
+      "timeout": 15000
+    }
+  },
+  "tools": {
+    "tankos_*": true
+  }
+}
