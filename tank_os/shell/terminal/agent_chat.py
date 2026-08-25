@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""TankOS Agent Chat — complete AI coding assistant.
+"""TankOS Agent Chat — Professional AI coding assistant.
 
 All 1,166 tools auto-selectable. Real camera via DFRobot USB serial + YOLO.
-9 cloud providers rotating. Phi-3 local fallback. Never shows rate limit.
+10 cloud providers rotating. Phi-3 local fallback. Never shows rate limit.
 
 Usage:
     python3 -m tank_os.shell.terminal.agent_chat
@@ -17,7 +17,8 @@ import re
 import subprocess
 import sys
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -42,11 +43,125 @@ if _env_file.exists():
                 os.environ[k] = v
 
 # ═══════════════════════════════════════════════════════════════════════════
+#  Professional UI Helpers
+# ═══════════════════════════════════════════════════════════════════════════
+
+class Colors:
+    """ANSI color codes for professional terminal output."""
+    RESET = "\033[0m"
+    BOLD = "\033[1m"
+    DIM = "\033[2m"
+    ITALIC = "\033[3m"
+    UNDERLINE = "\033[4m"
+    
+    # Foreground
+    RED = "\033[31m"
+    GREEN = "\033[32m"
+    YELLOW = "\033[33m"
+    BLUE = "\033[34m"
+    MAGENTA = "\033[35m"
+    CYAN = "\033[36m"
+    WHITE = "\033[37m"
+    GRAY = "\033[90m"
+    
+    # Bright
+    BRIGHT_RED = "\033[91m"
+    BRIGHT_GREEN = "\033[92m"
+    BRIGHT_YELLOW = "\033[93m"
+    BRIGHT_BLUE = "\033[94m"
+    BRIGHT_MAGENTA = "\033[95m"
+    BRIGHT_CYAN = "\033[96m"
+    BRIGHT_WHITE = "\033[97m"
+    
+    # Background
+    BG_RED = "\033[41m"
+    BG_GREEN = "\033[42m"
+    BG_YELLOW = "\033[43m"
+    BG_BLUE = "\033[44m"
+    BG_MAGENTA = "\033[45m"
+    BG_CYAN = "\033[46m"
+
+
+def _print_box(title: str, content: str, color: str = Colors.CYAN, width: int = 60):
+    """Print a professional box with title and content."""
+    print(f"\n{color}╔{'═' * (width - 2)}╗{Colors.RESET}")
+    print(f"{color}║{Colors.RESET} {Colors.BOLD}{title}{Colors.RESET}{' ' * max(0, width - len(title) - 4)}{color}║{Colors.RESET}")
+    print(f"{color}╠{'═' * (width - 2)}╣{Colors.RESET}")
+    for line in content.split('\n'):
+        print(f"{color}║{Colors.RESET} {line}{' ' * max(0, width - len(line) - 4)}{color}║{Colors.RESET}")
+    print(f"{color}╚{'═' * (width - 2)}╝{Colors.RESET}")
+
+
+def _print_status(label: str, value: str, color: str = Colors.GREEN):
+    """Print a status line with label and value."""
+    print(f"  {Colors.GRAY}├─{Colors.RESET} {Colors.BOLD}{label}:{Colors.RESET} {color}{value}{Colors.RESET}")
+
+
+def _print_thinking(provider: str, model: str):
+    """Print thinking indicator."""
+    print(f"\n{Colors.YELLOW}  ⚡ Thinking...{Colors.RESET} {Colors.GRAY}({provider}/{model}){Colors.RESET}", end="", flush=True)
+
+
+def _print_done(provider: str, elapsed: float):
+    """Print done indicator."""
+    print(f"\r{Colors.GREEN}  ✓ Done{Colors.RESET} {Colors.GRAY}({provider} in {elapsed:.1f}s){Colors.RESET}")
+
+
+def _print_action(action: str, details: str):
+    """Print action being taken."""
+    icons = {
+        "shell": "🔧",
+        "tool": "⚙️",
+        "camera": "📷",
+        "modem": "📱",
+        "opencode": "💻",
+        "reply": "💬",
+    }
+    icon = icons.get(action, "▶")
+    print(f"  {icon} {Colors.CYAN}{action.upper()}{Colors.RESET} {Colors.GRAY}{details[:80]}{Colors.RESET}")
+
+
+def _print_result(text: str, prefix: str = "🤖"):
+    """Print result with formatting."""
+    print(f"\n  {prefix} {Colors.BRIGHT_GREEN}{text}{Colors.RESET}")
+
+
+def _print_error(text: str):
+    """Print error with formatting."""
+    print(f"\n  {Colors.RED}✗ {text}{Colors.RESET}")
+
+
+def _print_variables(variables: Dict[str, Any]):
+    """Print current variables/state."""
+    if variables:
+        print(f"\n  {Colors.GRAY}┌─ Current State ──────────────────────────────────{Colors.RESET}")
+        for k, v in variables.items():
+            val = str(v)[:50]
+            print(f"  {Colors.GRAY}│{Colors.RESET} {Colors.BOLD}{k}:{Colors.RESET} {Colors.CYAN}{val}{Colors.RESET}")
+        print(f"  {Colors.GRAY}└─────────────────────────────────────────────────{Colors.RESET}")
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 #  Camera — DFRobot USB serial capture + REAL YOLO detection
 # ═══════════════════════════════════════════════════════════════════════════
 
 def _capture_frame() -> Optional[str]:
-    """Capture JPEG from DFRobot camera via USB serial /dev/ttyACM0."""
+    """Capture JPEG from the camera — HTTP bridge or legacy USB serial."""
+    cam_url = os.environ.get("TANK_CAM_URL", "").rstrip("/")
+    if cam_url:
+        try:
+            import urllib.request
+            with urllib.request.urlopen(f"{cam_url}/snapshot.jpg", timeout=8) as resp:
+                jpeg = resp.read()
+            if len(jpeg) >= 500:
+                out = _PROJECT_ROOT / "data" / "frames"
+                out.mkdir(parents=True, exist_ok=True)
+                path = out / "latest.jpg"
+                path.write_bytes(jpeg)
+                return str(path)
+        except Exception as e:
+            logger.debug("HTTP camera capture failed: %s", e)
+
     try:
         import serial as _serial
     except ImportError:
@@ -59,7 +174,6 @@ def _capture_frame() -> Optional[str]:
     try:
         s = _serial.Serial(port, 921600, timeout=5)
         time.sleep(0.5)
-        # Double-drain buffer
         s.read(s.in_waiting)
         time.sleep(0.1)
         s.read(s.in_waiting)
@@ -122,49 +236,213 @@ def _run_yolo(image_path: str) -> str:
         return f"YOLO error: {e}"
 
 
-def _camera_vision() -> str:
-    """Capture frame + run REAL YOLO + face recognition. Returns description for LLM."""
-    frame = _capture_frame()
-    if frame is None:
-        return "Camera not available — /dev/ttyACM0 not responding to SNAP"
-    detections = _run_yolo(frame)
+def _capture_camera2() -> Optional[str]:
+    """Capture from second camera (UNO Q ESP32-S3 CAM)."""
+    unoq_urls = [
+        os.environ.get("TANK_CAM2_URL", ""),                      # manual override
+        "http://192.168.31.72:8083/snapshot.jpg",  # UNO Q TankOS Camera Server
+        "http://100.84.235.7:8083/snapshot.jpg",   # UNO Q via Tailscale
+        "http://192.168.31.145/snapshot.jpg",      # ESP32-S3 CAM direct
+        "http://192.168.31.72:8081/frame.jpg",     # Motion streaming
+    ]
+    
+    for url in unoq_urls:
+        try:
+            import urllib.request
+            with urllib.request.urlopen(url, timeout=5) as resp:
+                jpeg = resp.read()
+            if len(jpeg) >= 500:  # Valid JPEG
+                out = _PROJECT_ROOT / "data" / "frames"
+                out.mkdir(parents=True, exist_ok=True)
+                path = out / "camera2.jpg"
+                path.write_bytes(jpeg)
+                return str(path)
+        except Exception:
+            continue
+    
+    # Try local serial cameras
+    for port in ["/dev/ttyACM1", "/dev/ttyACM2"]:
+        if Path(port).exists():
+            try:
+                import serial as _serial
+                s = _serial.Serial(port, 921600, timeout=5)
+                time.sleep(0.5)
+                s.read(s.in_waiting)
+                s.write(b"SNAP\n")
+                header = b""
+                deadline = time.time() + 5
+                while time.time() < deadline:
+                    c = s.read(1)
+                    if c:
+                        header += c
+                        if c == b"\n":
+                            break
+                h = header.decode("utf-8", errors="replace").strip()
+                if h.startswith("FRAME:"):
+                    parts = h.split(":")
+                    expected = int(parts[3])
+                    jpeg = b""
+                    dl = time.time() + 10
+                    while len(jpeg) < expected and time.time() < dl:
+                        chunk = s.read(min(expected - len(jpeg), 16384))
+                        if chunk:
+                            jpeg += chunk
+                            dl = time.time() + 2
+                    s.read(1)
+                    s.close()
+                    if len(jpeg) >= 500:
+                        out = _PROJECT_ROOT / "data" / "frames"
+                        out.mkdir(parents=True, exist_ok=True)
+                        path = out / "camera2.jpg"
+                        path.write_bytes(jpeg)
+                        return str(path)
+                s.close()
+            except Exception:
+                pass
+    return None
 
-    # Face recognition on detected persons
-    face_info = ""
+
+def _read_lidar() -> str:
+    """Read LiDAR distance data (aa55 protocol @ 115200, e.g. D300/Delta-2A).
+
+    Frame: AA55 | speed | count | start_angle(2, deg*100) | end_angle(2,
+    deg*100) | checksum(2) | count x distance(u16 LE, mm).
+    Verified live on /dev/ttyUSB0 — 2026-08-25.
+    """
+    lidar_port = os.environ.get("TANK_LIDAR_PORT", "/dev/ttyUSB0")
+    lidar_baud = int(os.environ.get("TANK_LIDAR_BAUD", "115200"))
+    if not Path(lidar_port).exists():
+        return f"LiDAR not connected ({lidar_port} not found)"
+
     try:
-        from tank_os.shell.terminal.face_db import FaceDB
-        db = FaceDB()
-        faces = db.recognize_in_frame(frame)
-        if faces:
-            parts = []
-            unknown_count = 0
-            for f in faces:
-                if f["is_known"]:
-                    parts.append(f'{f["name"]}({f["confidence"]:.0%}) at ({f["x"]},{f["y"]})')
-                else:
-                    unknown_count += 1
-            if parts:
-                face_info = f". Known faces: {', '.join(parts)}"
-            if unknown_count > 0:
-                face_info += f". {unknown_count} unknown person(s) detected"
-    except Exception:
-        pass
+        import serial as _serial
+        s = _serial.Serial(lidar_port, lidar_baud, timeout=0.1)
+        time.sleep(0.2)
+        s.reset_input_buffer()
 
-    return f"Captured {frame}. {detections}{face_info}"
+        points = []  # (angle_deg, distance_mm)
+        buf = b""
+        deadline = time.time() + 2.0
+        while time.time() < deadline:
+            buf += s.read(4096)
+        s.close()
+
+        # Scan for aa55 headers and parse frames (10 + count*2 bytes)
+        i = 0
+        while True:
+            idx = buf.find(b"\xaa\x55", i)
+            if idx == -1 or idx + 10 > len(buf):
+                break
+            count = buf[idx + 3]
+            frame_len = 10 + count * 2
+            if count < 1 or count > 40 or idx + frame_len > len(buf):
+                i = idx + 1
+                continue
+            frame = buf[idx:idx + frame_len]
+            start_angle = int.from_bytes(frame[4:6], "little") / 100.0
+            end_angle = int.from_bytes(frame[6:8], "little") / 100.0
+            for j in range(count):
+                off = 10 + j * 2
+                dist = int.from_bytes(frame[off:off + 2], "little")
+                if dist <= 0:
+                    continue
+                frac = j / max(count - 1, 1)
+                angle = start_angle + (end_angle - start_angle) * frac
+                if angle >= 360:
+                    angle -= 360
+                elif angle < 0:
+                    angle += 360
+                points.append((angle, dist))
+            i = idx + frame_len
+
+        if points:
+            distances = [d for _, d in points]
+            min_dist = min(distances)
+            max_dist = max(distances)
+            avg_dist = sum(distances) / len(distances)
+
+            # Find closest obstacles (<1 m), bucketed by direction
+            obstacles = []
+            for a, d in sorted(points, key=lambda p: p[1]):
+                if d >= 1000 or len(obstacles) >= 5:
+                    continue
+                direction = ("front" if a <= 45 or a >= 315 else
+                             "right" if 45 < a <= 135 else
+                             "back" if 135 < a <= 225 else "left")
+                tag = f"{direction}({a:.0f}deg {d}mm)"
+                if tag not in obstacles:
+                    obstacles.append(tag)
+
+            obstacle_str = ", ".join(obstacles) if obstacles else "none within 1m"
+            return (f"LiDAR: {len(points)} points, min={min_dist}mm, "
+                    f"max={max_dist}mm, avg={avg_dist:.0f}mm, "
+                    f"obstacles: {obstacle_str}")
+        else:
+            return "LiDAR: No valid aa55 frames received"
+    except Exception as e:
+        return f"LiDAR error: {e}"
+
+
+def _camera_vision() -> str:
+    """Capture from all cameras + LiDAR + run REAL YOLO + face recognition."""
+    results = []
+    
+    # Camera 1: DFRobot
+    frame1 = _capture_frame()
+    if frame1:
+        detections1 = _run_yolo(frame1)
+        results.append(f"Camera 1: {detections1}")
+        
+        # Face recognition
+        try:
+            from tank_os.shell.terminal.face_db import FaceDB
+            db = FaceDB()
+            faces = db.recognize_in_frame(frame1)
+            if faces:
+                parts = []
+                unknown_count = 0
+                for f in faces:
+                    if f["is_known"]:
+                        parts.append(f'{f["name"]}({f["confidence"]:.0%})')
+                    else:
+                        unknown_count += 1
+                if parts:
+                    results.append(f"Known faces: {', '.join(parts)}")
+                if unknown_count > 0:
+                    results.append(f"{unknown_count} unknown person(s)")
+        except Exception:
+            pass
+    else:
+        results.append("Camera 1: Not available")
+    
+    # Camera 2 (if available)
+    frame2 = _capture_camera2()
+    if frame2:
+        detections2 = _run_yolo(frame2)
+        results.append(f"Camera 2: {detections2}")
+    
+    # LiDAR
+    lidar_result = _read_lidar()
+    results.append(lidar_result)
+    
+    return ". ".join(results)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-#  Multi-provider LLM — all keys rotating, never fails silently
+#  Multi-provider LLM
 # ═══════════════════════════════════════════════════════════════════════════
 
 _PROVIDER_DEFS = [
+    # PRIMARY — fast, reliable
     ("groq_a",    "https://api.groq.com/openai/v1",  "GROQ_API_KEY",          "openai/gpt-oss-120b"),
     ("groq_b",    "https://api.groq.com/openai/v1",  "GROQ_API_KEY",          "openai/gpt-oss-20b"),
     ("groq_c",    "https://api.groq.com/openai/v1",  "GROQ_API_KEY",          "allam-2-7b"),
-    ("openrouter","https://openrouter.ai/api/v1",     "OPENROUTER_API_KEY",    "openai/gpt-4o-mini"),
     ("mistral",   "https://api.mistral.ai/v1",        "MISTRAL_API_KEY",       "mistral-small-latest"),
-    ("gemini",    "https://generativelanguage.googleapis.com/v1beta", "GEMINI_API_KEY", "gemini-2.0-flash"),
-    ("cohere",    "https://api.cohere.ai/v1",          "COHERE_API_KEY",        "command-r-plus"),
+    ("nvidia_nemotron_light", "https://integrate.api.nvidia.com/v1", "NVIDIA_API_KEY", "nvidia/nemotron-3.5-lightning-30b-a3b"),
+    ("nvidia_vision", "https://integrate.api.nvidia.com/v1", "NVIDIA_API_KEY_3",  "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"),
+    # FALLBACK
+    ("nvidia_ultra", "https://integrate.api.nvidia.com/v1", "NVIDIA_API_KEY_2",   "nvidia/nemotron-3-ultra-550b-a55b"),
+    ("gemini",    "https://generativelanguage.googleapis.com/v1beta", "GEMINI_API_KEY", "gemini-2.5-flash"),
 ]
 
 _local_llm = None
@@ -181,7 +459,27 @@ def _call_openai_shaped(base_url: str, api_key: str, model: str, messages: list)
     if resp.status_code == 429:
         raise RuntimeError("rate_limited")
     resp.raise_for_status()
-    return resp.json()["choices"][0]["message"]["content"].strip()
+    content = resp.json()["choices"][0]["message"]["content"].strip()
+    if "nvidia" in base_url.lower() or "nemotron" in model.lower():
+        content = _extract_nvidia_answer(content)
+    return content
+
+
+def _extract_nvidia_answer(text: str) -> str:
+    """Extract final answer from NVIDIA thinking models."""
+    lines = text.strip().split("\n")
+    for line in reversed(lines):
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith("Let me") or line.startswith("I'll") or line.startswith("Actually"):
+            continue
+        if line.startswith("-") and "output" in line.lower():
+            continue
+        if "--" in line and len(line) < 50:
+            continue
+        return line
+    return lines[-1].strip() if lines else text
 
 
 def _call_gemini(api_key: str, model: str, messages: list) -> str:
@@ -205,25 +503,6 @@ def _call_gemini(api_key: str, model: str, messages: list) -> str:
     return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
 
 
-def _call_cohere(api_key: str, model: str, messages: list) -> str:
-    import httpx
-    system = " ".join(m["content"] for m in messages if m["role"] == "system")
-    user = " ".join(m["content"] for m in messages if m["role"] == "user")
-    body: Dict[str, Any] = {"model": model, "message": user, "max_tokens": 512}
-    if system:
-        body["preamble"] = system
-        body["max_tokens"] = 1024
-    resp = httpx.post(
-        "https://api.cohere.ai/v1/chat",
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-        json=body, timeout=25.0,
-    )
-    if resp.status_code == 429:
-        raise RuntimeError("rate_limited")
-    resp.raise_for_status()
-    return resp.json()["text"].strip()
-
-
 def _call_provider(name: str, messages: list) -> str:
     for pname, base, key_env, model in _PROVIDER_DEFS:
         if pname != name:
@@ -233,8 +512,6 @@ def _call_provider(name: str, messages: list) -> str:
             raise RuntimeError(f"no_key:{name}")
         if "gemini" in pname:
             return _call_gemini(api_key, model, messages)
-        if "cohere" in pname:
-            return _call_cohere(api_key, model, messages)
         return _call_openai_shaped(base, api_key, model, messages)
     raise RuntimeError(f"unknown:{name}")
 
@@ -249,9 +526,9 @@ def _call_local_phi3(messages: list) -> str:
     if not model_path.exists():
         raise RuntimeError("Phi-3 not found")
     if _local_llm is None:
-        print("\033[90m  Loading Phi-3 (~60s)...\033[0m", end="", flush=True)
+        print(f"\n  {Colors.YELLOW}⏳ Loading Phi-3 (~60s)...{Colors.RESET}", end="", flush=True)
         _local_llm = llama_cpp.Llama(model_path=str(model_path), n_ctx=4096, n_threads=4, verbose=False)
-        print(" ready\033[0m")
+        print(f" {Colors.GREEN}ready{Colors.RESET}")
     prompt = ""
     for m in messages:
         if m["role"] == "system":
@@ -263,21 +540,33 @@ def _call_local_phi3(messages: list) -> str:
     return resp["choices"][0]["text"].strip()
 
 
-def _rotate_chat(messages: list) -> str:
-    """Try all providers. Local Phi-3 final fallback. Never raise."""
+def _rotate_chat(messages: list, show_thinking: bool = True) -> tuple:
+    """Try all providers. Returns (response, provider_name, elapsed)."""
     order = [p[0] for p in _PROVIDER_DEFS]
     last_err = None
     for name in order:
         try:
-            return _call_provider(name, messages)
+            provider_info = next((p for p in _PROVIDER_DEFS if p[0] == name), None)
+            if provider_info and show_thinking:
+                model_short = provider_info[3].split("/")[-1][:20]
+                _print_thinking(provider_info[0], model_short)
+            
+            start = time.time()
+            result = _call_provider(name, messages)
+            elapsed = time.time() - start
+            
+            if provider_info and show_thinking:
+                _print_done(provider_info[0], elapsed)
+            
+            return result, name, elapsed
         except Exception as e:
             last_err = e
             logger.debug("Provider %s failed: %s", name, e)
             time.sleep(0.3)
     try:
-        return _call_local_phi3(messages)
+        return _call_local_phi3(messages), "phi3-local", 0.0
     except Exception as e:
-        return f"All providers failed. Last error: {last_err}"
+        return f"All providers failed. Last error: {last_err}", "none", 0.0
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -306,6 +595,55 @@ def _load_tool_catalog(max_tools: int = 120) -> str:
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+#  OpenCode integration
+# ═══════════════════════════════════════════════════════════════════════════
+
+def _run_opencode(task: str, timeout: int = 120) -> str:
+    """Run OpenCode for development tasks."""
+    opencode_path = None
+    possible_paths = [
+        "/home/shashi/.opencode/bin/opencode",
+        "/usr/local/bin/opencode",
+        "/usr/bin/opencode",
+    ]
+    for p in possible_paths:
+        if Path(p).exists():
+            opencode_path = p
+            break
+    
+    if opencode_path is None:
+        try:
+            result = subprocess.run(["which", "opencode"], capture_output=True, text=True, timeout=5)
+            if result.returncode == 0:
+                opencode_path = result.stdout.strip()
+        except Exception:
+            pass
+    
+    if opencode_path is None:
+        return "OpenCode not installed. Run: curl -fsSL https://opencode.ai/install | bash"
+    
+    try:
+        result = subprocess.run(
+            [opencode_path, "run", task],
+            cwd=str(_PROJECT_ROOT),
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            env={**os.environ, "PYTHONPATH": str(_PROJECT_ROOT)}
+        )
+        output = []
+        if result.stdout:
+            output.append(result.stdout.strip())
+        if result.stderr:
+            output.append(f"[stderr] {result.stderr.strip()[:500]}")
+        return "\n".join(output) if output else "OpenCode completed with no output"
+    except subprocess.TimeoutExpired:
+        return f"OpenCode timed out after {timeout}s"
+    except Exception as e:
+        return f"OpenCode error: {e}"
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 #  Tool / shell execution
 # ═══════════════════════════════════════════════════════════════════════════
 
@@ -318,7 +656,6 @@ def _invoke_tool(tool_name: str, args: Dict[str, Any]) -> str:
         reg.discover()
         tool_def = reg.get(tool_name)
         if tool_def is None:
-            # Tool not registered — try to find a script that matches
             scripts_dir = _PROJECT_ROOT / "scripts"
             for cat_dir in scripts_dir.iterdir():
                 if cat_dir.is_dir():
@@ -326,7 +663,7 @@ def _invoke_tool(tool_name: str, args: Dict[str, Any]) -> str:
                         if tool_name.replace(".", "_") in script.name or tool_name.split(".")[-1] in script.name:
                             result = _run_shell(f"python3 {script} {' '.join(f'--{k} {v}' for k, v in args.items()) if args else ''}")
                             return result
-            return f"Tool '{tool_name}' not found. Try using shell: {{\"action\":\"shell\",\"cmd\":\"<command>\"}}"
+            return f"Tool '{tool_name}' not found"
         invoker = ToolInvoker(reg)
         req = ToolCallRequest(tool_name=tool_name, args=args, timeout_s=30)
         resp = invoker.invoke(req)
@@ -337,7 +674,7 @@ def _invoke_tool(tool_name: str, args: Dict[str, Any]) -> str:
             parts.append(f"[stderr] {resp.stderr.strip()}")
         return "\n".join(parts) if parts else f"(status={resp.status}, exit={resp.exit_code})"
     except Exception as e:
-        return f"Tool error: {e} — try shell instead"
+        return f"Tool error: {e}"
 
 
 def _run_shell(cmd: str) -> str:
@@ -386,46 +723,40 @@ MODEM ACTIONS (use {"action":"modem","function":"<fn>","args":{}}):
 - Send SMS: {"action":"modem","function":"send_sms","args":{"message":"Hi!","to":"shashi"}}
 - Read SMS: {"action":"modem","function":"get_sms_messages","args":{}}
 - List contacts: {"action":"modem","function":"list_contacts","args":{}}
-- Add contact: {"action":"modem","function":"add_contact","args":{"name":"mom","phone":"+919876543210"}}
 - Make call: {"action":"modem","function":"call_number","args":{"number_or_name":"shashi"}}
-- Hangup: {"action":"modem","function":"hangup_call","args":{}}
-- Modem status: {"action":"modem","function":"get_modem_status","args":{}}
 
-Saved contacts: Shashi (+917860245819), Owner (+917860245819)
-To save a new contact: use add_contact above.
-
-TORRENT/DOWNLOAD (use {"action":"shell","cmd":"python3 /home/shashi/The-Tank-Project/tank_os/shell/terminal/torrent_tool.py <command> <args>"}):
-- Search: search "query" — find torrents
-- Download: download <url_or_magnet> — start download on VPS
-- List: list active|waiting|stopped|all — show downloads
-- Status: status — global aria2 stats
-- Pause/Resume/Delete: pause/resume/delete <gid>
-Torrent downloads go to VPS aria2 (100.71.127.19:6800)
-Web UI: http://100.71.127.19:8082/
+OPENCODE DEVELOPMENT (use {"action":"opencode","task":"<description>"}):
+For ANY coding, development, debugging, or software engineering task:
+- Write code: {"action":"opencode","task":"Write a Python function to sort a list using quicksort"}
+- Debug code: {"action":"opencode","task":"Fix the bug in main.py where the API returns 500"}
+- Refactor: {"action":"opencode","task":"Refactor the authentication module to use JWT tokens"}
 
 EXAMPLES:
-- Send SMS: use modem tool above with send_sms('Hi mom!', to='mom')
-- Install packages: {"action":"shell","cmd":"pip install mediapipe"}
-- With sudo: {"action":"shell","cmd":"echo '1234' | sudo -S apt install -y mediapipe"}
-- Run python: {"action":"shell","cmd":"python3 -c 'print(1+1)'"}
-- Check devices: {"action":"shell","cmd":"ls /dev/ttyACM* /dev/ttyUSB*"}
 - Camera see: {"action":"camera"}
 - System info: {"action":"shell","cmd":"uname -a && free -h && df -h"}
-- Search torrents: {"action":"shell","cmd":"python3 /home/shashi/The-Tank-Project/tank_os/shell/terminal/torrent_tool.py search 'ubuntu 24.04'"}
-- Download torrent: {"action":"shell","cmd":"python3 /home/shashi/The-Tank-Project/tank_os/shell/terminal/torrent_tool.py download 'magnet:?xt=...'"}
-- List downloads: {"action":"shell","cmd":"python3 /home/shashi/The-Tank-Project/tank_os/shell/terminal/torrent_tool.py list all"}
+- Write code: {"action":"opencode","task":"Write a Python function to calculate fibonacci numbers"}
 - After seeing results: {"action":"reply","text":"The system shows..."}
 """
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-#  Agent REPL
+#  Agent REPL — Professional UI
 # ═══════════════════════════════════════════════════════════════════════════
 
 @dataclass
 class Turn:
     role: str
     content: str
+
+
+@dataclass
+class SessionState:
+    """Track session state for display."""
+    turn_count: int = 0
+    provider_used: str = ""
+    last_response_time: float = 0.0
+    tools_used: List[str] = field(default_factory=list)
+    total_tokens: int = 0
 
 
 class AgentChat:
@@ -435,46 +766,61 @@ class AgentChat:
         self._catalog = _load_tool_catalog()
         self._system = _SYSTEM_PROMPT + "\n\nAVAILABLE TOOLS:\n" + self._catalog
         self._history: List[Turn] = []
+        self._state = SessionState()
 
     def run(self):
         self._banner()
         while True:
             try:
-                user = input("\033[1;36mtank\033[0m> ").strip()
+                user = input(f"\n{Colors.BRIGHT_CYAN}tank{Colors.RESET}{Colors.DIM}>{Colors.RESET} ").strip()
             except (EOFError, KeyboardInterrupt):
-                print("\n\033[90mBye\033[0m")
+                print(f"\n{Colors.GRAY}  Bye! Session ended.{Colors.RESET}\n")
                 break
             if not user:
                 continue
             if user.lower() in ("exit", "quit", "q"):
+                print(f"\n{Colors.GRAY}  Bye! Session ended.{Colors.RESET}\n")
                 break
             if user.lower() == "clear":
                 self._history.clear()
+                self._state = SessionState()
+                print(f"\n{Colors.GREEN}  ✓ History cleared{Colors.RESET}")
+                continue
+            if user.lower() == "status":
+                self._show_status()
+                continue
+            if user.lower() == "help":
+                self._show_help()
                 continue
             self._handle(user)
 
     def _handle(self, user_input: str):
+        self._state.turn_count += 1
         self._history.append(Turn("user", user_input))
-        camera_used = False  # track camera captures per turn
+        camera_used = False
+
+        # Show what we're doing
+        print(f"\n{Colors.GRAY}  ┌─ Processing turn {self._state.turn_count} ──────────────────────────{Colors.RESET}")
 
         for round_num in range(self.MAX_ROUNDS):
-            resp = self._llm()
+            resp, provider, elapsed = self._llm_with_provider()
+            self._state.provider_used = provider
+            self._state.last_response_time = elapsed
+            
             if not resp:
-                print("\033[33m  LLM unavailable — retrying...\033[0m")
-                resp = self._llm()
+                print(f"\n{Colors.YELLOW}  ⚠ LLM unavailable — retrying...{Colors.RESET}")
+                resp, provider, elapsed = self._llm_with_provider()
                 if not resp:
-                    print("\033[31m  All providers down\033[0m")
+                    _print_error("All providers down")
                     return
             if resp.startswith("All providers"):
-                print(f"\033[31m  {resp}\033[0m")
+                _print_error(resp)
                 return
 
             action = self._parse(resp)
 
             if action is None:
-                # Plain text reply — but check if it contains hidden JSON
                 clean = resp.strip()
-                # Try harder to extract JSON from text
                 if '{"action"' in clean:
                     s = clean.find('{"action"')
                     e = clean.find('}', s) + 1
@@ -484,7 +830,7 @@ class AgentChat:
                         pass
                 if action is None and clean:
                     clean = self._strip_json_text(clean)
-                    print(f"\n\033[1;32m🤖\033[0m {clean}")
+                    self._print_response(clean)
                     self._history.append(Turn("assistant", clean))
                     return
 
@@ -495,113 +841,115 @@ class AgentChat:
 
             if at == "reply":
                 text = action.get("text", "")
-                print(f"\n\033[1;32m🤖\033[0m {text}")
+                self._print_response(text)
                 self._history.append(Turn("assistant", text))
-                # Trim history: keep only last 4 turns (user + assistant) to prevent repetition
                 if len(self._history) > 8:
                     self._history = self._history[-4:]
                 return
 
             elif at == "camera" and not camera_used:
                 camera_used = True
-                print("\033[90m  Capturing from DFRobot camera + YOLO...\033[0m", end="", flush=True)
+                _print_action("camera", "Capturing from DFRobot camera + YOLO")
                 result = _camera_vision()
-                print(" done")
+                self._state.tools_used.append("camera")
                 self._history.append(Turn("tool", f"[camera] {result}"))
-
-                # Check for unknown faces — prompt enrollment
-                if "unknown person" in result.lower():
-                    try:
-                        from tank_os.shell.terminal.face_db import FaceDB
-                        db = FaceDB()
-                        frame = _PROJECT_ROOT / "data" / "frames" / "latest.jpg"
-                        if frame.exists():
-                            faces = db.recognize_in_frame(str(frame))
-                            unknowns = [f for f in faces if not f["is_known"]]
-                            if unknowns:
-                                print(f"\n\033[1;33m  I see {len(unknowns)} unknown person(s).\033[0m")
-                                name = input("\033[1;33m  What is their name? (or press Enter to skip): \033[0m").strip()
-                                if name:
-                                    db.enroll(str(frame), name)
-                                    print(f"\033[32m  Saved {name} to face database\033[0m")
-                                    self._history.append(Turn("tool", f"[face] Enrolled new face: {name}"))
-                    except Exception as e:
-                        logger.debug("Face enrollment error: %s", e)
-
-                # Continue loop — LLM will describe what it sees
+                _print_status("Detections", result[:100])
 
             elif at == "camera" and camera_used:
-                # Already captured — force LLM to describe instead of capturing again
-                # Find the previous camera result in history
                 last_camera = ""
                 for t in reversed(self._history):
                     if t.role == "tool" and "[camera]" in t.content:
                         last_camera = t.content
                         break
-                self._history.append(Turn("user", f"STOP. Camera already captured. DO NOT capture again. Here are the results: {last_camera}\nDescribe what you see. Reply with {{\"action\":\"reply\",\"text\":\"...\"}} format."))
+                self._history.append(Turn("user", f"STOP. Camera already captured. Here are the results: {last_camera}\nDescribe what you see. Reply with {{\"action\":\"reply\",\"text\":\"...\"}} format."))
                 continue
 
             elif at == "tool":
                 tn = action.get("tool", "")
                 args = action.get("args", {})
-                print(f"\033[90m  {tn}({json.dumps(args, ensure_ascii=False)})\033[0m", end="", flush=True)
+                _print_action("tool", f"{tn}({json.dumps(args, ensure_ascii=False)})")
                 result = _invoke_tool(tn, args)
-                print(f" -> {len(result)} chars")
+                self._state.tools_used.append(tn)
+                _print_status("Result", f"{len(result)} chars")
                 self._history.append(Turn("tool", f"[tool:{tn}] {result[:500]}"))
 
             elif at == "shell":
                 cmd = action.get("cmd", "")
-                print(f"\033[90m  $ {cmd}\033[0m", end="", flush=True)
+                _print_action("shell", cmd)
                 result = _run_shell(cmd)
-                print(f" -> {len(result)} chars")
+                self._state.tools_used.append("shell")
+                _print_status("Output", f"{len(result)} chars")
                 self._history.append(Turn("tool", f"[shell] {result[:500]}"))
 
             elif at == "modem":
-                # Direct modem action: send_sms, call, contacts, etc.
                 fn = action.get("function", "")
                 args = action.get("args", {})
-                print(f"\033[90m  modem.{fn}({json.dumps(args, ensure_ascii=False)})\033[0m", end="", flush=True)
+                _print_action("modem", f"{fn}({json.dumps(args, ensure_ascii=False)})")
                 try:
                     import importlib
                     modem_mod = importlib.import_module("tank_os.shell.terminal.modem_tools")
                     fn_obj = getattr(modem_mod, fn, None)
                     if fn_obj is None:
-                        result = f"Unknown modem function: {fn}. Available: send_sms, get_sms_messages, list_contacts, add_contact, call_number, hangup_call, get_modem_status"
+                        result = f"Unknown modem function: {fn}"
                     else:
                         result = fn_obj(**args)
                 except Exception as e:
                     result = f"Modem error: {e}"
-                print(f" -> {len(result)} chars")
+                self._state.tools_used.append(f"modem.{fn}")
+                _print_status("Result", f"{len(result)} chars")
                 self._history.append(Turn("tool", f"[modem] {result[:500]}"))
 
+            elif at == "opencode":
+                task = action.get("task", "")
+                if not task:
+                    result = "No task specified for OpenCode"
+                else:
+                    _print_action("opencode", task[:80])
+                    result = _run_opencode(task)
+                    self._state.tools_used.append("opencode")
+                self._history.append(Turn("tool", f"[opencode] {result[:500]}"))
+
             else:
-                # Unknown action — strip any JSON and show clean text
                 clean = re.sub(r"<think>.*?</think>", "", resp, flags=re.DOTALL).strip()
                 clean = self._strip_json_text(clean)
-                print(f"\n\033[1;32m🤖\033[0m {clean}")
+                self._print_response(clean)
                 self._history.append(Turn("assistant", clean))
                 return
 
-        # Max rounds — force a text reply
-        self._history.append(Turn("user", "Stop using tools. Give your final answer as plain text describing what was found. Use {\"action\":\"reply\",\"text\":\"...\"} format."))
+        # Max rounds
+        self._history.append(Turn("user", 'Stop using tools. Give your final answer as plain text. Use {"action":"reply","text":"..."} format.'))
         final = self._llm()
         if final:
             clean = self._strip_json_text(final)
-            print(f"\n\033[1;32m🤖\033[0m {clean}")
-        # Trim history after max rounds
+            self._print_response(clean)
         if len(self._history) > 8:
             self._history = self._history[-4:]
 
-    def _llm(self) -> Optional[str]:
+    def _print_response(self, text: str):
+        """Print response with professional formatting."""
+        print(f"\n  {Colors.BRIGHT_GREEN}🤖 TankOS:{Colors.RESET}")
+        # Word wrap response
+        words = text.split()
+        line = "    "
+        for word in words:
+            if len(line) + len(word) + 1 > 70:
+                print(line)
+                line = "    " + word + " "
+            else:
+                line += word + " "
+        if line.strip():
+            print(line)
+        print(f"\n  {Colors.GRAY}└─────────────────────────────────────────────────{Colors.RESET}")
+
+    def _llm_with_provider(self) -> tuple:
+        """Call LLM and return (response, provider, elapsed)."""
         msgs = [{"role": "system", "content": self._system}]
-        # Only keep last 6 turns to avoid context overflow
         recent = self._history[-6:]
         parts = []
         for t in recent:
             if t.role == "user":
                 parts.append(f"User: {t.content}")
             elif t.role == "tool":
-                # Truncate tool results aggressively to save context
                 truncated = t.content[:500]
                 parts.append(truncated)
             elif t.role == "assistant":
@@ -610,26 +958,57 @@ class AgentChat:
         try:
             return _rotate_chat(msgs)
         except Exception as e:
-            return None
+            return None, "none", 0.0
+
+    def _llm(self) -> Optional[str]:
+        resp, _, _ = self._llm_with_provider()
+        return resp
+
+    def _show_status(self):
+        """Show session status."""
+        print(f"\n{Colors.CYAN}╔══════════════════════════════════════════════════╗{Colors.RESET}")
+        print(f"{Colors.CYAN}║{Colors.RESET} {Colors.BOLD}Session Status{Colors.RESET}")
+        print(f"{Colors.CYAN}╠══════════════════════════════════════════════════╣{Colors.RESET}")
+        _print_status("Turns", str(self._state.turn_count))
+        _print_status("Provider", self._state.provider_used or "none")
+        _print_status("Last Response", f"{self._state.last_response_time:.1f}s")
+        _print_status("Tools Used", ", ".join(set(self._state.tools_used)) or "none")
+        _print_status("History", f"{len(self._history)} messages")
+        print(f"{Colors.CYAN}╚══════════════════════════════════════════════════╝{Colors.RESET}")
+
+    def _show_help(self):
+        """Show help."""
+        print(f"\n{Colors.CYAN}╔══════════════════════════════════════════════════╗{Colors.RESET}")
+        print(f"{Colors.CYAN}║{Colors.RESET} {Colors.BOLD}TankOS Agent Chat — Commands{Colors.RESET}")
+        print(f"{Colors.CYAN}╠══════════════════════════════════════════════════╣{Colors.RESET}")
+        print(f"{Colors.CYAN}║{Colors.RESET} {Colors.BOLD}Natural Language:{Colors.RESET}")
+        print(f"{Colors.CYAN}║{Colors.RESET}   \"what do you see through the camera?\"")
+        print(f"{Colors.CYAN}║{Colors.RESET}   \"what is the system status?\"")
+        print(f"{Colors.CYAN}║{Colors.RESET}   \"write a Python function to sort a list\"")
+        print(f"{Colors.CYAN}║{Colors.RESET}   \"send an SMS to Shashi\"")
+        print(f"{Colors.CYAN}║{Colors.RESET}")
+        print(f"{Colors.CYAN}║{Colors.RESET} {Colors.BOLD}Commands:{Colors.RESET}")
+        print(f"{Colors.CYAN}║{Colors.RESET}   {Colors.GREEN}status{Colors.RESET}  — Show session info")
+        print(f"{Colors.CYAN}║{Colors.RESET}   {Colors.GREEN}help{Colors.RESET}    — Show this help")
+        print(f"{Colors.CYAN}║{Colors.RESET}   {Colors.GREEN}clear{Colors.RESET}   — Clear history")
+        print(f"{Colors.CYAN}║{Colors.RESET}   {Colors.GREEN}exit{Colors.RESET}    — Quit")
+        print(f"{Colors.CYAN}╚══════════════════════════════════════════════════╝{Colors.RESET}")
 
     @staticmethod
     def _strip_json_text(text: str) -> str:
-        """Extract human-readable text from LLM response that might contain JSON."""
+        """Extract human-readable text from LLM response."""
         text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
-        # If it's pure JSON with a text field, extract it
         try:
             obj = json.loads(text)
             if isinstance(obj, dict) and "text" in obj:
                 return obj["text"]
         except:
             pass
-        # Try to find reply JSON embedded in text
         for pattern in [r'\{"action"\s*:\s*"reply"\s*,\s*"text"\s*:\s*"([^"]+)"\}',
                        r'"text"\s*:\s*"([^"]+)"']:
             m = re.search(pattern, text)
             if m:
                 return m.group(1).replace("\\n", "").replace("\\t", " ")
-        # Remove raw JSON from the end of text
         text = re.sub(r'\s*\{"action".*$', '', text).strip()
         return text if text else "Done."
 
@@ -654,18 +1033,33 @@ class AgentChat:
         return None
 
     def _banner(self):
+        """Professional banner with full status."""
+        # Get provider count
+        configured = sum(1 for _, _, key, _ in _PROVIDER_DEFS if os.environ.get(key))
+        
         print()
-        print("  ╔══════════════════════════════════════════════════╗")
-        print("  ║      TankOS Agent Chat                         ║")
-        print("  ║      Talk naturally — auto tool selection       ║")
-        print(f"  ║      {len(_PROVIDER_DEFS)} cloud providers + Phi-3 local       ║")
-        print("  ║      Real DFRobot USB camera + YOLO             ║")
-        print("  ╚══════════════════════════════════════════════════╝")
+        print(f"  {Colors.BRIGHT_CYAN}╔═══════════════════════════════════════════════════════════╗{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}                                                           {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}   {Colors.BOLD}🤖  TankOS Agent Chat{Colors.RESET}                                 {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}   {Colors.DIM}Autonomous AI Robotics Operating System{Colors.RESET}              {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}                                                           {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}╠═══════════════════════════════════════════════════════════╣{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}                                                           {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}   {Colors.GREEN}●{Colors.RESET} {configured} cloud providers + Phi-3 local fallback       {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}   {Colors.GREEN}●{Colors.RESET} Real DFRobot USB camera + YOLO detection           {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}   {Colors.GREEN}●{Colors.RESET} OpenCode for development tasks                    {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}   {Colors.GREEN}●{Colors.RESET} 1,166+ callable robot modules                      {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}                                                           {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}╠═══════════════════════════════════════════════════════════╣{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}                                                           {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}   {Colors.BOLD}Quick Start:{Colors.RESET}                                         {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}   {Colors.CYAN}\"what do you see through the camera?\"{Colors.RESET}              {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}   {Colors.CYAN}\"what is the system status?\"{Colors.RESET}                      {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}   {Colors.CYAN}\"write a Python function to sort a list\"{Colors.RESET}            {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}   {Colors.CYAN}\"help\"{Colors.RESET} for all commands                             {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}║{Colors.RESET}                                                           {Colors.BRIGHT_CYAN}║{Colors.RESET}")
+        print(f"  {Colors.BRIGHT_CYAN}╚═══════════════════════════════════════════════════════════╝{Colors.RESET}")
         print()
-        print('  Try: "what do you see through the camera?"')
-        print('  Try: "what is the system status?"')
-        print('  Try: "show me the USB devices"')
-        print('  Type exit to quit.\n')
 
 
 def main():

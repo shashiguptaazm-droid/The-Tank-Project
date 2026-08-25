@@ -138,64 +138,65 @@ def _run_imu_placeholder() -> int:
 
 
 # ---------------------------------------------------------------------------
-# F003 — lidar (LDROBOT LD14/LD19 — aa55 protocol on /dev/ttyUSB0)
+# F003 — lidar (aa55 protocol @ 115200 — D300/Delta-2A class, /dev/ttyUSB0)
+# Frame: AA55 | speed | count | start_angle(u16, deg*100) | end_angle(u16,
+# deg*100) | checksum(u16) | count x distance(u16 LE, mm). Verified live.
 # ---------------------------------------------------------------------------
 def _parse_ldrobot_packet(data: bytes) -> list:
-    """Parse one LD14/LD19 packet into distance points (aa55 protocol)."""
+    """Parse one aa55 lidar frame into angle/distance points."""
     points = []
     if len(data) < 10:
         return points
     try:
-        start_angle = struct.unpack_from("<H", data, 2)[0] / 100.0  # centidegrees
-        for i in range(12):
-            offset = 4 + i * 3  # 2-byte distance + 1-byte confidence
-            if offset + 3 > len(data):
-                break
-            dist = struct.unpack_from("<H", data, offset)[0]  # mm
-            conf = data[offset + 2]
-            angle = start_angle + (i * 3.0)
+        count = data[3]
+        if count < 1 or len(data) < 10 + count * 2:
+            return points
+        start_angle = struct.unpack_from("<H", data, 4)[0] / 100.0  # centidegrees
+        end_angle = struct.unpack_from("<H", data, 6)[0] / 100.0
+        for i in range(count):
+            dist = struct.unpack_from("<H", data, 10 + i * 2)[0]  # mm
+            frac = i / max(count - 1, 1)
+            angle = start_angle + (end_angle - start_angle) * frac
             if angle >= 360:
                 angle -= 360
-            points.append({"angle": angle, "distance": dist, "confidence": conf})
+            elif angle < 0:
+                angle += 360
+            points.append({"angle": round(angle, 2), "distance": dist})
     except struct.error:
         pass
     return points
 
 
 def _read_ldrobot_scan(port: str, baud: int, timeout_s: float = 2.0):
-    """Read one LDROBOT scan and summarize it. Returns None on failure."""
+    """Read one lidar scan and summarize it. Returns None on failure."""
     import serial  # type: ignore
     s = serial.Serial(port, baud, timeout=0.1)
-    all_points: list = []
     buf = b""
     deadline = time.monotonic() + timeout_s
     try:
         while time.monotonic() < deadline:
-            chunk = s.read(200)
-            if not chunk:
-                continue
-            buf += chunk
-            while True:
-                idx = buf.find(b"\xaa\x55")
-                if idx == -1:
-                    buf = buf[-10:]  # keep tail bytes for re-alignment
-                    break
-                if idx > 0:
-                    buf = buf[idx:]
-                if len(buf) < 18:
-                    break
-                packet = buf[:18]
-                buf = buf[18:]
-                all_points.extend(_parse_ldrobot_packet(packet))
+            buf += s.read(4096)
     finally:
         s.close()
+
+    all_points: list = []
+    i = 0
+    while True:
+        idx = buf.find(b"\xaa\x55", i)
+        if idx == -1 or idx + 10 > len(buf):
+            break
+        count = buf[idx + 3]
+        frame_len = 10 + count * 2
+        if count < 1 or count > 40 or idx + frame_len > len(buf):
+            i = idx + 1
+            continue
+        all_points.extend(_parse_ldrobot_packet(buf[idx:idx + frame_len]))
+        i = idx + frame_len
 
     if not all_points:
         return None
 
-    valid = [p for p in all_points if p["distance"] > 0 and p["confidence"] > 50]
-    if not valid:
-        valid = [p for p in all_points if p["distance"] > 0]
+    valid = [p for p in all_points if p["distance"] > 0]
 
     if not valid:
         return {
@@ -228,7 +229,7 @@ def _read_ldrobot_scan(port: str, baud: int, timeout_s: float = 2.0):
         "min_angle": nearest["angle"],
         "nearest_object": (
             f"{nearest['distance'] / 1000.0:.2f}m {direction} "
-            f"(angle={angle:.0f}°, confidence={nearest['confidence']})"
+            f"(angle={angle:.0f}°)"
         ),
     }
 
