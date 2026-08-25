@@ -104,7 +104,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-enum class MsgType { USER, TANK_REPLY, THINKING, TOOL_EXEC }
+enum class MsgType { USER, TANK_REPLY, THINKING, TOOL_EXEC, AGENT_CAMERA, AGENT_SHELL, AGENT_TOOL, AGENT_CODE, AGENT_SYSTEM }
 data class ChatBubble(
     val sender: String,
     val text: String,
@@ -226,8 +226,8 @@ fun MainScreen(client: OkHttpClient) {
 
     // Navigation Tab state
     var selectedTab by remember { mutableStateOf(0) }
-    val tabIcons = listOf("🎮", "📷", "📥", "📊", "⚙️", "🗺️")
-    val tabLabels = listOf("Control", "Vision", "Torrents", "Stats", "Settings", "Map")
+    val tabIcons = listOf("🎮", "🤖", "📷", "📥", "🗺️", "⚙️")
+    val tabLabels = listOf("Control", "Agent", "Vision", "Torrents", "Map", "Settings")
     val haptic = LocalHapticFeedback.current
 
     // Telemetry state
@@ -1103,199 +1103,326 @@ fun MainScreen(client: OkHttpClient) {
                         }
                     }
 
-                    // Rich Agent Chat GUI Console
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = CyberTheme.BG_CARD),
-                            shape = RoundedCornerShape(16.dp),
-                            border = BorderStroke(1.dp, CyberTheme.DIM.copy(alpha = 0.2f))
-                        ) {
-                            Column(modifier = Modifier.padding(14.dp)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    val brainPulse by infiniteTransition.animateFloat(
-                                        initialValue = 0.4f,
-                                        targetValue = 1f,
-                                        animationSpec = infiniteRepeatable(
-                                            animation = tween(1200, easing = LinearEasing),
-                                            repeatMode = RepeatMode.Reverse
-                                        ),
-                                        label = "brain"
-                                    )
-                                    Box(modifier = Modifier.size(10.dp).clip(RoundedCornerShape(5.dp)).background(CyberTheme.NEON_BLUE.copy(alpha = brainPulse)))
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("🤖 TANKOS COGNITIVE AGENT PLAYGROUND", color = CyberTheme.ACCENT_CYAN, fontSize = 12.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
-                                }
-                                Spacer(modifier = Modifier.height(10.dp))
-                                
-                                // Scrollable Messages Board
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(280.dp)
-                                        .background(Color(0xFF070810), RoundedCornerShape(10.dp))
-                                        .border(1.dp, CyberTheme.DIM.copy(alpha = 0.3f), RoundedCornerShape(10.dp))
-                                        .padding(10.dp)
-                                ) {
-                                    LazyColumn(
-                                        modifier = Modifier.fillMaxSize(),
-                                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                                    ) {
-                                        if (chatBubbles.isEmpty()) {
-                                            item {
-                                                Text("Agent idle. Send a query to test active planners or run terminal tools.", color = CyberTheme.DIM, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
-                                            }
-                                        }
-                                        items(chatBubbles) { bubble ->
-                                            Column(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                horizontalAlignment = if (bubble.type == MsgType.USER) Alignment.End else Alignment.Start
-                                            ) {
-                                                Text(
-                                                    text = bubble.sender.uppercase(),
-                                                    color = CyberTheme.DIM,
-                                                    fontSize = 9.sp,
-                                                    fontWeight = FontWeight.Bold,
-                                                    fontFamily = FontFamily.Monospace,
-                                                    modifier = Modifier.padding(bottom = 2.dp)
-                                                )
-                                                
-                                                when (bubble.type) {
-                                                    MsgType.USER -> {
-                                                        Box(
-                                                            modifier = Modifier
-                                                                .background(CyberTheme.ACCENT_PURPLE.copy(alpha = 0.3f), RoundedCornerShape(12.dp, 12.dp, 0.dp, 12.dp))
-                                                                .border(1.dp, CyberTheme.ACCENT_PURPLE.copy(alpha = 0.6f), RoundedCornerShape(12.dp, 12.dp, 0.dp, 12.dp))
-                                                                .padding(10.dp)
-                                                        ) {
-                                                            Text(bubble.text, color = CyberTheme.TEXT, fontSize = 12.sp)
+                }
+            }
+            1 -> {
+                // ═══ TAB 2: AGENT CHAT (Full-screen with tool support) ═══
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                ) {
+                    // Agent Status Bar
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color(0xFF0D1117))
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            val brainPulse by infiniteTransition.animateFloat(
+                                initialValue = 0.4f, targetValue = 1f,
+                                animationSpec = infiniteRepeatable(tween(1200, easing = LinearEasing), RepeatMode.Reverse),
+                                label = "brain"
+                            )
+                            Box(modifier = Modifier.size(8.dp).clip(RoundedCornerShape(4.dp)).background(CyberTheme.NEON_BLUE.copy(alpha = brainPulse)))
+                            Text("AGENT", color = CyberTheme.ACCENT_CYAN, fontSize = 11.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                            Text("\u2022", color = CyberTheme.DIM, fontSize = 10.sp)
+                            Text("${chatBubbles.size} msgs", color = CyberTheme.DIM, fontSize = 9.sp, fontFamily = FontFamily.Monospace)
+                        }
+                        Text(
+                            if (isChatting) "⚡ THINKING..." else "✓ READY",
+                            color = if (isChatting) Color(0xFFFFEB3B) else CyberTheme.NEON_GREEN,
+                            fontSize = 9.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace
+                        )
+                    }
+                    // Quick Action Buttons
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color(0xFF0A0A12))
+                            .padding(horizontal = 6.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        val quickActions = listOf(
+                            "📷 Camera" to "{\"action\":\"camera\"}",
+                            "📡 LIDAR" to "read the lidar and tell me what you see",
+                            "🔍 Detect" to "{\"action\":\"camera\"}",
+                            "📋 Status" to "show me the tank status",
+                            "🔌 Shell" to null, // opens shell input
+                            "🧠 Help" to "what tools do you have?"
+                        )
+                        quickActions.forEach { (label, msg) ->
+                            Button(
+                                onClick = {
+                                    if (msg != null) {
+                                        val userMsg = msg
+                                        chatBubbles.add(ChatBubble("User", userMsg, MsgType.USER))
+                                        isChatting = true
+                                        val thinkingBubble = ChatBubble("Agent", "⚡ Thinking...", MsgType.THINKING)
+                                        chatBubbles.add(thinkingBubble)
+                                        dispatchCommand("chat", JSONObject().apply {
+                                            put("text", userMsg)
+                                            put("use_external_llm", false)
+                                        }) { res ->
+                                            isChatting = false
+                                            chatBubbles.remove(thinkingBubble)
+                                            if (res != null) {
+                                                val result = res.optJSONObject("result")
+                                                val reply = result?.optString("reply") ?: "No response"
+                                                // Parse tool invocations from reply
+                                                val lines = reply.split("\n")
+                                                val toolBuf = StringBuilder()
+                                                val textBuf = StringBuilder()
+                                                var lastType = "text"
+                                                lines.forEach { line ->
+                                                    val t = line.trim()
+                                                    when {
+                                                        t.startsWith("\ud83d\udd27") || t.startsWith("\u2699\ufe0f") || t.startsWith("├─") -> {
+                                                            if (lastType == "text" && textBuf.isNotEmpty()) {
+                                                                chatBubbles.add(ChatBubble("Agent", textBuf.toString().trim(), MsgType.TANK_REPLY))
+                                                                textBuf.clear()
+                                                            }
+                                                            toolBuf.append(line).append("\n")
+                                                            lastType = "tool"
                                                         }
-                                                    }
-                                                    MsgType.THINKING -> {
-                                                        Row(
-                                                            modifier = Modifier
-                                                                .background(Color(0x33FFB300), RoundedCornerShape(12.dp, 12.dp, 12.dp, 0.dp))
-                                                                .border(1.dp, Color(0xFFFFB300).copy(alpha = 0.5f), RoundedCornerShape(12.dp, 12.dp, 12.dp, 0.dp))
-                                                                .padding(10.dp),
-                                                            verticalAlignment = Alignment.CenterVertically,
-                                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                                        ) {
-                                                            CyberSpinner(size = 14.dp, color = Color(0xFFFFB300))
-                                                            Text(bubble.text, color = Color(0xFFFFB300), fontSize = 11.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.SemiBold)
+                                                        t.contains("CAMERA") || t.contains("LIDAR") || t.contains("YOLO") -> {
+                                                            chatBubbles.add(ChatBubble("Agent", line, MsgType.AGENT_TOOL))
                                                         }
-                                                    }
-                                                    MsgType.TOOL_EXEC -> {
-                                                        Box(
-                                                            modifier = Modifier
-                                                                .fillMaxWidth()
-                                                                .background(Color(0xFF020E04), RoundedCornerShape(8.dp))
-                                                                .border(1.dp, Color(0xFF00E676).copy(alpha = 0.4f), RoundedCornerShape(8.dp))
-                                                                .padding(8.dp)
-                                                        ) {
-                                                            Text(
-                                                                text = bubble.text,
-                                                                color = Color(0xFF00FF00),
-                                                                fontSize = 10.sp,
-                                                                fontFamily = FontFamily.Monospace
-                                                            )
+                                                        t.contains("shell:") || t.contains("Running:") -> {
+                                                            chatBubbles.add(ChatBubble("Agent", line, MsgType.AGENT_SHELL))
                                                         }
-                                                    }
-                                                    MsgType.TANK_REPLY -> {
-                                                        Box(
-                                                            modifier = Modifier
-                                                                .background(CyberTheme.BG_CARD, RoundedCornerShape(12.dp, 12.dp, 12.dp, 0.dp))
-                                                                .border(1.dp, CyberTheme.ACCENT_CYAN.copy(alpha = 0.4f), RoundedCornerShape(12.dp, 12.dp, 12.dp, 0.dp))
-                                                                .padding(10.dp)
-                                                        ) {
-                                                            Text(bubble.text, color = CyberTheme.TEXT, fontSize = 12.sp)
+                                                        t.contains("import ") || t.contains("def ") || t.contains("class ") -> {
+                                                            chatBubbles.add(ChatBubble("Agent", line, MsgType.AGENT_CODE))
                                                         }
+                                                        else -> textBuf.append(line).append("\n")
                                                     }
                                                 }
+                                                if (toolBuf.isNotEmpty()) chatBubbles.add(ChatBubble("Tools", toolBuf.toString().trim(), MsgType.AGENT_TOOL))
+                                                if (textBuf.isNotEmpty()) chatBubbles.add(ChatBubble("Agent", textBuf.toString().trim(), MsgType.TANK_REPLY))
+                                            } else {
+                                                chatBubbles.add(ChatBubble("Agent", "\u2717 Connection to bridge failed.", MsgType.AGENT_SYSTEM))
                                             }
                                         }
                                     }
-                                }
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = CyberTheme.BG_CARD),
+                                shape = RoundedCornerShape(6.dp),
+                                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(label, color = CyberTheme.ACCENT_CYAN, fontSize = 8.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, maxLines = 1)
+                            }
+                        }
+                    }
+                    // Chat Messages (full height)
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .background(Color(0xFF070810))
+                            .padding(horizontal = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(vertical = 8.dp)
+                    ) {
+                        if (chatBubbles.isEmpty()) {
+                            item {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth().padding(top = 60.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    OutlinedTextField(
-                                        value = chatInputText,
-                                        onValueChange = { chatInputText = it },
-                                        placeholder = { Text("Enter prompt for robot agents...", color = CyberTheme.DIM) },
-                                        textStyle = LocalTextStyle.current.copy(color = CyberTheme.TEXT),
-                                        modifier = Modifier.weight(1f),
-                                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = CyberTheme.ACCENT_CYAN, unfocusedBorderColor = CyberTheme.DIM.copy(alpha = 0.5f))
-                                    )
-                                    Button(
-                                        onClick = {
-                                            if (chatInputText.isNotEmpty()) {
-                                                val userMsg = chatInputText
-                                                chatBubbles.add(ChatBubble("User", userMsg, MsgType.USER))
-                                                chatInputText = ""
-                                                isChatting = true
-                                                
-                                                // Add animated placeholder thinking bubble
-                                                val thinkingBubble = ChatBubble("TankOS", "⚡ Analyzing prompt & scheduling rotation engine...", MsgType.THINKING)
-                                                chatBubbles.add(thinkingBubble)
-                                                
-                                                dispatchCommand("chat", JSONObject().apply { put("text", userMsg); put("use_external_llm", false) }) { res ->
-                                                    isChatting = false
-                                                    // Remove thinking bubble
-                                                    chatBubbles.remove(thinkingBubble)
-                                                    
-                                                    if (res != null) {
-                                                        val result = res.optJSONObject("result")
-                                                        val reply = result?.optString("reply") ?: "Error parsing response"
-                                                        
-                                                        // Parse reply to extract tool invocations if any (e.g. lines starting with custom markers)
-                                                        if (reply.contains("🔧 SHELL") || reply.contains("⚙️ TOOL")) {
-                                                            // Split reply by tool calls and text
-                                                            val lines = reply.split("\n")
-                                                            val toolLines = StringBuilder()
-                                                            val textLines = StringBuilder()
-                                                            lines.forEach { line ->
-                                                                if (line.trim().startsWith("🔧") || line.trim().startsWith("⚙️") || line.trim().startsWith("├─")) {
-                                                                    toolLines.append(line).append("\n")
-                                                                } else {
-                                                                    textLines.append(line).append("\n")
-                                                                }
-                                                            }
-                                                            if (toolLines.isNotEmpty()) {
-                                                                chatBubbles.add(ChatBubble("Sys Exec", toolLines.toString().trim(), MsgType.TOOL_EXEC))
-                                                            }
-                                                            if (textLines.toString().trim().isNotEmpty()) {
-                                                                chatBubbles.add(ChatBubble("TankOS", textLines.toString().trim(), MsgType.TANK_REPLY))
-                                                            }
-                                                        } else {
-                                                            chatBubbles.add(ChatBubble("TankOS", reply, MsgType.TANK_REPLY))
-                                                        }
-                                                    } else {
-                                                        chatBubbles.add(ChatBubble("TankOS", "Error connecting to command bridge API.", MsgType.TANK_REPLY))
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        enabled = !isChatting,
-                                        colors = ButtonDefaults.buttonColors(containerColor = CyberTheme.NEON_GREEN),
-                                        shape = RoundedCornerShape(8.dp)
-                                    ) {
-                                        if (isChatting) {
-                                            CyberSpinner(size = 18.dp, color = CyberTheme.BG)
-                                        } else {
-                                            Text("SEND", color = CyberTheme.BG, fontWeight = FontWeight.Bold)
+                                    Text("🤖", fontSize = 40.sp)
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Text("TANKOS AGENT", color = CyberTheme.ACCENT_CYAN, fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Text("1,166 tools available", color = CyberTheme.DIM, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text("Camera \u2022 YOLO \u2022 LIDAR \u2022 Shell \u2022 OpenCode", color = CyberTheme.DIM, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Text("Ask anything or tap a quick action above", color = CyberTheme.DIM.copy(alpha = 0.6f), fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                                }
+                            }
+                        }
+                        items(chatBubbles) { bubble ->
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = if (bubble.type == MsgType.USER) Alignment.End else Alignment.Start
+                            ) {
+                                Text(
+                                    text = bubble.sender.uppercase(),
+                                    color = when (bubble.type) {
+                                        MsgType.AGENT_CAMERA -> Color(0xFF00E5FF)
+                                        MsgType.AGENT_SHELL -> Color(0xFFFF9100)
+                                        MsgType.AGENT_TOOL -> Color(0xFF00E676)
+                                        MsgType.AGENT_CODE -> Color(0xFFE040FB)
+                                        MsgType.AGENT_SYSTEM -> Color(0xFFFF5252)
+                                        else -> CyberTheme.DIM
+                                    },
+                                    fontSize = 9.sp, fontWeight = FontWeight.Bold,
+                                    fontFamily = FontFamily.Monospace,
+                                    modifier = Modifier.padding(bottom = 2.dp)
+                                )
+                                when (bubble.type) {
+                                    MsgType.USER -> {
+                                        Box(
+                                            modifier = Modifier
+                                                .background(CyberTheme.ACCENT_PURPLE.copy(alpha = 0.3f), RoundedCornerShape(12.dp, 12.dp, 0.dp, 12.dp))
+                                                .border(1.dp, CyberTheme.ACCENT_PURPLE.copy(alpha = 0.6f), RoundedCornerShape(12.dp, 12.dp, 0.dp, 12.dp))
+                                                .padding(10.dp)
+                                        ) { Text(bubble.text, color = CyberTheme.TEXT, fontSize = 12.sp) }
+                                    }
+                                    MsgType.THINKING -> {
+                                        Row(
+                                            modifier = Modifier
+                                                .background(Color(0x33FFB300), RoundedCornerShape(12.dp, 12.dp, 12.dp, 0.dp))
+                                                .border(1.dp, Color(0xFFFFB300).copy(alpha = 0.5f), RoundedCornerShape(12.dp, 12.dp, 12.dp, 0.dp))
+                                                .padding(10.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            CyberSpinner(size = 14.dp, color = Color(0xFFFFB300))
+                                            Text(bubble.text, color = Color(0xFFFFB300), fontSize = 11.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.SemiBold)
                                         }
+                                    }
+                                    MsgType.TOOL_EXEC, MsgType.AGENT_TOOL -> {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .background(Color(0xFF020E04), RoundedCornerShape(8.dp))
+                                                .border(1.dp, Color(0xFF00E676).copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                                                .padding(8.dp)
+                                        ) { Text(bubble.text, color = Color(0xFF00FF00), fontSize = 10.sp, fontFamily = FontFamily.Monospace) }
+                                    }
+                                    MsgType.AGENT_SHELL -> {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .background(Color(0xFF1A0A00), RoundedCornerShape(8.dp))
+                                                .border(1.dp, Color(0xFFFF9100).copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                                                .padding(8.dp)
+                                        ) { Text(bubble.text, color = Color(0xFFFF9100), fontSize = 10.sp, fontFamily = FontFamily.Monospace) }
+                                    }
+                                    MsgType.AGENT_CAMERA -> {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .background(Color(0xFF001A33), RoundedCornerShape(8.dp))
+                                                .border(1.dp, Color(0xFF00E5FF).copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                                                .padding(8.dp)
+                                        ) { Text(bubble.text, color = Color(0xFF00E5FF), fontSize = 10.sp, fontFamily = FontFamily.Monospace) }
+                                    }
+                                    MsgType.AGENT_CODE -> {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .background(Color(0xFF1A0020), RoundedCornerShape(8.dp))
+                                                .border(1.dp, Color(0xFFE040FB).copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                                                .padding(8.dp)
+                                        ) { Text(bubble.text, color = Color(0xFFE040FB), fontSize = 10.sp, fontFamily = FontFamily.Monospace) }
+                                    }
+                                    MsgType.AGENT_SYSTEM -> {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .background(Color(0xFF1A0000), RoundedCornerShape(8.dp))
+                                                .border(1.dp, Color(0xFFFF5252).copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                                                .padding(8.dp)
+                                        ) { Text(bubble.text, color = Color(0xFFFF5252), fontSize = 10.sp, fontFamily = FontFamily.Monospace) }
+                                    }
+                                    MsgType.TANK_REPLY -> {
+                                        Box(
+                                            modifier = Modifier
+                                                .background(CyberTheme.BG_CARD, RoundedCornerShape(12.dp, 12.dp, 12.dp, 0.dp))
+                                                .border(1.dp, CyberTheme.ACCENT_CYAN.copy(alpha = 0.4f), RoundedCornerShape(12.dp, 12.dp, 12.dp, 0.dp))
+                                                .padding(10.dp)
+                                        ) { Text(bubble.text, color = CyberTheme.TEXT, fontSize = 12.sp) }
                                     }
                                 }
                             }
                         }
                     }
+                    // Input bar
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color(0xFF0D1117))
+                            .padding(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = chatInputText,
+                            onValueChange = { chatInputText = it },
+                            placeholder = { Text("Ask the agent anything...", color = CyberTheme.DIM, fontSize = 12.sp) },
+                            textStyle = LocalTextStyle.current.copy(color = CyberTheme.TEXT, fontSize = 13.sp),
+                            modifier = Modifier.weight(1f),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = CyberTheme.ACCENT_CYAN,
+                                unfocusedBorderColor = CyberTheme.DIM.copy(alpha = 0.5f),
+                                cursorColor = CyberTheme.ACCENT_CYAN
+                            ),
+                            singleLine = true
+                        )
+                        Button(
+                            onClick = {
+                                if (chatInputText.isNotEmpty()) {
+                                    val userMsg = chatInputText
+                                    chatBubbles.add(ChatBubble("User", userMsg, MsgType.USER))
+                                    chatInputText = ""
+                                    isChatting = true
+                                    val thinkingBubble = ChatBubble("Agent", "\u26a1 Analyzing prompt & scheduling rotation engine...", MsgType.THINKING)
+                                    chatBubbles.add(thinkingBubble)
+                                    dispatchCommand("chat", JSONObject().apply {
+                                        put("text", userMsg)
+                                        put("use_external_llm", false)
+                                    }) { res ->
+                                        isChatting = false
+                                        chatBubbles.remove(thinkingBubble)
+                                        if (res != null) {
+                                            val result = res.optJSONObject("result")
+                                            val reply = result?.optString("reply") ?: "No response"
+                                            val lines = reply.split("\n")
+                                            val toolBuf = StringBuilder()
+                                            val textBuf = StringBuilder()
+                                            lines.forEach { line ->
+                                                val t = line.trim()
+                                                when {
+                                                    t.startsWith("\ud83d\udd27") || t.startsWith("\u2699\ufe0f") || t.startsWith("├─") -> {
+                                                        if (textBuf.isNotEmpty()) {
+                                                            chatBubbles.add(ChatBubble("Agent", textBuf.toString().trim(), MsgType.TANK_REPLY))
+                                                            textBuf.clear()
+                                                        }
+                                                        toolBuf.append(line).append("\n")
+                                                    }
+                                                    t.contains("CAMERA") || t.contains("camera") -> chatBubbles.add(ChatBubble("Camera", line, MsgType.AGENT_CAMERA))
+                                                    t.contains("shell") || t.contains("Running:") -> chatBubbles.add(ChatBubble("Shell", line, MsgType.AGENT_SHELL))
+                                                    t.contains("import ") || t.contains("def ") -> chatBubbles.add(ChatBubble("Code", line, MsgType.AGENT_CODE))
+                                                    else -> textBuf.append(line).append("\n")
+                                                }
+                                            }
+                                            if (toolBuf.isNotEmpty()) chatBubbles.add(ChatBubble("Tools", toolBuf.toString().trim(), MsgType.AGENT_TOOL))
+                                            if (textBuf.isNotEmpty()) chatBubbles.add(ChatBubble("Agent", textBuf.toString().trim(), MsgType.TANK_REPLY))
+                                        } else {
+                                            chatBubbles.add(ChatBubble("System", "\u2717 Bridge connection failed", MsgType.AGENT_SYSTEM))
+                                        }
+                                    }
+                                }
+                            },
+                            enabled = !isChatting,
+                            colors = ButtonDefaults.buttonColors(containerColor = CyberTheme.NEON_GREEN),
+                            shape = RoundedCornerShape(8.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp)
+                        ) {
+                            if (isChatting) CyberSpinner(size = 18.dp, color = CyberTheme.BG)
+                            else Text("\u27a4", color = CyberTheme.BG, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        }
+                    }
                 }
             }
-            1 -> {
-                // Tab 2: Vision, Dual USB Cameras, & OpenCV Overlays
+            2 -> {
+                // Tab 3: Vision, Dual USB Cameras, & OpenCV Overlays
                 LazyColumn(
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -1720,8 +1847,8 @@ fun MainScreen(client: OkHttpClient) {
                     }
                 }
             }
-            2 -> {
-                // Tab 3: VPS Torrents Center & Cloud Player cockpit
+            3 -> {
+                // Tab 4: VPS Torrents Center & Cloud Player cockpit
                 LazyColumn(
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -2081,8 +2208,8 @@ fun MainScreen(client: OkHttpClient) {
                     }
                 }
             }
-            3 -> {
-                // Tab 4: System Stats, Devices Matrix, & Diagnostics
+            7 -> {
+                // System Stats, Devices Matrix, & Diagnostics (hidden tab)
                 LazyColumn(
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -2482,8 +2609,8 @@ fun MainScreen(client: OkHttpClient) {
                     }
                 }
             }
-            4 -> {
-                // Tab 5: Settings Manager
+            5 -> {
+                // Tab 6: Settings Manager
                 LazyColumn(
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -2613,8 +2740,8 @@ fun MainScreen(client: OkHttpClient) {
                     }
                 }
             }
-            5 -> {
-                // ═══ TAB 6: FULL-SCREEN VISUAL MAP ═══
+            4 -> {
+                // ═══ TAB 5: FULL-SCREEN VISUAL MAP ═══
                 // Camera feed + LIDAR radar + YOLO + Motion + Sweep + Controls + HUD
                 var sweepAngle by remember { mutableFloatStateOf(0f) }
                 var mapShowLidar by remember { mutableStateOf(true) }
