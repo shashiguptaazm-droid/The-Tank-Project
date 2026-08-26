@@ -1221,16 +1221,39 @@ def _call_local_phi3(messages):
         return None
 
 
+
+# ====================================================================
+# FREE-MODEL-ONLY SAFETY — Only :free suffix models may be used
+# with OpenRouter. Paid models are BLOCKED.
+# ====================================================================
+_PAID_MODEL_BLOCKLIST = {
+    "mistral-small-latest", "mistral-large-latest",
+    "groq/compound", "qwen/qwen3.6-27b", "allam-2-7b",
+    "gpt-4", "gpt-4o", "gpt-4-turbo", "gpt-4.1", "gpt-5", "gpt-5-mini",
+    "claude-sonnet-5", "claude-haiku-4.5", "claude-3.5-sonnet",
+    "gemini-2.5-flash", "gemini-2.5-pro",
+    "deepseek-v4-flash", "deepseek-v3.2", "deepseek-chat",
+}
+
 def _rotate_llm(messages):
     """Try providers in rotation: cloud first, local fallback last."""
     cloud_providers = [
         ("mistral", "https://api.mistral.ai/v1", "MISTRAL_API_KEY", "mistral-small-latest"),
         ("groq_compound", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "groq/compound"),
-        ("groq_qwen", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "qwen/qwen3.6-27b"),
-        ("groq_allam", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "allam-2-7b"),
+        ("or_nemotron", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "nvidia/nemotron-3-super-120b-a12b:free"),
+        ("or_gemma", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "google/gemma-4-31b-it:free"),
+        ("or_ling", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "inclusionai/ling-3.0-flash:free"),
     ]
     # Try cloud providers
     for name, base_url, env_key, model in cloud_providers:
+        # SAFETY: skip paid models
+        if model in _PAID_MODEL_BLOCKLIST:
+            _LOG.warning("BLOCKED paid model %s", model)
+            continue
+        # SAFETY: OpenRouter models MUST end with :free
+        if "openrouter" in base_url and not model.endswith(":free"):
+            _LOG.warning("BLOCKED non-free OpenRouter model %s", model)
+            continue
         api_key = _os.environ.get(env_key, "")
         if not api_key:
             continue
@@ -1452,7 +1475,7 @@ async def agent_debug():
     """Debug: check env vars, LLM providers, and local models."""
     import os
     result = {}
-    for key in ["MISTRAL_API_KEY", "GROQ_API_KEY", "GEMINI_API_KEY"]:
+    for key in ["MISTRAL_API_KEY", "GROQ_API_KEY", "OPENROUTER_API_KEY"]:
         val = os.environ.get(key, "")
         result[f"env_{key}"] = f"SET ({len(val)} chars)" if val else "MISSING"
     # Check local models
@@ -1575,11 +1598,20 @@ def _rotate_llm(messages):
     cloud_providers = [
         ("mistral", "https://api.mistral.ai/v1", "MISTRAL_API_KEY", "mistral-small-latest"),
         ("groq_compound", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "groq/compound"),
-        ("groq_qwen", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "qwen/qwen3.6-27b"),
-        ("groq_allam", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "allam-2-7b"),
+        ("or_nemotron", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "nvidia/nemotron-3-super-120b-a12b:free"),
+        ("or_gemma", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "google/gemma-4-31b-it:free"),
+        ("or_ling", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "inclusionai/ling-3.0-flash:free"),
     ]
     # Try cloud providers
     for name, base_url, env_key, model in cloud_providers:
+        # SAFETY: skip paid models
+        if model in _PAID_MODEL_BLOCKLIST:
+            _LOG.warning("BLOCKED paid model %s", model)
+            continue
+        # SAFETY: OpenRouter models MUST end with :free
+        if "openrouter" in base_url and not model.endswith(":free"):
+            _LOG.warning("BLOCKED non-free OpenRouter model %s", model)
+            continue
         api_key = _os.environ.get(env_key, "")
         if not api_key:
             continue
@@ -3123,7 +3155,7 @@ async def agent_debug():
     """Debug: check env vars, LLM providers, and local models."""
     import os
     result = {}
-    for key in ["MISTRAL_API_KEY", "GROQ_API_KEY", "GEMINI_API_KEY"]:
+    for key in ["MISTRAL_API_KEY", "GROQ_API_KEY", "OPENROUTER_API_KEY"]:
         val = os.environ.get(key, "")
         result[f"env_{key}"] = f"SET ({len(val)} chars)" if val else "MISSING"
     # Check local models
