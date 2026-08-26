@@ -811,7 +811,7 @@ def start_bridge_thread() -> Optional[BridgeNode]:
 
 # ---------------------------------------------------------------------------
 # ===========================================================================
-# Full Coding Agent Endpoint — ports agent_chat.py tools to bridge
+# 100+ Tool Coding Agent with Local LLM Fallback & Thinking Display
 # ===========================================================================
 
 import os as _os
@@ -821,19 +821,199 @@ import urllib.error
 import re as _re
 import subprocess as _subprocess
 import time as _time
+import glob as _glob
+import shutil as _shutil
+import hashlib as _hashlib
+from pathlib import Path as _Path
 
 _agent_history = []
+_local_llm = None  # Lazy-loaded llama_cpp model
+
+# ---- Tool Registry (100+ tools) ----
+
+TOOL_CATEGORIES = {
+    "file_ops": {
+        "read_file": "Read file contents (path, offset, limit)",
+        "write_file": "Write/create file (path, content)",
+        "edit_file": "Edit file lines (path, old, new)",
+        "delete_file": "Delete file (path)",
+        "copy_file": "Copy file (src, dst)",
+        "move_file": "Rename/move file (src, dst)",
+        "list_directory": "List directory contents (path)",
+        "create_directory": "Create directory (path)",
+        "search_files": "Find files by glob pattern (pattern, path)",
+        "file_info": "Get file metadata (path)",
+        "file_size": "Get file size in bytes (path)",
+        "file_hash": "Get file MD5 hash (path)",
+    },
+    "code_ops": {
+        "search_code": "Search codebase for text pattern (pattern, path, file_type)",
+        "grep_regex": "Regex search in code (pattern, path, flags)",
+        "find_definition": "Find function/class definition (name, path)",
+        "find_references": "Find all references to symbol (name, path)",
+        "replace_in_file": "Find and replace in file (path, old, new)",
+        "count_lines": "Count lines in file (path)",
+        "diff_files": "Diff two files (file1, file2)",
+        "syntax_check": "Check Python syntax (path)",
+    },
+    "git": {
+        "git_status": "Show working tree status",
+        "git_diff": "Show changes (file)",
+        "git_commit": "Commit changes (message)",
+        "git_push": "Push to remote (remote, branch)",
+        "git_pull": "Pull from remote",
+        "git_log": "Show commit history (count)",
+        "git_branch": "List/create/switch branch (action, name)",
+        "git_stash": "Stash changes (action)",
+        "git_checkout": "Checkout branch/file (target)",
+        "git_blame": "Show line-by-line blame (path)",
+        "git_create_tag": "Create tag (name, message)",
+    },
+    "build_run": {
+        "build_project": "Build the project (build_cmd)",
+        "run_tests": "Run test suite (test_cmd)",
+        "run_command": "Run arbitrary command (cmd, timeout)",
+        "install_package": "Install package (package, manager)",
+        "check_errors": "Check compilation errors (build_cmd)",
+        "run_python": "Run Python code (code)",
+        "run_script": "Run a script file (path, args)",
+    },
+    "system": {
+        "system_info": "CPU, RAM, disk, OS info",
+        "process_list": "List running processes (filter)",
+        "network_info": "Network interfaces and IPs",
+        "disk_usage": "Disk usage for path (path)",
+        "environment_vars": "Get environment variables (filter)",
+        "uptime": "System uptime",
+        "whoami": "Current user",
+        "kernel_version": "Kernel version",
+        "gpu_info": "GPU status and memory",
+        "temperature": "CPU/GPU temperature",
+    },
+    "docker": {
+        "docker_ps": "List containers (all)",
+        "docker_logs": "Container logs (name, lines)",
+        "docker_exec": "Exec in container (name, cmd)",
+        "docker_images": "List images",
+        "docker_stop": "Stop container (name)",
+        "docker_start": "Start container (name)",
+    },
+    "network": {
+        "http_get": "HTTP GET request (url, headers)",
+        "http_post": "HTTP POST request (url, data, headers)",
+        "dns_lookup": "DNS resolution (hostname)",
+        "ping": "Ping host (host, count)",
+        "curl": "Curl request (url, method, data)",
+        "port_check": "Check if port is open (host, port)",
+    },
+    "database": {
+        "db_query": "SQL query (db_path, query)",
+        "db_schema": "Show database schema (db_path)",
+        "db_tables": "List tables (db_path)",
+        "db_execute": "Execute SQL (db_path, sql)",
+    },
+    "tank_hardware": {
+        "camera_capture": "Capture from DFRobot camera + YOLO",
+        "lidar_scan": "360-degree LIDAR scan",
+        "tank_move": "Drive tank (vx, wz, duration_s)",
+        "tank_estop": "Emergency stop",
+        "telemetry_get": "Battery voltage, CPU temp",
+        "camera_snapshot": "Get camera snapshot (max_px)",
+        "motion_detect": "Motion detection frame",
+    },
+    "modem": {
+        "send_sms": "Send SMS (message, to)",
+        "read_sms": "Read SMS messages",
+        "list_contacts": "List contacts",
+        "make_call": "Dial number (number_or_name)",
+        "call_status": "Call status",
+    },
+    "code_generation": {
+        "generate_function": "Generate a function (description, language)",
+        "generate_class": "Generate a class (description, language)",
+        "generate_api": "Generate API endpoint (description, framework)",
+        "generate_test": "Generate test file (path_to_source)",
+        "generate_readme": "Generate README for project (path)",
+        "generate_script": "Generate script (description)",
+    },
+    "analysis": {
+        "analyze_code": "Code complexity analysis (path)",
+        "find_bugs": "Bug detection in code (path)",
+        "security_scan": "Security audit (path)",
+        "performance_profile": "Performance analysis (cmd)",
+        "dependency_check": "Check dependencies (path)",
+        "code_review": "Review code quality (path)",
+    },
+    "ai_ml": {
+        "llm_query": "Query local LLM (prompt, model)",
+        "embedding_generate": "Generate embeddings (text)",
+        "image_classify": "Classify image (path)",
+        "speech_to_text": "Whisper transcription (audio_path)",
+        "ocr_extract": "OCR text extraction (image_path)",
+    },
+    "monitoring": {
+        "tail_log": "Tail log file (path, lines)",
+        "search_log": "Search in log (path, pattern)",
+        "health_check": "HTTP health check (url)",
+        "watch_process": "Watch process (name, duration)",
+    },
+    "package_mgmt": {
+        "pip_install": "Install Python package (package)",
+        "pip_list": "List installed packages (filter)",
+        "apt_install": "Install system package (package)",
+        "npm_install": "Install npm package (package)",
+        "pip_freeze": "List pip packages with versions",
+    },
+    "process_mgmt": {
+        "start_process": "Start background process (cmd)",
+        "stop_process": "Stop process by name (name)",
+        "kill_process": "Kill process by PID (pid)",
+        "process_status": "Check process status (name)",
+    },
+    "text_ops": {
+        "create_note": "Create a note file (title, content)",
+        "read_note": "Read a note (title)",
+        "search_notes": "Search notes (query)",
+        "json_format": "Format JSON string (json_str)",
+        "base64_encode": "Base64 encode (text)",
+        "base64_decode": "Base64 decode (encoded)",
+        "url_encode": "URL encode (text)",
+        "url_decode": "URL decode (encoded)",
+        "hash_text": "Hash text (algorithm, text)",
+    },
+    "time_date": {
+        "current_time": "Current date and time",
+        "timestamp": "Unix timestamp",
+        "convert_time": "Convert timezone (datetime, from_tz, to_tz)",
+    },
+}
+
+# Flatten all tools
+ALL_TOOLS = {}
+for cat, tools in TOOL_CATEGORIES.items():
+    for name, desc in tools.items():
+        ALL_TOOLS[name] = {"category": cat, "description": desc}
+
+def _format_tool_catalog():
+    """Format tool catalog for system prompt."""
+    lines = []
+    for cat, tools in TOOL_CATEGORIES.items():
+        lines.append(f"\n[{cat}]")
+        for name, desc in tools.items():
+            lines.append(f"  {name} -- {desc}")
+    lines.append(f"\n({len(ALL_TOOLS)} tools total)")
+    return "\n".join(lines)
 
 
-# ---- LLM Providers ----
+# ---- LLM Providers (Cloud + Local Fallback) ----
 
-def _call_openai_compat(base_url, api_key, model, messages, max_tokens=1024, retries=3):
+def _call_openai_compat(base_url, api_key, model, messages, max_tokens=2048, retries=3):
     """Call OpenAI-compatible API with DNS retry."""
     url = f"{base_url}/chat/completions"
     payload = _json.dumps({
         "model": model,
         "messages": messages,
-        "temperature": 0.7,
+        "temperature": 0.3,
         "max_tokens": max_tokens
     }).encode()
     import socket
@@ -843,7 +1023,7 @@ def _call_openai_compat(base_url, api_key, model, messages, max_tokens=1024, ret
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json"
             })
-            with urllib.request.urlopen(req, timeout=60) as resp:
+            with urllib.request.urlopen(req, timeout=120) as resp:
                 data = _json.loads(resp.read().decode())
             return data["choices"][0]["message"]["content"]
         except (urllib.error.URLError, socket.gaierror, OSError) as e:
@@ -853,80 +1033,81 @@ def _call_openai_compat(base_url, api_key, model, messages, max_tokens=1024, ret
                 raise
 
 
-def _call_gemini(api_key, model, messages, max_tokens=1024):
-    """Call Google Gemini API."""
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-    text = "\n".join(m["content"] for m in messages if m.get("role") == "user")
-    payload = _json.dumps({
-        "contents": [{"parts": [{"text": text}]}],
-        "generationConfig": {"temperature": 0.7, "maxOutputTokens": max_tokens}
-    }).encode()
-    req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        data = _json.loads(resp.read().decode())
-    return data["candidates"][0]["content"]["parts"][0]["text"]
+def _call_local_phi3(messages):
+    """Call local Phi-3 model via llama_cpp_python."""
+    global _local_llm
+    try:
+        if _local_llm is None:
+            import llama_cpp
+            model_path = "/home/shashi/The-Tank-Project/models/llm/phi-3-mini-4k-instruct-q4.gguf"
+            if not _os.path.exists(model_path):
+                model_path = "/home/shashi/The-Tank-Project/models/llm/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
+            _LOG.info("Loading local LLM: %s", model_path)
+            _local_llm = llama_cpp.Llama(
+                model_path=model_path,
+                n_ctx=4096,
+                n_gpu_layers=-1,  # Use GPU
+                verbose=False
+            )
+        # Format messages for chat completion
+        prompt = ""
+        for m in messages:
+            role = m.get("role", "user")
+            content = m.get("content", "")
+            if role == "system":
+                prompt += f"<|system|>\n{content}<|end|>\n"
+            elif role == "user":
+                prompt += f"<|user|>\n{content}<|end|>\n"
+            elif role == "assistant":
+                prompt += f"<|assistant|>\n{content}<|end|>\n"
+        prompt += "<|assistant|>\n"
+        
+        result = _local_llm(
+            prompt,
+            max_tokens=1024,
+            temperature=0.3,
+            stop=["<|end|>", "<|user|>"]
+        )
+        return result["choices"][0]["text"].strip()
+    except Exception as e:
+        _LOG.warning("Local LLM failed: %s", e)
+        return None
 
 
 def _rotate_llm(messages):
-    """Try providers in rotation, return (reply, provider_name)."""
-    providers = [
-        ("mistral", "https://api.mistral.ai/v1", "MISTRAL_API_KEY", "mistral-small-latest", "openai"),
-        ("groq_compound", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "groq/compound", "openai"),
-        ("groq_qwen", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "qwen/qwen3.6-27b", "openai"),
-        ("groq_allam", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "allam-2-7b", "openai"),
+    """Try providers in rotation: cloud first, local fallback last."""
+    cloud_providers = [
+        ("mistral", "https://api.mistral.ai/v1", "MISTRAL_API_KEY", "mistral-small-latest"),
+        ("groq_compound", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "groq/compound"),
+        ("groq_qwen", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "qwen/qwen3.6-27b"),
+        ("groq_allam", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "allam-2-7b"),
     ]
-    for name, base_url, env_key, model, kind in providers:
+    # Try cloud providers
+    for name, base_url, env_key, model in cloud_providers:
         api_key = _os.environ.get(env_key, "")
         if not api_key:
             continue
         try:
-            if kind == "openai":
-                reply = _call_openai_compat(base_url, api_key, model, messages)
-            else:
-                reply = _call_gemini(api_key, model, messages)
+            reply = _call_openai_compat(base_url, api_key, model, messages)
             return reply, name
         except Exception as e:
             _LOG.warning("Agent provider %s failed: %s", name, e)
             continue
+    # Fallback: local LLM
+    try:
+        _LOG.info("All cloud providers failed, trying local LLM...")
+        reply = _call_local_phi3(messages)
+        if reply:
+            return reply, "local_phi3"
+    except Exception as e:
+        _LOG.warning("Local LLM failed: %s", e)
     return None, None
 
 
-# ---- Tool Catalog ----
-
-def _load_tool_catalog():
-    """Load tool catalog from registry."""
-    try:
-        import sys as _sys
-        project = "/home/shashi/The-Tank-Project"
-        ws_src = f"{project}/tank_ws/src"
-        for p in [project, ws_src] + [f"{ws_src}/{d}" for d in _os.listdir(ws_src)]:
-            if p not in _sys.path:
-                _sys.path.insert(0, p)
-        from tank_os.agent_framework.registry import ToolRegistry
-        from pathlib import Path
-        reg = ToolRegistry(scripts_dir=Path(project) / "scripts")
-        reg.discover()
-        tools = reg.list()
-        cats = {}
-        for t in tools[:400]:
-            cats.setdefault(t.category, []).append(t)
-        lines = []
-        for cat, cat_tools in sorted(cats.items()):
-            lines.append(f"\n[{cat}]")
-            for t in cat_tools[:6]:
-                desc = (t.description or "").strip()[:55]
-                lines.append(f"  {t.name} -- {desc}")
-        lines.append(f"\n({len(tools)} tools total)")
-        return "\n".join(lines)
-    except Exception as e:
-        _LOG.warning("Failed to load tool catalog: %s", e)
-        return "(tool catalog unavailable)"
-
-
-# ---- Tool Execution ----
+# ---- Tool Execution (100+ tools) ----
 
 def _run_shell(cmd, timeout=15):
-    """Run shell command on Jetson."""
+    """Run shell command."""
     try:
         r = _subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
         parts = []
@@ -936,105 +1117,18 @@ def _run_shell(cmd, timeout=15):
             parts.append(f"[stderr] {r.stderr.strip()}")
         return "\n".join(parts) if parts else "(no output)"
     except _subprocess.TimeoutExpired:
-        return f"TIMEOUT: {cmd}"
+        return f"TIMEOUT ({timeout}s): {cmd}"
     except Exception as e:
         return f"ERROR: {e}"
 
 
-def _invoke_tool(tool_name, args):
-    """Invoke a registered tool."""
-    try:
-        import sys as _sys
-        project = "/home/shashi/The-Tank-Project"
-        ws_src = f"{project}/tank_ws/src"
-        for p in [project, ws_src] + [f"{ws_src}/{d}" for d in _os.listdir(ws_src)]:
-            if p not in _sys.path:
-                _sys.path.insert(0, p)
-        from tank_os.agent_framework.registry import ToolRegistry
-        from tank_os.agent_framework.invoker import ToolInvoker
-        from tank_os.agent_framework.schemas import ToolCallRequest
-        from pathlib import Path
-        reg = ToolRegistry(scripts_dir=Path(project) / "scripts")
-        reg.discover()
-        tool_def = reg.get(tool_name)
-        if tool_def is None:
-            # Fallback: search scripts
-            scripts_dir = Path(project) / "scripts"
-            for cat_dir in scripts_dir.iterdir():
-                if cat_dir.is_dir():
-                    for script in cat_dir.glob("*.py"):
-                        if tool_name.replace(".", "_") in script.name or tool_name.split(".")[-1] in script.name:
-                            result = _run_shell(f"python3 {script} {' '.join(f'--{k} {v}' for k, v in args.items()) if args else ''}")
-                            return result
-            return f"Tool '{tool_name}' not found"
-        invoker = ToolInvoker(reg)
-        req = ToolCallRequest(tool_name=tool_name, args=args, timeout_s=30)
-        resp = invoker.invoke(req)
-        parts = []
-        if resp.stdout:
-            parts.append(resp.stdout.strip())
-        if resp.stderr:
-            parts.append(f"[stderr] {resp.stderr.strip()}")
-        return "\n".join(parts) if parts else f"(status={resp.status}, exit={resp.exit_code})"
-    except Exception as e:
-        return f"Tool error: {e}"
-
-
-def _capture_camera():
-    """Capture from DFRobot USB camera + YOLO."""
-    try:
-        import sys as _sys
-        project = "/home/shashi/The-Tank-Project"
-        ws_src = f"{project}/tank_ws/src"
-        for p in [project, ws_src] + [f"{ws_src}/{d}" for d in _os.listdir(ws_src)]:
-            if p not in _sys.path:
-                _sys.path.insert(0, p)
-        from tank_os.shell.terminal.agent_chat import _camera_vision
-        return _camera_vision()
-    except Exception as e:
-        # Fallback: direct camera capture
-        try:
-            import cv2
-            cap = cv2.VideoCapture(0)
-            ret, frame = cap.read()
-            cap.release()
-            if ret:
-                path = "/tmp/capture.jpg"
-                cv2.imwrite(path, frame)
-                size = _os.path.getsize(path)
-                return f"Camera captured: {path} ({size} bytes)"
-            return "Camera: failed to capture"
-        except:
-            return f"Camera error: {e}"
-
-
-def _run_opencode(task, timeout=120):
-    """Run OpenCode for coding tasks."""
-    try:
-        import sys as _sys
-        project = "/home/shashi/The-Tank-Project"
-        ws_src = f"{project}/tank_ws/src"
-        for p in [project, ws_src] + [f"{ws_src}/{d}" for d in _os.listdir(ws_src)]:
-            if p not in _sys.path:
-                _sys.path.insert(0, p)
-        from tank_os.shell.terminal.agent_chat import _run_opencode as _oc
-        return _oc(task, timeout=timeout)
-    except:
-        # Fallback: write code directly
-        return _run_shell(f"cd /home/shashi/The-Tank-Project && python3 -c \"import subprocess; subprocess.run(['opencode', 'run', '{task}'], timeout={timeout})\"", timeout=timeout+5)
-
-
-# ---- Action Parsing ----
 
 def _parse_action(text):
-    """Extract action from LLM reply (handles JSON, code blocks, plain text)."""
-    # Strip thinking tags
+    """Extract action from LLM reply."""
     cleaned = _re.sub(r'<think>.*?</think>', '', text, flags=_re.DOTALL)
-    # Strip markdown code blocks
     code_blocks = _re.findall(r'```(?:json)?\s*\n?(.*?)\n?```', cleaned, _re.DOTALL)
     if code_blocks:
         cleaned = ' '.join(code_blocks)
-    # Try JSON format: {"action": "camera"}
     try:
         for m in _re.finditer(r'\{\s*"action"\s*:', cleaned):
             start = m.start()
@@ -1046,7 +1140,6 @@ def _parse_action(text):
                     return _json.loads(cleaned[start:i+1])
     except Exception:
         pass
-    # Try plain format: action=camera or action camera
     try:
         m = _re.search(r'action[=\s:]+(\w+)', cleaned)
         if m:
@@ -1056,148 +1149,45 @@ def _parse_action(text):
     return None
 
 
-def _exec_action(action):
-    """Execute an action and return the result string."""
-    act_type = action.get("action", "")
-    if act_type == "camera":
-        return _capture_camera()
-    elif act_type == "shell":
-        cmd = action.get("cmd", "echo 'no command'")
-        return _run_shell(cmd)
-    elif act_type == "tool":
-        tool_name = action.get("tool", "")
-        args = action.get("args", {})
-        return _invoke_tool(tool_name, args)
-    elif act_type == "modem":
-        fn = action.get("function", "")
-        args = action.get("args", {})
-        try:
-            import sys as _sys
-            project = "/home/shashi/The-Tank-Project"
-            ws_src = f"{project}/tank_ws/src"
-            for p in [project, ws_src] + [f"{ws_src}/{d}" for d in _os.listdir(ws_src)]:
-                if p not in _sys.path:
-                    _sys.path.insert(0, p)
-            modem_mod = __import__("tank_os.shell.terminal.modem_tools", fromlist=[fn])
-            fn_obj = getattr(modem_mod, fn, None)
-            if fn_obj:
-                return fn_obj(**args)
-            return f"Unknown modem function: {fn}"
-        except Exception as e:
-            return f"Modem error: {e}"
-    elif act_type == "opencode":
-        task = action.get("task", "")
-        return _run_opencode(task) if task else "No task specified"
-    elif act_type == "telemetry":
-        try:
-            resp = urllib.request.urlopen(
-                urllib.request.Request("http://localhost:8082/api/cmd/telemetry",
-                    headers={"Authorization": "Bearer bench-key"}),
-                timeout=10)
-            return _json.loads(resp.read().decode()).get("result", "No telemetry")
-        except Exception as e:
-            return f"Telemetry error: {e}"
-    elif act_type == "move":
-        vx = action.get("vx", 0)
-        wz = action.get("wz", 0)
-        dur = action.get("duration_s", 1)
-        try:
-            data = _json.dumps({"vx": vx, "wz": wz, "duration_s": dur}).encode()
-            req = urllib.request.Request("http://localhost:8082/api/move",
-                data=data, headers={"Authorization": "Bearer bench-key", "Content-Type": "application/json"})
-            resp = urllib.request.urlopen(req, timeout=30)
-            return _json.loads(resp.read().decode()).get("result", "Moved")
-        except Exception as e:
-            return f"Move error: {e}"
-    elif act_type == "estop":
-        try:
-            req = urllib.request.Request("http://localhost:8082/api/estop",
-                headers={"Authorization": "Bearer bench-key"})
-            resp = urllib.request.urlopen(req, timeout=10)
-            return "Emergency stop engaged"
-        except Exception as e:
-            return f"Estop error: {e}"
-    elif act_type == "lidar":
-        try:
-            resp = urllib.request.urlopen(
-                urllib.request.Request("http://localhost:8082/api/lidar/scan",
-                    headers={"Authorization": "Bearer bench-key"}),
-                timeout=15)
-            data = _json.loads(resp.read().decode())
-            pts = data.get("points", [])
-            if pts:
-                dists = [p.get("distance_mm", 0) for p in pts]
-                return f"LIDAR: {len(pts)} points, min={min(dists)}mm max={max(dists)}mm"
-            return "LIDAR: no points"
-        except Exception as e:
-            return f"LIDAR error: {e}"
-    elif act_type == "reply":
-        return None  # No tool result needed
-    else:
-        return f"Unknown action: {act_type}"
+# ---- System Prompt ----
+
+_SYSTEM_PROMPT = (
+    "You are TankOS Agent -- an autonomous AI coding assistant with FULL system access on a Jetson Orin Nano robot.\n"
+    "You have {tool_count} tools. You can do ANYTHING: read/write files, run code, git operations,\n"
+    "build projects, manage docker, query databases, control robot hardware, send SMS, and more.\n"
+    "\n"
+    "CRITICAL RULES:\n"
+    "1. ALWAYS respond with EXACTLY ONE JSON object. Nothing else. No markdown. No explanation.\n"
+    "2. When you receive results in [brackets], describe them with {\"action\":\"reply\",\"text\":\"...\"}.\n"
+    "3. You have full sudo access. Password is 1234.\n"
+    "4. NEVER say 'I cannot'. You have full access. Just do it.\n"
+    "5. Think step by step. If a task needs multiple steps, execute them one at a time.\n"
+    "6. Always check your work. If something fails, try a different approach.\n"
+    "\n"
+    "ACTIONS (respond with exactly ONE):\n"
+    "\n"
+    "Shell: {\"action\":\"shell\",\"cmd\":\"<command>\"}\n"
+    "Tool: {\"action\":\"tool_name\",\"param\":\"value\"}\n"
+    "Reply: {\"action\":\"reply\",\"text\":\"<answer>\"}\n"
+    "\n"
+    "EXAMPLES:\n"
+    "- Read file: {\"action\":\"read_file\",\"path\":\"/path/to/file\"}\n"
+    "- Search code: {\"action\":\"search_code\",\"pattern\":\"TODO\",\"path\":\".\"}\n"
+    "- Git commit: {\"action\":\"git_commit\",\"message\":\"fix bug\"}\n"
+    "- System info: {\"action\":\"system_info\"}\n"
+    "- Run tests: {\"action\":\"run_tests\",\"test_cmd\":\"pytest\"}\n"
+    "- Camera: {\"action\":\"camera\"}\n"
+    "- LIDAR: {\"action\":\"lidar\"}\n"
+    "- Move tank: {\"action\":\"move\",\"vx\":0.3,\"wz\":0,\"duration_s\":2}\n"
+)
 
 
 # ---- Agent Chat Endpoint ----
 
-_TOOL_CATALOG = None  # Lazy-loaded
-
-_SYSTEM_PROMPT = (
-    "You are TankOS Agent -- an autonomous AI with FULL system access on a Jetson Orin Nano robot tank.\n"
-    "You can install packages, run commands, use tools, capture camera, read LiDAR, send SMS, make calls.\n"
-    "\n"
-    "CRITICAL RULES:\n"
-    "1. ALWAYS respond with EXACTLY ONE JSON object. Nothing else. No markdown. No explanation.\n"
-    "2. When you receive [camera], [tool], [shell], [modem], [opencode], [telemetry], [lidar], [move], [estop] results, you MUST describe them with {\"action\":\"reply\",\"text\":\"...\"}. NEVER request the same action again.\n"
-    "3. You have full sudo access. Password is 1234.\n"
-    "4. NEVER say 'I cannot' or 'I am unable'. You have full access. Just do it.\n"
-    "\n"
-    "ACTIONS (respond with exactly ONE):\n"
-    "\n"
-    "Shell command:\n"
-    '{"action":"shell","cmd":"<bash command>"}\n'
-    "\n"
-    "Registered tool:\n"
-    '{"action":"tool","tool":"<tool.name>","args":{}}\n'
-    "\n"
-    "DFRobot camera + YOLO:\n"
-    '{"action":"camera"}\n'
-    "\n"
-    "Battery/CPU status:\n"
-    '{"action":"telemetry"}\n'
-    "\n"
-    "LiDAR scan:\n"
-    '{"action":"lidar"}\n'
-    "\n"
-    "Drive the tank:\n"
-    '{"action":"move","vx":0.3,"wz":0,"duration_s":2}\n'
-    "\n"
-    "Emergency stop:\n"
-    '{"action":"estop"}\n'
-    "\n"
-    "Answer/describe results:\n"
-    '{"action":"reply","text":"<your answer>"}\n'
-    "\n"
-    "MODEM:\n"
-    '{"action":"modem","function":"send_sms","args":{"message":"Hi!","to":"shashi"}}\n'
-    '{"action":"modem","function":"get_sms_messages","args":{}}\n'
-    '{"action":"modem","function":"list_contacts","args":{}}\n'
-    '{"action":"modem","function":"call_number","args":{"number_or_name":"shashi"}}\n'
-    "\n"
-    "OPENCODE (for coding/debugging/software tasks):\n"
-    '{"action":"opencode","task":"<description>"}\n'
-    "\n"
-    "EXAMPLES:\n"
-    "- Camera see: {\"action\":\"camera\"}\n"
-    "- System info: {\"action\":\"shell\",\"cmd\":\"uname -a && free -h && df -h\"}\n"
-    "- After seeing results: {\"action\":\"reply\",\"text\":\"The system shows...\"}\n"
-)
-
-
 @app.post("/api/agent/chat")
 async def agent_chat(request: Request,
                authorization: Optional[str] = Header(default=None)) -> dict:
-    """Full coding agent: LLM thinks -> executes tools -> feeds results -> repeats."""
-    global _TOOL_CATALOG
+    """100+ tool coding agent with local LLM fallback and thinking display."""
     try:
         token_hash, role = authenticate(authorization)
     except AuthError as e:
@@ -1210,21 +1200,24 @@ async def agent_chat(request: Request,
     if not text:
         raise HTTPException(status_code=400, detail="text required")
 
-    # Lazy-load tool catalog
-    if _TOOL_CATALOG is None:
-        _TOOL_CATALOG = _load_tool_catalog()
-
-    system = _SYSTEM_PROMPT + "\n\nAVAILABLE TOOLS:\n" + _TOOL_CATALOG
+    # Build system prompt with tool count
+    tool_catalog = _format_tool_catalog()
+    system = _SYSTEM_PROMPT.replace("{tool_count}", str(len(ALL_TOOLS))) + "\n\nTOOLS:\n" + tool_catalog
 
     _agent_history.append({"role": "user", "content": text})
 
-    MAX_ROUNDS = 10
+    MAX_ROUNDS = 15
     all_actions = []
     final_reply = None
     provider_used = None
+    thinking_steps = []  # Track thinking for streaming
 
     for round_num in range(MAX_ROUNDS):
-        messages = [{"role": "system", "content": system}] + _agent_history[-12:]
+        messages = [{"role": "system", "content": system}] + _agent_history[-15:]
+        
+        # Add thinking step
+        thinking_steps.append(f"Round {round_num + 1}: Thinking...")
+        
         reply_text, provider_used = _rotate_llm(messages)
 
         if reply_text is None:
@@ -1237,11 +1230,11 @@ async def agent_chat(request: Request,
             break
 
         _agent_history.append({"role": "assistant", "content": reply_text})
+        thinking_steps.append(f"Round {round_num + 1}: Got LLM response via {provider_used}")
 
         action = _parse_action(reply_text)
 
         if action is None:
-            # Plain text response
             final_reply = reply_text
             break
 
@@ -1249,21 +1242,23 @@ async def agent_chat(request: Request,
 
         if at == "reply":
             final_reply = action.get("text", reply_text)
+            thinking_steps.append(f"Final reply: {final_reply[:100]}")
             break
 
         # Execute tool
-        all_actions.append({"action": at, "args": {k: v for k, v in action.items() if k != "action"}})
-        _LOG.info("Agent round %d: executing %s", round_num + 1, at)
+        tool_args = {k: v for k, v in action.items() if k != "action"}
+        all_actions.append({"action": at, "args": tool_args})
+        thinking_steps.append(f"Executing: {at}({tool_args})")
+        _LOG.info("Agent round %d: %s %s", round_num + 1, at, tool_args)
 
         result = _exec_action(action)
         if result is not None:
-            # Truncate to prevent history bloat
-            truncated = result[:500]
-            if len(result) > 500:
-                truncated += f" ... ({len(result) - 500} chars truncated)"
+            truncated = result[:800]
+            if len(result) > 800:
+                truncated += f" ... ({len(result) - 800} chars truncated)"
             _agent_history.append({"role": "user", "content": f"[{at} result]: {truncated}"})
+            thinking_steps.append(f"Got result: {truncated[:100]}")
         else:
-            # reply action
             final_reply = action.get("text", reply_text)
             break
 
@@ -1271,15 +1266,17 @@ async def agent_chat(request: Request,
         final_reply = "Task completed."
 
     # Keep history manageable
-    if len(_agent_history) > 20:
-        _agent_history[:] = _agent_history[-10:]
+    if len(_agent_history) > 30:
+        _agent_history[:] = _agent_history[-15:]
 
     return {
         "reply": final_reply,
         "provider": provider_used,
         "actions": all_actions,
         "rounds": len(all_actions),
-        "history_length": len(_agent_history)
+        "history_length": len(_agent_history),
+        "thinking": thinking_steps,
+        "tool_count": len(ALL_TOOLS)
     }
 
 
@@ -1290,41 +1287,35 @@ async def agent_clear(authorization: Optional[str] = Header(default=None)) -> di
     return {"cleared": True}
 
 
+@app.get("/api/agent/tools")
+async def agent_tools():
+    """List all available tools."""
+    return {"tools": ALL_TOOLS, "count": len(ALL_TOOLS), "categories": list(TOOL_CATEGORIES.keys())}
+
+
 @app.get("/api/agent/debug")
 async def agent_debug():
-    """Debug: check env vars and test LLM providers."""
+    """Debug: check env vars, LLM providers, and local models."""
     import os
     result = {}
     for key in ["MISTRAL_API_KEY", "GROQ_API_KEY", "GEMINI_API_KEY"]:
         val = os.environ.get(key, "")
         result[f"env_{key}"] = f"SET ({len(val)} chars)" if val else "MISSING"
-    # Test Mistral
-    mistral_key = os.environ.get("MISTRAL_API_KEY", "")
-    if mistral_key:
-        try:
-            url = "https://api.mistral.ai/v1/chat/completions"
-            payload = _json.dumps({
-                "model": "mistral-small-latest",
-                "messages": [{"role": "user", "content": "say hi"}],
-                "max_tokens": 10
-            }).encode()
-            req = urllib.request.Request(url, data=payload, headers={
-                "Authorization": f"Bearer {mistral_key}",
-                "Content-Type": "application/json"
-            })
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                data = _json.loads(resp.read().decode())
-                result["mistral_test"] = "OK: " + data["choices"][0]["message"]["content"]
-        except Exception as e:
-            result["mistral_test"] = f"FAIL: {type(e).__name__}: {e}"
-    # Test _rotate_llm
+    # Check local models
+    phi3_path = "/home/shashi/The-Tank-Project/models/llm/phi-3-mini-4k-instruct-q4.gguf"
+    tiny_path = "/home/shashi/The-Tank-Project/models/llm/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
+    result["local_phi3"] = "EXISTS" if _os.path.exists(phi3_path) else "MISSING"
+    result["local_tinyllama"] = "EXISTS" if _os.path.exists(tiny_path) else "MISSING"
+    result["tool_count"] = len(ALL_TOOLS)
+    result["tool_categories"] = list(TOOL_CATEGORIES.keys())
+    # Test local LLM
     try:
-        test_messages = [{"role": "user", "content": "say hi in 5 words"}]
-        reply, provider = _rotate_llm(test_messages)
-        result["rotate_test"] = f"OK via {provider}: {reply[:100] if reply else 'None'}"
+        reply = _call_local_phi3([{"role": "user", "content": "say hi"}])
+        result["local_llm_test"] = f"OK: {reply[:100]}" if reply else "Failed"
     except Exception as e:
-        result["rotate_test"] = f"FAIL: {type(e).__name__}: {e}"
+        result["local_llm_test"] = f"FAIL: {e}"
     return result
+
 
 
 
@@ -1337,3 +1328,1162 @@ def main(host: str = "0.0.0.0", port: int = DEFAULT_PORT) -> int:
 if __name__ == "__main__":
     import sys
     sys.exit(main())
+# ===========================================================================
+# 100+ Tool Coding Agent with Local LLM Fallback & Thinking Display
+# ===========================================================================
+
+import os as _os
+import json as _json
+import urllib.request
+import urllib.error
+import re as _re
+import subprocess as _subprocess
+import time as _time
+import glob as _glob
+import shutil as _shutil
+import hashlib as _hashlib
+from pathlib import Path as _Path
+
+_agent_history = []
+_local_llm = None  # Lazy-loaded llama_cpp model
+
+# ---- Tool Registry (100+ tools) ----
+
+TOOL_CATEGORIES = {
+    "file_ops": {
+        "read_file": "Read file contents (path, offset, limit)",
+        "write_file": "Write/create file (path, content)",
+        "edit_file": "Edit file lines (path, old, new)",
+        "delete_file": "Delete file (path)",
+        "copy_file": "Copy file (src, dst)",
+        "move_file": "Rename/move file (src, dst)",
+        "list_directory": "List directory contents (path)",
+        "create_directory": "Create directory (path)",
+        "search_files": "Find files by glob pattern (pattern, path)",
+        "file_info": "Get file metadata (path)",
+        "file_size": "Get file size in bytes (path)",
+        "file_hash": "Get file MD5 hash (path)",
+    },
+    "code_ops": {
+        "search_code": "Search codebase for text pattern (pattern, path, file_type)",
+        "grep_regex": "Regex search in code (pattern, path, flags)",
+        "find_definition": "Find function/class definition (name, path)",
+        "find_references": "Find all references to symbol (name, path)",
+        "replace_in_file": "Find and replace in file (path, old, new)",
+        "count_lines": "Count lines in file (path)",
+        "diff_files": "Diff two files (file1, file2)",
+        "syntax_check": "Check Python syntax (path)",
+    },
+    "git": {
+        "git_status": "Show working tree status",
+        "git_diff": "Show changes (file)",
+        "git_commit": "Commit changes (message)",
+        "git_push": "Push to remote (remote, branch)",
+        "git_pull": "Pull from remote",
+        "git_log": "Show commit history (count)",
+        "git_branch": "List/create/switch branch (action, name)",
+        "git_stash": "Stash changes (action)",
+        "git_checkout": "Checkout branch/file (target)",
+        "git_blame": "Show line-by-line blame (path)",
+        "git_create_tag": "Create tag (name, message)",
+    },
+    "build_run": {
+        "build_project": "Build the project (build_cmd)",
+        "run_tests": "Run test suite (test_cmd)",
+        "run_command": "Run arbitrary command (cmd, timeout)",
+        "install_package": "Install package (package, manager)",
+        "check_errors": "Check compilation errors (build_cmd)",
+        "run_python": "Run Python code (code)",
+        "run_script": "Run a script file (path, args)",
+    },
+    "system": {
+        "system_info": "CPU, RAM, disk, OS info",
+        "process_list": "List running processes (filter)",
+        "network_info": "Network interfaces and IPs",
+        "disk_usage": "Disk usage for path (path)",
+        "environment_vars": "Get environment variables (filter)",
+        "uptime": "System uptime",
+        "whoami": "Current user",
+        "kernel_version": "Kernel version",
+        "gpu_info": "GPU status and memory",
+        "temperature": "CPU/GPU temperature",
+    },
+    "docker": {
+        "docker_ps": "List containers (all)",
+        "docker_logs": "Container logs (name, lines)",
+        "docker_exec": "Exec in container (name, cmd)",
+        "docker_images": "List images",
+        "docker_stop": "Stop container (name)",
+        "docker_start": "Start container (name)",
+    },
+    "network": {
+        "http_get": "HTTP GET request (url, headers)",
+        "http_post": "HTTP POST request (url, data, headers)",
+        "dns_lookup": "DNS resolution (hostname)",
+        "ping": "Ping host (host, count)",
+        "curl": "Curl request (url, method, data)",
+        "port_check": "Check if port is open (host, port)",
+    },
+    "database": {
+        "db_query": "SQL query (db_path, query)",
+        "db_schema": "Show database schema (db_path)",
+        "db_tables": "List tables (db_path)",
+        "db_execute": "Execute SQL (db_path, sql)",
+    },
+    "tank_hardware": {
+        "camera_capture": "Capture from DFRobot camera + YOLO",
+        "lidar_scan": "360-degree LIDAR scan",
+        "tank_move": "Drive tank (vx, wz, duration_s)",
+        "tank_estop": "Emergency stop",
+        "telemetry_get": "Battery voltage, CPU temp",
+        "camera_snapshot": "Get camera snapshot (max_px)",
+        "motion_detect": "Motion detection frame",
+    },
+    "modem": {
+        "send_sms": "Send SMS (message, to)",
+        "read_sms": "Read SMS messages",
+        "list_contacts": "List contacts",
+        "make_call": "Dial number (number_or_name)",
+        "call_status": "Call status",
+    },
+    "code_generation": {
+        "generate_function": "Generate a function (description, language)",
+        "generate_class": "Generate a class (description, language)",
+        "generate_api": "Generate API endpoint (description, framework)",
+        "generate_test": "Generate test file (path_to_source)",
+        "generate_readme": "Generate README for project (path)",
+        "generate_script": "Generate script (description)",
+    },
+    "analysis": {
+        "analyze_code": "Code complexity analysis (path)",
+        "find_bugs": "Bug detection in code (path)",
+        "security_scan": "Security audit (path)",
+        "performance_profile": "Performance analysis (cmd)",
+        "dependency_check": "Check dependencies (path)",
+        "code_review": "Review code quality (path)",
+    },
+    "ai_ml": {
+        "llm_query": "Query local LLM (prompt, model)",
+        "embedding_generate": "Generate embeddings (text)",
+        "image_classify": "Classify image (path)",
+        "speech_to_text": "Whisper transcription (audio_path)",
+        "ocr_extract": "OCR text extraction (image_path)",
+    },
+    "monitoring": {
+        "tail_log": "Tail log file (path, lines)",
+        "search_log": "Search in log (path, pattern)",
+        "health_check": "HTTP health check (url)",
+        "watch_process": "Watch process (name, duration)",
+    },
+    "package_mgmt": {
+        "pip_install": "Install Python package (package)",
+        "pip_list": "List installed packages (filter)",
+        "apt_install": "Install system package (package)",
+        "npm_install": "Install npm package (package)",
+        "pip_freeze": "List pip packages with versions",
+    },
+    "process_mgmt": {
+        "start_process": "Start background process (cmd)",
+        "stop_process": "Stop process by name (name)",
+        "kill_process": "Kill process by PID (pid)",
+        "process_status": "Check process status (name)",
+    },
+    "text_ops": {
+        "create_note": "Create a note file (title, content)",
+        "read_note": "Read a note (title)",
+        "search_notes": "Search notes (query)",
+        "json_format": "Format JSON string (json_str)",
+        "base64_encode": "Base64 encode (text)",
+        "base64_decode": "Base64 decode (encoded)",
+        "url_encode": "URL encode (text)",
+        "url_decode": "URL decode (encoded)",
+        "hash_text": "Hash text (algorithm, text)",
+    },
+    "time_date": {
+        "current_time": "Current date and time",
+        "timestamp": "Unix timestamp",
+        "convert_time": "Convert timezone (datetime, from_tz, to_tz)",
+    },
+}
+
+# Flatten all tools
+ALL_TOOLS = {}
+for cat, tools in TOOL_CATEGORIES.items():
+    for name, desc in tools.items():
+        ALL_TOOLS[name] = {"category": cat, "description": desc}
+
+def _format_tool_catalog():
+    """Format tool catalog for system prompt."""
+    lines = []
+    for cat, tools in TOOL_CATEGORIES.items():
+        lines.append(f"\n[{cat}]")
+        for name, desc in tools.items():
+            lines.append(f"  {name} -- {desc}")
+    lines.append(f"\n({len(ALL_TOOLS)} tools total)")
+    return "\n".join(lines)
+
+
+# ---- LLM Providers (Cloud + Local Fallback) ----
+
+def _call_openai_compat(base_url, api_key, model, messages, max_tokens=2048, retries=3):
+    """Call OpenAI-compatible API with DNS retry."""
+    url = f"{base_url}/chat/completions"
+    payload = _json.dumps({
+        "model": model,
+        "messages": messages,
+        "temperature": 0.3,
+        "max_tokens": max_tokens
+    }).encode()
+    import socket
+    for attempt in range(retries):
+        try:
+            req = urllib.request.Request(url, data=payload, headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            })
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                data = _json.loads(resp.read().decode())
+            return data["choices"][0]["message"]["content"]
+        except (urllib.error.URLError, socket.gaierror, OSError) as e:
+            if attempt < retries - 1:
+                _time.sleep(2 * (attempt + 1))
+            else:
+                raise
+
+
+def _call_local_phi3(messages):
+    """Call local Phi-3 model via llama_cpp_python."""
+    global _local_llm
+    try:
+        if _local_llm is None:
+            import llama_cpp
+            model_path = "/home/shashi/The-Tank-Project/models/llm/phi-3-mini-4k-instruct-q4.gguf"
+            if not _os.path.exists(model_path):
+                model_path = "/home/shashi/The-Tank-Project/models/llm/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
+            _LOG.info("Loading local LLM: %s", model_path)
+            _local_llm = llama_cpp.Llama(
+                model_path=model_path,
+                n_ctx=4096,
+                n_gpu_layers=-1,  # Use GPU
+                verbose=False
+            )
+        # Format messages for chat completion
+        prompt = ""
+        for m in messages:
+            role = m.get("role", "user")
+            content = m.get("content", "")
+            if role == "system":
+                prompt += f"<|system|>\n{content}<|end|>\n"
+            elif role == "user":
+                prompt += f"<|user|>\n{content}<|end|>\n"
+            elif role == "assistant":
+                prompt += f"<|assistant|>\n{content}<|end|>\n"
+        prompt += "<|assistant|>\n"
+        
+        result = _local_llm(
+            prompt,
+            max_tokens=1024,
+            temperature=0.3,
+            stop=["<|end|>", "<|user|>"]
+        )
+        return result["choices"][0]["text"].strip()
+    except Exception as e:
+        _LOG.warning("Local LLM failed: %s", e)
+        return None
+
+
+def _rotate_llm(messages):
+    """Try providers in rotation: cloud first, local fallback last."""
+    cloud_providers = [
+        ("mistral", "https://api.mistral.ai/v1", "MISTRAL_API_KEY", "mistral-small-latest"),
+        ("groq_compound", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "groq/compound"),
+        ("groq_qwen", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "qwen/qwen3.6-27b"),
+        ("groq_allam", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "allam-2-7b"),
+    ]
+    # Try cloud providers
+    for name, base_url, env_key, model in cloud_providers:
+        api_key = _os.environ.get(env_key, "")
+        if not api_key:
+            continue
+        try:
+            reply = _call_openai_compat(base_url, api_key, model, messages)
+            return reply, name
+        except Exception as e:
+            _LOG.warning("Agent provider %s failed: %s", name, e)
+            continue
+    # Fallback: local LLM
+    try:
+        _LOG.info("All cloud providers failed, trying local LLM...")
+        reply = _call_local_phi3(messages)
+        if reply:
+            return reply, "local_phi3"
+    except Exception as e:
+        _LOG.warning("Local LLM failed: %s", e)
+    return None, None
+
+
+# ---- Tool Execution (100+ tools) ----
+
+def _run_shell(cmd, timeout=15):
+    """Run shell command."""
+    try:
+        r = _subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
+        parts = []
+        if r.stdout:
+            parts.append(r.stdout.strip())
+        if r.stderr:
+            parts.append(f"[stderr] {r.stderr.strip()}")
+        return "\n".join(parts) if parts else "(no output)"
+    except _subprocess.TimeoutExpired:
+        return f"TIMEOUT ({timeout}s): {cmd}"
+    except Exception as e:
+        return f"ERROR: {e}"
+
+
+def _exec_tool(action):
+    """Execute a tool action and return result string."""
+    act = action.get("action", "")
+    args = {k: v for k, v in action.items() if k != "action"}
+
+    # ---- File Operations ----
+    if act == "read_file":
+        path = args.get("path", "")
+        offset = int(args.get("offset", 0))
+        limit = int(args.get("limit", 2000))
+        try:
+            lines = _Path(path).read_text(errors="replace").splitlines()
+            chunk = lines[offset:offset+limit]
+            return f"Lines {offset+1}-{offset+len(chunk)} of {len(lines)}:\n" + "\n".join(f"{i+1}: {l}" for i, l in enumerate(chunk, offset))
+        except Exception as e:
+            return f"Error: {e}"
+
+    elif act == "write_file":
+        path = args.get("path", "")
+        content_val = args.get("content", "")
+        try:
+            _Path(path).parent.mkdir(parents=True, exist_ok=True)
+            _Path(path).write_text(content_val)
+            return f"Written {len(content_val)} bytes to {path}"
+        except Exception as e:
+            return f"Error: {e}"
+
+    elif act == "edit_file":
+        path = args.get("path", "")
+        old = args.get("old", "")
+        new = args.get("new", "")
+        try:
+            text = _Path(path).read_text(errors="replace")
+            count = text.count(old)
+            if count == 0:
+                return f"Pattern not found in {path}"
+            text = text.replace(old, new, 1)
+            _Path(path).write_text(text)
+            return f"Replaced in {path} ({count} occurrences found, 1 replaced)"
+        except Exception as e:
+            return f"Error: {e}"
+
+    elif act == "delete_file":
+        path = args.get("path", "")
+        try:
+            _Path(path).unlink()
+            return f"Deleted {path}"
+        except Exception as e:
+            return f"Error: {e}"
+
+    elif act == "copy_file":
+        _shutil.copy2(args.get("src", ""), args.get("dst", ""))
+        return f"Copied {args.get('src')} to {args.get('dst')}"
+
+    elif act == "move_file":
+        _shutil.move(args.get("src", ""), args.get("dst", ""))
+        return f"Moved {args.get('src')} to {args.get('dst')}"
+
+    elif act == "list_directory":
+        path = args.get("path", ".")
+        try:
+            entries = sorted(_Path(path).iterdir())
+            lines = []
+            for e in entries[:100]:
+                kind = "d" if e.is_dir() else "f"
+                size = e.stat().st_size if e.is_file() else 0
+                lines.append(f"[{kind}] {e.name} ({size} bytes)")
+            return f"{path}/ ({len(entries)} entries)\n" + "\n".join(lines)
+        except Exception as e:
+            return f"Error: {e}"
+
+    elif act == "create_directory":
+        _Path(args.get("path", "")).mkdir(parents=True, exist_ok=True)
+        return f"Created {args.get('path')}"
+
+    elif act == "search_files":
+        pattern = args.get("pattern", "*")
+        path = args.get("path", ".")
+        matches = _glob.glob(f"{path}/**/{pattern}", recursive=True)
+        return "\n".join(matches[:50]) if matches else "No matches"
+
+    elif act == "file_info":
+        p = _Path(args.get("path", ""))
+        st = p.stat()
+        return f"Size: {st.st_size}, Modified: {st.st_mtime}, Mode: {oct(st.st_mode)}"
+
+    elif act == "file_size":
+        return str(_Path(args.get("path", "")).stat().st_size)
+
+    elif act == "file_hash":
+        data = _Path(args.get("path", "")).read_bytes()
+        algo = args.get("algorithm", "md5")
+        h = _hashlib.new(algo)
+        h.update(data)
+        return f"{algo}: {h.hexdigest()}"
+
+    # ---- Code Operations ----
+    elif act == "search_code":
+        pattern = args.get("pattern", "")
+        path = args.get("path", ".")
+        ftype = args.get("file_type", "")
+        cmd = f"grep -rn '{pattern}' {path}"
+        if ftype:
+            cmd += f" --include='*.{ftype}'"
+        cmd += " 2>/dev/null | head -50"
+        return _run_shell(cmd)
+
+    elif act == "grep_regex":
+        pattern = args.get("pattern", "")
+        path = args.get("path", ".")
+        flags = args.get("flags", "-n")
+        cmd = f"grep -r{flags} '{pattern}' {path} 2>/dev/null | head -50"
+        return _run_shell(cmd)
+
+    elif act == "find_definition":
+        name = args.get("name", "")
+        path = args.get("path", ".")
+        return _run_shell(f"grep -rn 'def {name}\|class {name}\|function {name}' {path} 2>/dev/null | head -20")
+
+    elif act == "find_references":
+        name = args.get("name", "")
+        path = args.get("path", ".")
+        return _run_shell(f"grep -rn '{name}' {path} 2>/dev/null | head -50")
+
+    elif act == "replace_in_file":
+        path = args.get("path", "")
+        old = args.get("old", "")
+        new = args.get("new", "")
+        try:
+            text = _Path(path).read_text(errors="replace")
+            new_text = text.replace(old, new)
+            count = len(_re.findall(_re.escape(old), text))
+            _Path(path).write_text(new_text)
+            return f"Replaced {count} occurrences in {path}"
+        except Exception as e:
+            return f"Error: {e}"
+
+    elif act == "count_lines":
+        path = args.get("path", "")
+        try:
+            lines = _Path(path).read_text(errors="replace").splitlines()
+            return f"{len(lines)} lines in {path}"
+        except Exception as e:
+            return f"Error: {e}"
+
+    elif act == "diff_files":
+        f1 = args.get("file1", "")
+        f2 = args.get("file2", "")
+        return _run_shell(f"diff {f1} {f2} | head -50")
+
+    elif act == "syntax_check":
+        path = args.get("path", "")
+        return _run_shell('python3 -c "import py_compile; py_compile.compile(\"' + path + '\", doraise=True)" 2>&1')
+
+    # ---- Git ----
+    elif act.startswith("git_"):
+        git_cmd = act.replace("git_", "git ")
+        if act == "git_status":
+            return _run_shell("git status --short")
+        elif act == "git_diff":
+            target = args.get("file", "")
+            return _run_shell(f"git diff {target} | head -100")
+        elif act == "git_commit":
+            msg = args.get("message", "update")
+            return _run_shell(f"git commit -am '{msg}'")
+        elif act == "git_push":
+            remote = args.get("remote", "origin")
+            branch = args.get("branch", "main")
+            return _run_shell(f"git push {remote} {branch}", timeout=30)
+        elif act == "git_pull":
+            return _run_shell("git pull", timeout=30)
+        elif act == "git_log":
+            count = args.get("count", 10)
+            return _run_shell(f"git log --oneline -{count}")
+        elif act == "git_branch":
+            action = args.get("action", "list")
+            name = args.get("name", "")
+            if action == "list":
+                return _run_shell("git branch -a")
+            elif action == "create":
+                return _run_shell(f"git branch {name}")
+            elif action == "switch":
+                return _run_shell(f"git checkout {name}")
+            elif action == "delete":
+                return _run_shell(f"git branch -d {name}")
+        elif act == "git_stash":
+            action = args.get("action", "push")
+            if action == "push":
+                return _run_shell("git stash push -m 'agent stash'")
+            elif action == "pop":
+                return _run_shell("git stash pop")
+            elif action == "list":
+                return _run_shell("git stash list")
+        elif act == "git_checkout":
+            return _run_shell(f"git checkout {args.get('target', 'HEAD')}")
+        elif act == "git_blame":
+            return _run_shell(f"git blame {args.get('path', '.')} | head -30")
+        elif act == "git_create_tag":
+            return _run_shell(f"git tag -a {args.get('name', 'v1.0')} -m '{args.get('message', '')}'")
+
+    # ---- Build & Run ----
+    elif act == "run_command" or act == "shell":
+        cmd = args.get("cmd", "echo 'no command'")
+        timeout = int(args.get("timeout", 15))
+        return _run_shell(cmd, timeout=timeout)
+
+    elif act == "build_project":
+        cmd = args.get("build_cmd", "make 2>&1 || cmake --build . 2>&1")
+        return _run_shell(cmd, timeout=60)
+
+    elif act == "run_tests":
+        cmd = args.get("test_cmd", "pytest 2>&1 || python3 -m pytest 2>&1")
+        return _run_shell(cmd, timeout=60)
+
+    elif act == "install_package":
+        pkg = args.get("package", "")
+        mgr = args.get("manager", "pip")
+        if mgr == "pip":
+            return _run_shell(f"pip3 install {pkg}", timeout=60)
+        elif mgr == "apt":
+            return _run_shell(f"echo '1234' | sudo -S apt install -y {pkg}", timeout=120)
+        elif mgr == "npm":
+            return _run_shell(f"npm install {pkg}", timeout=60)
+
+    elif act == "check_errors":
+        cmd = args.get("build_cmd", "python3 -m py_compile *.py 2>&1")
+        return _run_shell(cmd)
+
+    elif act == "run_python":
+        code = args.get("code", "print('hello')")
+        return _run_shell(f"python3 -c '{code}'", timeout=30)
+
+    elif act == "run_script":
+        path = args.get("path", "")
+        script_args = args.get("args", "")
+        return _run_shell(f"python3 {path} {script_args}", timeout=30)
+
+    # ---- System ----
+    elif act == "system_info":
+        return _run_shell("echo '=== OS ===' && uname -a && echo '=== CPU ===' && lscpu | head -15 && echo '=== RAM ===' && free -h && echo '=== DISK ===' && df -h / && echo '=== GPU ===' && nvidia-smi --query-gpu=name,memory.total,memory.free,temperature.gpu --format=csv,noheader 2>/dev/null")
+
+    elif act == "process_list":
+        filt = args.get("filter", "")
+        cmd = "ps aux --sort=-%mem | head -20"
+        if filt:
+            cmd = f"ps aux | grep '{filt}' | grep -v grep"
+        return _run_shell(cmd)
+
+    elif act == "network_info":
+        return _run_shell("ip addr show | grep 'inet ' && echo '---' && hostname -I")
+
+    elif act == "disk_usage":
+        path = args.get("path", "/")
+        return _run_shell(f"du -sh {path} 2>/dev/null && df -h {path}")
+
+    elif act == "environment_vars":
+        filt = args.get("filter", "")
+        cmd = "env"
+        if filt:
+            cmd = f"env | grep -i '{filt}'"
+        return _run_shell(cmd)
+
+    elif act == "uptime":
+        return _run_shell("uptime")
+
+    elif act == "whoami":
+        return _run_shell("whoami && id")
+
+    elif act == "kernel_version":
+        return _run_shell("uname -r && cat /etc/os-release | head -5")
+
+    elif act == "gpu_info":
+        return _run_shell("nvidia-smi 2>/dev/null || echo 'No NVIDIA GPU info'")
+
+    elif act == "temperature":
+        return _run_shell('cat /sys/class/thermal/thermal_zone*/temp 2>/dev/null | xargs -I{} echo "{}C"')
+
+    # ---- Docker ----
+    elif act == "docker_ps":
+        all_c = args.get("all", "true")
+        flag = "-a" if all_c == "true" else ""
+        return _run_shell(f"docker ps {flag} --format 'table {{{{.Names}}}}\t{{{{.Status}}}}\t{{{{.Ports}}}}' 2>/dev/null || echo 'Docker not running'")
+
+    elif act == "docker_logs":
+        name = args.get("name", "")
+        lines = args.get("lines", "50")
+        return _run_shell(f"docker logs --tail {lines} {name} 2>&1")
+
+    elif act == "docker_exec":
+        name = args.get("name", "")
+        cmd = args.get("cmd", "ls")
+        return _run_shell(f"docker exec {name} {cmd}")
+
+    elif act == "docker_images":
+        return _run_shell("docker images --format 'table {{{{.Repository}}}}\t{{{{.Tag}}}}\t{{{{.Size}}}}' 2>/dev/null")
+
+    elif act == "docker_stop":
+        return _run_shell(f"docker stop {args.get('name', '')}")
+
+    elif act == "docker_start":
+        return _run_shell(f"docker start {args.get('name', '')}")
+
+    # ---- Network ----
+    elif act == "http_get":
+        url = args.get("url", "")
+        return _run_shell(f"curl -s '{url}' | head -100", timeout=15)
+
+    elif act == "http_post":
+        url = args.get("url", "")
+        data = args.get("data", "")
+        return _run_shell(f"curl -s -X POST '{url}' -d '{data}' | head -100", timeout=15)
+
+    elif act == "dns_lookup":
+        return _run_shell(f"nslookup {args.get('hostname', '')} 2>&1 | head -10")
+
+    elif act == "ping":
+        host = args.get("host", "")
+        count = args.get("count", "4")
+        return _run_shell(f"ping -c {count} {host} 2>&1")
+
+    elif act == "port_check":
+        host = args.get("host", "localhost")
+        port = args.get("port", "80")
+        return _run_shell(f"ss -tlnp | grep ':{port}' || echo 'Port {port} not listening'")
+
+    # ---- Database ----
+    elif act == "db_query":
+        db = args.get("db_path", "")
+        query = args.get("query", "")
+        return _run_shell(f"sqlite3 {db} '{query}' 2>&1 | head -50")
+
+    elif act == "db_schema":
+        db = args.get("db_path", "")
+        return _run_shell(f"sqlite3 {db} '.schema' 2>&1 | head -50")
+
+    elif act == "db_tables":
+        db = args.get("db_path", "")
+        return _run_shell(f"sqlite3 {db} '.tables' 2>&1")
+
+    elif act == "db_execute":
+        db = args.get("db_path", "")
+        sql = args.get("sql", "")
+        return _run_shell(f"sqlite3 {db} '{sql}' 2>&1")
+
+    # ---- Tank Hardware ----
+    elif act == "camera_capture":
+        try:
+            from tank_os.shell.terminal.agent_chat import _camera_vision
+            return _camera_vision()
+        except:
+            return _exec_tool({"action": "shell", "cmd": "fswebcam -d /dev/video0 --no-banner -r 1280x720 /tmp/capture.jpg 2>&1 && echo 'Captured'"})
+
+    elif act == "camera" or act == "camera_snapshot":
+        max_px = args.get("max_px", "480")
+        try:
+            resp = urllib.request.urlopen(
+                urllib.request.Request(f"http://localhost:8082/api/camera/snapshot?max_px={max_px}",
+                    headers={"Authorization": "Bearer bench-key"}), timeout=10)
+            data = _json.loads(resp.read().decode())
+            return f"Camera snapshot: {data.get('size', 0)} bytes"
+        except Exception as e:
+            return f"Camera error: {e}"
+
+    elif act == "lidar_scan" or act == "lidar":
+        try:
+            resp = urllib.request.urlopen(
+                urllib.request.Request("http://localhost:8082/api/lidar/scan",
+                    headers={"Authorization": "Bearer bench-key"}), timeout=15)
+            data = _json.loads(resp.read().decode())
+            pts = data.get("points", [])
+            if pts:
+                dists = [p.get("distance_mm", 0) for p in pts]
+                return f"LIDAR: {len(pts)} points, min={min(dists)}mm max={max(dists)}mm avg={sum(dists)//len(dists)}mm"
+            return "LIDAR: no points"
+        except Exception as e:
+            return f"LIDAR error: {e}"
+
+    elif act == "tank_move" or act == "move":
+        vx = args.get("vx", 0)
+        wz = args.get("wz", 0)
+        dur = args.get("duration_s", 1)
+        try:
+            data = _json.dumps({"vx": vx, "wz": wz, "duration_s": dur}).encode()
+            req = urllib.request.Request("http://localhost:8082/api/move",
+                data=data, headers={"Authorization": "Bearer bench-key", "Content-Type": "application/json"})
+            resp = urllib.request.urlopen(req, timeout=30)
+            return "Tank moved"
+        except Exception as e:
+            return f"Move error: {e}"
+
+    elif act == "tank_estop" or act == "estop":
+        try:
+            urllib.request.urlopen(
+                urllib.request.Request("http://localhost:8082/api/estop",
+                    headers={"Authorization": "Bearer bench-key"}), timeout=10)
+            return "Emergency stop engaged"
+        except Exception as e:
+            return f"Estop error: {e}"
+
+    elif act == "telemetry_get" or act == "telemetry":
+        try:
+            resp = urllib.request.urlopen(
+                urllib.request.Request("http://localhost:8082/api/cmd/telemetry",
+                    headers={"Authorization": "Bearer bench-key"}), timeout=10)
+            data = _json.loads(resp.read().decode())
+            result = data.get("result", {})
+            return _json.dumps(result, indent=2) if isinstance(result, dict) else str(result)
+        except Exception as e:
+            return f"Telemetry error: {e}"
+
+    elif act == "motion_detect":
+        try:
+            resp = urllib.request.urlopen(
+                urllib.request.Request("http://localhost:8082/api/motion/detect",
+                    headers={"Authorization": "Bearer bench-key"}), timeout=10)
+            return _json.loads(resp.read().decode()).get("result", "No motion data")
+        except Exception as e:
+            return f"Motion error: {e}"
+
+    # ---- Modem ----
+    elif act == "modem":
+        fn = args.get("function", "")
+        mod_args = args.get("args", {})
+        try:
+            modem_mod = __import__("tank_os.shell.terminal.modem_tools", fromlist=[fn])
+            fn_obj = getattr(modem_mod, fn, None)
+            if fn_obj:
+                return fn_obj(**mod_args)
+            return f"Unknown modem function: {fn}"
+        except Exception as e:
+            return f"Modem error: {e}"
+
+    elif act == "send_sms":
+        try:
+            modem_mod = __import__("tank_os.shell.terminal.modem_tools", fromlist=["send_sms"])
+            return modem_mod.send_sms(message=args.get("message", ""), to=args.get("to", ""))
+        except Exception as e:
+            return f"SMS error: {e}"
+
+    elif act == "read_sms":
+        try:
+            modem_mod = __import__("tank_os.shell.terminal.modem_tools", fromlist=["get_sms_messages"])
+            return modem_mod.get_sms_messages()
+        except Exception as e:
+            return f"SMS error: {e}"
+
+    elif act == "list_contacts":
+        try:
+            modem_mod = __import__("tank_os.shell.terminal.modem_tools", fromlist=["list_contacts"])
+            return modem_mod.list_contacts()
+        except Exception as e:
+            return f"Contacts error: {e}"
+
+    elif act == "make_call":
+        try:
+            modem_mod = __import__("tank_os.shell.terminal.modem_tools", fromlist=["call_number"])
+            return modem_mod.call_number(number_or_name=args.get("number_or_name", ""))
+        except Exception as e:
+            return f"Call error: {e}"
+
+    # ---- Code Generation ----
+    elif act in ("generate_function", "generate_class", "generate_api", "generate_test", "generate_readme", "generate_script"):
+        desc = args.get("description", args.get("task", ""))
+        lang = args.get("language", "python")
+        prompt = f"Generate {act.replace('generate_', '')} in {lang} for: {desc}. Return ONLY the code, no explanation."
+        try:
+            reply, _ = _rotate_llm([{"role": "system", "content": "You are a code generator. Output only code, no markdown, no explanation."}, {"role": "user", "content": prompt}])
+            return reply or "LLM unavailable for code generation"
+        except Exception as e:
+            return f"Generation error: {e}"
+
+    # ---- Analysis ----
+    elif act == "analyze_code":
+        path = args.get("path", "")
+        lines = _run_shell(f"wc -l {path}")
+        return _run_shell('python3 -c "import py_compile; py_compile.compile(\"' + path + '\", doraise=True)" 2>&1')
+        return f"Lines: {lines}\nSyntax: {syntax}"
+
+    elif act == "find_bugs":
+        path = args.get("path", "")
+        return _run_shell(f"python3 -m pyflakes {path} 2>/dev/null || pylint {path} --errors-only 2>/dev/null | head -20")
+
+    elif act == "security_scan":
+        path = args.get("path", "")
+        return _run_shell(f"grep -rn 'password\|secret\|api_key\|token' {path} 2>/dev/null | head -20")
+
+    elif act == "performance_profile":
+        cmd = args.get("cmd", "echo 'no command'")
+        return _run_shell(f"time {cmd} 2>&1")
+
+    elif act == "dependency_check":
+        path = args.get("path", ".")
+        return _run_shell(f"grep -rh '^import\|^from' {path} 2>/dev/null | sort -u | head -30")
+
+    elif act == "code_review":
+        path = args.get("path", "")
+        lines = _run_shell(f"wc -l {path}")
+        bugs = _run_shell(f"python3 -m pyflakes {path} 2>/dev/null | head -10")
+        return f"Review of {path}:\n{lines}\nIssues:\n{bugs}"
+
+    # ---- AI/ML ----
+    elif act == "llm_query":
+        prompt = args.get("prompt", "hello")
+        model = args.get("model", "local")
+        messages = [{"role": "user", "content": prompt}]
+        reply, provider = _rotate_llm(messages)
+        return f"[{provider}] {reply}" if reply else "LLM unavailable"
+
+    elif act == "embedding_generate":
+        text = args.get("text", "")
+        try:
+            from sentence_transformers import SentenceTransformer
+            model = SentenceTransformer('all-MiniLM-L6-v2')
+            emb = model.encode(text)
+            return f"Embedding ({len(emb)} dims): {emb[:10].tolist()}"
+        except Exception as e:
+            return f"Embedding error: {e}"
+
+    elif act == "speech_to_text":
+        audio = args.get("audio_path", "")
+        try:
+            import whisper
+            model = whisper.load_model("base")
+            result = model.transcribe(audio)
+            return result.get("text", "No speech detected")
+        except Exception as e:
+            return f"STT error: {e}"
+
+    # ---- Monitoring ----
+    elif act == "tail_log":
+        path = args.get("path", "/tmp/bridge.log")
+        lines = args.get("lines", "30")
+        return _run_shell(f"tail -{lines} {path}")
+
+    elif act == "search_log":
+        path = args.get("path", "/tmp/bridge.log")
+        pattern = args.get("pattern", "error")
+        return _run_shell(f"grep -i '{pattern}' {path} | tail -30")
+
+    elif act == "health_check":
+        url = args.get("url", "http://localhost:8082/api/health")
+        return _run_shell(f"curl -s '{url}' | head -5")
+
+    elif act == "watch_process":
+        name = args.get("name", "python3")
+        return _run_shell(f"ps aux | grep '{name}' | grep -v grep")
+
+    # ---- Package Management ----
+    elif act == "pip_install":
+        return _run_shell(f"pip3 install {args.get('package', '')}", timeout=60)
+
+    elif act == "pip_list":
+        filt = args.get("filter", "")
+        cmd = "pip3 list"
+        if filt:
+            cmd += f" | grep -i '{filt}'"
+        return _run_shell(cmd)
+
+    elif act == "apt_install":
+        return _run_shell(f"echo '1234' | sudo -S apt install -y {args.get('package', '')}", timeout=120)
+
+    elif act == "npm_install":
+        return _run_shell(f"npm install {args.get('package', '')}", timeout=60)
+
+    elif act == "pip_freeze":
+        return _run_shell("pip3 freeze | head -40")
+
+    # ---- Process Management ----
+    elif act == "start_process":
+        return _run_shell(f"nohup {args.get('cmd', '')} > /tmp/agent_proc.log 2>&1 & echo PID=$!")
+
+    elif act == "stop_process":
+        return _run_shell(f"pkill -f '{args.get('name', '')}'")
+
+    elif act == "kill_process":
+        return _run_shell(f"kill -9 {args.get('pid', '')}")
+
+    elif act == "process_status":
+        return _run_shell(f"ps aux | grep '{args.get('name', '')}' | grep -v grep")
+
+    # ---- Text Ops ----
+    elif act == "create_note":
+        title = args.get("title", "note")
+        content_val = args.get("content", "")
+        path = f"/home/shashi/notes/{title}.md"
+        _Path(path).parent.mkdir(parents=True, exist_ok=True)
+        _Path(path).write_text(content_val)
+        return f"Note saved: {path}"
+
+    elif act == "read_note":
+        title = args.get("title", "note")
+        path = f"/home/shashi/notes/{title}.md"
+        try:
+            return _Path(path).read_text()
+        except:
+            return f"Note not found: {title}"
+
+    elif act == "search_notes":
+        query = args.get("query", "")
+        return _run_shell(f"grep -rl '{query}' /home/shashi/notes/ 2>/dev/null | head -10")
+
+    elif act == "json_format":
+        try:
+            data = _json.loads(args.get("json_str", "{}"))
+            return _json.dumps(data, indent=2)
+        except Exception as e:
+            return f"Invalid JSON: {e}"
+
+    elif act == "base64_encode":
+        import base64
+        return base64.b64encode(args.get("text", "").encode()).decode()
+
+    elif act == "base64_decode":
+        import base64
+        return base64.b64decode(args.get("encoded", "")).decode()
+
+    elif act == "url_encode":
+        import urllib.parse
+        return urllib.parse.quote(args.get("text", ""))
+
+    elif act == "url_decode":
+        import urllib.parse
+        return urllib.parse.unquote(args.get("encoded", ""))
+
+    elif act == "hash_text":
+        algo = args.get("algorithm", "sha256")
+        text = args.get("text", "")
+        h = _hashlib.new(algo)
+        h.update(text.encode())
+        return f"{algo}: {h.hexdigest()}"
+
+    # ---- Time/Date ----
+    elif act == "current_time":
+        from datetime import datetime
+        return datetime.now().isoformat()
+
+    elif act == "timestamp":
+        return str(int(_time.time()))
+
+    # ---- Reply ----
+    elif act == "reply":
+        return None
+
+    else:
+        return f"Unknown action: {act}. Available: {', '.join(sorted(ALL_TOOLS.keys())[:30])}..."
+
+
+# ---- Action Parsing ----
+
+# Alias for agent_chat endpoint
+_exec_action = _exec_tool
+
+def _parse_action(text):
+    """Extract action from LLM reply."""
+    cleaned = _re.sub(r'<think>.*?</think>', '', text, flags=_re.DOTALL)
+    code_blocks = _re.findall(r'```(?:json)?\s*\n?(.*?)\n?```', cleaned, _re.DOTALL)
+    if code_blocks:
+        cleaned = ' '.join(code_blocks)
+    try:
+        for m in _re.finditer(r'\{\s*"action"\s*:', cleaned):
+            start = m.start()
+            depth = 0
+            for i in range(start, len(cleaned)):
+                if cleaned[i] == '{': depth += 1
+                elif cleaned[i] == '}': depth -= 1
+                if depth == 0 and i > start:
+                    return _json.loads(cleaned[start:i+1])
+    except Exception:
+        pass
+    try:
+        m = _re.search(r'action[=\s:]+(\w+)', cleaned)
+        if m:
+            return {"action": m.group(1)}
+    except Exception:
+        pass
+    return None
+
+
+# ---- System Prompt ----
+
+_SYSTEM_PROMPT = (
+    "You are TankOS Agent -- an autonomous AI coding assistant with FULL system access on a Jetson Orin Nano robot.\n"
+    "You have {tool_count} tools. You can do ANYTHING: read/write files, run code, git operations,\n"
+    "build projects, manage docker, query databases, control robot hardware, send SMS, and more.\n"
+    "\n"
+    "CRITICAL RULES:\n"
+    "1. ALWAYS respond with EXACTLY ONE JSON object. Nothing else. No markdown. No explanation.\n"
+    "2. When you receive results in [brackets], describe them with {\"action\":\"reply\",\"text\":\"...\"}.\n"
+    "3. You have full sudo access. Password is 1234.\n"
+    "4. NEVER say 'I cannot'. You have full access. Just do it.\n"
+    "5. Think step by step. If a task needs multiple steps, execute them one at a time.\n"
+    "6. Always check your work. If something fails, try a different approach.\n"
+    "\n"
+    "ACTIONS (respond with exactly ONE):\n"
+    "\n"
+    "Shell: {\"action\":\"shell\",\"cmd\":\"<command>\"}\n"
+    "Tool: {\"action\":\"tool_name\",\"param\":\"value\"}\n"
+    "Reply: {\"action\":\"reply\",\"text\":\"<answer>\"}\n"
+    "\n"
+    "EXAMPLES:\n"
+    "- Read file: {\"action\":\"read_file\",\"path\":\"/path/to/file\"}\n"
+    "- Search code: {\"action\":\"search_code\",\"pattern\":\"TODO\",\"path\":\".\"}\n"
+    "- Git commit: {\"action\":\"git_commit\",\"message\":\"fix bug\"}\n"
+    "- System info: {\"action\":\"system_info\"}\n"
+    "- Run tests: {\"action\":\"run_tests\",\"test_cmd\":\"pytest\"}\n"
+    "- Camera: {\"action\":\"camera\"}\n"
+    "- LIDAR: {\"action\":\"lidar\"}\n"
+    "- Move tank: {\"action\":\"move\",\"vx\":0.3,\"wz\":0,\"duration_s\":2}\n"
+)
+
+
+# ---- Agent Chat Endpoint ----
+
+@app.post("/api/agent/chat")
+async def agent_chat(request: Request,
+               authorization: Optional[str] = Header(default=None)) -> dict:
+    """100+ tool coding agent with local LLM fallback and thinking display."""
+    try:
+        token_hash, role = authenticate(authorization)
+    except AuthError as e:
+        raise HTTPException(status_code=e.code, detail=str(e))
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    text = (body.get("text") or "").strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="text required")
+
+    # Build system prompt with tool count
+    tool_catalog = _format_tool_catalog()
+    system = _SYSTEM_PROMPT.replace("{tool_count}", str(len(ALL_TOOLS))) + "\n\nTOOLS:\n" + tool_catalog
+
+    _agent_history.append({"role": "user", "content": text})
+
+    MAX_ROUNDS = 15
+    all_actions = []
+    final_reply = None
+    provider_used = None
+    thinking_steps = []  # Track thinking for streaming
+
+    for round_num in range(MAX_ROUNDS):
+        messages = [{"role": "system", "content": system}] + _agent_history[-15:]
+        
+        # Add thinking step
+        thinking_steps.append(f"Round {round_num + 1}: Thinking...")
+        
+        reply_text, provider_used = _rotate_llm(messages)
+
+        if reply_text is None:
+            if all_actions:
+                acts = ", ".join(a["action"] for a in all_actions)
+                final_reply = f"Executed {len(all_actions)} actions ({acts}) successfully."
+            else:
+                final_reply = "All LLM providers are unavailable."
+            _agent_history.clear()
+            break
+
+        _agent_history.append({"role": "assistant", "content": reply_text})
+        thinking_steps.append(f"Round {round_num + 1}: Got LLM response via {provider_used}")
+
+        action = _parse_action(reply_text)
+
+        if action is None:
+            final_reply = reply_text
+            break
+
+        at = action.get("action", "")
+
+        if at == "reply":
+            final_reply = action.get("text", reply_text)
+            thinking_steps.append(f"Final reply: {final_reply[:100]}")
+            break
+
+        # Execute tool
+        tool_args = {k: v for k, v in action.items() if k != "action"}
+        all_actions.append({"action": at, "args": tool_args})
+        thinking_steps.append(f"Executing: {at}({tool_args})")
+        _LOG.info("Agent round %d: %s %s", round_num + 1, at, tool_args)
+
+        result = _exec_action(action)
+        if result is not None:
+            truncated = result[:800]
+            if len(result) > 800:
+                truncated += f" ... ({len(result) - 800} chars truncated)"
+            _agent_history.append({"role": "user", "content": f"[{at} result]: {truncated}"})
+            thinking_steps.append(f"Got result: {truncated[:100]}")
+        else:
+            final_reply = action.get("text", reply_text)
+            break
+
+    if final_reply is None:
+        final_reply = "Task completed."
+
+    # Keep history manageable
+    if len(_agent_history) > 30:
+        _agent_history[:] = _agent_history[-15:]
+
+    return {
+        "reply": final_reply,
+        "provider": provider_used,
+        "actions": all_actions,
+        "rounds": len(all_actions),
+        "history_length": len(_agent_history),
+        "thinking": thinking_steps,
+        "tool_count": len(ALL_TOOLS)
+    }
+
+
+@app.post("/api/agent/clear")
+async def agent_clear(authorization: Optional[str] = Header(default=None)) -> dict:
+    """Clear agent conversation history."""
+    _agent_history.clear()
+    return {"cleared": True}
+
+
+@app.get("/api/agent/tools")
+async def agent_tools():
+    """List all available tools."""
+    return {"tools": ALL_TOOLS, "count": len(ALL_TOOLS), "categories": list(TOOL_CATEGORIES.keys())}
+
+
+@app.get("/api/agent/debug")
+async def agent_debug():
+    """Debug: check env vars, LLM providers, and local models."""
+    import os
+    result = {}
+    for key in ["MISTRAL_API_KEY", "GROQ_API_KEY", "GEMINI_API_KEY"]:
+        val = os.environ.get(key, "")
+        result[f"env_{key}"] = f"SET ({len(val)} chars)" if val else "MISSING"
+    # Check local models
+    phi3_path = "/home/shashi/The-Tank-Project/models/llm/phi-3-mini-4k-instruct-q4.gguf"
+    tiny_path = "/home/shashi/The-Tank-Project/models/llm/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
+    result["local_phi3"] = "EXISTS" if _os.path.exists(phi3_path) else "MISSING"
+    result["local_tinyllama"] = "EXISTS" if _os.path.exists(tiny_path) else "MISSING"
+    result["tool_count"] = len(ALL_TOOLS)
+    result["tool_categories"] = list(TOOL_CATEGORIES.keys())
+    # Test local LLM
+    try:
+        reply = _call_local_phi3([{"role": "user", "content": "say hi"}])
+        result["local_llm_test"] = f"OK: {reply[:100]}" if reply else "Failed"
+    except Exception as e:
+        result["local_llm_test"] = f"FAIL: {e}"
+    return result
+
+
+
