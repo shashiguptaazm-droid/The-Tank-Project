@@ -929,28 +929,19 @@ class AgentChat:
                         action = json.loads(clean[s:e])
                     except:
                         pass
-                if action is None and clean:
-                    clean = self._strip_json_text(clean)
+                if action is None:
+                    # Model returned text, not JSON — show it and stop
+                    clean = self._strip_json_text(resp)
                     if clean and clean not in ("Done.", "Done", "done.", "done", ""):
                         self._print_response(clean)
                         self._history.append(Turn("assistant", clean))
                         return
-                    # Model said "Done." — check if user wanted an action
-                    last_user = ""
-                    for t in reversed(self._history):
-                        if t.role == "user":
-                            last_user = t.content.lower()
-                            break
-                    if any(w in last_user for w in ["camera", "see", "photo", "capture"]):
-                        action = {"action": "camera"}
-                        # Fall through to execute camera
-                    elif any(w in last_user for w in ["sms", "send", "message"]):
-                        self._print_response("Please specify: send sms to NUMBER that MESSAGE")
-                        return
-                    elif any(w in last_user for w in ["status", "system"]):
-                        action = {"action": "shell", "cmd": "uname -a && free -h && uptime"}
-                    else:
-                        self._print_response("I need clearer instructions. Try: 'see camera', 'send sms to 7860245819', 'system status'.")
+                    # Model said "Done." with no actionable content — force inference
+                    action = self._infer_action()
+                    if action and action.get("action") == "reply":
+                        # Inference gave a reply — show it and stop
+                        self._print_response(action.get("text", "Done."))
+                        self._history.append(Turn("assistant", action.get("text", "Done.")))
                         return
 
             if action is None:
@@ -1209,7 +1200,11 @@ class AgentChat:
         if any(w in last_user for w in ["help", "?", "commands"]):
             return {"action": "reply", "text": "I can: see camera, send SMS, check system status, run shell commands, read/write files, git operations, and more."}
         
-        # Default: tell user what happened
+        # Greetings
+        if any(w in last_user for w in ["hi", "hello", "hey", "sup", "howdy", "greetings", "good morning", "good evening"]):
+            return {"action": "reply", "text": "Hello! I'm TankOS Agent. I can see through the camera, send SMS via Arduino, check system status, run commands, write code, and more. What would you like me to do?"}
+        
+        # Default
         return {"action": "reply", "text": "I'm ready. Try: 'see camera', 'send sms to 7860245819', 'system status', 'help'"}
 
     def _banner(self):
