@@ -799,6 +799,12 @@ The SIM modem is connected to the Arduino, NOT the Jetson. To send SMS, SSH to t
 - Make call: {"action":"shell","cmd":"sshpass -p '9936468425' ssh -o StrictHostKeyChecking=no arduino@192.168.31.72 'python3 /home/arduino/make_call.py --number 7860245819'"}
 
 === CRITICAL RULES ===
+
+FIRST LINE OF YOUR RESPONSE MUST BE A JSON OBJECT. NOT TEXT. NOT "Done."
+YOUR ENTIRE RESPONSE MUST BE: {"action":"camera"} or {"action":"shell","cmd":"..."} or {"action":"reply","text":"..."}
+If you output anything other than a JSON object, you have FAILED the task.
+
+
 1. ALWAYS respond with EXACTLY ONE JSON object. Nothing else.
 2. When you receive results from a tool, process them and either take the next step or reply with {"action":"reply","text":"..."}.
 3. NEVER say 'I cannot' or 'I am unable'. You have full access. Just do it.
@@ -921,9 +927,27 @@ class AgentChat:
                         pass
                 if action is None and clean:
                     clean = self._strip_json_text(clean)
-                    self._print_response(clean)
-                    self._history.append(Turn("assistant", clean))
-                    return
+                    if clean and clean not in ("Done.", "Done", "done.", "done", ""):
+                        self._print_response(clean)
+                        self._history.append(Turn("assistant", clean))
+                        return
+                    # Model said "Done." — check if user wanted an action
+                    last_user = ""
+                    for t in reversed(self._history):
+                        if t.role == "user":
+                            last_user = t.content.lower()
+                            break
+                    if any(w in last_user for w in ["camera", "see", "photo", "capture"]):
+                        action = {"action": "camera"}
+                        # Fall through to execute camera
+                    elif any(w in last_user for w in ["sms", "send", "message"]):
+                        self._print_response("Please specify: send sms to NUMBER that MESSAGE")
+                        return
+                    elif any(w in last_user for w in ["status", "system"]):
+                        action = {"action": "shell", "cmd": "uname -a && free -h && uptime"}
+                    else:
+                        self._print_response("I need clearer instructions. Try: 'see camera', 'send sms to 7860245819', 'system status'.")
+                        return
 
             if action is None:
                 return
@@ -1131,6 +1155,16 @@ class AgentChat:
                 return json.loads(text[s:e + 1])
             except json.JSONDecodeError:
                 pass
+        # LAST RESORT: detect action keywords in plain text
+        lower = text.lower().strip()
+        if any(w in lower for w in ["camera", "see", "capture", "photo", "look", "vision", "yolo", "detect"]):
+            return {"action": "camera"}
+        if any(w in lower for w in ["sms", "send sms", "message to", "text "]):
+            return {"action": "shell", "cmd": "echo 'Specify phone and message: send sms to NUMBER that MESSAGE'"}
+        if any(w in lower for w in ["status", "system", "health", "uptime"]):
+            return {"action": "shell", "cmd": "uname -a && free -h && uptime"}
+        if any(w in lower for w in ["help", "?", "commands"]):
+            return {"action": "reply", "text": "Commands: see camera, send sms, system status, help"}
         return None
 
     def _banner(self):
