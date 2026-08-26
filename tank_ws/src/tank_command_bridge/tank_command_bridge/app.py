@@ -986,6 +986,153 @@ TOOL_CATEGORIES = {
         "timestamp": "Unix timestamp",
         "convert_time": "Convert timezone (datetime, from_tz, to_tz)",
     },
+    "datetime_ops": {
+        "parse_datetime": "Parse datetime string (text, format)",
+        "format_datetime": "Format timestamp (timestamp, format)",
+        "date_diff": "Difference between dates (date1, date2)",
+        "add_days": "Add days to date (date, days)",
+        "get_day_of_week": "Day of week for date (date)",
+    },
+    "string_ops": {
+        "string_reverse": "Reverse a string (text)",
+        "string_count": "Count occurrences in text (text, substring)",
+        "string_replace_all": "Replace all occurrences (text, old, new)",
+        "string_split": "Split string by delimiter (text, delimiter)",
+        "string_join": "Join list with separator (items_comma, separator)",
+    },
+    "file_transform": {
+        "file_hash_all": "Hash with multiple algorithms (path)",
+        "file_head": "First N bytes of file (path, bytes)",
+        "file_tail": "Last N bytes of file (path, bytes)",
+        "file_line_count": "Count lines in file (path)",
+        "file_word_count": "Count words in file (path)",
+    },
+    "network_diagnostics": {
+        "trace_path": "Trace route to host (host)",
+        "latency_test": "Test latency to host (host, count)",
+        "dns_resolve_all": "Full DNS resolution (domain)",
+        "port_scan_range": "Scan port range (host, start_port, end_port)",
+        "ssl_grade": "Rate SSL config (host)",
+    },
+    "process_diagnostics": {
+        "process_tree": "Show process tree (pid_or_name)",
+        "process_open_fds": "Open file descriptors for process (pid)",
+        "process_memory_detail": "Detailed memory map (pid_or_name)",
+        "zombie_check": "Find zombie processes",
+        "process_uptime": "Process uptime (pid_or_name)",
+    },
+    "container_ops2": {
+        "docker_commit": "Commit container to image (container, image)",
+        "docker_inspect": "Inspect container (name)",
+        "docker_diff": "Container filesystem diff (name)",
+        "docker_copy_in": "Copy file to container (src, container, dst)",
+        "docker_copy_out": "Copy file from container (container, src, dst)",
+    },
+    "code_quality": {
+        "code_complexity": "Cyclomatic complexity (path)",
+        "code_duplication": "Find code duplication (path)",
+        "code_metrics": "Lines/comments/functions metrics (path)",
+        "code_quality_score": "Rate code quality (path)",
+        "dead_code_detect": "Detect dead code (path)",
+    },
+    "security_ops": {
+        "vulnerability_scan": "Scan for vulnerabilities (path)",
+        "dependency_audit": "Audit dependencies (path)",
+        "env_var_check": "Check exposed env vars",
+        "open_ports_check": "List all open ports",
+        "encryption_verify": "Verify encryption on files (path)",
+    },
+    "data_ops": {
+        "data_validate": "Validate data structure (path, schema_path)",
+        "data_clean": "Clean null/empty rows (path)",
+        "data_merge_files": "Merge multiple CSVs (paths_comma, output)",
+        "data_pivot": "Pivot CSV table (path, index_col, pivot_col, value_col)",
+        "data_aggregate": "Aggregate CSV column (path, group_col, agg_col, func)",
+    },
+    "report_ops": {
+        "generate_report": "Generate markdown report (title, sections_json)",
+        "system_report": "Full system health report",
+        "code_report": "Code quality report for project (path)",
+        "security_report": "Security audit report",
+        "performance_report": "Performance metrics report",
+    },
+    "dev_ops": {
+        "rollback_commit": "Git rollback to commit (hash)",
+        "cherry_pick_range": "Cherry pick range (start, end)",
+        "branch_cleanup": "Delete merged branches",
+        "tag_release": "Create release tag (version, message)",
+        "dependency_tree": "Show dependency tree (path)",
+    },
+    "database_ops2": {
+        "db_migrate": "Run database migration (db_path, migration_sql)",
+        "db_seed": "Seed database from CSV (db_path, csv_path, table)",
+        "db_clone": "Clone database (src_db, dst_db)",
+        "db_perf_test": "Database performance test (db_path)",
+        "db_table_info": "Detailed table info (db_path, table)",
+    },
+    "api_ops": {
+        "api_mock_server": "Start mock API server (port, routes_json)",
+        "api_rate_check": "Check API rate limits (url)",
+        "api_schema_validate": "Validate API response against schema (url, schema_path)",
+        "api_benchmark": "Benchmark API endpoint (url, iterations)",
+        "api_health_chain": "Health check multiple endpoints (urls_comma)",
+    },
+    "testing_ops": {
+        "pytest_run": "Run pytest with coverage (path)",
+        "unittest_run": "Run unittest suite (path)",
+        "test_count": "Count test functions in project (path)",
+        "test_coverage_report": "Generate coverage report (path)",
+        "test_failures": "Show test failures (path)",
+    },
+    "documentation_ops": {
+        "generate_api_docs": "Generate API documentation (path)",
+        "generate_changelog": "Generate changelog from git (count)",
+        "readme_validate": "Validate README completeness (path)",
+        "docstring_coverage": "Check docstring coverage (path)",
+        "generate_runbook": "Generate ops runbook for service (name)",
+    },
+    "git_ops2": {
+        "git_clean": "Clean untracked files (dry_run)",
+        "git_bisect_visual": "Visual bisect log",
+        "git_contributors": "List contributors with stats",
+        "git_file_history": "History of a file (path, count)",
+        "git_merge_conflicts": "Show merge conflict markers (path)",
+    },
+    "text_analysis": {
+        "text_readability": "Flesch reading ease score (text)",
+        "text_word_freq": "Word frequency analysis (text)",
+        "text_sentences": "Extract sentences from text (text)",
+        "text_language_detect": "Detect language of text (text)",
+        "text_diff_words": "Word-level diff between texts (text1, text2)",
+    },
+    "image_ops2": {
+        "image_metadata_all": "Full image metadata EXIF (path)",
+        "image_compare": "Compare two images (path1, path2)",
+        "image_histogram": "Image color histogram (path)",
+        "image_resize_batch": "Batch resize images (dir, width, height)",
+        "image_format_convert_batch": "Batch convert image formats (dir, from_ext, to_ext)",
+    },
+    "json_ops2": {
+        "json_to_toml": "Convert JSON to TOML (path)",
+        "toml_to_json": "Convert TOML to JSON (path)",
+        "json_merge_deep": "Deep merge two JSON files (path1, path2)",
+        "json_remove_keys": "Remove keys from JSON (path, keys_comma)",
+        "json_filter_values": "Filter JSON by value (path, key, operator, value)",
+    },
+    "system_ops2": {
+        "startup_services": "List startup services",
+        "cron_analyze": "Analyze cron job patterns",
+        "resource_alerts": "Check resource usage alerts (cpu_threshold, mem_threshold)",
+        "disk_health": "Disk SMART health check",
+        "network_connections_all": "All network connections with process names",
+    },
+    "shell_utils": {
+        "shell_history": "Show recent shell history (count)",
+        "alias_list": "List shell aliases",
+        "env_diff": "Diff environment variables (host1, host2)",
+        "path_check": "Check if command exists in PATH (command)",
+        "shell_completion": "Generate bash completion script (command)",
+    },
 }
 
 # Flatten all tools
@@ -1348,182 +1495,6 @@ _agent_history = []
 _local_llm = None  # Lazy-loaded llama_cpp model
 
 # ---- Tool Registry (100+ tools) ----
-
-TOOL_CATEGORIES = {
-    "file_ops": {
-        "read_file": "Read file contents (path, offset, limit)",
-        "write_file": "Write/create file (path, content)",
-        "edit_file": "Edit file lines (path, old, new)",
-        "delete_file": "Delete file (path)",
-        "copy_file": "Copy file (src, dst)",
-        "move_file": "Rename/move file (src, dst)",
-        "list_directory": "List directory contents (path)",
-        "create_directory": "Create directory (path)",
-        "search_files": "Find files by glob pattern (pattern, path)",
-        "file_info": "Get file metadata (path)",
-        "file_size": "Get file size in bytes (path)",
-        "file_hash": "Get file MD5 hash (path)",
-    },
-    "code_ops": {
-        "search_code": "Search codebase for text pattern (pattern, path, file_type)",
-        "grep_regex": "Regex search in code (pattern, path, flags)",
-        "find_definition": "Find function/class definition (name, path)",
-        "find_references": "Find all references to symbol (name, path)",
-        "replace_in_file": "Find and replace in file (path, old, new)",
-        "count_lines": "Count lines in file (path)",
-        "diff_files": "Diff two files (file1, file2)",
-        "syntax_check": "Check Python syntax (path)",
-    },
-    "git": {
-        "git_status": "Show working tree status",
-        "git_diff": "Show changes (file)",
-        "git_commit": "Commit changes (message)",
-        "git_push": "Push to remote (remote, branch)",
-        "git_pull": "Pull from remote",
-        "git_log": "Show commit history (count)",
-        "git_branch": "List/create/switch branch (action, name)",
-        "git_stash": "Stash changes (action)",
-        "git_checkout": "Checkout branch/file (target)",
-        "git_blame": "Show line-by-line blame (path)",
-        "git_create_tag": "Create tag (name, message)",
-    },
-    "build_run": {
-        "build_project": "Build the project (build_cmd)",
-        "run_tests": "Run test suite (test_cmd)",
-        "run_command": "Run arbitrary command (cmd, timeout)",
-        "install_package": "Install package (package, manager)",
-        "check_errors": "Check compilation errors (build_cmd)",
-        "run_python": "Run Python code (code)",
-        "run_script": "Run a script file (path, args)",
-    },
-    "system": {
-        "system_info": "CPU, RAM, disk, OS info",
-        "process_list": "List running processes (filter)",
-        "network_info": "Network interfaces and IPs",
-        "disk_usage": "Disk usage for path (path)",
-        "environment_vars": "Get environment variables (filter)",
-        "uptime": "System uptime",
-        "whoami": "Current user",
-        "kernel_version": "Kernel version",
-        "gpu_info": "GPU status and memory",
-        "temperature": "CPU/GPU temperature",
-    },
-    "docker": {
-        "docker_ps": "List containers (all)",
-        "docker_logs": "Container logs (name, lines)",
-        "docker_exec": "Exec in container (name, cmd)",
-        "docker_images": "List images",
-        "docker_stop": "Stop container (name)",
-        "docker_start": "Start container (name)",
-    },
-    "network": {
-        "http_get": "HTTP GET request (url, headers)",
-        "http_post": "HTTP POST request (url, data, headers)",
-        "dns_lookup": "DNS resolution (hostname)",
-        "ping": "Ping host (host, count)",
-        "curl": "Curl request (url, method, data)",
-        "port_check": "Check if port is open (host, port)",
-    },
-    "database": {
-        "db_query": "SQL query (db_path, query)",
-        "db_schema": "Show database schema (db_path)",
-        "db_tables": "List tables (db_path)",
-        "db_execute": "Execute SQL (db_path, sql)",
-    },
-    "tank_hardware": {
-        "camera_capture": "Capture from DFRobot camera + YOLO",
-        "lidar_scan": "360-degree LIDAR scan",
-        "tank_move": "Drive tank (vx, wz, duration_s)",
-        "tank_estop": "Emergency stop",
-        "telemetry_get": "Battery voltage, CPU temp",
-        "camera_snapshot": "Get camera snapshot (max_px)",
-        "motion_detect": "Motion detection frame",
-    },
-    "modem": {
-        "send_sms": "Send SMS (message, to)",
-        "read_sms": "Read SMS messages",
-        "list_contacts": "List contacts",
-        "make_call": "Dial number (number_or_name)",
-        "call_status": "Call status",
-    },
-    "code_generation": {
-        "generate_function": "Generate a function (description, language)",
-        "generate_class": "Generate a class (description, language)",
-        "generate_api": "Generate API endpoint (description, framework)",
-        "generate_test": "Generate test file (path_to_source)",
-        "generate_readme": "Generate README for project (path)",
-        "generate_script": "Generate script (description)",
-    },
-    "analysis": {
-        "analyze_code": "Code complexity analysis (path)",
-        "find_bugs": "Bug detection in code (path)",
-        "security_scan": "Security audit (path)",
-        "performance_profile": "Performance analysis (cmd)",
-        "dependency_check": "Check dependencies (path)",
-        "code_review": "Review code quality (path)",
-    },
-    "ai_ml": {
-        "llm_query": "Query local LLM (prompt, model)",
-        "embedding_generate": "Generate embeddings (text)",
-        "image_classify": "Classify image (path)",
-        "speech_to_text": "Whisper transcription (audio_path)",
-        "ocr_extract": "OCR text extraction (image_path)",
-    },
-    "monitoring": {
-        "tail_log": "Tail log file (path, lines)",
-        "search_log": "Search in log (path, pattern)",
-        "health_check": "HTTP health check (url)",
-        "watch_process": "Watch process (name, duration)",
-    },
-    "package_mgmt": {
-        "pip_install": "Install Python package (package)",
-        "pip_list": "List installed packages (filter)",
-        "apt_install": "Install system package (package)",
-        "npm_install": "Install npm package (package)",
-        "pip_freeze": "List pip packages with versions",
-    },
-    "process_mgmt": {
-        "start_process": "Start background process (cmd)",
-        "stop_process": "Stop process by name (name)",
-        "kill_process": "Kill process by PID (pid)",
-        "process_status": "Check process status (name)",
-    },
-    "text_ops": {
-        "create_note": "Create a note file (title, content)",
-        "read_note": "Read a note (title)",
-        "search_notes": "Search notes (query)",
-        "json_format": "Format JSON string (json_str)",
-        "base64_encode": "Base64 encode (text)",
-        "base64_decode": "Base64 decode (encoded)",
-        "url_encode": "URL encode (text)",
-        "url_decode": "URL decode (encoded)",
-        "hash_text": "Hash text (algorithm, text)",
-    },
-    "time_date": {
-        "current_time": "Current date and time",
-        "timestamp": "Unix timestamp",
-        "convert_time": "Convert timezone (datetime, from_tz, to_tz)",
-    },
-}
-
-# Flatten all tools
-ALL_TOOLS = {}
-for cat, tools in TOOL_CATEGORIES.items():
-    for name, desc in tools.items():
-        ALL_TOOLS[name] = {"category": cat, "description": desc}
-
-def _format_tool_catalog():
-    """Format tool catalog for system prompt."""
-    lines = []
-    for cat, tools in TOOL_CATEGORIES.items():
-        lines.append(f"\n[{cat}]")
-        for name, desc in tools.items():
-            lines.append(f"  {name} -- {desc}")
-    lines.append(f"\n({len(ALL_TOOLS)} tools total)")
-    return "\n".join(lines)
-
-
-# ---- LLM Providers (Cloud + Local Fallback) ----
 
 def _call_openai_compat(base_url, api_key, model, messages, max_tokens=2048, retries=3):
     """Call OpenAI-compatible API with DNS retry."""
@@ -2283,6 +2254,683 @@ def _exec_tool(action):
     elif act == "reply":
         return None
 
+    # ---- DateTime Ops ----
+    elif act == "parse_datetime":
+        from datetime import datetime
+        text = args.get("text", "")
+        fmt = args.get("format", "%Y-%m-%d %H:%M:%S")
+        try:
+            dt = datetime.strptime(text, fmt)
+            return "Parsed: %s (weekday: %s)" % (dt.isoformat(), dt.strftime("%A"))
+        except Exception as e:
+            return "Parse error: %s" % e
+
+    elif act == "format_datetime":
+        from datetime import datetime
+        ts = args.get("timestamp", "")
+        fmt = args.get("format", "%Y-%m-%d %H:%M:%S")
+        try:
+            dt = datetime.fromtimestamp(float(ts)) if ts else datetime.now()
+            return dt.strftime(fmt)
+        except Exception as e:
+            return "Format error: %s" % e
+
+    elif act == "date_diff":
+        from datetime import datetime
+        d1 = args.get("date1", "")
+        d2 = args.get("date2", "")
+        fmt = args.get("format", "%Y-%m-%d")
+        try:
+            dt1 = datetime.strptime(d1, fmt)
+            dt2 = datetime.strptime(d2, fmt)
+            diff = dt2 - dt1
+            return "Difference: %d days, %d hours" % (diff.days, diff.seconds // 3600)
+        except Exception as e:
+            return "Date diff error: %s" % e
+
+    elif act == "add_days":
+        from datetime import datetime, timedelta
+        date_str = args.get("date", "")
+        days = int(args.get("days", 1))
+        fmt = args.get("format", "%Y-%m-%d")
+        try:
+            dt = datetime.strptime(date_str, fmt) if date_str else datetime.now()
+            result = dt + timedelta(days=days)
+            return result.strftime(fmt)
+        except Exception as e:
+            return "Add days error: %s" % e
+
+    elif act == "get_day_of_week":
+        from datetime import datetime
+        date_str = args.get("date", "")
+        fmt = args.get("format", "%Y-%m-%d")
+        try:
+            dt = datetime.strptime(date_str, fmt) if date_str else datetime.now()
+            return "%s is a %s" % (date_str or "Today", dt.strftime("%A"))
+        except Exception as e:
+            return "Error: %s" % e
+
+    # ---- String Ops ----
+    elif act == "string_reverse":
+        text = args.get("text", "")
+        return text[::-1]
+
+    elif act == "string_count":
+        text = args.get("text", "")
+        sub = args.get("substring", "")
+        return "Found %d occurrences" % text.count(sub)
+
+    elif act == "string_replace_all":
+        text = args.get("text", "")
+        old = args.get("old", "")
+        new = args.get("new", "")
+        result = text.replace(old, new)
+        return "%d replacements. Result: %s" % (text.count(old), result[:500])
+
+    elif act == "string_split":
+        text = args.get("text", "")
+        delim = args.get("delimiter", ",")
+        parts = text.split(delim)
+        return "\n".join("%d: %s" % (i, p.strip()) for i, p in enumerate(parts))
+
+    elif act == "string_join":
+        items = args.get("items_comma", "").split(",")
+        sep = args.get("separator", ", ")
+        return sep.join(i.strip() for i in items)
+
+    # ---- File Transform ----
+    elif act == "file_hash_all":
+        path = args.get("path", "")
+        import hashlib
+        try:
+            data = _Path(path).read_bytes()
+            results = []
+            for algo in ["md5", "sha1", "sha256"]:
+                h = hashlib.new(algo)
+                h.update(data)
+                results.append("%s: %s" % (algo, h.hexdigest()))
+            return "\n".join(results) + "\nSize: %d bytes" % len(data)
+        except Exception as e:
+            return "Hash error: %s" % e
+
+    elif act == "file_head":
+        path = args.get("path", "")
+        n = int(args.get("bytes", 512))
+        try:
+            data = _Path(path).read_bytes()[:n]
+            return "First %d bytes:\n%s" % (len(data), data.decode("utf-8", "replace"))
+        except Exception as e:
+            return "Error: %s" % e
+
+    elif act == "file_tail":
+        path = args.get("path", "")
+        n = int(args.get("bytes", 512))
+        try:
+            data = _Path(path).read_bytes()
+            chunk = data[-n:]
+            return "Last %d bytes:\n%s" % (len(chunk), chunk.decode("utf-8", "replace"))
+        except Exception as e:
+            return "Error: %s" % e
+
+    elif act == "file_line_count":
+        path = args.get("path", "")
+        try:
+            lines = _Path(path).read_text(errors="replace").splitlines()
+            return "Lines: %d, Words: %d, Chars: %d" % (len(lines), sum(len(l.split()) for l in lines), sum(len(l) for l in lines))
+        except Exception as e:
+            return "Error: %s" % e
+
+    elif act == "file_word_count":
+        path = args.get("path", "")
+        return _run_shell("wc -w '%s'" % path)
+
+    # ---- Network Diagnostics ----
+    elif act == "trace_path":
+        host = args.get("host", "")
+        return _run_shell("traceroute -m 20 %s 2>/dev/null | head -25 || tracepath %s 2>/dev/null | head -25 || echo 'traceroute not available'" % (host, host))
+
+    elif act == "latency_test":
+        host = args.get("host", "localhost")
+        count = args.get("count", "10")
+        return _run_shell("ping -c %s -i 0.2 %s 2>&1 | tail -3" % (count, host))
+
+    elif act == "dns_resolve_all":
+        domain = args.get("domain", "")
+        return _run_shell("dig %s ANY +noall +answer 2>/dev/null || nslookup %s 2>/dev/null" % (domain, domain))
+
+    elif act == "port_scan_range":
+        host = args.get("host", "localhost")
+        start = int(args.get("start_port", 1))
+        end = int(args.get("end_port", 100))
+        open_ports = []
+        for p in range(start, min(end+1, start+50)):
+            import socket as _sock
+            s = _sock.socket(_sock.AF_INET, _sock.SOCK_STREAM)
+            s.settimeout(0.1)
+            if s.connect_ex((host, p)) == 0:
+                open_ports.append(p)
+            s.close()
+        return "Open ports: %s" % (open_ports if open_ports else "None found in range %d-%d" % (start, end))
+
+    elif act == "ssl_grade":
+        host = args.get("host", "")
+        result = _run_shell("echo | openssl s_client -connect %s:443 2>/dev/null | openssl x509 -noout -dates -subject -issuer -serial 2>/dev/null" % host)
+        return result or "No SSL info for %s" % host
+
+    # ---- Process Diagnostics ----
+    elif act == "process_tree":
+        target = args.get("pid_or_name", "")
+        if target.isdigit():
+            return _run_shell("pstree -p %s 2>/dev/null || ps --forest -g $(ps -o sid= -p %s) 2>/dev/null || ps aux | grep %s" % (target, target, target))
+        return _run_shell("ps aux | grep '%s' | grep -v grep" % target)
+
+    elif act == "process_open_fds":
+        pid = args.get("pid", "")
+        return _run_shell("ls -la /proc/%s/fd 2>/dev/null | head -20 || echo 'PID %s not found'" % (pid, pid))
+
+    elif act == "process_memory_detail":
+        target = args.get("pid_or_name", "")
+        if target.isdigit():
+            return _run_shell("cat /proc/%s/status 2>/dev/null | grep -E 'Vm|Name|Pid' | head -15" % target)
+        return _run_shell("ps aux --sort=-%mem | grep '%s' | head -5" % target)
+
+    elif act == "zombie_check":
+        return _run_shell("ps aux | awk '$8 ~ /Z/ {print}' | head -10 || echo 'No zombie processes'")
+
+    elif act == "process_uptime":
+        target = args.get("pid_or_name", "")
+        if target.isdigit():
+            return _run_shell("ps -p %s -o pid,etime,cmd 2>/dev/null || echo 'PID %s not found'" % (target, target))
+        return _run_shell("ps aux | grep '%s' | grep -v grep | awk '{print $2}' | head -1 | xargs -I{} ps -p {} -o pid,etime,cmd 2>/dev/null" % target)
+
+    # ---- Container Ops ----
+    elif act == "docker_commit":
+        container = args.get("container", "")
+        image = args.get("image", "snapshot")
+        return _run_shell("docker commit %s %s 2>&1" % (container, image))
+
+    elif act == "docker_inspect":
+        name = args.get("name", "")
+        return _run_shell("docker inspect %s 2>/dev/null | python3 -m json.tool 2>/dev/null | head -50 || docker inspect %s 2>&1 | head -50" % (name, name))
+
+    elif act == "docker_diff":
+        name = args.get("name", "")
+        return _run_shell("docker diff %s 2>/dev/null | head -30" % name)
+
+    elif act == "docker_copy_in":
+        src = args.get("src", "")
+        container = args.get("container", "")
+        dst = args.get("dst", "/tmp/")
+        return _run_shell("docker cp '%s' '%s:%s' 2>&1" % (src, container, dst))
+
+    elif act == "docker_copy_out":
+        container = args.get("container", "")
+        src = args.get("src", "")
+        dst = args.get("dst", "/tmp/")
+        return _run_shell("docker cp '%s:%s' '%s' 2>&1" % (container, src, dst))
+
+    # ---- Code Quality ----
+    elif act == "code_complexity":
+        path = args.get("path", "")
+        return _run_shell("python3 -m radon cc '%s' -s -a 2>/dev/null | head -30 || python3 -m mccabe '%s' 2>/dev/null | head -20 || echo 'Complexity tools not installed'" % (path, path))
+
+    elif act == "code_duplication":
+        path = args.get("path", "")
+        return _run_shell("find '%s' -name '*.py' -exec grep -l 'def ' {} + 2>/dev/null | head -20 && echo '---' && find '%s' -name '*.py' -exec md5sum {} + 2>/dev/null | sort | uniq -D -w32 | head -10" % (path, path))
+
+    elif act == "code_metrics":
+        path = args.get("path", "")
+        return _run_shell("find '%s' -name '*.py' -exec cat {} + 2>/dev/null | awk 'END{print \"Files:\", NR, \"Lines:\", FNR}' && find '%s' -name '*.py' -exec wc -l {} + 2>/dev/null | tail -1" % (path, path))
+
+    elif act == "code_quality_score":
+        path = args.get("path", "")
+        lines = _run_shell("find '%s' -name '*.py' -exec cat {} + 2>/dev/null | wc -l" % path)
+        bugs = _run_shell("python3 -m pyflakes '%s' 2>/dev/null | wc -l" % path)
+        return "Lines: %s, Potential issues: %s" % (lines.strip(), bugs.strip())
+
+    elif act == "dead_code_detect":
+        path = args.get("path", "")
+        return _run_shell("python3 -m pyflakes '%s' 2>/dev/null | grep 'imported but unused' | head -20 || echo 'pyflakes not available'" % path)
+
+    # ---- Security Ops ----
+    elif act == "vulnerability_scan":
+        path = args.get("path", ".")
+        return _run_shell("pip3 audit 2>/dev/null | head -20 || safety check 2>/dev/null | head -20 || echo 'No vulnerability scanner available. Checking for hardcoded secrets...' && grep -rn 'password\\|secret\\|api_key\\|token' '%s' --include='*.py' --include='*.env' 2>/dev/null | grep -v '.pyc' | head -20" % path)
+
+    elif act == "dependency_audit":
+        path = args.get("path", ".")
+        return _run_shell("pip3 list --outdated 2>/dev/null | head -20 && echo '---' && pip3 check 2>/dev/null | head -20 || echo 'pip check not available'")
+
+    elif act == "env_var_check":
+        import os
+        sensitive = ["password", "secret", "key", "token", "api_key", "private"]
+        exposed = []
+        for k, v in os.environ.items():
+            if any(s in k.lower() for s in sensitive):
+                exposed.append("%s=%s..." % (k, v[:10]))
+        return "Sensitive env vars: %d found\n%s" % (len(exposed), "\n".join(exposed) if exposed else "None exposed")
+
+    elif act == "open_ports_check":
+        return _run_shell("ss -tlnp 2>/dev/null | head -30 || netstat -tlnp 2>/dev/null | head -30")
+
+    elif act == "encryption_verify":
+        path = args.get("path", "")
+        return _run_shell("file '%s' && echo '---' && head -c 100 '%s' | xxd | head -5" % (path, path))
+
+    # ---- Data Ops ----
+    elif act == "data_validate":
+        path = args.get("path", "")
+        return _run_shell("head -5 '%s' && echo '---' && wc -l '%s'" % (path, path))
+
+    elif act == "data_clean":
+        path = args.get("path", "")
+        try:
+            lines = _Path(path).read_text(errors="replace").splitlines()
+            cleaned = [l for l in lines if l.strip()]
+            _Path(path).write_text("\n".join(cleaned))
+            return "Cleaned: removed %d empty lines from %d total" % (len(lines) - len(cleaned), len(lines))
+        except Exception as e:
+            return "Clean error: %s" % e
+
+    elif act == "data_merge_files":
+        paths = args.get("paths_comma", "").split(",")
+        output = args.get("output", "/tmp/merged.csv")
+        try:
+            all_lines = []
+            for p in paths:
+                p = p.strip()
+                if p and _Path(p).exists():
+                    all_lines.extend(_Path(p).read_text(errors="replace").splitlines())
+            _Path(output).write_text("\n".join(all_lines))
+            return "Merged %d files into %s (%d lines)" % (len(paths), output, len(all_lines))
+        except Exception as e:
+            return "Merge error: %s" % e
+
+    elif act == "data_pivot":
+        path = args.get("path", "")
+        return _run_shell("head -5 '%s' && echo '---Columns:' && head -1 '%s' | tr ',' '\\n' | nl" % (path, path))
+
+    elif act == "data_aggregate":
+        path = args.get("path", "")
+        func = args.get("func", "count")
+        return _run_shell("wc -l '%s' && head -3 '%s'" % (path, path))
+
+    # ---- Report Ops ----
+    elif act == "generate_report":
+        title = args.get("title", "Report")
+        return "Report: %s\nGenerated: %s" % (title, _time.strftime("%Y-%m-%d %H:%M:%S"))
+
+    elif act == "system_report":
+        info = _exec_tool({"action": "system_info"})
+        temp = _exec_tool({"action": "temperature"})
+        disk = _exec_tool({"action": "disk_usage", "path": "/"})
+        net = _exec_tool({"action": "network_info"})
+        return "=== SYSTEM REPORT ===\n%s\n\n=== TEMPERATURE ===\n%s\n\n=== DISK ===\n%s\n\n=== NETWORK ===\n%s" % (info, temp, disk, net)
+
+    elif act == "code_report":
+        path = args.get("path", ".")
+        metrics = _exec_tool({"action": "code_metrics", "path": path})
+        bugs = _exec_tool({"action": "find_bugs", "path": path})
+        return "=== CODE REPORT ===\nMetrics:\n%s\n\nIssues:\n%s" % (metrics, bugs)
+
+    elif act == "security_report":
+        secrets = _exec_tool({"action": "scan_secrets", "path": "."})
+        perms = _exec_tool({"action": "open_ports_check"})
+        envs = _exec_tool({"action": "env_var_check"})
+        return "=== SECURITY REPORT ===\nSecrets:\n%s\n\nOpen Ports:\n%s\n\nEnv Vars:\n%s" % (secrets, perms, envs)
+
+    elif act == "performance_report":
+        sys_info = _exec_tool({"action": "system_info"})
+        procs = _exec_tool({"action": "top_processes", "sort_by": "cpu", "count": "5"})
+        return "=== PERFORMANCE REPORT ===\n%s\n\nTop Processes:\n%s" % (sys_info, procs)
+
+    # ---- DevOps ----
+    elif act == "rollback_commit":
+        hash_val = args.get("hash", "HEAD~1")
+        return _run_shell("git revert --no-edit %s 2>&1 || echo 'git revert failed'" % hash_val)
+
+    elif act == "cherry_pick_range":
+        start = args.get("start", "")
+        end = args.get("end", "")
+        return _run_shell("git log --oneline %s..%s 2>/dev/null | head -10" % (start, end))
+
+    elif act == "branch_cleanup":
+        return _run_shell("git branch --merged main 2>/dev/null | grep -v 'main\\|master' | head -10 || git branch --merged 2>/dev/null | grep -v '\\*\\|main\\|master' | head -10")
+
+    elif act == "tag_release":
+        version = args.get("version", "v1.0.0")
+        message = args.get("message", "Release %s" % version)
+        return _run_shell("git tag -a '%s' -m '%s' 2>&1 && echo 'Tag created: %s'" % (version, message, version))
+
+    elif act == "dependency_tree":
+        path = args.get("path", ".")
+        return _run_shell("grep -rh '^import\\|^from' '%s' --include='*.py' 2>/dev/null | sort -u | head -30" % path)
+
+    # ---- Database Ops ----
+    elif act == "db_migrate":
+        db_path = args.get("db_path", "")
+        sql = args.get("migration_sql", "")
+        return _run_shell("echo '%s' | sqlite3 '%s' 2>&1" % (sql, db_path))
+
+    elif act == "db_seed":
+        db_path = args.get("db_path", "")
+        csv_path = args.get("csv_path", "")
+        table = args.get("table", "seed_data")
+        return _run_shell("echo '.mode csv\n.import %s %s' | sqlite3 '%s' 2>&1" % (csv_path, table, db_path))
+
+    elif act == "db_clone":
+        src = args.get("src_db", "")
+        dst = args.get("dst_db", "")
+        return _run_shell("cp '%s' '%s' && echo 'Cloned %s to %s'" % (src, dst, src, dst))
+
+    elif act == "db_perf_test":
+        db_path = args.get("db_path", "")
+        return _run_shell("time echo 'SELECT count(*) FROM sqlite_master;' | sqlite3 '%s' 2>&1" % db_path)
+
+    elif act == "db_table_info":
+        db_path = args.get("db_path", "")
+        table = args.get("table", "")
+        return _run_shell("sqlite3 '%s' '.schema %s' 2>/dev/null && sqlite3 '%s' 'SELECT count(*) FROM %s;' 2>/dev/null" % (db_path, table, db_path, table))
+
+    # ---- API Ops ----
+    elif act == "api_mock_server":
+        port = args.get("port", "8083")
+        return "Mock server would start on port %s (not implemented in agent mode)" % port
+
+    elif act == "api_rate_check":
+        url = args.get("url", "")
+        return _run_shell("curl -sI '%s' 2>/dev/null | grep -iE 'rate|limit|retry'" % url)
+
+    elif act == "api_schema_validate":
+        url = args.get("url", "")
+        resp = _exec_tool({"action": "http_get", "url": url})
+        return "Response validation:\n%s" % resp[:500]
+
+    elif act == "api_benchmark":
+        url = args.get("url", "")
+        iters = int(args.get("iterations", 10))
+        return _run_shell("for i in $(seq 1 %d); do curl -s -o /dev/null -w '%%{time_total}\\n' '%s'; done | awk '{sum+=$1; count++} END{print \"Avg:\", sum/count, \"s over\", count, \"requests\"}'" % (iters, url))
+
+    elif act == "api_health_chain":
+        urls = args.get("urls_comma", "").split(",")
+        results = []
+        for u in urls[:10]:
+            u = u.strip()
+            if u:
+                r = _run_shell("curl -s -o /dev/null -w '%%{http_code} %%{time_total}s' '%s' 2>/dev/null" % u)
+                results.append("%s: %s" % (u, r))
+        return "\n".join(results)
+
+    # ---- Testing Ops ----
+    elif act == "pytest_run":
+        path = args.get("path", ".")
+        return _run_shell("python3 -m pytest '%s' -v --tb=short 2>&1 | tail -40" % path, timeout=60)
+
+    elif act == "unittest_run":
+        path = args.get("path", ".")
+        return _run_shell("python3 -m unittest discover '%s' -v 2>&1 | tail -30" % path, timeout=60)
+
+    elif act == "test_count":
+        path = args.get("path", ".")
+        return _run_shell("grep -r 'def test_' '%s' --include='*.py' 2>/dev/null | wc -l" % path)
+
+    elif act == "test_coverage_report":
+        path = args.get("path", ".")
+        return _run_shell("python3 -m pytest --co -q '%s' 2>/dev/null | tail -10 || echo 'No tests found'" % path)
+
+    elif act == "test_failures":
+        path = args.get("path", ".")
+        return _run_shell("python3 -m pytest '%s' --tb=short 2>&1 | grep -E 'FAILED|ERROR|PASSED|passed|failed' | tail -20" % path, timeout=60)
+
+    # ---- Documentation Ops ----
+    elif act == "generate_api_docs":
+        path = args.get("path", "")
+        return _run_shell("grep -n 'def \\|class \\|@app\\.' '%s' 2>/dev/null | head -40 || grep -n 'def \\|class \\|async def' '%s' | head -40" % (path, path))
+
+    elif act == "generate_changelog":
+        count = args.get("count", "20")
+        return _run_shell("git log --pretty=format:'%%h %%s' -%s 2>/dev/null || echo 'Not a git repo'" % count)
+
+    elif act == "readme_validate":
+        path = args.get("path", "")
+        return _run_shell("ls -la '%s/README*' 2>/dev/null && echo '---' && head -20 '%s/README.md' 2>/dev/null || echo 'No README found'" % (path, path))
+
+    elif act == "docstring_coverage":
+        path = args.get("path", "")
+        total = _run_shell("grep -c 'def ' '%s' 2>/dev/null" % path)
+        documented = _run_shell("grep -c 'def .*:' '%s' 2>/dev/null" % path)
+        return "Functions: %s, With docstrings: %s" % (total.strip(), documented.strip())
+
+    elif act == "generate_runbook":
+        name = args.get("name", "service")
+        return "Runbook: %s\n\n1. Start: systemctl start %s\n2. Stop: systemctl stop %s\n3. Status: systemctl status %s\n4. Logs: journalctl -u %s -f\n5. Restart: systemctl restart %s" % (name, name, name, name, name, name)
+
+    # ---- Git Ops ----
+    elif act == "git_clean":
+        dry_run = args.get("dry_run", "true")
+        flag = "-n" if dry_run == "true" else "-f"
+        return _run_shell("git clean %s 2>&1 | head -20" % flag)
+
+    elif act == "git_bisect_visual":
+        return _run_shell("git log --oneline --graph -20 2>/dev/null || echo 'Not a git repo'")
+
+    elif act == "git_contributors":
+        return _run_shell("git shortlog -sn --all 2>/dev/null | head -15 || echo 'Not a git repo'")
+
+    elif act == "git_file_history":
+        path = args.get("path", "")
+        count = args.get("count", "10")
+        return _run_shell("git log --oneline -%s -- '%s' 2>/dev/null || echo 'Not a git repo or file not tracked'" % (count, path))
+
+    elif act == "git_merge_conflicts":
+        path = args.get("path", "")
+        return _run_shell("grep -n '<<<<<<<\\|=======\\|>>>>>>>' '%s' 2>/dev/null | head -20 || echo 'No conflict markers found'" % path)
+
+    # ---- Text Analysis ----
+    elif act == "text_readability":
+        text = args.get("text", "")
+        words = text.split()
+        sentences = text.count('.') + text.count('!') + text.count('?')
+        syllables = sum(1 for w in words if len(w) > 3)
+        score = 206.835 - 1.015 * (len(words) / max(sentences, 1)) - 84.6 * (syllables / max(len(words), 1))
+        return "Flesch score: %.1f (0=hard, 100=easy)\nWords: %d, Sentences: %d" % (score, len(words), sentences)
+
+    elif act == "text_word_freq":
+        text = args.get("text", "")
+        words = text.lower().split()
+        freq = {}
+        for w in words:
+            w = w.strip(".,;:!?\"'()[]{}")
+            if len(w) > 2:
+                freq[w] = freq.get(w, 0) + 1
+        top = sorted(freq.items(), key=lambda x: -x[1])[:20]
+        return "\n".join("%s: %d" % (w, c) for w, c in top)
+
+    elif act == "text_sentences":
+        text = args.get("text", "")
+        import re
+        sents = re.split(r'[.!?]+', text)
+        return "\n".join("%d: %s" % (i, s.strip()) for i, s in enumerate(sents[:20]) if s.strip())
+
+    elif act == "text_language_detect":
+        text = args.get("text", "")
+        common_words = {"the": "en", "is": "en", "are": "en", "el": "es", "la": "es", "de": "es", "le": "fr", "la": "fr", "der": "de", "die": "de"}
+        words = text.lower().split()[:20]
+        scores = {}
+        for w in words:
+            if w in common_words:
+                lang = common_words[w]
+                scores[lang] = scores.get(lang, 0) + 1
+        if scores:
+            best = max(scores, key=scores.get)
+            return "Detected: %s (confidence: %d/%d words)" % (best, scores[best], len(words))
+        return "Could not detect language"
+
+    elif act == "text_diff_words":
+        text1 = args.get("text1", "")
+        text2 = args.get("text2", "")
+        words1 = set(text1.split())
+        words2 = set(text2.split())
+        added = words2 - words1
+        removed = words1 - words2
+        return "Added: %d words\nRemoved: %d words\nCommon: %d words" % (len(added), len(removed), len(words1 & words2))
+
+    # ---- Image Ops ----
+    elif act == "image_metadata_all":
+        path = args.get("path", "")
+        return _run_shell("identify -verbose '%s' 2>/dev/null | head -40 || file '%s'" % (path, path))
+
+    elif act == "image_compare":
+        path1 = args.get("path1", "")
+        path2 = args.get("path2", "")
+        h1 = _run_shell("md5sum '%s'" % path1).split()[0] if path1 else ""
+        h2 = _run_shell("md5sum '%s'" % path2).split()[0] if path2 else ""
+        same = "IDENTICAL" if h1 == h2 else "DIFFERENT"
+        return "Image 1: %s\nImage 2: %s\nResult: %s" % (h1[:12], h2[:12], same)
+
+    elif act == "image_histogram":
+        path = args.get("path", "")
+        return _run_shell("convert '%s' -format %%c histogram:info:- 2>/dev/null | head -20 || echo 'ImageMagick not available'" % path)
+
+    elif act == "image_resize_batch":
+        d = args.get("dir", ".")
+        w = args.get("width", "800")
+        h = args.get("height", "600")
+        return _run_shell("find '%s' -name '*.jpg' -o -name '*.png' | head -20 | while read f; do convert \"$f\" -resize %sx%s \"$f.resized\" 2>/dev/null; done && echo 'Batch resize complete'" % (d, w, h))
+
+    elif act == "image_format_convert_batch":
+        d = args.get("dir", ".")
+        from_ext = args.get("from_ext", "jpg")
+        to_ext = args.get("to_ext", "png")
+        return _run_shell("find '%s' -name '*.%s' | head -20 | while read f; do convert \"$f\" \"${f%.%s}.%s\" 2>/dev/null; done && echo 'Batch convert complete'" % (d, from_ext, from_ext, to_ext))
+
+    # ---- JSON Ops ----
+    elif act == "json_to_toml":
+        path = args.get("path", "")
+        try:
+            data = _json.loads(_Path(path).read_text())
+            lines = []
+            for k, v in data.items():
+                if isinstance(v, dict):
+                    lines.append("[%s]" % k)
+                    for k2, v2 in v.items():
+                        lines.append('%s = "%s"' % (k2, v2))
+                elif isinstance(v, list):
+                    lines.append('%s = %s' % (k, _json.dumps(v)))
+                else:
+                    lines.append('%s = "%s"' % (k, v))
+            return "\n".join(lines)
+        except Exception as e:
+            return "JSON to TOML error: %s" % e
+
+    elif act == "toml_to_json":
+        path = args.get("path", "")
+        return _run_shell("python3 -c \"import tomllib; print(__import__('json').dumps(tomllib.load(open('%s','rb')), indent=2))\" 2>/dev/null || echo 'tomllib not available'" % path)
+
+    elif act == "json_merge_deep":
+        path1 = args.get("path1", "")
+        path2 = args.get("path2", "")
+        try:
+            d1 = _json.loads(_Path(path1).read_text())
+            d2 = _json.loads(_Path(path2).read_text())
+            def deep_merge(a, b):
+                for k, v in b.items():
+                    if k in a and isinstance(a[k], dict) and isinstance(v, dict):
+                        deep_merge(a[k], v)
+                    else:
+                        a[k] = v
+                return a
+            result = deep_merge(d1, d2)
+            return _json.dumps(result, indent=2)
+        except Exception as e:
+            return "Deep merge error: %s" % e
+
+    elif act == "json_remove_keys":
+        path = args.get("path", "")
+        keys = args.get("keys_comma", "").split(",")
+        try:
+            data = _json.loads(_Path(path).read_text())
+            removed = []
+            for k in keys:
+                k = k.strip()
+                if k in data:
+                    del data[k]
+                    removed.append(k)
+            return "Removed: %s\nRemaining: %s" % (removed, _json.dumps(data, indent=2)[:500])
+        except Exception as e:
+            return "Remove keys error: %s" % e
+
+    elif act == "json_filter_values":
+        path = args.get("path", "")
+        key = args.get("key", "")
+        op = args.get("operator", "exists")
+        value = args.get("value", "")
+        try:
+            data = _json.loads(_Path(path).read_text())
+            if isinstance(data, list):
+                filtered = []
+                for item in data:
+                    val = item.get(key)
+                    if op == "exists" and val is not None:
+                        filtered.append(item)
+                    elif op == "equals" and str(val) == value:
+                        filtered.append(item)
+                    elif op == "contains" and value in str(val):
+                        filtered.append(item)
+                return _json.dumps(filtered, indent=2)[:1000]
+            return "Data is not a list"
+        except Exception as e:
+            return "Filter error: %s" % e
+
+    # ---- System Ops ----
+    elif act == "startup_services":
+        return _run_shell("systemctl list-unit-files --type=service --state=enabled 2>/dev/null | head -20 || ls /etc/init.d/ 2>/dev/null | head -20")
+
+    elif act == "cron_analyze":
+        return _run_shell("crontab -l 2>/dev/null | grep -v '^#' | head -20 || echo 'No crontab'")
+
+    elif act == "resource_alerts":
+        cpu_thresh = args.get("cpu_threshold", "80")
+        mem_thresh = args.get("mem_threshold", "80")
+        cpu_high = _run_shell("top -bn1 | grep 'Cpu(s)' | awk '{print $2}' 2>/dev/null")
+        mem_high = _run_shell("free | awk '/Mem:/ {printf \"%%.0f\", $3/$2*100}' 2>/dev/null")
+        alerts = []
+        try:
+            if float(cpu_high.strip()) > float(cpu_thresh):
+                alerts.append("CPU HIGH: %s%%" % cpu_high.strip())
+        except:
+            pass
+        try:
+            if float(mem_high.strip()) > float(mem_thresh):
+                alerts.append("MEMORY HIGH: %s%%" % mem_high.strip())
+        except:
+            pass
+        return "CPU: %s%%, Memory: %s%%\nAlerts: %s" % (cpu_high.strip(), mem_high.strip(), alerts if alerts else "None")
+
+    elif act == "disk_health":
+        return _run_shell("smartctl -H /dev/sda 2>/dev/null | head -10 || echo 'SMART not available. Disk usage:' && df -h / | tail -1")
+
+    elif act == "network_connections_all":
+        return _run_shell("ss -tunap 2>/dev/null | head -30 || netstat -tunap 2>/dev/null | head -30")
+
+    # ---- Shell Utils ----
+    elif act == "shell_history":
+        count = args.get("count", "20")
+        return _run_shell("tail -%s ~/.bash_history 2>/dev/null || echo 'No bash history'" % count)
+
+    elif act == "alias_list":
+        return _run_shell("alias 2>/dev/null | head -20 || echo 'No aliases'")
+
+    elif act == "env_diff":
+        return _run_shell("env | sort > /tmp/env_current.txt && echo 'Current env: %d vars' $(wc -l < /tmp/env_current.txt)")
+
+    elif act == "path_check":
+        command = args.get("command", "")
+        return _run_shell("which %s 2>/dev/null || command -v %s 2>/dev/null || echo '%s not found in PATH'" % (command, command, command))
+
+    elif act == "shell_completion":
+        command = args.get("command", "")
+        return _run_shell("complete -p %s 2>/dev/null || echo 'No completion for %s'" % (command, command))
     else:
         return f"Unknown action: {act}. Available: {', '.join(sorted(ALL_TOOLS.keys())[:30])}..."
 
