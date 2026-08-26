@@ -1247,6 +1247,7 @@ def _rotate_llm(messages):
         ("gemini", "https://generativelanguage.googleapis.com/v1beta/openai", "GEMINI_API_KEY", "gemini-2.5-flash"),
         ("or_nemotron", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "nvidia/nemotron-3-super-120b-a12b:free"),
         ("or_gemma", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "google/gemma-4-31b-it:free"),
+        ("or_qwen", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "qwen/qwen3-235b-a22b:free"),
     ]
     # Try cloud providers
     for name, base_url, env_key, model in cloud_providers:
@@ -1629,6 +1630,7 @@ def _rotate_llm(messages):
         ("gemini", "https://generativelanguage.googleapis.com/v1beta/openai", "GEMINI_API_KEY", "gemini-2.5-flash"),
         ("or_nemotron", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "nvidia/nemotron-3-super-120b-a12b:free"),
         ("or_gemma", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "google/gemma-4-31b-it:free"),
+        ("or_qwen", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "qwen/qwen3-235b-a22b:free"),
     ]
     # Try cloud providers
     for name, base_url, env_key, model in cloud_providers:

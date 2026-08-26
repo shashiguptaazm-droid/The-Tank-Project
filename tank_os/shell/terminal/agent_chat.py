@@ -452,15 +452,14 @@ def _camera_vision() -> str:
 
 _PROVIDER_DEFS = [
     # === FREE ONLY — No paid models ===
-    # Groq free tier (fast, reliable, completely free)
-    ("groq_a",    "https://api.groq.com/openai/v1",  "GROQ_API_KEY",          "llama-3.3-70b-versatile"),
-    ("groq_b",    "https://api.groq.com/openai/v1",  "GROQ_API_KEY",          "llama-3.1-8b-instant"),
-    ("groq_c",    "https://api.groq.com/openai/v1",  "GROQ_API_KEY",          "gemma2-9b-it"),
-
-    # OpenRouter FREE models only (suffix :free = $0 cost)
+    # OpenRouter FREE models (most reliable, always $0)
     ("or_nemotron",  "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "nvidia/nemotron-3-super-120b-a12b:free"),
     ("or_gemma",     "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "google/gemma-4-31b-it:free"),
     ("or_ling",      "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "inclusionai/ling-3.0-flash:free"),
+    ("or_qwen",      "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "qwen/qwen3-235b-a22b:free"),
+
+    # Gemini free tier (reliable)
+    ("gemini",    "https://generativelanguage.googleapis.com/v1beta", "GEMINI_API_KEY", "gemini-2.5-flash"),
 
     # Cerebras free tier (fast inference)
     ("cerebras",  "https://api.cerebras.ai/v1",       "CEREBRAS_API_KEY",     "llama-3.3-70b"),
@@ -470,9 +469,6 @@ _PROVIDER_DEFS = [
 
     # NVIDIA free tier
     ("nvidia_nemotron", "https://integrate.api.nvidia.com/v1", "NVIDIA_API_KEY", "nvidia/nemotron-3.5-lightning-30b-a3b"),
-
-    # Gemini free tier
-    ("gemini",    "https://generativelanguage.googleapis.com/v1beta", "GEMINI_API_KEY", "gemini-2.5-flash"),
 ]
 
 _local_llm = None
@@ -597,6 +593,8 @@ def _rotate_chat(messages: list, show_thinking: bool = True) -> tuple:
                 _print_done(provider_info[0], elapsed)
             
             return result, name, elapsed
+        except KeyboardInterrupt:
+            raise
         except Exception as e:
             last_err = e
             logger.debug("Provider %s failed: %s", name, e)
@@ -769,10 +767,17 @@ For ANY coding, development, debugging, or software engineering task:
 - Debug code: {"action":"opencode","task":"Fix the bug in main.py where the API returns 500"}
 - Refactor: {"action":"opencode","task":"Refactor the authentication module to use JWT tokens"}
 
+SSH TO OTHER MACHINES (use {"action":"shell","cmd":"ssh ..."}):
+- SSH to Arduino: {"action":"shell","cmd":"ssh -o StrictHostKeyChecking=no arduino@192.168.31.72"}
+- SSH with password: {"action":"shell","cmd":"sshpass -p '9936468425' ssh -o StrictHostKeyChecking=no arduino@192.168.31.72"}
+
+CURRENT DATE/TIME: Thursday, August 27, 2026 at 00:06 
+Always use the current date/time above. NEVER hallucinate dates.
+
 EXAMPLES:
 - Camera see: {"action":"camera"}
 - System info: {"action":"shell","cmd":"uname -a && free -h && df -h"}
-- Write code: {"action":"opencode","task":"Write a Python function to calculate fibonacci numbers"}
+- SSH to device: {"action":"shell","cmd":"sshpass -p '9936468425' ssh -o StrictHostKeyChecking=no arduino@192.168.31.72 'ls'"}
 - After seeing results: {"action":"reply","text":"The system shows..."}
 """
 
@@ -894,13 +899,8 @@ class AgentChat:
                 _print_status("Detections", result[:100])
 
             elif at == "camera" and camera_used:
-                last_camera = ""
-                for t in reversed(self._history):
-                    if t.role == "tool" and "[camera]" in t.content:
-                        last_camera = t.content
-                        break
-                self._history.append(Turn("user", f"STOP. Camera already captured. Here are the results: {last_camera}\nDescribe what you see. Reply with {{\"action\":\"reply\",\"text\":\"...\"}} format."))
-                continue
+                # Allow re-capture — just update the flag
+                camera_used = True
 
             elif at == "tool":
                 tn = action.get("tool", "")
@@ -960,8 +960,8 @@ class AgentChat:
         if final:
             clean = self._strip_json_text(final)
             self._print_response(clean)
-        if len(self._history) > 8:
-            self._history = self._history[-4:]
+        if len(self._history) > 6:
+            self._history = self._history[-3:]
 
     def _print_response(self, text: str):
         """Print response with professional formatting."""
@@ -1036,6 +1036,10 @@ class AgentChat:
     def _strip_json_text(text: str) -> str:
         """Extract human-readable text from LLM response."""
         text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
+        # Remove JSON action blocks and stray artifacts
+        text = re.sub(r'\s*\{"action".*$', '', text).strip()
+        text = re.sub(r'^[}\]\s]+', '', text).strip()
+        text = re.sub(r'[}\]\s]+$', '', text).strip()
         try:
             obj = json.loads(text)
             if isinstance(obj, dict) and "text" in obj:
@@ -1101,7 +1105,12 @@ class AgentChat:
 
 
 def main():
-    AgentChat().run()
+    try:
+        AgentChat().run()
+    except KeyboardInterrupt:
+        print(f"\n  {Colors.GRAY}Bye! Session ended.{Colors.RESET}\n")
+    except Exception as e:
+        print(f"\n  {Colors.RED}Fatal error: {e}{Colors.RESET}\n")
 
 
 if __name__ == "__main__":
