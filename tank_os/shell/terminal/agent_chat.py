@@ -21,6 +21,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+from tank_os.shell.terminal.intent_engine import infer_action as _infer_from_intent
 
 logger = logging.getLogger("tank_os.agent_chat")
 
@@ -918,7 +919,7 @@ class AgentChat:
 
             # AUTO-INFER: If model returned "Done." or plain text, infer action from user intent
             if action is None or (isinstance(action, dict) and action.get("action") == "reply" and action.get("text", "").strip() in ("Done.", "Done", "done.", "done", "")):
-                action = self._infer_action()
+                action = _infer_from_intent(user_input, self._history)
 
             if action is None:
                 clean = resp.strip()
@@ -937,7 +938,7 @@ class AgentChat:
                         self._history.append(Turn("assistant", clean))
                         return
                     # Model said "Done." with no actionable content — force inference
-                    action = self._infer_action()
+                    action = _infer_from_intent(user_input, self._history)
                     if action and action.get("action") == "reply":
                         # Inference gave a reply — show it and stop
                         self._print_response(action.get("text", "Done."))
@@ -1161,51 +1162,6 @@ class AgentChat:
         if any(w in lower for w in ["help", "?", "commands"]):
             return {"action": "reply", "text": "Commands: see camera, send sms, system status, help"}
         return None
-
-    def _infer_action(self):
-        """Infer what action to take from the user's last message, ignoring model output."""
-        last_user = ""
-        for t in reversed(self._history):
-            if t.role == "user":
-                last_user = t.content.lower()
-                break
-        
-        # Camera requests
-        if any(w in last_user for w in ["camera", "see", "capture", "photo", "look", "vision", "yolo", "detect"]):
-            return {"action": "camera"}
-        
-        # SMS requests
-        if any(w in last_user for w in ["sms", "send sms", "message to", "text "]):
-            import re as _re
-            phone = _re.search(r'(\d{10})', last_user)
-            to_num = phone.group(1) if phone else "7860245819"
-            # Extract message text after common keywords
-            msg = ""
-            for sep in ["that ", "saying ", "message ", "msg ", "text "]:
-                if sep in last_user:
-                    msg = last_user.split(sep, 1)[1].strip().strip('"\'')
-                    break
-            if not msg:
-                msg = "Hello from TankOS"
-            cmd = ("sshpass -p '9936468425' ssh -o StrictHostKeyChecking=no "
-                   "arduino@192.168.31.72 'python3 /home/arduino/send_sms.py "
-                   "--to " + to_num + ' --msg "' + msg + '"')
-            return {"action": "shell", "cmd": cmd}
-        
-        # System status
-        if any(w in last_user for w in ["status", "system", "health", "uptime"]):
-            return {"action": "shell", "cmd": "uname -a && free -h && df -h && uptime"}
-        
-        # Help
-        if any(w in last_user for w in ["help", "?", "commands"]):
-            return {"action": "reply", "text": "I can: see camera, send SMS, check system status, run shell commands, read/write files, git operations, and more."}
-        
-        # Greetings
-        if any(w in last_user for w in ["hi", "hello", "hey", "sup", "howdy", "greetings", "good morning", "good evening"]):
-            return {"action": "reply", "text": "Hello! I'm TankOS Agent. I can see through the camera, send SMS via Arduino, check system status, run commands, write code, and more. What would you like me to do?"}
-        
-        # Default
-        return {"action": "reply", "text": "I'm ready. Try: 'see camera', 'send sms to 7860245819', 'system status', 'help'"}
 
     def _banner(self):
         """Professional banner with full status."""
