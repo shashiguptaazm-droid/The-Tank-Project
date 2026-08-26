@@ -526,7 +526,7 @@ async def camera_snapshot(
             authenticate(authorization)
         except AuthError:
             pass
-    return _read_serial_camera(max_px)
+    return _read_serial_camera_fast(max_px)
 
 
 # ---------------------------------------------------------------------------
@@ -551,10 +551,16 @@ def _get_serial():
                 _serial_conn = None
         return _serial_conn
 
+_last_frame_cache = {"ts": 0, "data": None}
+
 def _read_serial_camera_fast(max_px: int = 640) -> dict:
     """Fast camera read — keeps serial port open between frames."""
     import base64 as _b64
     import time as _time
+    global _last_frame_cache
+    if _time.time() - _last_frame_cache["ts"] < 1.0 and _last_frame_cache["data"]:
+        return _last_frame_cache["data"]
+
     try:
         s = _get_serial()
         if s is None:
@@ -1148,7 +1154,7 @@ def _format_tool_catalog():
         lines.append(f"\n[{cat}]")
         for name, desc in tools.items():
             lines.append(f"  {name} -- {desc}")
-    lines.append(f"\n({len(ALL_TOOLS)} tools total)")
+    lines.append(f"\n({all_tools_count} tools total)")
     return "\n".join(lines)
 
 
@@ -1170,7 +1176,7 @@ def _call_openai_compat(base_url, api_key, model, messages, max_tokens=2048, ret
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json"
             })
-            with urllib.request.urlopen(req, timeout=120) as resp:
+            with urllib.request.urlopen(req, timeout=30) as resp:
                 data = _json.loads(resp.read().decode())
             return data["choices"][0]["message"]["content"]
         except (urllib.error.URLError, socket.gaierror, OSError) as e:
@@ -1238,11 +1244,9 @@ _PAID_MODEL_BLOCKLIST = {
 def _rotate_llm(messages):
     """Try providers in rotation: cloud first, local fallback last."""
     cloud_providers = [
-        ("mistral", "https://api.mistral.ai/v1", "MISTRAL_API_KEY", "mistral-small-latest"),
-        ("groq_compound", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "groq/compound"),
+        ("gemini", "https://generativelanguage.googleapis.com/v1beta/openai", "GEMINI_API_KEY", "gemini-2.5-flash"),
         ("or_nemotron", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "nvidia/nemotron-3-super-120b-a12b:free"),
         ("or_gemma", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "google/gemma-4-31b-it:free"),
-        ("or_ling", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "inclusionai/ling-3.0-flash:free"),
     ]
     # Try cloud providers
     for name, base_url, env_key, model in cloud_providers:
@@ -1321,62 +1325,88 @@ def _parse_action(text):
 
 # ---- System Prompt ----
 
-_SYSTEM_PROMPT = (
-    "You are TankOS Agent -- an autonomous AI coding assistant with FULL system access on a Jetson Orin Nano robot.\n"
-    "You have {tool_count} tools. You can do ANYTHING: read/write files, run code, git operations,\n"
-    "build projects, manage docker, query databases, control robot hardware, send SMS, and more.\n"
-    "\n"
-    "CRITICAL RULES:\n"
-    "1. ALWAYS respond with EXACTLY ONE JSON object. Nothing else. No markdown. No explanation.\n"
-    "2. When you receive results in [brackets], describe them with {\"action\":\"reply\",\"text\":\"...\"}.\n"
-    "3. You have full sudo access. Password is 1234.\n"
-    "4. NEVER say 'I cannot'. You have full access. Just do it.\n"
-    "5. Think step by step. If a task needs multiple steps, execute them one at a time.\n"
-    "6. Always check your work. If something fails, try a different approach.\n"
-    "\n"
-    "ACTIONS (respond with exactly ONE):\n"
-    "\n"
-    "Shell: {\"action\":\"shell\",\"cmd\":\"<command>\"}\n"
-    "Tool: {\"action\":\"tool_name\",\"param\":\"value\"}\n"
-    "Reply: {\"action\":\"reply\",\"text\":\"<answer>\"}\n"
-    "\n"
-    "EXAMPLES:\n"
-    "- Read file: {\"action\":\"read_file\",\"path\":\"/path/to/file\"}\n"
-    "- Search code: {\"action\":\"search_code\",\"pattern\":\"TODO\",\"path\":\".\"}\n"
-    "- Git commit: {\"action\":\"git_commit\",\"message\":\"fix bug\"}\n"
-    "- System info: {\"action\":\"system_info\"}\n"
-    "- Run tests: {\"action\":\"run_tests\",\"test_cmd\":\"pytest\"}\n"
-    "- Camera: {\"action\":\"camera\"}\n"
-    "- LIDAR: {\"action\":\"lidar\"}\n"
-    "- Move tank: {\"action\":\"move\",\"vx\":0.3,\"wz\":0,\"duration_s\":2}\n"
-)
+_SYSTEM_PROMPT = """You are TankOS Agent — an autonomous AI with FULL system access on a Jetson Orin Nano robot.
+You can install packages, run commands, use tools, capture camera, read LiDAR, send SMS, make calls — anything.
+
+CRITICAL RULES:
+1. ALWAYS respond with EXACTLY ONE JSON object. Nothing else. No markdown. No explanation.
+2. You have full sudo access. Password is 1234. If pip/apt fails, use: echo '1234' | sudo -S <command>
+3. NEVER say 'I cannot'. You have full access. Just do it.
+
+ACTIONS (respond with exactly ONE):
+
+To run ANY shell command:
+{"action":"shell","cmd":"<bash command>"}
+
+To use a registered tool:
+{"action":"tool","tool":"<tool.name>","args":{}}
+
+To capture from the DFRobot USB camera + YOLO detection:
+{"action":"camera_capture"}
+
+To perform a 360-degree LiDAR scan:
+{"action":"lidar_scan"}
+
+To drive the tank:
+{"action":"tank_move","vx":0.3,"wz":0.0,"duration_s":2}
+
+To answer/describe results to the user:
+{"action":"reply","text":"<your answer>"}
+
+MODEM ACTIONS (use {"action":"modem","function":"<fn>","args":{}}):
+- Send SMS: {"action":"modem","function":"send_sms","args":{"message":"Hi!","to":"shashi"}}
+- List contacts: {"action":"modem","function":"list_contacts","args":{}}
+
+OPENCODE DEVELOPMENT (use {"action":"opencode","task":"<description>"}):
+For ANY coding, development, debugging, or software engineering task:
+{"action":"opencode","task":"write a python script to ping google"}
+"""
 
 
 # ---- Agent Chat Endpoint ----
 
 @app.post("/api/agent/chat")
-async def agent_chat(request: Request,
+def agent_chat(payload: dict,
                authorization: Optional[str] = Header(default=None)) -> dict:
     """100+ tool coding agent with local LLM fallback and thinking display."""
     try:
         token_hash, role = authenticate(authorization)
     except AuthError as e:
         raise HTTPException(status_code=e.code, detail=str(e))
-    try:
-        body = await request.json()
-    except Exception:
-        body = {}
+    body = payload
     text = (body.get("text") or "").strip()
     if not text:
         raise HTTPException(status_code=400, detail="text required")
 
     # Build system prompt with tool count
-    tool_catalog = _format_tool_catalog()
-    system = _SYSTEM_PROMPT.replace("{tool_count}", str(len(ALL_TOOLS))) + "\n\nTOOLS:\n" + tool_catalog
+
+    try:
+        import sys
+        sys.path.insert(0, '/home/shashi/The-Tank-Project/tank_ws/src')
+        from tank_os.agent_framework.registry import ToolRegistry
+        from pathlib import Path
+        reg = ToolRegistry(scripts_dir=Path("/home/shashi/The-Tank-Project/scripts"))
+        reg.discover()
+        
+        # SMART RAG: Only inject the tools relevant to the user's prompt!
+        relevant_tools = reg.search(text, top_k=25)
+        
+        lines = []
+        for t in relevant_tools:
+            desc = (t.description or "").strip()[:80]
+            lines.append(f"  [{t.category}] {t.name} - {desc}")
+            
+        real_catalog = "\n".join(lines)
+        system = _SYSTEM_PROMPT + "\n\nRELEVANT TOOLS FOUND FOR THIS REQUEST:\n" + (real_catalog if real_catalog else "(no specific tools matched, but you can still run standard shell commands)")
+        all_tools_count = len(reg.list())
+    except Exception as e:
+        system = _SYSTEM_PROMPT + "\n\nTOOLS:\n" + _format_tool_catalog()
+        all_tools_count = 0
+
 
     _agent_history.append({"role": "user", "content": text})
 
-    MAX_ROUNDS = 15
+    MAX_ROUNDS = 5
     all_actions = []
     final_reply = None
     provider_used = None
@@ -1453,7 +1483,7 @@ async def agent_chat(request: Request,
         "rounds": len(all_actions),
         "history_length": len(_agent_history),
         "thinking": thinking_steps,
-        "tool_count": len(ALL_TOOLS)
+        "tool_count": all_tools_count
     }
 
 
@@ -1467,7 +1497,7 @@ async def agent_clear(authorization: Optional[str] = Header(default=None)) -> di
 @app.get("/api/agent/tools")
 async def agent_tools():
     """List all available tools."""
-    return {"tools": ALL_TOOLS, "count": len(ALL_TOOLS), "categories": list(TOOL_CATEGORIES.keys())}
+    return {"tools": ALL_TOOLS, "count": all_tools_count, "categories": list(TOOL_CATEGORIES.keys())}
 
 
 @app.get("/api/agent/debug")
@@ -1542,7 +1572,7 @@ def _call_openai_compat(base_url, api_key, model, messages, max_tokens=2048, ret
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json"
             })
-            with urllib.request.urlopen(req, timeout=120) as resp:
+            with urllib.request.urlopen(req, timeout=30) as resp:
                 data = _json.loads(resp.read().decode())
             return data["choices"][0]["message"]["content"]
         except (urllib.error.URLError, socket.gaierror, OSError) as e:
@@ -1596,11 +1626,9 @@ def _call_local_phi3(messages):
 def _rotate_llm(messages):
     """Try providers in rotation: cloud first, local fallback last."""
     cloud_providers = [
-        ("mistral", "https://api.mistral.ai/v1", "MISTRAL_API_KEY", "mistral-small-latest"),
-        ("groq_compound", "https://api.groq.com/openai/v1", "GROQ_API_KEY", "groq/compound"),
+        ("gemini", "https://generativelanguage.googleapis.com/v1beta/openai", "GEMINI_API_KEY", "gemini-2.5-flash"),
         ("or_nemotron", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "nvidia/nemotron-3-super-120b-a12b:free"),
         ("or_gemma", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "google/gemma-4-31b-it:free"),
-        ("or_ling", "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "inclusionai/ling-3.0-flash:free"),
     ]
     # Try cloud providers
     for name, base_url, env_key, model in cloud_providers:
@@ -1654,6 +1682,57 @@ def _exec_tool(action):
     """Execute a tool action and return result string."""
     act = action.get("action", "")
     args = {k: v for k, v in action.items() if k != "action"}
+
+
+    # ---- Dynamic Framework Tools ----
+    if act == "tool":
+        t = args.get("tool", "")
+        if t == "camera_capture":
+            act = "camera_capture"
+        elif "lidar" in t:
+            act = "lidar_scan"
+
+    if act == "tool":
+        tool_name = args.get("tool", "")
+        tool_args = args.get("args", {})
+        try:
+            from tank_os.agent_framework.registry import ToolRegistry
+            from tank_os.agent_framework.invoker import ToolInvoker
+            from tank_os.agent_framework.schemas import ToolCallRequest
+            from pathlib import Path
+            reg = ToolRegistry(scripts_dir=Path("/home/shashi/The-Tank-Project/scripts"))
+            reg.discover()
+            invoker = ToolInvoker(reg)
+            req = ToolCallRequest(tool_name=tool_name, args=tool_args, timeout_s=30)
+            resp = invoker.invoke(req)
+            result_str = ""
+            if resp.stdout: result_str += resp.stdout.strip()
+            if resp.stderr: result_str += f"\n[stderr] {resp.stderr.strip()}"
+            if resp.error: result_str += f"\n[error] {resp.error}"
+            return result_str if result_str else "Executed successfully with no output."
+        except Exception as e:
+            return f"Tool invocation error: {e}"
+
+    elif act == "opencode":
+        task = args.get("task", "")
+        try:
+            from tank_os.agent_framework.opencode_agent import _run_opencode
+            return _run_opencode(task)
+        except Exception as e:
+            return f"OpenCode error: {e}"
+
+    elif act == "modem":
+        fn = args.get("function", "")
+        modem_args = args.get("args", {})
+        try:
+            import importlib
+            modem_mod = importlib.import_module("tank_os.shell.terminal.modem_tools")
+            fn_obj = getattr(modem_mod, fn, None)
+            if fn_obj is None:
+                return f"Unknown modem function: {fn}"
+            return fn_obj(**modem_args)
+        except Exception as e:
+            return f"Modem error: {e}"
 
     # ---- File Operations ----
     if act == "read_file":
@@ -1995,19 +2074,38 @@ def _exec_tool(action):
         return _run_shell(f"sqlite3 {db} '{sql}' 2>&1")
 
     # ---- Tank Hardware ----
-    elif act == "camera_capture":
+    elif act == "camera_capture" or act == "camera":
         try:
-            from tank_os.shell.terminal.agent_chat import _camera_vision
-            return _camera_vision()
-        except:
-            return _exec_tool({"action": "shell", "cmd": "fswebcam -d /dev/video0 --no-banner -r 1280x720 /tmp/capture.jpg 2>&1 && echo 'Captured'"})
+            from tank_os.shell.terminal.agent_chat import _run_yolo
+            import os
+            # Use the local API endpoint over HTTP so it goes through the lock safely
+            import urllib.request
+            resp = urllib.request.urlopen("http://localhost:8082/api/camera/snapshot?max_px=640", timeout=5)
+            import json
+            data = json.loads(resp.read().decode())
+            if not data or not data.get("data_url"):
+                return "Camera 1: Not available or blocked by telemetry loop."
+            
+            b64 = data["data_url"].split("base64,")[1]
+            import base64
+            jpeg_bytes = base64.b64decode(b64)
+            
+            out_path = "/home/shashi/The-Tank-Project/data/frames/agent_latest.jpg"
+            os.makedirs(os.path.dirname(out_path), exist_ok=True)
+            with open(out_path, "wb") as f:
+                f.write(jpeg_bytes)
+                
+            detections = _run_yolo(out_path)
+            return f"Camera 1: {detections}"
+        except Exception as e:
+            return f"Camera error: {e}" 
 
-    elif act == "camera" or act == "camera_snapshot":
+    elif act == "camera_snapshot":
         max_px = args.get("max_px", "480")
         try:
             resp = urllib.request.urlopen(
                 urllib.request.Request(f"http://localhost:8082/api/camera/snapshot?max_px={max_px}",
-                    headers={"Authorization": "Bearer bench-key"}), timeout=10)
+                    headers={"Authorization": f"Bearer {_os.environ.get('TANK_API_KEY', 'tankos-dev-key-2024')}"}), timeout=10)
             data = _json.loads(resp.read().decode())
             return f"Camera snapshot: {data.get('size', 0)} bytes"
         except Exception as e:
@@ -2017,7 +2115,7 @@ def _exec_tool(action):
         try:
             resp = urllib.request.urlopen(
                 urllib.request.Request("http://localhost:8082/api/lidar/scan",
-                    headers={"Authorization": "Bearer bench-key"}), timeout=15)
+                    headers={"Authorization": f"Bearer {_os.environ.get('TANK_API_KEY', 'tankos-dev-key-2024')}"}), timeout=15)
             data = _json.loads(resp.read().decode())
             pts = data.get("points", [])
             if pts:
@@ -2034,7 +2132,7 @@ def _exec_tool(action):
         try:
             data = _json.dumps({"vx": vx, "wz": wz, "duration_s": dur}).encode()
             req = urllib.request.Request("http://localhost:8082/api/move",
-                data=data, headers={"Authorization": "Bearer bench-key", "Content-Type": "application/json"})
+                data=data, headers={"Authorization": f"Bearer {_os.environ.get('TANK_API_KEY', 'tankos-dev-key-2024')}", "Content-Type": "application/json"})
             resp = urllib.request.urlopen(req, timeout=30)
             return "Tank moved"
         except Exception as e:
@@ -2044,7 +2142,7 @@ def _exec_tool(action):
         try:
             urllib.request.urlopen(
                 urllib.request.Request("http://localhost:8082/api/estop",
-                    headers={"Authorization": "Bearer bench-key"}), timeout=10)
+                    headers={"Authorization": f"Bearer {_os.environ.get('TANK_API_KEY', 'tankos-dev-key-2024')}"}), timeout=10)
             return "Emergency stop engaged"
         except Exception as e:
             return f"Estop error: {e}"
@@ -2053,7 +2151,7 @@ def _exec_tool(action):
         try:
             resp = urllib.request.urlopen(
                 urllib.request.Request("http://localhost:8082/api/cmd/telemetry",
-                    headers={"Authorization": "Bearer bench-key"}), timeout=10)
+                    headers={"Authorization": f"Bearer {_os.environ.get('TANK_API_KEY', 'tankos-dev-key-2024')}"}), timeout=10)
             data = _json.loads(resp.read().decode())
             result = data.get("result", {})
             return _json.dumps(result, indent=2) if isinstance(result, dict) else str(result)
@@ -2064,7 +2162,7 @@ def _exec_tool(action):
         try:
             resp = urllib.request.urlopen(
                 urllib.request.Request("http://localhost:8082/api/motion/detect",
-                    headers={"Authorization": "Bearer bench-key"}), timeout=10)
+                    headers={"Authorization": f"Bearer {_os.environ.get('TANK_API_KEY', 'tankos-dev-key-2024')}"}), timeout=10)
             return _json.loads(resp.read().decode()).get("result", "No motion data")
         except Exception as e:
             return f"Motion error: {e}"
@@ -3007,62 +3105,88 @@ def _parse_action(text):
 
 # ---- System Prompt ----
 
-_SYSTEM_PROMPT = (
-    "You are TankOS Agent -- an autonomous AI coding assistant with FULL system access on a Jetson Orin Nano robot.\n"
-    "You have {tool_count} tools. You can do ANYTHING: read/write files, run code, git operations,\n"
-    "build projects, manage docker, query databases, control robot hardware, send SMS, and more.\n"
-    "\n"
-    "CRITICAL RULES:\n"
-    "1. ALWAYS respond with EXACTLY ONE JSON object. Nothing else. No markdown. No explanation.\n"
-    "2. When you receive results in [brackets], describe them with {\"action\":\"reply\",\"text\":\"...\"}.\n"
-    "3. You have full sudo access. Password is 1234.\n"
-    "4. NEVER say 'I cannot'. You have full access. Just do it.\n"
-    "5. Think step by step. If a task needs multiple steps, execute them one at a time.\n"
-    "6. Always check your work. If something fails, try a different approach.\n"
-    "\n"
-    "ACTIONS (respond with exactly ONE):\n"
-    "\n"
-    "Shell: {\"action\":\"shell\",\"cmd\":\"<command>\"}\n"
-    "Tool: {\"action\":\"tool_name\",\"param\":\"value\"}\n"
-    "Reply: {\"action\":\"reply\",\"text\":\"<answer>\"}\n"
-    "\n"
-    "EXAMPLES:\n"
-    "- Read file: {\"action\":\"read_file\",\"path\":\"/path/to/file\"}\n"
-    "- Search code: {\"action\":\"search_code\",\"pattern\":\"TODO\",\"path\":\".\"}\n"
-    "- Git commit: {\"action\":\"git_commit\",\"message\":\"fix bug\"}\n"
-    "- System info: {\"action\":\"system_info\"}\n"
-    "- Run tests: {\"action\":\"run_tests\",\"test_cmd\":\"pytest\"}\n"
-    "- Camera: {\"action\":\"camera\"}\n"
-    "- LIDAR: {\"action\":\"lidar\"}\n"
-    "- Move tank: {\"action\":\"move\",\"vx\":0.3,\"wz\":0,\"duration_s\":2}\n"
-)
+_SYSTEM_PROMPT = """You are TankOS Agent — an autonomous AI with FULL system access on a Jetson Orin Nano robot.
+You can install packages, run commands, use tools, capture camera, read LiDAR, send SMS, make calls — anything.
+
+CRITICAL RULES:
+1. ALWAYS respond with EXACTLY ONE JSON object. Nothing else. No markdown. No explanation.
+2. You have full sudo access. Password is 1234. If pip/apt fails, use: echo '1234' | sudo -S <command>
+3. NEVER say 'I cannot'. You have full access. Just do it.
+
+ACTIONS (respond with exactly ONE):
+
+To run ANY shell command:
+{"action":"shell","cmd":"<bash command>"}
+
+To use a registered tool:
+{"action":"tool","tool":"<tool.name>","args":{}}
+
+To capture from the DFRobot USB camera + YOLO detection:
+{"action":"camera_capture"}
+
+To perform a 360-degree LiDAR scan:
+{"action":"lidar_scan"}
+
+To drive the tank:
+{"action":"tank_move","vx":0.3,"wz":0.0,"duration_s":2}
+
+To answer/describe results to the user:
+{"action":"reply","text":"<your answer>"}
+
+MODEM ACTIONS (use {"action":"modem","function":"<fn>","args":{}}):
+- Send SMS: {"action":"modem","function":"send_sms","args":{"message":"Hi!","to":"shashi"}}
+- List contacts: {"action":"modem","function":"list_contacts","args":{}}
+
+OPENCODE DEVELOPMENT (use {"action":"opencode","task":"<description>"}):
+For ANY coding, development, debugging, or software engineering task:
+{"action":"opencode","task":"write a python script to ping google"}
+"""
 
 
 # ---- Agent Chat Endpoint ----
 
 @app.post("/api/agent/chat")
-async def agent_chat(request: Request,
+def agent_chat(payload: dict,
                authorization: Optional[str] = Header(default=None)) -> dict:
     """100+ tool coding agent with local LLM fallback and thinking display."""
     try:
         token_hash, role = authenticate(authorization)
     except AuthError as e:
         raise HTTPException(status_code=e.code, detail=str(e))
-    try:
-        body = await request.json()
-    except Exception:
-        body = {}
+    body = payload
     text = (body.get("text") or "").strip()
     if not text:
         raise HTTPException(status_code=400, detail="text required")
 
     # Build system prompt with tool count
-    tool_catalog = _format_tool_catalog()
-    system = _SYSTEM_PROMPT.replace("{tool_count}", str(len(ALL_TOOLS))) + "\n\nTOOLS:\n" + tool_catalog
+
+    try:
+        import sys
+        sys.path.insert(0, '/home/shashi/The-Tank-Project/tank_ws/src')
+        from tank_os.agent_framework.registry import ToolRegistry
+        from pathlib import Path
+        reg = ToolRegistry(scripts_dir=Path("/home/shashi/The-Tank-Project/scripts"))
+        reg.discover()
+        
+        # SMART RAG: Only inject the tools relevant to the user's prompt!
+        relevant_tools = reg.search(text, top_k=25)
+        
+        lines = []
+        for t in relevant_tools:
+            desc = (t.description or "").strip()[:80]
+            lines.append(f"  [{t.category}] {t.name} - {desc}")
+            
+        real_catalog = "\n".join(lines)
+        system = _SYSTEM_PROMPT + "\n\nRELEVANT TOOLS FOUND FOR THIS REQUEST:\n" + (real_catalog if real_catalog else "(no specific tools matched, but you can still run standard shell commands)")
+        all_tools_count = len(reg.list())
+    except Exception as e:
+        system = _SYSTEM_PROMPT + "\n\nTOOLS:\n" + _format_tool_catalog()
+        all_tools_count = 0
+
 
     _agent_history.append({"role": "user", "content": text})
 
-    MAX_ROUNDS = 15
+    MAX_ROUNDS = 5
     all_actions = []
     final_reply = None
     provider_used = None
@@ -3133,7 +3257,7 @@ async def agent_chat(request: Request,
         "rounds": len(all_actions),
         "history_length": len(_agent_history),
         "thinking": thinking_steps,
-        "tool_count": len(ALL_TOOLS)
+        "tool_count": all_tools_count
     }
 
 
@@ -3147,7 +3271,7 @@ async def agent_clear(authorization: Optional[str] = Header(default=None)) -> di
 @app.get("/api/agent/tools")
 async def agent_tools():
     """List all available tools."""
-    return {"tools": ALL_TOOLS, "count": len(ALL_TOOLS), "categories": list(TOOL_CATEGORIES.keys())}
+    return {"tools": ALL_TOOLS, "count": all_tools_count, "categories": list(TOOL_CATEGORIES.keys())}
 
 
 @app.get("/api/agent/debug")

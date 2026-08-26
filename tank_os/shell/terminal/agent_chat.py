@@ -147,20 +147,24 @@ def _print_variables(variables: Dict[str, Any]):
 
 def _capture_frame() -> Optional[str]:
     """Capture JPEG from the camera — HTTP bridge or legacy USB serial."""
-    cam_url = os.environ.get("TANK_CAM_URL", "").rstrip("/")
-    if cam_url:
-        try:
-            import urllib.request
-            with urllib.request.urlopen(f"{cam_url}/snapshot.jpg", timeout=8) as resp:
-                jpeg = resp.read()
+    try:
+        # Loopback to Uvicorn API to safely bypass hardware lock
+        import urllib.request
+        import json
+        import base64
+        resp = urllib.request.urlopen("http://localhost:8082/api/camera/snapshot?max_px=640", timeout=5)
+        data = json.loads(resp.read().decode())
+        if data and data.get("data_url"):
+            b64 = data["data_url"].split("base64,")[1]
+            jpeg = base64.b64decode(b64)
             if len(jpeg) >= 500:
                 out = _PROJECT_ROOT / "data" / "frames"
                 out.mkdir(parents=True, exist_ok=True)
                 path = out / "latest.jpg"
                 path.write_bytes(jpeg)
                 return str(path)
-        except Exception as e:
-            logger.debug("HTTP camera capture failed: %s", e)
+    except Exception as e:
+        logger.debug("Local HTTP API camera capture failed: %s", e)
 
     try:
         import serial as _serial
@@ -309,6 +313,20 @@ def _read_lidar() -> str:
     deg*100) | checksum(2) | count x distance(u16 LE, mm).
     Verified live on /dev/ttyUSB0 — 2026-08-25.
     """
+    try:
+        import urllib.request
+        import json
+        resp = urllib.request.urlopen("http://localhost:8082/api/lidar/scan", timeout=5)
+        data = json.loads(resp.read().decode())
+        pts = data.get("points", [])
+        if pts:
+            dists = [p.get("distance", p.get("dist_mm", 0)) for p in pts]
+            return f"LiDAR: {len(pts)} points, min={min(dists)}mm max={max(dists)}mm avg={sum(dists)//len(dists)}mm"
+        else:
+            return "LiDAR error: device reports readiness to read but returned no data"
+    except Exception as e:
+        return f"LiDAR error: {e}"
+
     lidar_port = os.environ.get("TANK_LIDAR_PORT", "/dev/ttyUSB0")
     lidar_baud = int(os.environ.get("TANK_LIDAR_BAUD", "115200"))
     if not Path(lidar_port).exists():
@@ -433,15 +451,27 @@ def _camera_vision() -> str:
 # ═══════════════════════════════════════════════════════════════════════════
 
 _PROVIDER_DEFS = [
-    # PRIMARY — fast, reliable
-    ("groq_a",    "https://api.groq.com/openai/v1",  "GROQ_API_KEY",          "openai/gpt-oss-120b"),
-    ("groq_b",    "https://api.groq.com/openai/v1",  "GROQ_API_KEY",          "openai/gpt-oss-20b"),
-    ("groq_c",    "https://api.groq.com/openai/v1",  "GROQ_API_KEY",          "allam-2-7b"),
-    ("mistral",   "https://api.mistral.ai/v1",        "MISTRAL_API_KEY",       "mistral-small-latest"),
-    ("nvidia_nemotron_light", "https://integrate.api.nvidia.com/v1", "NVIDIA_API_KEY", "nvidia/nemotron-3.5-lightning-30b-a3b"),
-    ("nvidia_vision", "https://integrate.api.nvidia.com/v1", "NVIDIA_API_KEY_3",  "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"),
-    # FALLBACK
-    ("nvidia_ultra", "https://integrate.api.nvidia.com/v1", "NVIDIA_API_KEY_2",   "nvidia/nemotron-3-ultra-550b-a55b"),
+    # === FREE ONLY — No paid models ===
+    # Groq free tier (fast, reliable, completely free)
+    ("groq_a",    "https://api.groq.com/openai/v1",  "GROQ_API_KEY",          "llama-3.3-70b-versatile"),
+    ("groq_b",    "https://api.groq.com/openai/v1",  "GROQ_API_KEY",          "llama-3.1-8b-instant"),
+    ("groq_c",    "https://api.groq.com/openai/v1",  "GROQ_API_KEY",          "gemma2-9b-it"),
+
+    # OpenRouter FREE models only (suffix :free = $0 cost)
+    ("or_nemotron",  "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "nvidia/nemotron-3-super-120b-a12b:free"),
+    ("or_gemma",     "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "google/gemma-4-31b-it:free"),
+    ("or_ling",      "https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "inclusionai/ling-3.0-flash:free"),
+
+    # Cerebras free tier (fast inference)
+    ("cerebras",  "https://api.cerebras.ai/v1",       "CEREBRAS_API_KEY",     "llama-3.3-70b"),
+
+    # Cloudflare Workers AI (free tier)
+    ("cloudflare","https://api.cloudflare.com/client/v4/accounts/e5f9992bb6193c3a5e0fca71a6c772b8/ai/v1", "CLOUDFLARE_WORKER_API_KEY", "@cf/meta/llama-3-8b-instruct"),
+
+    # NVIDIA free tier
+    ("nvidia_nemotron", "https://integrate.api.nvidia.com/v1", "NVIDIA_API_KEY", "nvidia/nemotron-3.5-lightning-30b-a3b"),
+
+    # Gemini free tier
     ("gemini",    "https://generativelanguage.googleapis.com/v1beta", "GEMINI_API_KEY", "gemini-2.5-flash"),
 ]
 
@@ -449,6 +479,14 @@ _local_llm = None
 
 
 def _call_openai_shaped(base_url: str, api_key: str, model: str, messages: list) -> str:
+    # SAFETY: Block any paid model
+    _PAID_BLOCKLIST = {"mistral-small-latest", "mistral-large-latest", "deepseek-chat",
+                       "gpt-4", "gpt-4o", "gpt-5", "gpt-5-mini", "gpt-4o-mini",
+                       "claude-sonnet-5", "claude-haiku-4.5"}
+    if model in _PAID_BLOCKLIST:
+        raise RuntimeError(f"BLOCKED paid model: {model}")
+    if "openrouter" in base_url and not model.endswith(":free"):
+        raise RuntimeError(f"BLOCKED non-free OpenRouter model: {model}")
     import httpx
     resp = httpx.post(
         f"{base_url}/chat/completions",
@@ -573,7 +611,7 @@ def _rotate_chat(messages: list, show_thinking: bool = True) -> tuple:
 #  Tool catalog
 # ═══════════════════════════════════════════════════════════════════════════
 
-def _load_tool_catalog(max_tools: int = 120) -> str:
+def _load_tool_catalog(max_tools: int = 1000) -> str:
     try:
         from tank_os.agent_framework.registry import ToolRegistry
         reg = ToolRegistry(scripts_dir=_PROJECT_ROOT / "scripts")
@@ -582,12 +620,12 @@ def _load_tool_catalog(max_tools: int = 120) -> str:
     except Exception:
         return "(no tools)"
     cats: Dict[str, list] = {}
-    for t in tools[:400]:
+    for t in tools:
         cats.setdefault(t.category, []).append(t)
     lines = []
     for cat, cat_tools in sorted(cats.items()):
         lines.append(f"\n[{cat}]")
-        for t in cat_tools[:6]:
+        for t in cat_tools:
             desc = (t.description or "").strip()[:55]
             lines.append(f"  {t.name} — {desc}")
     lines.append(f"\n({len(tools)} tools total)")
