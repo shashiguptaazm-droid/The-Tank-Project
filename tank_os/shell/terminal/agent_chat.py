@@ -791,14 +791,22 @@ You have access to 1,966+ tools via shell commands and the ToolRegistry.
 5. Test: {"action":"shell","cmd":"python3 <test_script>"}
 6. Reply: {"action":"reply","text":"Fixed bug: <description>. Changed line X from Y to Z."}
 
+=== MODEM (on Arduino at 192.168.31.72) ===
+The SIM modem is connected to the Arduino, NOT the Jetson. To send SMS, SSH to the Arduino:
+- Send SMS: {"action":"shell","cmd":"sshpass -p '9936468425' ssh -o StrictHostKeyChecking=no arduino@192.168.31.72 'python3 /home/arduino/send_sms.py --to 7860245819 --msg \"i am fine\"'"}
+- List contacts: {"action":"shell","cmd":"sshpass -p '9936468425' ssh -o StrictHostKeyChecking=no arduino@192.168.31.72 'python3 /home/arduino/list_contacts.py'"}
+- Read SMS: {"action":"shell","cmd":"sshpass -p '9936468425' ssh -o StrictHostKeyChecking=no arduino@192.168.31.72 'python3 /home/arduino/read_sms.py'"}
+- Make call: {"action":"shell","cmd":"sshpass -p '9936468425' ssh -o StrictHostKeyChecking=no arduino@192.168.31.72 'python3 /home/arduino/make_call.py --number 7860245819'"}
+
 === CRITICAL RULES ===
 1. ALWAYS respond with EXACTLY ONE JSON object. Nothing else.
 2. When you receive results from a tool, process them and either take the next step or reply with {"action":"reply","text":"..."}.
 3. NEVER say 'I cannot' or 'I am unable'. You have full access. Just do it.
 4. You have full sudo access. Password is 1234.
 5. For multi-step tasks, keep executing tools until done, then reply.
-6. NEVER repeat the same tool call if you already have the result.
-7. Current date/time: Thursday, August 27, 2026 at 00:11 
+6. NEVER repeat the same tool call if you already have the result. If a tool returns the same error twice, stop and report the issue.
+7. NEVER call the same action with the same parameters more than ONCE. If it failed, report the failure.
+8. Current date/time: Thursday, August 27, 2026 at 00:13 
    Use real dates. NEVER hallucinate dates.
 
 === EXAMPLES ===
@@ -879,6 +887,7 @@ class AgentChat:
         self._state.turn_count += 1
         self._history.append(Turn("user", user_input))
         camera_used = False
+        actions_taken = set()  # Track actions to prevent repetition
 
         # Show what we're doing
         print(f"\n{Colors.GRAY}  ┌─ Processing turn {self._state.turn_count} ──────────────────────────{Colors.RESET}")
@@ -919,6 +928,15 @@ class AgentChat:
                 return
 
             at = action.get("action", "")
+            action_key = json.dumps(action, sort_keys=True)
+
+            # DEDUP: If same action repeated, force reply
+            if action_key in actions_taken:
+                self._history.append(Turn("user", 
+                    'You already tried this action and it failed or returned the same result. ' +
+                    'Do NOT try it again. Give your final answer now with {"action":"reply","text":"..."} format.'))
+                continue
+            actions_taken.add(action_key)
 
             if at == "reply":
                 text = action.get("text", "")
@@ -958,22 +976,18 @@ class AgentChat:
                 self._history.append(Turn("tool", f"[shell] {result[:500]}"))
 
             elif at == "modem":
+                # Modem is on Arduino — SSH to it
                 fn = action.get("function", "")
                 args = action.get("args", {})
                 _print_action("modem", f"{fn}({json.dumps(args, ensure_ascii=False)})")
-                try:
-                    import importlib
-                    modem_mod = importlib.import_module("tank_os.shell.terminal.modem_tools")
-                    fn_obj = getattr(modem_mod, fn, None)
-                    if fn_obj is None:
-                        result = f"Unknown modem function: {fn}"
-                    else:
-                        result = fn_obj(**args)
-                except Exception as e:
-                    result = f"Modem error: {e}"
+                # Build SSH command to Arduino
+                arduino_cmd = f"/home/arduino/{fn}.py"
+                arg_str = " ".join(f"--{k} '{v}'" for k, v in args.items())
+                ssh_cmd = f"sshpass -p '9936468425' ssh -o StrictHostKeyChecking=no arduino@192.168.31.72 'python3 {arduino_cmd} {arg_str}'"
+                result = _run_shell(ssh_cmd)
                 self._state.tools_used.append(f"modem.{fn}")
                 _print_status("Result", f"{len(result)} chars")
-                self._history.append(Turn("tool", f"[modem] {result[:500]}"))
+                self._history.append(Turn("tool", f"[modem:{fn}] {result[:500]}"))
 
             elif at == "opencode":
                 task = action.get("task", "")
