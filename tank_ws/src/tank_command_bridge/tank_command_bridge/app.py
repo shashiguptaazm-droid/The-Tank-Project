@@ -1410,6 +1410,12 @@ async def agent_chat(request: Request,
             break
 
     if final_reply is None:
+        if all_actions:
+            acts = ", ".join(a["action"] for a in all_actions)
+            final_reply = f"Completed {len(all_actions)} actions: {acts}"
+        else:
+            final_reply = "No action needed - task complete."
+    if final_reply is None:
         final_reply = "Task completed."
 
     # Keep history manageable
@@ -1418,6 +1424,7 @@ async def agent_chat(request: Request,
 
     return {
         "reply": final_reply,
+        "answer": final_reply,
         "provider": provider_used,
         "actions": all_actions,
         "rounds": len(all_actions),
@@ -3088,6 +3095,7 @@ async def agent_chat(request: Request,
 
     return {
         "reply": final_reply,
+        "answer": final_reply,
         "provider": provider_used,
         "actions": all_actions,
         "rounds": len(all_actions),
