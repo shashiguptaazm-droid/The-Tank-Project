@@ -895,7 +895,7 @@ class AgentChat:
         self._history.append(Turn("user", user_input))
         camera_used = False
         actions_taken = set()
-        actions_taken = set()  # Track actions to prevent repetition
+        tool_executed = False  # Track if ANY tool was executed this turn
 
         # Show what we're doing
         print(f"\n{Colors.GRAY}  ┌─ Processing turn {self._state.turn_count} ──────────────────────────{Colors.RESET}")
@@ -937,10 +937,21 @@ class AgentChat:
                         self._print_response(clean)
                         self._history.append(Turn("assistant", clean))
                         return
-                    # Model said "Done." with no actionable content — force inference
+                    # Model said "Done." with no actionable content
+                    if tool_executed:
+                        # A tool was already executed this turn — show latest result and stop
+                        last_tool = [t for t in self._history if t.role == "tool"]
+                        if last_tool:
+                            result_text = last_tool[-1].content
+                            self._print_response(result_text)
+                            self._history.append(Turn("assistant", result_text))
+                        else:
+                            self._print_response("Done.")
+                            self._history.append(Turn("assistant", "Done."))
+                        return
+                    # No tool executed yet — try inference
                     action = _infer_from_intent(user_input, self._history)
                     if action and action.get("action") == "reply":
-                        # Inference gave a reply — show it and stop
                         self._print_response(action.get("text", "Done."))
                         self._history.append(Turn("assistant", action.get("text", "Done.")))
                         return
@@ -955,7 +966,6 @@ class AgentChat:
                     "You already tried this action and it failed. Do NOT try it again. Reply now with your final answer."))
                 continue
             actions_taken.add(action_key)
-            action_key = json.dumps(action, sort_keys=True)
 
             # DEDUP: If same action repeated, force reply
             if action_key in actions_taken:
