@@ -962,16 +962,19 @@ class AgentChat:
             at = action.get("action", "")
             action_key = json.dumps(action, sort_keys=True)
             if action_key in actions_taken:
+                # Already tried this action — if a tool was executed, show result and stop
+                if tool_executed:
+                    last_tool = [t for t in self._history if t.role == "tool"]
+                    if last_tool:
+                        result_text = last_tool[-1].content
+                        self._print_response(result_text)
+                        self._history.append(Turn("assistant", result_text))
+                    else:
+                        self._print_response("Action completed.")
+                        self._history.append(Turn("assistant", "Action completed."))
+                    return
                 self._history.append(Turn("user",
                     "You already tried this action and it failed. Do NOT try it again. Reply now with your final answer."))
-                continue
-            actions_taken.add(action_key)
-
-            # DEDUP: If same action repeated, force reply
-            if action_key in actions_taken:
-                self._history.append(Turn("user", 
-                    'You already tried this action and it failed or returned the same result. ' +
-                    'Do NOT try it again. Give your final answer now with {"action":"reply","text":"..."} format.'))
                 continue
             actions_taken.add(action_key)
 
@@ -990,6 +993,7 @@ class AgentChat:
                 self._state.tools_used.append("camera")
                 self._history.append(Turn("tool", f"[camera] {result}"))
                 _print_status("Detections", result[:100])
+                tool_executed = True
 
             elif at == "camera" and camera_used:
                 # Allow re-capture — just update the flag
@@ -1003,6 +1007,7 @@ class AgentChat:
                 self._state.tools_used.append(tn)
                 _print_status("Result", f"{len(result)} chars")
                 self._history.append(Turn("tool", f"[tool:{tn}] {result[:500]}"))
+                tool_executed = True
 
             elif at == "shell":
                 cmd = action.get("cmd", "")
@@ -1011,6 +1016,7 @@ class AgentChat:
                 self._state.tools_used.append("shell")
                 _print_status("Output", f"{len(result)} chars")
                 self._history.append(Turn("tool", f"[shell] {result[:500]}"))
+                tool_executed = True
 
             elif at == "modem":
                 # Modem is on Arduino — SSH to it
@@ -1025,6 +1031,7 @@ class AgentChat:
                 self._state.tools_used.append(f"modem.{fn}")
                 _print_status("Result", f"{len(result)} chars")
                 self._history.append(Turn("tool", f"[modem:{fn}] {result[:500]}"))
+                tool_executed = True
 
             elif at == "opencode":
                 task = action.get("task", "")
@@ -1035,6 +1042,7 @@ class AgentChat:
                     result = _run_opencode(task)
                     self._state.tools_used.append("opencode")
                 self._history.append(Turn("tool", f"[opencode] {result[:500]}"))
+                tool_executed = True
 
             else:
                 clean = re.sub(r"<think>.*?</think>", "", resp, flags=re.DOTALL).strip()
