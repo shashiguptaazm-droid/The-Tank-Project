@@ -198,6 +198,41 @@ xcodebuild test -project MediGyaan.xcodeproj -scheme MediGyaan \
   above. Skips automatically when the host is unreachable, so CI never goes red
   on a network blip.
 
+## Calling (LiveKit, not Jitsi)
+
+Calls go through the self-hosted LiveKit SFU at `wss://medigyaan.com/rtc`
+instead of the Jitsi Meet SDK. The SDK is a Swift Package pinned to
+`livekit/client-sdk-swift` **2.16.0** (product and module are both `LiveKit`;
+`SwiftUIVideoView` ships inside it).
+
+| Piece | Where |
+|---|---|
+| `LiveKitAPI` | Requests a room token from `livekit_token.php` |
+| `CallToken`, `CallRoom`, `CallKind` | Token model and room-name derivation |
+| `CallViewModel` | Owns the `Room`: connect, mute, flip camera, leave |
+| `CallView` | Full-screen call UI, styled with the app's own tokens |
+| `MessengerView` | Toolbar phone/video buttons start a call with the thread peer |
+
+**The API secret is never in the binary.** It grants full room control
+(create/delete/list/kick), so it stays on the VPS in
+`/etc/medigyaan/livekit.php` — outside the webroot, `root:www-data 0640`. The app
+only ever receives a short-lived, room-scoped JWT. This is the same reasoning
+behind `AIAPI` proxying through `ask_ai2.php` rather than shipping keys.
+
+**Room names are byte-identical to Android.** `CallRoom.oneToOne` builds
+`edu_lab_rtm_<low>_<high>` from the two user ids in ascending order, matching
+`MessengerActivity.getRoomName`, so both platforms derive a single shared room.
+Ad-hoc calls use `EDULABS_<epoch-ms>`, as `VideoCallActivity` did. Android still
+dials `meet.jit.si`, so the two interoperate only once Android is pointed at
+this SFU as well.
+
+**The server enforces room entitlement.** `user_id` alone is guessable, so the
+endpoint refuses any room the caller is not a party to — see `livekit/README.md`
+for the full contract and the hardening path.
+
+`UIBackgroundModes` includes `audio` so a call survives backgrounding and screen
+lock.
+
 ## Differences from the Android app
 
 Three deliberate changes, all security-motivated:
@@ -216,8 +251,9 @@ Three deliberate changes, all security-motivated:
 Implemented end to end: authentication (login, register, OTP recovery),
 dashboard, topics, quiz runner with scoring and sync, leaderboard, attempt
 history, profile, settings, news feed, messenger, challenges hub, rank
-predictor, referrals, and the thesis studio (chapters, references, PRISMA,
-checklist, theme export).
+predictor, referrals, the thesis studio (chapters, references, PRISMA,
+checklist, theme export), and audio/video calling over the self-hosted LiveKit
+SFU.
 
-Still to port from Android: live video calls (Jitsi SDK), reels, the home-screen
-widget, offline Room-style caching, and admin/quiz-authoring screens.
+Still to port from Android: reels, the home-screen widget, offline Room-style
+caching, and admin/quiz-authoring screens.

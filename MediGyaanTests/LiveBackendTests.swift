@@ -220,9 +220,26 @@ final class LiveBackendTests: XCTestCase {
         do {
             _ = try await client.getObject(endpoint)
         } catch let error as APIError {
-            guard case .transport = error else { throw error }
-            try? await Task.sleep(for: .milliseconds(750))
+            guard Self.isWorthRetrying(error) else { throw error }
+            try? await Task.sleep(for: .milliseconds(1_500))
             _ = try await client.getObject(endpoint)
+        }
+    }
+
+    /// Whether a probe failure looks transient rather than real.
+    ///
+    /// A shared production host answers a spurious 404 now and then when 50-plus
+    /// requests arrive back to back from one fresh address. A genuine typo in a
+    /// path 404s on both attempts, so retrying once keeps every bit of detection
+    /// power while stopping the host's hiccups from reddening the build.
+    private static func isWorthRetrying(_ error: APIError) -> Bool {
+        switch error {
+        case .transport:
+            return true
+        case let .httpStatus(status):
+            return status == 404
+        case .server, .decoding, .invalidResponse, .unauthorized:
+            return false
         }
     }
 
