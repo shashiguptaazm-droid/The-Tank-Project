@@ -1,0 +1,444 @@
+========================================================================
+MACULAR DYSTROPHIES PRESENTATION — OCR + LINE-BY-LINE CHECK
+Source: D:\SlideShare_Presentation macular dystrophies.pptx (48 slides)
+OCR engine: Windows.Media.Ocr (built-in), 638x359 source images,
+           re-OCR'd at 3x upscale for the worst slides.
+========================================================================
+
+PART 1 — AUDIT: issues found per slide
+========================================================================
+S1  Clean (title slide, native text).
+S2  ✏ "15—200" -> "15–20°" (degree sign lost in OCR). "subserves the
+    central 15-20° of the visual field" (macula = 5.5mm, ~15-20°).
+S3  ✏ "part ofthe" -> "part of the"; "density Of cone" -> "of cone".
+S4  ⚠ TABLE (slide is a dense gene table, worst OCR). Recovered via 3x
+    upscale. Cells corrected from ophthalmology knowledge; uncertain
+    cells marked below. Chromosome for ABCA4 read as "6" both passes —
+    canonically chr 1p22 (Stargardt-like ELOVL4 is the chr 6 one).
+    Row label "Front-I associated / Pattern" garbled -> Pattern
+    dystrophy (PRPH2). "Sorsbv" -> Sorsby. "CEH" gene cell -> Unknown.
+    Glomerulonephritis row = type II (CFH, chr 1, AR) — flag.
+S5  ✏ "RSI" -> "RS1" (retinoschisin gene). "distal arm of the X
+    chromosome" — original likely "short arm" (RS1 is Xp22) ⚠.
+S6  Clean. (Note: "reading vision maybe maintained even up to 4th to
+    5th decade" — as printed.)
+S7  Clean (figure captions; word-order oddity is OCR, meaning intact).
+S8  ✏ "<I.O" -> "<1.0" (b/a ratio).
+S9  Clean. (Slightly run-on sentence = original slide wording.)
+S10 Clean.
+S11 ✏ "Stargard disease" -> "Stargardt disease".
+S12 ✏ "functional Glindness" -> "functional blindness"; "Initial sta es"
+    -> "stages"; "Loss Of"/"center Of" case fixes.
+S13 ✏ "appearance Of oval area Of atrophy Of RPE" -> "of ... of ... of".
+S14 Clean.
+S15 Clean.
+S16 Clean.
+S17 Clean.
+S18 ✏ "crescentric" -> "crescentic"; "Confluence Of the flecks" ->
+    "Confluence of the flecks".
+S19 Clean.
+S20 ✏ "BESTI gene" -> "BEST1 gene" (formerly VMD2). Rest clean.
+S21 Clean (minor spacing "(scrambled egg )").
+S22 Clean.
+S23 Clean.
+S24 Clean.
+S25 ✏ "fihrntic nodule" x2 -> "fibrotic nodule"; case fixes.
+S26 ✏ "tne nght" -> "the right"; figure label "G. 44.14" truncated at
+    "47" (age) — rest of caption lost to low res ⚠.
+S27 Clean.
+S28 ⚠ NO TEXT DETECTED — pure fundus photograph (illustration only),
+    even after 4x upscale + autocontrast. No caption present.
+S29 Clean.
+S30 Clean.
+S31 ✏ "Doynes honey-comb choroiditis" -> "Doyne's honeycomb
+    choroiditis"; "EFEMPI" -> "EFEMP1".
+S32 Clean ("25–75 microns" — en-dash/µ misread, meaning intact).
+S33 Clean.
+S34 Clean.
+S35 Clean; one junk token "aa" removed.
+S36 Clean.
+S37 Clean.
+S38 Clean.
+S39 Clean.
+S40 Clean.
+S41 ✏ "night blidness" -> "night blindness"; "TIMP- 3" -> "TIMP-3".
+S42 Clean.
+S43 ✏ "HERIDITARY" -> "HEREDITARY".
+S44 Clean.
+S45 Clean.
+S46 Clean.
+S47 Clean.
+S48 ⚠ Blank in first pass — "THANK YOU" recovered via autocontrast.
+    Closing slide, no content.
+
+========================================================================
+PART 2 — CLEANED TEXT (corrections applied; ⚠ = could not verify)
+========================================================================
+
+### SLIDE 1
+Macular Dystrophies: A Comprehensive Review.
+PRESENTOR – DR SHEKHAR GUPTA.
+MODERATOR – DR. NITIN SINGH.
+Dr. SHEKHAR GUPTA JR 1 OPHTHALMOLOGY
+
+### SLIDE 2 — Anatomical landmarks
+• The macula is a round area at the posterior pole, lying inside the
+  temporal vascular arcades.
+• It measures between 5 and 6 mm in diameter, and subserves the
+  central 15–20° of the visual field.
+
+### SLIDE 3
+The fovea is a depression in the retina surface at the centre of the
+macula, with a diameter of 1.5 mm about the same as the optic disc.
+The foveola forms the central floor of the fovea and has a diameter
+of 0.35 mm.
+It is the thinnest part of the retina and is devoid of ganglion cells,
+consisting only of a high density of cone photoreceptors and the
+nuclei together with Müller cells.
+
+### SLIDE 4 — Macular Dystrophies (gene table; ⚠ low-res, cells best-effort)
+Disease Name                     | Gene     | Chromosome | Inheritance
+Best macular dystrophy           | BEST1    | 11         | AD
+Stargardt disease                | ABCA4    | 1 ⚠(OCR:6) | AR
+Stargardt-like dominant          | ELOVL4   | 6          | AD
+Pattern dystrophy                | PRPH2    | 6p21       | AD
+Sorsby fundus dystrophy          | TIMP3    | 22 ⚠(OCR:7)| AD
+Autosomal dominant radial drusen | EFEMP1   | 2 ⚠(OCR:?) | AD
+North Carolina macular dystrophy | MCDR1    | 6 ⚠(OCR:1) | AD
+Spotted cystic dystrophy         | Unknown  | Unknown    | AD
+Dominant cystoid macular edema   | Unknown  | 7 ⚠         | AD
+Fenestrated sheen macular dystrophy | Unknown | Unknown   | AD
+Glomerulonephritis type II       | CFH      | 1 ⚠         | AR
+AD = autosomal dominant; AR = autosomal recessive.
+
+### SLIDE 5 — X-LINKED JUVENILE RETINOSCHISIS
+• The disease is caused by mutations in the retinoschisis gene (RS1)
+  which is located on the ⚠(short?) arm of the X chromosome.
+• The protein retinoschisin is expressed only in the retina, in the
+  inner and outer retinal layers.
+
+### SLIDE 6 — SYMPTOMS & SIGNS
+SYMPTOMS
+• Present in the first decade itself, although reading vision may be
+  maintained even up to 4th to 5th decade of life.
+• Macular RPE atrophy occurs leading to gross loss of central vision.
+• Field defects are absolute.
+SIGNS
+• The diagnosis is usually straightforward on binocular indirect
+  ophthalmoscopy.
+• It differs from retinal detachment in being bilateral usually, with
+  taut dome-like elevation without undulations, thin inner layer.
+
+### SLIDE 7 (figures)
+Left fundus picture demonstrating the large peripheral retinoschisis
+with almost total absence of the inner layer.
+Left eye fundus photograph with typical foveal retinoschisis.
+Traction caused by the posterior edge of the inner layer on the intact
+posterior retina. A few laser marks are also seen beyond the schisis
+area.
+
+### SLIDE 8
+• Electroretinography is also diagnostic with the typical wave form
+  being 'negative'.
+• The 'b' wave amplitudes are reduced while 'a' wave amplitudes are
+  maintained at a near normal level and b/a ratio is <1.0 in the
+  standard combined maximal response.
+
+### SLIDE 9 — Treatment
+• Surgery is recommended for vitreous hemorrhage and retinal
+  detachments.
+• Retinal detachment cannot be ruled out or when it does not clear in
+  a short period.
+• Pars plana vitrectomy can clear the hemorrhage.
+• Retinal detachments due to breaks in the outer layer in the
+  periphery can be corrected by scleral buckling.
+
+### SLIDE 10 — STARGARDT'S DISEASE
+• Autosomal recessive trait with an estimated prevalence of 1 in
+  10,000.
+• Associated with accumulation of fluorescent lipofuscin pigments in
+  cells of the RPE.
+• Specifically, A2E (bis-retinoid pyridinium salt
+  N-retinylidene-N-retinylethanolamine) is the major component of
+  lipofuscin that is accumulated in the RPE cells.
+
+### SLIDE 11
+• The use of the term Stargardt's disease should be ideally restricted
+  to atrophic macular dystrophy associated with flecks.
+• Mild reduction in ABCA4 activity in Stargardt disease is associated
+  with some bisretinoid formation on the inner leaflet of the
+  photoreceptor outer-segment disc membranes.
+
+### SLIDE 12
+• The usual age of presentation is between 6 and 20 years.
+• Visual acuity can drop up to 6/60.
+• Although the disease tends to be symmetrical, asymmetry is not
+  unknown.
+SIGNS
+• Initial stages may show no fundus findings leading to wrong labeling
+  as functional blindness.
+• Later stages: loss of foveal reflex followed by RPE defects in the
+  center of macula occur later.
+
+### SLIDE 13
+• Perifoveal flecks also start appearing.
+• Fully developed fundus lesion is characterized by appearance of oval
+  area of atrophy of RPE in the macula, typically described as
+  "beaten bronze" appearance.
+• More flecks appear beyond the macula but do not extend into the
+  periphery.
+• The disk and blood vessels remain normal throughout the process.
+
+### SLIDE 14
+• With angiography, the A2E blocks the exciting blue light from
+  reaching the dye in the choroidal circulation.
+• Resulting in a finding that is variously known as a dark, silent, or
+  masked choroid.
+
+### SLIDE 15
+• FFA-Fluorescein angiography shows hyperfluorescence due to window
+  transmission defects in the macular area at the site of RPE atrophy.
+• Rest of the fundus has relative blockade of choroidal fluorescence,
+  termed as 'silent choroid' / dark choroid (relative
+  hypofluorescence of the choroid) due to the accumulation of
+  lipofuscin in the RPE.
+
+### SLIDE 16
+• OCT have shown expected reduction in macular function and reduction
+  in foveal thickness.
+• Choroidal neovascularization is a very rarely reported complication.
+• SD-OCT reveals selective loss of foveal photoreceptors.
+
+### SLIDE 17 — MANAGEMENT
+• Currently, there is no treatment for the disease.
+• Experimental studies in knock-out mice have shown beneficial effects
+  of isotretinoin.
+• The drug inhibits 11-cis-retinol dehydrogenase and hence reduces the
+  accumulation of A2E.
+• However human studies are awaited.
+• Low vision aids can be useful.
+
+### SLIDE 18
+SIGNS — flecks within the foveal area.
+The flecks are ill defined and can have variable shapes, crescentic,
+fish tail shaped, linear and circular.
+Confluence of the flecks can result in a reticular appearance.
+The flecks never appear beyond the equator.
+
+### SLIDE 19
+• FFA-Fluorescein angiography expectedly shows window defects due to
+  RPE atrophy in the involved areas, although early lesions may have
+  no actual RPE atrophy and so may not show transmission defects.
+• ERG — ERG is normal in most cases, in contrast to tapetoretinal
+  degenerations.
+
+### SLIDE 20 — BEST DISEASE
+• Best macular dystrophy (BMD), or Best disease.
+• Autosomal dominant condition caused by mutations in the BEST1 gene,
+  formerly known as VMD2.
+• The first family with this dystrophy was described by Friedrich Best
+  in 1905.
+• Other designations: vitelline dystrophy, vitelliruptive
+  degeneration, and vitelliform dystrophy.
+• It is one of the most common Mendelian macular dystrophies,
+  occurring in about 1 in 10,000 individuals.
+
+### SLIDE 21 — SYMPTOMS
+• Clinically several stages have been described:
+  - Previtelliform stage
+  - Vitelliform stage
+  - Vitelliruptive stage (scrambled egg) associated with reduced
+    vision
+  - Vitelliform stage with sub-retinal neovascularization (CNVM) is a
+    complication that can result in significant drop in vision.
+  - Atrophic stage.
+• Color vision is affected as in any other macular disease.
+
+### SLIDE 22
+• Visual acuity (VA) sufficient to drive is usually preserved in at
+  least one eye throughout the first six decades of life.
+• More substantial visual loss occurs when BMD is complicated by
+  nodular fibrosis, choroidal neovascularization or central geographic
+  atrophy.
+
+### SLIDE 23 — SIGNS
+• Previtelliform stage: evident as a small, round yellowish dot at the
+  site of foveola.
+
+### SLIDE 24
+• Vitelliform stage: appearance of cyst with fluid level or sometimes
+  clear space in center with the material situated all round.
+• Pseudohypopyon may occur when part of the lesion regresses, often at
+  puberty.
+• Subretinal neovascularization (CNVM) is a complication.
+
+### SLIDE 25 (figure)
+FIG 44.18 (A) Fundus photograph of the right eye of a 23-year-old
+female with Best disease and an evolving subretinal fibrotic nodule.
+A small amount of subretinal blood can be seen at the inferior margin
+of the associated serous macular detachment. The acuity in this eye is
+20/100. (B) The early phase of the fluorescein angiogram of this eye
+shows a classic choroidal neovascular membrane centered on the
+fibrotic nodule.
+
+### SLIDE 26 — VITELLIRUPTIVE FORM
+RPE atrophy in addition to hyperpigmentation, and atrophy of the RPE.
+⚠ Figure caption truncated by low res: "G. 44.14 Fundus photograph of
+the right eye of a 47-..." (rest unreadable).
+
+### SLIDE 27
+• Vitelliruptive: the lesion breaks up and visual acuity drops.
+• Atrophic stage can be represented by area of RPE atrophy or
+  sometimes disciform scar if complicated by CNVM.
+
+### SLIDE 28 — ⚠ figure only (fundus photograph, no text/caption)
+
+### SLIDE 29
+• VITELLIFORM STAGE — characterized by the classic egg yolk
+  appearance.
+• HD-OCT reveals this material as hyper-reflective lesion located
+  between the hyporeflective outer nuclear layer and the
+  hyper-reflective RPE layer.
+• Disruption of the inner segment/outer segment has also been
+  described at this stage while other layers of the retina are intact.
+
+### SLIDE 30 — TREATMENT
+• Treatment for BEST1 disease consists primarily of recognizing
+  choroidal neovascularization and hastening its regression with
+  anti-VEGF therapy.
+• Even in the absence of CNV, subretinal hemorrhage can occur in
+  patients with Best disease following relatively modest head or eye
+  trauma.
+• As a result, patients are usually cautioned against playing sports
+  in which frequent blows to the head are to be expected.
+• Protective eyewear is recommended for all sports.
+
+### SLIDE 31 — DOMINANT FAMILIAL DRUSEN
+• Disease is termed variously as Doyne's honeycomb choroiditis, and
+  Hutchinson-Tay choroiditis.
+• GENETICS — Autosomal Dominant.
+• EFEMP1 gene mutations have been associated with this disorder.
+• The gene encodes the EGF-containing fibulin-like extracellular
+  matrix protein-1.
+
+### SLIDE 32
+• SYMPTOMS — Vision can be affected due to CNVM, and geographic
+  atrophy.
+• SIGNS — The drusen in this condition are small (25–75 microns).
+• More of them are detected on fluorescein angiography rather than on
+  ophthalmoscopy.
+
+### SLIDE 33
+• Described as 'stars in the sky' or 'milky way', they are seen in
+  clusters in the posterior pole.
+• The drusen are present as nodular thickening of the basement
+  membrane of the RPE.
+
+### SLIDE 34 — NORTH CAROLINA MACULAR DYSTROPHY
+• North Carolina macular dystrophy, as the term indicates, was
+  originally described in a family in North Carolina but has now been
+  identified all over the world and in various ethnic groups.
+• Transmitted as an autosomal dominant disease.
+• Called as central areolar pigment epithelial dystrophy and dominant
+  progressive foveal dystrophy.
+
+### SLIDE 35
+• Characterized by drusen in the posterior pole leading to disciform
+  scar.
+• Sometimes staphylomatous chorioretinal scars in the posterior pole.
+• Complete lack of progression is one of the most reliable diagnostic
+  features of the disease, and accounts to some degree for the
+  amazingly good VA in some patients with very large lesions.
+
+### SLIDE 36 — PATTERN DYSTROPHY
+• Originally described with black pigmentation in the macular area.
+• Subsequent reports included yellow, gold and gray subretinal
+  deposits as well.
+• GENETICS — The most common causes of all of these different patterns
+  have proven to be mutations in a single gene, PRPH2.
+• Autosomal dominant in transmission.
+• Peripherin and RDS gene mutations have been identified in these
+  families.
+
+### SLIDE 37
+• SYMPTOMS
+  - Vision is usually not affected to a great degree.
+  - However, Francis et al have reported significant vision loss in
+    the 6th decade of life.
+  - The disease is very slowly progressive.
+• SIGNS
+  - Reticular (Sjögren): a network of pigmented lines at the posterior
+    pole.
+  - Fundus pulverulentus is extremely rare.
+  - Macular pigment mottling develops.
+
+### SLIDE 38
+• Butterfly-shaped: foveal yellow and melanin pigmentation, commonly
+  in a spoke-like or butterfly wing-like conformation; drusen- or
+  Stargardt-like flecks may be associated with any pattern dystrophy.
+
+### SLIDE 39 — Multifocal pattern dystrophy
+• Simulating fundus flavimaculatus: multiple, widely scattered,
+  irregular yellow lesions; they may be similar to those seen in
+  fundus flavimaculatus.
+
+### SLIDE 40
+• Macroreticular (spider-shaped): initially pigment granules are seen
+  at the fovea; reticular pigmentation develops that spreads to the
+  periphery.
+• FA shows hyperfluorescence of the flecks.
+• Choroid is not dark.
+
+### SLIDE 41 — SORSBY DYSTROPHY
+• Condition was first described in five British families.
+• GENETICS — Transmitted as an autosomal dominant condition, mutations
+  in the tissue inhibitor of metalloproteinase-3 (TIMP-3) have been
+  identified as a possible cause of the disease.
+• SYMPTOMS — The disease presents as reduced central vision along with
+  night blindness.
+
+### SLIDE 42
+• SIGNS — Choroidal neovascular membrane (CNVM) formation and
+  subretinal bleeding.
+• Disciform scar formation takes place, sometimes extending to the
+  periphery as well.
+
+### SLIDE 43 — OTHER HEREDITARY MACULAR DYSTROPHIES — SPOTTED CYSTIC DYSTROPHY
+• Autosomal dominant inheritance.
+• New dystrophy limited to the macula and characterized by round, flat
+  pigmented spots with or without surrounding hypopigmentation.
+• OCT: cysts in multiple retinal layers and neovascularization.
+
+### SLIDE 44
+• O/E: Amblyopia and strabismus were frequently present in affected
+  individuals.
+• Visual acuity ranged from 20/20 to 20/200.
+• The pathophysiology and genetic mutation responsible for this
+  condition have not been identified.
+• TREATMENT: When active macular neovascularization occurs in affected
+  individuals, it has been responsive to either focal laser or a
+  single injection of bevacizumab.
+
+### SLIDE 45 — DOMINANT CYSTOID MACULAR DYSTROPHY
+• Dominant cystoid macular dystrophy (DCMD) was described in 1976 by
+  Deutman.
+• Autosomal dominant.
+• Characterized by EARLY leaking perimacular capillaries, whitish
+  punctate deposits in the vitreous.
+• In the LATE stages of the disease, an atrophic central
+  "beaten-bronze" macula was common.
+• OTHER INVESTIGATION: a normal ERG, a subnormal EOG, and hyperopia.
+
+### SLIDE 46
+• The disease-causing gene for DCMD has not yet been identified.
+• Hogewind and coworkers evaluated intramuscular injections of a
+  somatostatin analog (octreotide acetate) in four patients with DCMD
+  and seven of the eight eyes showed improvement on fluorescein
+  angiography, with stabilization of visual acuity.
+
+### SLIDE 47 (figure)
+Fluorescein angiogram of the right eye of a patient with dominant
+cystoid macular edema showing leakage from perifoveal capillaries.
+
+### SLIDE 48
+THANK YOU

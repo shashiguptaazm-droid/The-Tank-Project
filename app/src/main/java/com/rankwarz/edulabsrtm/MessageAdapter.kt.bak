@@ -1,0 +1,121 @@
+package com.rankwarz.edulabsrtm
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import java.text.SimpleDateFormat
+import java.util.Locale
+
+class MessageAdapter(
+    private val currentUserId: Int,
+    private val onImageClick: (String) -> Unit,
+    private val onFileClick: (String) -> Unit,
+    private val onCallInviteClick: (String) -> Unit
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private val messages = mutableListOf<ChatMessage>()
+
+    companion object {
+        private const val TYPE_SENT = 1
+        private const val TYPE_RECEIVED = 2
+    }
+
+    fun setMessages(newList: List<ChatMessage>) {
+        messages.clear()
+        messages.addAll(newList)
+        notifyDataSetChanged()
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (messages[position].senderId == currentUserId) TYPE_SENT else TYPE_RECEIVED
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == TYPE_SENT) {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_message_sent, parent, false)
+            SentViewHolder(view)
+        } else {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_message_received, parent, false)
+            ReceivedViewHolder(view)
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val message = messages[position]
+        if (holder is SentViewHolder) holder.bind(message)
+        else if (holder is ReceivedViewHolder) holder.bind(message)
+    }
+
+    override fun getItemCount(): Int = messages.size
+
+    inner class SentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val text: TextView = view.findViewById(R.id.messageText)
+        private val time: TextView = view.findViewById(R.id.messageTime)
+        private val image: ImageView = view.findViewById(R.id.messageImage)
+        private val fileBadge: TextView = view.findViewById(R.id.fileBadge)
+        private val status: TextView = view.findViewById(R.id.messageStatus)
+
+        fun bind(msg: ChatMessage) {
+            bindShared(msg, text, time, image, fileBadge)
+            status.text = if (msg.isRead == 1) " ✓✓" else " ✓"
+            status.setTextColor(if (msg.isRead == 1) 0xFF34B7F1.toInt() else 0xFF808080.toInt())
+        }
+    }
+
+    inner class ReceivedViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val text: TextView = view.findViewById(R.id.messageText)
+        private val time: TextView = view.findViewById(R.id.messageTime)
+        private val image: ImageView = view.findViewById(R.id.messageImage)
+        private val fileBadge: TextView = view.findViewById(R.id.fileBadge)
+
+        fun bind(msg: ChatMessage) {
+            bindShared(msg, text, time, image, fileBadge)
+        }
+    }
+
+    private fun bindShared(msg: ChatMessage, textTv: TextView, timeTv: TextView, imageIv: ImageView, fileTv: TextView) {
+        if (msg.text.startsWith("VIDEO_CALL_INVITE:")) {
+            val room = msg.text.substringAfter("VIDEO_CALL_INVITE:")
+            textTv.text = "📹 Video Call Invite (Tap to join)"
+            textTv.setOnClickListener { onCallInviteClick(room) }
+        } else {
+            textTv.text = msg.text
+            textTv.setOnClickListener(null)
+        }
+        textTv.visibility = if (msg.text.isNotEmpty()) View.VISIBLE else View.GONE
+
+        timeTv.text = formatTime(msg.sentAt)
+
+        if (msg.attachment.isNotBlank() && msg.attachment != "null") {
+            val fullUrl = if (msg.attachment.startsWith("http")) msg.attachment else "https://medigyaan.xyz/Neurons/" + msg.attachment.removePrefix("/")
+            if (isImage(msg.attachment)) {
+                imageIv.visibility = View.VISIBLE
+                fileTv.visibility = View.GONE
+                Glide.with(imageIv.context).load(fullUrl).centerCrop().into(imageIv)
+                imageIv.setOnClickListener { onImageClick(fullUrl) }
+            } else {
+                imageIv.visibility = View.GONE
+                fileTv.visibility = View.VISIBLE
+                fileTv.text = "📎 " + msg.attachment.substringAfterLast("/")
+                fileTv.setOnClickListener { onFileClick(fullUrl) }
+            }
+        } else {
+            imageIv.visibility = View.GONE
+            fileTv.visibility = View.GONE
+        }
+    }
+
+    private fun isImage(path: String) = listOf("jpg", "jpeg", "png", "gif", "webp").any { path.lowercase().endsWith(it) }
+
+    private fun formatTime(sentAt: String): String {
+        return try {
+            val sdfSource = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val date = sdfSource.parse(sentAt) ?: return sentAt
+            SimpleDateFormat("hh:mm a", Locale.getDefault()).format(date)
+        } catch (e: Exception) { sentAt }
+    }
+}

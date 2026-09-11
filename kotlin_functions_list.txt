@@ -1,0 +1,472 @@
+Line 141: fun fromName(value: String): PdfTheme {
+Line 261: private fun resolvePdfThemeStyle(theme: PdfTheme): PdfThemeStyle {
+Line 436: private fun builtinLogoDefaults(layoutId: String): LogoSetting {
+Line 541: private fun builtinLayoutFeatures(layoutId: String): LayoutFeatures {
+Line 604: private fun resolvePdfThemeStyle(selection: String): PdfThemeStyle {
+Line 973: private fun applyRemoteLayoutToStyle(style: PdfThemeStyle, remote: RemoteThemeLayout): PdfThemeStyle {
+Line 1173: private fun exportLineSpacingMultiplier(value: String): Float = when (value.lowercase()) {
+Line 1180: private fun romanNumeral(value: Int): String {
+Line 1205: private fun officeColor(color: Int): String {
+Line 1209: private fun sanitizeOfficeText(value: String): String {
+Line 1331: private fun startBackgroundWork(context: Context, message: String) {
+Line 1335: private fun stopBackgroundWork(context: Context) {
+Line 1385: private fun initialChapterList(): List<Chapter> {
+Line 2080: private fun professionalTextSchema(
+Line 2135: private fun consentSchema(language: String): ChapterSchema = ChapterSchema(
+Line 2154: private fun getVariablesForChapter(chapterName: String, allVariables: List<Variable>): List<Variable> {
+Line 2181: private fun newSessionId(): String =
+Line 2184: private fun getUid(): String? = FirebaseAuth.getInstance().currentUser?.uid
+Line 2186: fun setPdfUri(uri: Uri) {
+Line 2191: fun setCollegeLogoUri(uri: String) {
+Line 2196: fun clearCollegeLogo() {
+Line 2201: fun setPdfTheme(theme: PdfTheme) {
+Line 2206: fun setPdfThemeSelection(selection: String) {
+Line 2211: fun setExportMargin(value: String) {
+Line 2216: fun setExportFont(value: String) {
+Line 2221: fun setExportLineSpacing(value: String) {
+Line 2226: fun setExportLogoPlacement(value: String) {
+Line 2231: fun setExportPageNumbering(value: String) {
+Line 2236: fun setExportHeaderFooter(enabled: Boolean) {
+Line 2241: fun setExportWatermark(enabled: Boolean) {
+Line 2246: fun setExportAutoToc(enabled: Boolean) {
+Line 2251: fun setExportAutoLists(enabled: Boolean) {
+Line 2256: fun setPromptSectionSplittingEnabled(enabled: Boolean) {
+Line 2262: fun setPromptMaxChars(value: Int) {
+Line 2268: fun generateMasterChartTemplate() {
+Line 2289: fun importMasterData(context: Context, uri: Uri) {
+Line 2353: private fun readMasterDataFile(context: Context, uri: Uri): ImportedMasterData {
+Line 2377: private fun resolveMasterDataFileName(context: Context, uri: Uri): String {
+Line 2391: private fun parseWorkbookRows(input: java.io.InputStream): List<List<String>> {
+Line 2410: private fun parseCsvRows(text: String): List<List<String>> {
+Line 2444: private fun buildMasterDataMappings(
+Line 2467: private fun masterDataMappingScore(header: String, column: MasterChartColumnJson): Double {
+Line 2485: private fun normalizeMasterDataName(value: String): String {
+Line 2495: private fun validateMasterDataRows(
+Line 2566: private fun buildMasterDataResultTables(
+Line 2631: private fun formatStat(value: Double): String {
+Line 2635: private fun buildChaptersWithMasterDataResults(
+Line 2731: private fun buildMasterChartColumns(state: UiState): List<MasterChartColumnJson> {
+Line 2734: fun add(
+Line 2827: private fun sanitizeMasterChartColumnName(value: String): String {
+Line 2836: private fun inferMasterChartType(name: String): String {
+Line 2847: private fun inferMasterChartRole(name: String): String {
+Line 2859: private fun inferMasterChartAllowedValues(name: String): String {
+Line 2870: private fun suggestedMasterChartAnalysis(name: String, role: String): String {
+Line 2882: private fun buildMasterChartCsv(columns: List<MasterChartColumnJson>): String {
+Line 2892: private fun csvEscape(value: String): String {
+Line 2897: private fun refreshWorkerPromptsForCurrentSettings() {
+Line 2922: fun setProvider(provider: String) {
+Line 2937: fun setVpsAutoCompleteEnabled(enabled: Boolean) {
+Line 2992: fun setThesisTitle(title: String) {
+Line 3002: fun createNewSession(title: String = "") {
+Line 3017: fun startExtraction(context: Context) {
+Line 3088: fun refreshReferenceCorpus() {
+Line 3119: private suspend fun prepareReferenceCorpusFromCurrentVariables(): Int {
+Line 3204: private suspend fun extractVariables(fullText: String): List<Variable> {
+Line 3234: private suspend fun callVariableExtractionAi(prompt: String): String = withContext(Dispatchers.IO) {
+Line 3323: private fun mergeExtractedVariable(existing: Variable?, incoming: Variable): Variable {
+Line 3348: private fun ensureDiseaseTopicVariable(
+Line 3361: fun pick(vararg names: String): String {
+Line 3387: private fun deriveDiseaseTopic(
+Line 3419: private fun isPlaceholderDiseaseTopic(value: String): Boolean {
+Line 3426: private fun cleanDiseaseTopicCandidate(value: String): String {
+Line 3445: private fun normalizeExtractedText(text: String): String {
+Line 3451: private fun buildThesisSessionPayload(sessionId: String): ThesisSessionPayload {
+Line 3503: private suspend fun saveThesisSessionToBackend(baseUrl: String, payload: ThesisSessionPayload): Boolean {
+Line 3525: private suspend fun loadThesisSessionFromBackend(action: String, userId: String, sessionId: String? = null): ThesisSessionPayload? {
+Line 3554: private suspend fun listThesisSessionsFromBackend(userId: String, limit: Int = 50): List<SessionItem> {
+Line 3577: private fun appendAiLogEntry(
+Line 3609: fun clearAiLogs() {
+Line 3614: private suspend fun callAiApi(
+Line 3801: private suspend fun refreshOpenRouterFreeModelsIfNeeded() {
+Line 3818: private suspend fun fetchOpenRouterFreeModels(): List<String> = withContext(Dispatchers.IO) {
+Line 3837: private fun parseOpenRouterFreeModels(raw: String): List<String> {
+Line 3886: private fun isTransientNetworkFailure(error: Throwable): Boolean {
+Line 3904: private fun notifyEndpointGatewayStillFailing(reason: String) {
+Line 3912: private suspend fun callOpenAiCompatibleFallback(prompt: String): String {
+Line 3961: private suspend fun callDeepSeekLastResort(prompt: String): String {
+Line 4013: private fun extractEndpointCompletionText(json: JsonObject): String {
+Line 4049: private suspend fun callOpenAiStyleProvider(
+Line 4114: private suspend fun callGemini(model: String, prompt: String): String {
+Line 4171: private suspend fun callCloudflare(model: String, prompt: String): String {
+Line 4218: private suspend fun callCohere(model: String, prompt: String): String {
+Line 4261: private suspend fun callReplicate(model: String, prompt: String): String {
+Line 4319: private fun firstCloudflareText(obj: JsonObject): String? {
+Line 4326: private fun isSkipToNextModelError(message: String): Boolean {
+Line 4346: private fun isProviderWideRefusalText(text: String): Boolean {
+Line 4358: private fun buildExtractionPrompt(
+Line 4448: private fun parseExtractionJson(text: String): List<Variable> {
+Line 4473: private fun extractJsonBlock(text: String): String {
+Line 4519: private fun looksLikeJsonObject(text: String): Boolean {
+Line 4524: private fun isCompleteJson(text: String): Boolean {
+Line 4535: private fun buildContinuationPrompt(basePrompt: String, previousOutput: String, chapterName: String): String {
+Line 4560: private suspend fun callAiJsonWithContinuation(
+Line 4590: private fun isWeakChapterContent(text: String): Boolean {
+Line 4600: fun updateVariable(name: String, newValue: String) {
+Line 4615: fun getChapterTextBoxesForEditor(chapter: Chapter): List<ChapterTextBoxJson> {
+Line 4621: fun ensureChapterTextBoxes(chapterName: String) {
+Line 4633: fun updateChapterTextBoxes(chapterName: String, textBoxes: List<ChapterTextBoxJson>) {
+Line 4655: fun startChapterGeneration() {
+Line 4679: fun dismissReferenceValidation() {
+Line 4683: fun dismissReferenceUpdateNotice() {
+Line 4687: fun confirmReferenceValidationAndGenerate() {
+Line 4714: private suspend fun validateReferencesBeforeGeneration(): ReferenceValidationState? {
+Line 4766: private fun beginChapterGeneration() {
+Line 4796: private fun buildReferenceValidationIssues(
+Line 4829: private fun normalizeReferenceText(text: String): String {
+Line 4833: private fun canonicalReferenceTextKey(text: String): String {
+Line 4843: private fun calculateLevenshteinDistance(s1: String, s2: String): Int {
+Line 4861: private fun isFuzzyMatch(ref1: String, ref2: String): Boolean {
+Line 4872: private fun deduplicateFuzzy(references: List<ReferenceJson>): List<ReferenceJson> {
+Line 4890: private fun formatReferencesForVariable(references: List<ReferenceJson>): String {
+Line 4900: private suspend fun mergeReferencesIntoGlobalVariable(
+Line 4944: private suspend fun generateAllChapters(
+Line 5054: private suspend fun generateSingleChapter(
+Line 5284: private fun queuePendingChaptersForVps(
+Line 5340: private suspend fun showParsedChapterWritingDraft(chapterName: String, content: String, rawJson: String = "") {
+Line 5346: private fun updateLoadingChapterDraft(chapterName: String, content: String, rawJson: String = "") {
+Line 5361: private fun chapterWritingPreview(chapterName: String, attempt: Int, variables: List<Variable> = emptyList()): String {
+Line 5389: private suspend fun generateLiteratureReviewChapter(
+Line 5442: private fun buildLiteratureReviewPrompt(
+Line 5499: private fun formatAbstractSectionsForPrompt(sections: List<PubMedAbstractSectionJson>): String {
+Line 5506: private fun buildPromptSizeControlInstructions(): String {
+Line 5521: private fun capPromptBlock(text: String, maxChars: Int, label: String): String {
+Line 5532: private fun buildChapterPrompt(
+Line 5630: private fun buildReferenceLedgerContext(limit: Int = Int.MAX_VALUE): String {
+Line 5648: private fun currentReferenceLedgerReferences(): List<ReferenceJson> {
+Line 5660: private fun approvedReferenceCorpusReferences(): List<ReferenceJson> {
+Line 5663: fun addReference(reference: ReferenceJson) {
+Line 5705: private fun approvedReferenceEvidence(): List<ReferenceEvidence> {
+Line 5708: fun add(item: ReferenceEvidence) {
+Line 5766: private fun selectEvidenceForChapter(chapterName: String, limit: Int = 12): List<ReferenceEvidence> {
+Line 5823: private fun queryTokens(text: String): Set<String> {
+Line 5837: private fun evidenceScore(queryTokens: Set<String>, haystack: String, sourceType: String): Int {
+Line 5846: private fun buildApprovedReferenceCorpusContext(chapterName: String): String {
+Line 5918: private fun abstractSectionCategoriesForChapter(chapterName: String): Set<String> {
+Line 5943: private fun buildChapterAbstractSectionContext(
+Line 5984: private fun buildTitleTopicContext(): String {
+Line 5985: fun variableValue(vararg names: String): String {
+Line 6018: private fun buildVerifiedPubMedEvidenceContext(chapterName: String): String {
+Line 6085: private fun thesisCapabilitySpec(): String = """
+Line 6095: private fun requiresPubMedCitations(chapterName: String): Boolean {
+Line 6109: private fun requiresFigureForChapter(chapterName: String): Boolean {
+Line 6122: private fun requiredFigureCountForChapter(chapterName: String): Int {
+Line 6129: private fun requiresChartForChapter(chapterName: String): Boolean {
+Line 6133: private suspend fun ensureRequiredCharts(
+Line 6148: private fun ensureRequiredFigures(chapterName: String, figures: List<FigureJson>): List<FigureJson> {
+Line 6175: private fun chartsToFigures(charts: List<ChartJson>): List<FigureJson> {
+Line 6188: private fun defaultFigureSpecsForChapter(chapterName: String): List<FigureJson> {
+Line 6258: private fun buildFallbackChartFromTables(chapterName: String, tables: List<ThesisTableJson>): ChartJson? {
+Line 6288: private fun buildFallbackChartFromVariables(chapterName: String): ChartJson? {
+Line 6319: private fun getFigureRequirementInstructions(chapterName: String): String {
+Line 6372: private fun getReferenceRelevanceInstructions(chapterName: String): String {
+Line 6398: private fun getReferenceChapterRules(chapterName: String): String {
+Line 6416: private fun hasInTextCitation(text: String): Boolean {
+Line 6425: private fun buildNormalizedVariableContext(chapterName: String, variables: List<Variable>): String {
+Line 6476: private fun chapterVariableGroups(chapterName: String): List<VariableGroup> {
+Line 6559: private fun canonicalVariableHints(): List<String> {
+Line 6572: private fun normalizeVariableKey(name: String): String {
+Line 6580: private fun denormalizeVariableKey(name: String): String {
+Line 6609: private fun getChartFormatRules(chapterName: String): String {
+Line 6643: private suspend fun sanitizeChartsForUse(charts: List<ChartJson>, chapterName: String): List<ChartJson> {
+Line 6669: private suspend fun repairChartWithAi(chart: ChartJson, chapterName: String): ChartJson? {
+Line 6711: private fun isRenderableChart(chart: ChartJson?): Boolean {
+Line 6718: private fun getSpecialInstructions(chapterName: String): String {
+Line 7003: private fun defaultGenericSchema(): String = """
+Line 7023: private suspend fun assembleAutoGeneratedFrontMatter() {
+Line 7160: fun addOrUpdateChapter(name: String, content: String, tables: List<ThesisTableJson> = emptyList()) {
+Line 7277: private fun chapterTypeFor(chapterName: String): String {
+Line 7301: private fun parseReferencesVariable(variables: List<Variable>): List<ReferenceJson> {
+Line 7323: private fun referencesVariableText(variables: List<Variable>): String {
+Line 7329: private suspend fun parseReferencesVariableForProcessing(): List<ReferenceJson> {
+Line 7343: private suspend fun repairReferenceBlockWithAi(
+Line 7381: private fun parseRepairedReferencesJson(raw: String): List<ReferenceJson> {
+Line 7401: private fun splitReferenceEntries(refsText: String): List<String> {
+Line 7427: fun flush() {
+Line 7456: private fun isReferenceEntryStart(line: String): Boolean {
+Line 7464: private fun countReferenceEntryMarkers(text: String): Int {
+Line 7468: private fun stripReferenceEntryNumber(entry: String): String {
+Line 7474: private fun looksLikeReferenceEntry(entry: String): Boolean {
+Line 7486: private fun isMetadataOnlyReference(reference: ReferenceJson): Boolean {
+Line 7490: private fun isReferenceMetadataOnlyText(text: String): Boolean {
+Line 7500: private fun splitInlineNumberedReferences(refsText: String): List<String> {
+Line 7509: private fun parseAbbreviationsVariable(variables: List<Variable>): List<AbbreviationJson> {
+Line 7529: private suspend fun verifyReferencesWithPubMed(references: List<ReferenceJson>): List<ReferenceJson> {
+Line 7605: private suspend fun refreshVerifiedPubMedEvidence(references: List<ReferenceJson>) {
+Line 7654: private fun seedVerifiedReferenceCache(references: List<ReferenceJson>) {
+Line 7658: private fun cacheVerifiedReference(reference: ReferenceJson) {
+Line 7670: private fun cacheVerifiedReferenceAliases(
+Line 7691: private fun findCachedVerifiedReference(reference: ReferenceJson, strippedCitation: String): ReferenceJson? {
+Line 7706: private fun verifiedReferenceKeys(reference: ReferenceJson): List<String> {
+Line 7719: private fun persistVerifiedReferenceCache() {
+Line 7732: private suspend fun resolvePubMedForReference(reference: ReferenceJson, strippedCitation: String): PubMedMatch? {
+Line 7757: private fun isCitationCompatibleWithPubMed(strippedCitation: String, pubmed: PubMedMatch): Boolean {
+Line 7764: private suspend fun requirePubMedVerifiedReferences(
+Line 7798: private fun isReferenceRelatedToDiseaseTopic(reference: ReferenceJson, chapterName: String): Boolean {
+Line 7822: private fun currentDiseaseTopic(): String {
+Line 7827: private fun diseaseTopicFromVariables(variables: List<Variable>): String {
+Line 7847: private fun topicTokens(text: String): Set<String> {
+Line 7866: private fun extractPmid(text: String): String {
+Line 7875: private fun extractBarePmid(text: String): String {
+Line 7880: private fun extractDoi(text: String): String? {
+Line 7941: private fun sanitizeReferenceForLookup(reference: ReferenceJson): ReferenceJson {
+Line 7958: private fun stripReferenceMetadata(text: String): String {
+Line 7968: private fun stripAppendedReferenceBlock(text: String): String {
+Line 7979: private fun buildDefaultChapterTextBoxes(chapter: Chapter): List<ChapterTextBoxJson> {
+Line 8010: private fun ensureChapterTextBoxes(chapter: Chapter): List<ChapterTextBoxJson> {
+Line 8014: private fun estimateTextBoxHeight(text: String, widthFraction: Float): Float {
+Line 8029: private fun buildReferenceSearchHints(referenceText: String): ReferenceSearchHints {
+Line 8061: private fun extractReferenceTitleCandidates(cleanedReference: String): List<String> {
+Line 8092: private fun looksLikeArticleTitle(segment: String): Boolean {
+Line 8105: private fun longestReferencePhrase(cleanedReference: String): String {
+Line 8143: private suspend fun searchPubMedReference(referenceText: String): PubMedMatch? = withContext(Dispatchers.IO) {
+Line 8170: private fun buildPubMedQueries(hints: ReferenceSearchHints): List<String> {
+Line 8213: private suspend fun searchPubMedMatches(
+Line 8240: private suspend fun batchFetchPubMedMatches(pmids: List<String>): Map<String, PubMedMatch> = withContext(Dispatchers.IO) {
+Line 8281: private suspend fun fetchPubMedMatch(pmid: String, hints: ReferenceSearchHints): PubMedMatch? = withContext(Dispatchers.IO) {
+Line 8308: private fun fetchLiteratureReviewSources(): List<PubMedReviewSource> {
+Line 8345: private suspend fun fetchPubMedAbstractSources(pmids: List<String>): List<PubMedAbstractSourceJson> = withContext(Dispatchers.IO) {
+Line 8425: private suspend fun fetchPubMedSimilarArticles(pmid: String): List<PubMedCitedByArticleJson> = withContext(Dispatchers.IO) {
+Line 8490: private suspend fun fetchPubMedSimilarPmidsFromELink(pmid: String): List<String> = withContext(Dispatchers.IO) {
+Line 8514: private suspend fun fetchPubMedAbstracts(pmids: List<String>): Map<String, String> = withContext(Dispatchers.IO) {
+Line 8518: private suspend fun fetchPubMedAbstractRecords(pmids: List<String>): Map<String, PubMedFetchedAbstract> = withContext(Dispatchers.IO) {
+Line 8551: private fun parsePubMedAbstractSections(article: org.jsoup.nodes.Element): List<PubMedAbstractSectionJson> {
+Line 8566: private fun normalizeAbstractSectionLabel(label: String): String {
+Line 8578: private fun normalizeAbstractSectionCategory(label: String): String {
+Line 8600: private fun hasPurposeMethodResultConclusion(abstractText: String): Boolean {
+Line 8610: private fun parsePubMedSummaryItem(pmid: String, resultObj: JsonObject?): PubMedMatch? {
+Line 8650: private fun scorePubMedMatch(match: PubMedMatch, hints: ReferenceSearchHints): Int {
+Line 8693: private fun isAcceptablePubMedSearchMatch(match: PubMedMatch, hints: ReferenceSearchHints): Boolean {
+Line 8726: private fun tokenOverlapScore(source: String, target: String): Int {
+Line 8734: private fun searchableTokenCount(text: String): Int {
+Line 8738: private fun extractAbbreviationsFromText(text: String): List<AbbreviationJson> {
+Line 8774: private fun parseThesisChapterJson(text: String, fallbackName: String = ""): ThesisChapterJson {
+Line 8788: private fun hasMeaningfulJsonContent(element: com.google.gson.JsonElement?): Boolean {
+Line 8818: private fun isMeaningfulThesisChapter(chapter: ThesisChapterJson): Boolean {
+Line 8836: private fun isMeaningfulParsedChapterValue(chapterName: String, parsed: Any): Boolean {
+Line 8867: private fun validateOrThrowParsedChapterValue(chapterName: String, rawJson: String, schema: ChapterSchema?): Any {
+Line 8907: private fun getDetailedUnmeaningfulReason(chapterName: String, parsed: Any): String {
+Line 8967: private fun verifySampleSizeCalculation(content: String): String? {
+Line 9003: fun reindexAllCitations() {
+Line 9078: private fun parseLooseThesisChapterJson(text: String, fallbackName: String): ThesisChapterJson {
+Line 9186: private fun fallbackThesisChapterJson(fallbackName: String, rawText: String = ""): ThesisChapterJson {
+Line 9206: private fun normalizeThesisChapterJson(
+Line 9277: private fun collectChapterFigures(chapter: ThesisChapterJson): List<FigureJson> {
+Line 9290: private fun collectChapterReferences(chapter: ThesisChapterJson): List<ReferenceJson> {
+Line 9298: private fun parseChapterFromRawJson(rawJson: String, fallbackName: String): ThesisChapterJson? {
+Line 9325: private fun serializedCitation(number: Int): String = "[$number]"
+Line 9327: private fun referenceIdentity(reference: ReferenceJson): String? {
+Line 9331: private fun referenceIdentities(reference: ReferenceJson): List<String> {
+Line 9355: private fun referenceNumber(reference: ReferenceJson): Int? {
+Line 9363: private fun nextReferenceSequence(references: List<ReferenceJson>): Int {
+Line 9371: private fun currentReferenceSequence(): Int {
+Line 9376: private fun citationNumber(citation: String): Int? {
+Line 9380: private fun rewriteInlineCitations(text: String, oldToNew: Map<Int, Int>): String {
+Line 9389: private fun inlineCitationNumbers(text: String): List<Int> {
+Line 9396: private fun inlineCitationNumbers(chapter: ThesisChapterJson): List<Int> {
+Line 9412: private fun inferInlineCitationMap(
+Line 9432: private fun serializeReferenceList(
+Line 9449: private fun serializeChapterCitations(
+Line 9488: private fun serializeThesisChapterCitations(
+Line 9523: private fun buildReferencesContent(title: String, references: List<ReferenceJson>): String {
+Line 9532: private fun parseChapterJson(text: String): ThesisChapterJson {
+Line 9536: private fun fallbackParsedChapterValue(chapterName: String, rawJson: String): Any? {
+Line 9565: private fun extractVisibleText(rawJson: String): String {
+Line 9600: fun collectText(element: com.google.gson.JsonElement?): List<String> {
+Line 9626: private fun formatMethodologyPreview(m: MethodologyJson): String {
+Line 9659: private fun formatDiscussionPreview(d: DiscussionJson): String {
+Line 9685: private fun convertStructuredPayloadToSections(chapterName: String, parsedValue: Any): List<ThesisSectionJson> {
+Line 9781: private fun formatChapterPreview(chapter: ThesisChapterJson): String {
+Line 9878: fun retryAllFailed() {
+Line 9944: fun retrySelected(chapterNames: Set<String>) {
+Line 10006: fun retryAllIncomplete() {
+Line 10072: fun retryChapter(chapter: Chapter, customPrompt: String? = null) {
+Line 10352: fun exportAllChaptersToUri(context: Context, uri: Uri) {
+Line 10386: fun closeContentStream() {
+Line 10393: fun setStrokeColor(cs: PDPageContentStream, color: Int) {
+Line 10401: fun setFillColor(cs: PDPageContentStream, color: Int) {
+Line 10409: fun drawPageChrome(cs: PDPageContentStream, sectionLabel: String) {
+Line 10854: fun newPage(sectionLabel: String = currentSectionLabel, decorate: Boolean = true): PDPageContentStream {
+Line 10870: fun ensureSpace(needed: Float) {
+Line 10877: fun contentWidth(): Float = pageSize.width - (margin * 2f)
+Line 10879: fun drawScaledCenteredBitmap(bitmap: Bitmap, maxWidth: Float, maxHeight: Float): Float {
+Line 10891: fun normalizePdfParagraphText(text: String): String {
+Line 10903: fun pdfFontForRun(baseFont: PDType1Font, runBold: Boolean): PDType1Font {
+Line 10916: fun pdfTextWidth(runs: List<ExportTextRun>, baseFont: PDType1Font, size: Float): Float {
+Line 10926: fun wrapPdfMarkdownLine(line: String, baseFont: PDType1Font, size: Float, maxWidth: Float): List<List<ExportTextRun>> {
+Line 11004: fun writeText(
+Line 11046: fun writeBulletText(
+Line 11100: fun writeNumberedPointText(
+Line 11155: fun exportTextForChapter(chapter: Chapter): String {
+Line 11160: fun drawCenteredText(
+Line 11189: suspend fun renderFigureBlock(
+Line 11233: suspend fun renderChartBlock(chart: ChartJson) {
+Line 11261: suspend fun renderStructuredSection(section: ThesisSectionJson, chapterName: String, resolvedFigures: List<FigureJson>) {
+Line 11409: fun renderStructuredMethodology(m: MethodologyJson) {
+Line 11473: fun renderStructuredDiscussion(d: DiscussionJson) {
+Line 11524: suspend fun renderStructuredChapter(chapter: Chapter): Boolean {
+Line 11610: suspend fun renderSpecialFormChapter(chapter: Chapter): Boolean {
+Line 11799: private fun savePdfDocument(context: Context, uri: Uri, pdf: PDDocument) {
+Line 11813: fun exportAllChaptersToDocx(context: Context, uri: Uri) {
+Line 11860: fun exportAllChaptersToPptx(context: Context, uri: Uri) {
+Line 11883: private fun outputStreamForUri(context: Context, uri: Uri) =
+Line 11892: private fun saveDocxDocument(context: Context, uri: Uri, document: XWPFDocument) {
+Line 11898: private fun addDocxCover(document: XWPFDocument, theme: PdfThemeStyle) {
+Line 11925: private suspend fun addDocxChapter(context: Context, document: XWPFDocument, chapter: Chapter, theme: PdfThemeStyle) {
+Line 11986: private fun addDocxMultilineText(document: XWPFDocument, text: String, theme: PdfThemeStyle) {
+Line 11992: private fun addDocxParagraph(
+Line 12026: private fun addDocxTable(document: XWPFDocument, table: ThesisTableJson, theme: PdfThemeStyle) {
+Line 12041: private fun fillDocxRow(row: XWPFTableRow, values: List<String>, bold: Boolean, theme: PdfThemeStyle, header: Boolean, shaded: Boolean) {
+Line 12053: private fun setDocxCellText(cell: XWPFTableCell, text: String, bold: Boolean, color: Int, theme: PdfThemeStyle) {
+Line 12072: private suspend fun addDocxFigure(context: Context, document: XWPFDocument, figure: FigureJson, theme: PdfThemeStyle) {
+Line 12085: private suspend fun addDocxChart(context: Context, document: XWPFDocument, chart: ChartJson, theme: PdfThemeStyle) {
+Line 12096: private fun addDocxBitmap(document: XWPFDocument, bitmap: Bitmap, widthDp: Int, heightDp: Int) {
+Line 12129: private fun sameExportHeading(left: String, right: String): Boolean {
+Line 12130: fun normalize(value: String): String {
+Line 12138: private fun parseBoldMarkdownRuns(text: String): List<ExportTextRun> {
+Line 12165: private fun stripBoldMarkdown(text: String): String =
+Line 12168: private fun appendExportRun(runs: MutableList<ExportTextRun>, text: String, bold: Boolean) {
+Line 12178: private fun wrapBoldMarkdownForExport(text: String, maxChars: Int = 170): List<String> {
+Line 12208: private fun wrapPptxTextLine(text: String, maxChars: Int = 170): List<String> {
+Line 12212: private fun buildPptxChapterSlides(
+Line 12247: private fun exportTextForPptxChapter(chapter: Chapter): String {
+Line 12252: private suspend fun buildPptxSlides(context: Context): List<PptxSlide> {
+Line 12331: private fun savePptxDocument(context: Context, uri: Uri, slides: List<PptxSlide>, theme: PdfThemeStyle) {
+Line 12357: private fun bitmapToPngBytes(bitmap: Bitmap): ByteArray {
+Line 12364: private fun zipText(zip: ZipOutputStream, path: String, text: String) {
+Line 12370: private fun zipBytes(zip: ZipOutputStream, path: String, bytes: ByteArray) {
+Line 12376: private fun xml(value: String): String = value
+Line 12384: private fun pptxText(value: String): String = xml(value)
+Line 12386: private fun pptxContentTypes(slideCount: Int): String = buildString {
+Line 12395: private fun pptxRootRels(): String =
+Line 12398: private fun pptxCoreProperties(): String =
+Line 12401: private fun pptxAppProperties(slideCount: Int): String =
+Line 12404: private fun pptxPresentation(slideCount: Int): String = buildString {
+Line 12410: private fun pptxPresentationRels(slideCount: Int): String = buildString {
+Line 12418: private fun pptxSlideRels(slide: PptxSlide, slideNumber: Int): String = buildString {
+Line 12427: private fun pptxSlideXml(slide: PptxSlide, slideNumber: Int, theme: PdfThemeStyle): String {
+Line 12479: private fun pptxTextShape(id: Int, text: String, x: Int, y: Int, cx: Int, cy: Int, size: Int, bold: Boolean, color: Int): String {
+Line 12491: private fun pptxDesignBlocks(theme: PdfThemeStyle, layout: String): String {
+Line 12601: private fun pptxRectShape(id: Int, x: Int, y: Int, cx: Int, cy: Int, fill: Int, stroke: Int?): String {
+Line 12606: private fun pptxPictureShape(id: Int, relId: String, x: Int, y: Int, cx: Int, cy: Int): String =
+Line 12609: private fun pptxSlideMaster(): String =
+Line 12612: private fun pptxSlideMasterRels(): String =
+Line 12615: private fun pptxSlideLayout(): String =
+Line 12618: private fun pptxSlideLayoutRels(): String =
+Line 12621: private fun pptxTheme(theme: PdfThemeStyle): String =
+Line 12624: private fun resolveExportFigure(figure: FigureJson, resolvedFigures: List<FigureJson>): FigureJson {
+Line 12646: private suspend fun loadFigureBitmap(context: Context, source: String, searchQuery: String?): Bitmap? {
+Line 12662: private fun createFigurePlaceholderBitmap(query: String): Bitmap {
+Line 12700: private fun wrapPlainText(text: String, paint: Paint, maxWidth: Float): List<String> {
+Line 12717: private suspend fun loadBitmapFromSource(context: Context, source: String): Bitmap? = withContext(Dispatchers.IO) {
+Line 12764: private suspend fun loadCollegeLogoBitmap(context: Context, selectedLogoUri: String): Bitmap? {
+Line 12779: private fun buildFigureImageSearchUrl(query: String): String {
+Line 12784: private suspend fun renderSpecialFormChapterBitmap(context: Context, logoBitmap: Bitmap?, theme: PdfThemeStyle, chapter: Chapter): Bitmap? {
+Line 12891: private suspend fun buildTitlePageDataFromVariables(): TitlePageJson {
+Line 12893: fun pick(vararg names: String, fallback: String = ""): String {
+Line 12912: private suspend fun renderTitlePageBitmap(context: Context, logoBitmap: Bitmap?, theme: PdfThemeStyle, titlePage: TitlePageJson, chapterTitle: String): Bitmap {
+Line 12990: fun wrapCanvasText(text: String, paint: Paint, maxWidth: Float): List<String> {
+Line 13003: fun flush() {
+Line 13025: fun drawCenteredWrappedText(
+Line 13211: private fun renderProformaBitmap(proforma: ProformaJson, chapterTitle: String, logoBitmap: Bitmap?, theme: PdfThemeStyle): Bitmap {
+Line 13273: fun drawField(label: String, value: String, boxHeight: Float = 112f, fullWidth: Boolean = true) {
+Line 13288: fun drawSmallField(x: Float, label: String, value: String) {
+Line 13311: private fun renderCertificateBitmap(certificate: CertificateJson, chapterTitle: String, logoBitmap: Bitmap?, theme: PdfThemeStyle): Bitmap {
+Line 13382: private fun renderDeclarationBitmap(declaration: DeclarationJson, chapterTitle: String, logoBitmap: Bitmap?, theme: PdfThemeStyle): Bitmap {
+Line 13449: private fun renderAcknowledgementsBitmap(acknowledgements: AcknowledgementsJson, chapterTitle: String, logoBitmap: Bitmap?, theme: PdfThemeStyle): Bitmap {
+Line 13510: private fun renderConsentBitmap(consent: ConsentFormJson, chapterTitle: String, isHindi: Boolean, logoBitmap: Bitmap?, theme: PdfThemeStyle): Bitmap {
+Line 13564: fun drawSection(title: String, content: String, boxHeight: Float) {
+Line 13596: private fun drawWrappedText(
+Line 13611: fun flushLine() {
+Line 13649: private fun drawCenteredText(
+Line 13674: private fun wrapText(
+Line 13684: fun textWidth(s: String): Float {
+Line 13711: fun resolveAndRefreshFigures() {
+Line 13726: fun updateFigureImageUrl(
+Line 13749: fun refreshPubMedFigures(context: Context) {
+Line 13829: private fun collectVerifiedPmids(): List<String> {
+Line 13840: private suspend fun fetchPubMedFiguresForPmid(context: Context, pmid: String): List<PubMedFigureJson> = withContext(Dispatchers.IO) {
+Line 13862: private suspend fun fetchPubMedPageFigures(context: Context, pmid: String): List<PubMedFigureJson> = withContext(Dispatchers.IO) {
+Line 13909: private suspend fun fetchLinkedPmcIds(pmid: String): List<String> = withContext(Dispatchers.IO) {
+Line 13932: private suspend fun fetchPmcFigures(context: Context, pmid: String, pmcId: String): List<PubMedFigureJson> = withContext(Dispatchers.IO) {
+Line 13974: private suspend fun downloadPubMedFigure(
+Line 14011: private suspend fun resolveFigureImages(chapters: List<Chapter>): List<Chapter> = withContext(Dispatchers.IO) {
+Line 14025: private suspend fun searchImageFromQuery(query: String): String = withContext(Dispatchers.IO) {
+Line 14037: private fun buildRetryPrompt(chapterName: String, variables: List<Variable>): String {
+Line 14042: private fun parseGeneratedChapterValue(chapterName: String, rawJson: String, schema: ChapterSchema?): Any? {
+Line 14054: private fun saveChapterVersion(chapterName: String, content: String, rawJson: String) {
+Line 14063: fun getChapterVersions(chapterName: String): List<ChapterVersion> {
+Line 14067: private fun computeCompletionPercent(chapters: List<Chapter>): Int {
+Line 14093: private fun cachedPubMedMatchesSnapshot(): List<PubMedMatchCacheJson> {
+Line 14099: private fun cachedPubMedSearchMatchesSnapshot(): List<PubMedSearchMatchCacheJson> {
+Line 14105: private fun cachedAbstractSourcesSnapshot(): List<PubMedAbstractSourceJson> {
+Line 14111: private fun cachedVerifiedReferencesSnapshot(): List<ReferenceJson> {
+Line 14117: private fun buildReferenceCachePayload(sessionId: String): ThesisReferenceCachePayload {
+Line 14132: private fun firestoreSafeDocumentId(value: String, fallback: String): String {
+Line 14143: private fun referenceCacheDocumentId(reference: ReferenceJson, index: Int): String {
+Line 14151: private fun shouldWriteFirestoreChunk(label: String, value: Any): Boolean {
+Line 14160: private fun referenceCacheSignature(
+Line 14182: fun syncVerifiedReferenceCacheNow() {
+Line 14186: private fun mergeReferenceCacheIntoSession(
+Line 14220: private fun saveReferenceCacheToFirestore(uid: String, sessionId: String, force: Boolean = false) {
+Line 14265: private fun restoreSessionWithFirestoreCache(session: ThesisSessionPayload) {
+Line 14272: private suspend fun ensureAbstractSourcesHydratedAfterSessionLoad(session: ThesisSessionPayload) = withContext(Dispatchers.IO) {
+Line 14301: private fun postReferenceCacheBackend(payload: Map<String, Any?>): JsonObject {
+Line 14337: private fun loadReferenceCacheFromPhp(uid: String, sessionId: String): ThesisReferenceCachePayload {
+Line 14383: private fun restorePubMedCachesFromSession(session: ThesisSessionPayload) {
+Line 14409: private fun uploadCurrentVerifiedReferenceCacheToFirestore(reason: String, force: Boolean = false) {
+Line 14471: fun saveSessionToFirebase(immediate: Boolean = false) {
+Line 14614: fun setAutoSyncEnabled(enabled: Boolean) {
+Line 14624: fun refreshFromWorker() {
+Line 14674: fun pushLocalChanges() {
+Line 14678: fun toggleChapterSelection(chapterName: String) {
+Line 14689: fun clearChapterSelection() {
+Line 14693: private fun syncRemoteThemeLayoutsOnStart() {
+Line 14702: fun tryLoadLatestSession() {
+Line 14721: private fun loadLatestSessionFromFirebase() {
+Line 14755: fun loadPreviousSessions() {
+Line 14822: fun loadSession(sessionId: String) {
+Line 14880: private fun parseThesisSessionSnapshot(snapshot: com.google.firebase.database.DataSnapshot): ThesisSessionPayload? {
+Line 14892: private fun normalizeThesisSessionJson(element: com.google.gson.JsonElement): com.google.gson.JsonElement {
+Line 14903: private fun normalizeChapterJson(chapter: JsonObject) {
+Line 14925: private fun attachCurrentSessionWorkerListener(sessionId: String) {
+Line 15000: private fun detachCurrentSessionWorkerListener() {
+Line 15018: private fun chapterSuccessNotificationSignature(sessionId: String, chapter: Chapter): String {
+Line 15029: private fun notifyChapterCompleted(sessionId: String, chapter: Chapter) {
+Line 15085: private fun remoteWorkerSignature(session: ThesisSessionPayload): String {
+Line 15111: private fun shouldMergeRemoteWorkerChapter(local: Chapter, remote: Chapter): Boolean {
+Line 15129: private fun mergeRemoteWorkerChapter(local: Chapter, remote: Chapter): Chapter {
+Line 15168: private fun isVpsWrittenChapter(chapter: Chapter): Boolean {
+Line 15176: private fun mergeRemoteWorkerChapters(session: ThesisSessionPayload, remoteChapters: List<Chapter>) {
+Line 15256: private suspend fun reparseWorkerChapterForApp(chapter: Chapter): Chapter {
+Line 15357: private fun restoreSession(session: ThesisSessionPayload) {
+Line 15571: private fun normalizeRestoredChapterList(restoredChapters: List<Chapter>): List<Chapter> {
+Line 15581: private fun isChapterIncompleteAfterRestore(chapter: Chapter): Boolean {
+Line 15592: private fun isChapterQueueCandidateForVps(chapter: Chapter): Boolean {
+Line 15597: private fun areAllNormalChaptersCompleted(chapters: List<Chapter>): Boolean {
+Line 15602: private suspend fun completeRemainingRestoredChaptersAndGenerateLists(
+Line 15686: private fun autoRetryRestoredStuckChapters() {
+Line 15730: private suspend fun recheckRestoredReferences() {
+Line 15783: private fun shouldRebuildReferenceSections(variables: List<Variable>, chapters: List<Chapter>): Boolean {
+Line 15859: private fun drawPdfTable(
+Line 15889: fun ensureTableSpace(requiredHeight: Float): Boolean {
+Line 15899: fun drawHeader() {
+Line 15969: fun drawRow(row: List<String>) {
+Line 16058: private fun normalizeAiTable(table: AiTable): ThesisTableJson {
+Line 16091: private fun normalizeResultTable(table: TableJson): ThesisTableJson {
+Line 16114: private fun normalizeThesisTable(table: ThesisTableJson): ThesisTableJson {
+Line 16125: private fun normalizeAiChart(chart: AiChart): ChartJson {
+Line 16149: private fun normalizeResultChart(chart: ChartJson): ChartJson {
+Line 16178: private fun inferSupportedChartType(rawType: String, chartTemplate: String, datasets: List<ChartDatasetJson>): String {
+Line 16199: private fun parseResultsFromRawJson(rawJson: String): ResultsJson? {
+Line 16209: private fun formatResultsPreview(results: ResultsJson): String {
+Line 16230: private fun chartDataLabels(data: Any?): List<String> {
+Line 16244: private fun chartDataValues(data: Any?): List<Double> {
+Line 16267: private fun extractTopLevelJsonObject(text: String): String {
+Line 16279: private fun chartPaletteForTheme(theme: PdfThemeStyle): List<Int> {
+Line 16314: private suspend fun renderChartToBitmap(
+Line 16552: private fun chartLabels(chart: ChartJson, dataset: ChartDatasetJson): List<String> {
+Line 16559: private fun stripBoldMarkdownForPlainExport(text: String): String {
+Line 16580: private fun sanitizePdfText(text: String): String {
+Line 16591: private fun wrapPdfCellText(
+Line 16602: fun width(value: String): Float {

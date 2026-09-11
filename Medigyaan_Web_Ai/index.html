@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1d4ed8">
+    <meta name="description" content="Medigyaan AI - Professional Medical Assistant for NEET PG">
+    <title>Medigyaan AI - Pro Medical Assistant</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+    <link rel="icon" type="image/png" href="assets/images/medigyaan_icon_only.png">
+    
+    <!-- PDF.js for PDF parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="chat-container" id="chat-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <button class="icon-btn pulse-btn" onclick="toggleHistory()" title="History">
+                    <i class="fas fa-comment-dots"></i>
+                    <span class="badge" id="history-badge" style="display:none;">0</span>
+                </button>
+                <div class="logo-wrapper">
+                    <img src="assets/images/medigyaan_logo.png" alt="Medigyaan" class="logo-image" onerror="this.style.display='none'">
+                    <div class="logo-ring"></div>
+                </div>
+                <div class="header-info">
+                    <h1>Medigyaan AI</h1>
+                    <div class="status-line">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Professional Mode</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="model-chip" id="model-badge" onclick="cycleModelMode()" title="Switch model">
+                    <i class="fas fa-bolt"></i>
+                    <span>Fast</span>
+                </button>
+                <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                </button>
+                <button class="icon-btn" onclick="startNewChat()" title="New Chat">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="icon-btn" onclick="toggleHistory()" title="History">
+                    <i class="fas fa-clock-rotate-left"></i>
+                </button>
+                <button class="icon-btn" onclick="showExportMenu()" title="Export">
+                    <i class="fas fa-download"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Tools Bar -->
+        <div class="tools-bar">
+            <button class="tool-chip active" onclick="selectTool('all')" data-tool="all">
+                <i class="fas fa-sparkles"></i> All
+            </button>
+            <button class="tool-chip" onclick="selectTool('pubmed')" data-tool="pubmed">
+                <i class="fas fa-flask"></i> PubMed
+            </button>
+            <button class="tool-chip" onclick="selectTool('poster')" data-tool="poster">
+                <i class="fas fa-image"></i> Poster
+            </button>
+            <button class="tool-chip" onclick="selectTool('chapter')" data-tool="chapter">
+                <i class="fas fa-book"></i> Chapter
+            </button>
+            <button class="tool-chip" onclick="selectTool('counselor')" data-tool="counselor">
+                <i class="fas fa-graduation-cap"></i> Counselor
+            </button>
+            <button class="tool-chip" onclick="selectTool('thesis')" data-tool="thesis">
+                <i class="fas fa-microscope"></i> Thesis
+            </button>
+            <button class="tool-chip" onclick="selectTool('export')" data-tool="export">
+                <i class="fas fa-file-export"></i> Export
+            </button>
+        </div>
+
+        <!-- History Drawer -->
+        <div class="drawer-overlay" id="drawer-overlay" onclick="toggleHistory()"></div>
+        <div class="history-drawer" id="history-drawer">
+            <div class="drawer-header">
+                <h3><i class="fas fa-history"></i> Chat History</h3>
+                <button class="close-btn" onclick="toggleHistory()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="history-search" placeholder="Search conversations..." oninput="filterHistory()">
+            </div>
+            <div class="session-list" id="session-list">
+                <div class="empty-state">
+                    <i class="fas fa-comments"></i>
+                    <p>No conversations yet</p>
+                    <small>Start chatting to see your history here</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Area -->
+        <main id="chat-messages">
+            <!-- Welcome Screen -->
+            <div class="welcome-screen" id="welcome-hint">
+                <div class="welcome-animation">
+                    <div class="brain-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="pulse-ring"></div>
+                </div>
+                <h2 class="welcome-title">Welcome to Medigyaan AI</h2>
+                <p class="welcome-subtitle">Your professional medical assistant for NEET PG preparation</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card" onclick="fillInput('Explain diabetic ketoacidosis management step by step')">
+                        <div class="feature-icon pubmed">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <h4>PubMed Validation</h4>
+                        <p>Verify medical references and citations</p>
+                    </div>
+                    <div class="feature-card" onclick="fillInput('Generate a research poster from this abstract: ')">
+                        <div class="feature-icon poster">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <h4>Poster Generator</h4>
+                        <p>Create professional research posters</p>
+                    </div>
+                    <div class="feature-card" onclick="fillInput('Write the Discussion chapter from my PDF')">
+                        <div class="feature-icon chapter">
+                            <i class="fas fa-book-medical"></i>
+                        </div>
+                        <h4>Chapter Writer</h4>
+                        <p>Generate thesis chapters from PDFs</p>
+                    </div>
+                    <div class="feature-card" onclick="fillInput('Predict my colleges for rank 12000 GEN category')">
+                        <div class="feature-icon counselor">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h4>College Counselor</h4>
+                        <p>Get personalized college predictions</p>
+                    </div>
+                    <div class="feature-card" onclick="fillInput('Search thesis topics on glaucoma management')">
+                        <div class="feature-icon thesis">
+                            <i class="fas fa-microscope"></i>
+                        </div>
+                        <h4>Thesis Topics</h4>
+                        <p>Find research topics and ideas</p>
+                    </div>
+                    <div class="feature-card" onclick="fillInput('Explain the pathophysiology of heart failure')">
+                        <div class="feature-icon chat">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h4>AI Chat</h4>
+                        <p>Ask any medical question</p>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="fillInput('Explain diabetic ketoacidosis management')">
+                        <i class="fas fa-pills"></i> DKA Management
+                    </button>
+                    <button class="quick-btn" onclick="fillInput('Search thesis topics on glaucoma')">
+                        <i class="fas fa-graduation-cap"></i> Thesis Topics
+                    </button>
+                    <button class="quick-btn" onclick="fillInput('Validate these references:\n1. Smith J et al. Lancet 2023')">
+                        <i class="fas fa-check-circle"></i> Validate References
+                    </button>
+                    <button class="quick-btn" onclick="fillInput('Predict my colleges for rank 12000 GEN')">
+                        <i class="fas fa-bullseye"></i> College Predictor
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Attachment Status -->
+        <div id="attachment-status" class="attachment-status hidden">
+            <div class="attachment-info">
+                <i class="fas fa-paperclip"></i>
+                <span id="attachment-name"></span>
+            </div>
+            <button onclick="clearAttachment()" class="remove-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- PDF Status -->
+        <div id="pdf-status" class="pdf-status hidden">
+            <div class="pdf-info">
+                <i class="fas fa-file-pdf"></i>
+                <span id="pdf-status-text"></span>
+            </div>
+            <button onclick="clearPdf()" class="remove-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="typing-indicator" class="typing-indicator hidden">
+            <div class="typing-avatar">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <span class="typing-text">Medigyaan is thinking...</span>
+        </div>
+
+        <!-- Export Menu -->
+        <div id="export-menu" class="export-menu hidden">
+            <div class="export-header">
+                <i class="fas fa-file-export"></i>
+                <span>Export Conversation</span>
+            </div>
+            <div class="export-options">
+                <button onclick="exportChat('pdf')" class="export-btn">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>PDF Document</span>
+                </button>
+                <button onclick="exportChat('docx')" class="export-btn">
+                    <i class="fas fa-file-word"></i>
+                    <span>Word Document</span>
+                </button>
+                <button onclick="exportChat('pptx')" class="export-btn">
+                    <i class="fas fa-file-powerpoint"></i>
+                    <span>PowerPoint</span>
+                </button>
+                <button onclick="exportChat('txt')" class="export-btn">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Text File</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <footer class="input-footer">
+            <div class="input-wrapper">
+                <input type="file" id="file-input" class="hidden" accept=".pdf,.txt,.png,.jpg,.jpeg">
+                <button class="attach-btn" onclick="document.getElementById('file-input').click()" title="Attach file">
+                    <i class="fas fa-paperclip"></i>
+                </button>
+                <div class="input-field-wrapper">
+                    <textarea id="user-input" placeholder="Ask anything about NEET PG medicine..." rows="1"></textarea>
+                    <div class="input-hint">
+                        <span class="char-count" id="char-count">0</span>
+                        <span class="input-tip">Press Enter to send, Shift+Enter for new line</span>
+                    </div>
+                </div>
+                <button id="send-btn" class="send-btn" disabled title="Send">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            <div class="footer-info">
+                <span class="powered-by">Powered by Medigyaan AI</span>
+                <span class="version">v2.0</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

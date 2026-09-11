@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Customize Widget"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- 🔥 EXAM NAME -->
+        <EditText
+            android:id="@+id/etWidgetExamName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Exam Name (e.g. NEET PG)"
+            android:padding="12dp"
+            android:background="#FFFFFF"
+            android:textColor="#000"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- 🔥 EXAM DATE -->
+        <EditText
+            android:id="@+id/etWidgetExamDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Exam Date (yyyy-MM-dd OR yyyy-MM-dd HH:mm)"
+            android:padding="12dp"
+            android:background="#FFFFFF"
+            android:textColor="#000"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- 🔥 SAVE BUTTON -->
+        <Button
+            android:id="@+id/btnSaveWidgetExam"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Save Exam"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- IMAGE SETTINGS -->
+        <Button
+            android:id="@+id/btnSetWidgetProfile"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Change Profile Icon"
+            android:backgroundTint="#2196F3"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp"/>
+
+        <Button
+            android:id="@+id/btnSetWidgetBackground"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Change Background Image"
+            android:backgroundTint="#2196F3"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- RESET -->
+        <Button
+            android:id="@+id/btnResetWidget"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reset to Default"
+            android:backgroundTint="#757575"
+            android:textColor="#FFFFFF"/>
+
+        <!-- BACK -->
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Back"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
+
+    </LinearLayout>
+</ScrollView>

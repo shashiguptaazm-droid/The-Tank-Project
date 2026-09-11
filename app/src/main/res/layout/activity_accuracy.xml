@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:fitsSystemWindows="true">
+
+    <!-- ============================================================ -->
+    <!--  BIG ACCURACY TITLE – glowing neon                           -->
+    <!-- ============================================================ -->
+    <TextView
+        android:id="@+id/txtBigAccuracy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="0%"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-black"
+        android:textColor="?attr/colorOnSurface"
+        android:shadowColor="#00E5FF"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:shadowRadius="8"
+        android:transitionName="big_accuracy" />
+
+    <!-- ============================================================ -->
+    <!--  STATS CARDS – horizontal row with neon strokes               -->
+    <!-- ============================================================ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:animateLayoutChanges="true">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:strokeColor="#BB86FC"
+            app:strokeWidth="2dp"
+            app:rippleColor="#BB86FC"
+            android:transitionName="overall_card">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Overall"
+                    android:textColor="#BB86FC"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/txtOverallStats"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 correct / 0 attempted"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-medium" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:strokeColor="#00E5FF"
+            app:strokeWidth="2dp"
+            app:rippleColor="#00E5FF"
+            android:transitionName="today_card">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Today"
+                    android:textColor="#00E5FF"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/txtTodayStats"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 correct / 0 attempted"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-medium" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
+    <!-- ============================================================ -->
+    <!--  ESTIMATED END‑OF‑DAY CARD                                    -->
+    <!-- ============================================================ -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:cardBackgroundColor="?attr/colorSurface"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="6dp"
+        app:strokeColor="#FFD54F"
+        app:strokeWidth="2dp"
+        app:rippleColor="#FFD54F"
+        android:transitionName="estimated_card">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Estimated End‑of‑Day"
+                android:textColor="#FFD54F"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/txtPeriodStats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 / 0 • 0%"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- ============================================================ -->
+    <!--  STATUS LINE – neon glow                                      -->
+    <!-- ============================================================ -->
+    <TextView
+        android:id="@+id/txtStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:text="Loading..."
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="12sp"
+        android:fontFamily="sans-serif-medium"
+        android:shadowColor="#00E5FF"
+        android:shadowRadius="2" />
+
+    <!-- ============================================================ -->
+    <!--  REFRESH BUTTON – glowing MaterialButton                      -->
+    <!-- ============================================================ -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:text="Refresh Accuracy"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="?attr/colorOnSurface"
+        android:fontFamily="sans-serif-black"
+        android:shadowColor="#00E5FF"
+        android:shadowRadius="3"
+        app:backgroundTint="#7B1FFF"
+        app:cornerRadius="12dp"
+        app:rippleColor="#00E5FF"
+        android:transitionName="refresh_button" />
+
+    <!-- ============================================================ -->
+    <!--  TAB LAYOUT – now used to switch between LEVEL views          -->
+    <!--  (Easy / Medium / Hard)                                       -->
+    <!-- ============================================================ -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayoutAccuracy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="?attr/colorSurface"
+        app:tabBackground="@drawable/bg_gaming_tab_track"
+        app:tabIndicatorColor="#00E5FF"
+        app:tabIndicatorHeight="3dp"
+        app:tabTextColor="?attr/colorOnSurfaceVariant"
+        app:tabSelectedTextColor="#00E5FF"
+        app:tabRippleColor="#1A1F38"
+        android:animateLayoutChanges="true" />
+
+    <!-- ============================================================ -->
+    <!--  LINE CHART – THREE‑PART GRAPH (multi‑line)                   -->
+    <!--  Dark background, neon grid lines                             -->
+    <!-- ============================================================ -->
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/lineChartAccuracy"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:background="?attr/colorSurface"
+        android:padding="8dp"
+        android:transitionName="accuracy_chart" />
+
+</LinearLayout>

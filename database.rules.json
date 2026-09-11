@@ -1,0 +1,41 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "auth != null && auth.uid == $uid",
+        "thesis_sessions": {
+          ".indexOn": ["updatedAt"]
+        },
+        "poster_sessions": {
+          ".indexOn": ["updatedAt"]
+        }
+      }
+    },
+
+    "lobbies": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "challenges": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "history": {
+      "$userId": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".indexOn": ["timestamp"]
+      }
+    },
+
+    "user_challenges": {
+      "$userId": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    }
+  }
+}

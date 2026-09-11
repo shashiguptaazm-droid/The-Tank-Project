@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MediGyaan</string>
+
+    <string name="contact_us">Contact Us</string>
+    <string name="challenge_friends">Challenge Friends</string>
+    <string name="search_friends">Search friends...</string>
+
+
+<item name="txtInstitute" type="id"/>
+<item name="txtCourse" type="id"/>
+<item name="txtRank" type="id"/>
+<item name="txtChance" type="id"/>
+<item name="txtFees" type="id"/>
+<item name="txtStipend" type="id"/>
+<item name="txtExtra" type="id"/>
+</resources>

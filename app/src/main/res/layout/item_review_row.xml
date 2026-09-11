@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="?attr/colorSurface">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <!-- QUESTION -->
+        <TextView
+            android:id="@+id/itemQuestion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- QUESTION IMAGE -->
+        <ImageView
+            android:id="@+id/questionImage"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginTop="10dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:visibility="gone" />
+
+        <!-- OPTIONS -->
+        <TextView
+            android:id="@+id/optionA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="12dp"
+            android:text="A. Option A"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/optionB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:padding="12dp"
+            android:text="B. Option B"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/optionC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:padding="12dp"
+            android:text="C. Option C"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/optionD"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:padding="12dp"
+            android:text="D. Option D"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="14sp" />
+
+        <!-- USER ANSWER -->
+        <TextView
+            android:id="@+id/itemUserAnswer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Your Answer"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <!-- CORRECT ANSWER -->
+        <TextView
+            android:id="@+id/itemCorrectAnswer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Correct Answer"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="14sp" />
+
+        <!-- EXPLANATION -->
+        <TextView
+            android:id="@+id/itemExplanation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorPrimaryContainer"
+            android:padding="12dp"
+            android:textColor="@color/colorOnPrimaryContainer"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
+        <!-- ASK AI BUTTON -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/askAiBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="ðŸ’¬ Ask AI Tutor"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textColor="@color/colorOnPrimary"
+            android:backgroundTint="@color/colorPrimary"
+            app:cornerRadius="10dp" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

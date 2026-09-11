@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/side_profile"
+            android:icon="@drawable/ic_person"
+            android:title="My Profile" />
+
+        <item
+            android:id="@+id/side_scores"
+            android:icon="@drawable/ic_score"
+            android:title="My Scores" />
+
+        <item
+            android:id="@+id/side_pdfs"
+            android:icon="@drawable/ic_description"
+            android:title="Study Materials" />
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/side_messenger"
+                android:icon="@drawable/ic_send"
+                android:title="Messenger" />
+            <item
+                android:id="@+id/side_settings"
+                android:icon="@drawable/ic_settings"
+                android:title="Settings" />
+        </menu>
+    </item>
+
+    <item android:title="Account">
+        <menu>
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_logout"
+                android:title="Logout" />
+        </menu>
+    </item>
+
+</menu>

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ========================================================= -->
+    <!-- NIGHT THEME -->
+    <!-- File: values-night/themes.xml -->
+    <!-- ========================================================= -->
+
+    <style name="Theme.EduLabsRTM"
+        parent="Theme.Material3.DayNight.NoActionBar">
+
+        <!-- PRIMARY -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+
+        <!-- PRIMARY CONTAINER -->
+        <item name="colorPrimaryContainer">@color/colorPrimaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/colorOnPrimaryContainer</item>
+
+        <!-- SECONDARY -->
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorOnSecondary">@color/colorOnSecondary</item>
+
+        <!-- BACKGROUND -->
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorBackgroundFloating">@color/colorBackground</item>
+        <item name="colorOnBackground">@color/colorOnBackground</item>
+
+        <!-- SURFACE -->
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+
+        <!-- ERROR -->
+        <item name="colorError">@android:color/holo_red_light</item>
+        <item name="colorOnError">@android:color/white</item>
+
+        <!-- OUTLINE -->
+        <item name="colorOutline">@color/colorOutline</item>
+
+        <!-- WINDOW -->
+        <item name="android:windowBackground">@color/colorBackground</item>
+
+        <!-- STATUS / NAVIGATION -->
+        <item name="android:statusBarColor">@color/colorBackground</item>
+        <item name="android:navigationBarColor">@color/colorSurface</item>
+
+        <!-- DARK MODE ICONS -->
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+
+        <!-- MATERIAL COMPONENTS -->
+        <item name="materialCardViewStyle">@style/AppMaterialCardView</item>
+        <item name="materialButtonStyle">@style/AppMaterialButton</item>
+        <item name="textInputStyle">@style/AppTextInputLayout</item>
+
+    </style>
+
+
+    <!-- ========================================================= -->
+    <!-- MATERIAL CARD -->
+    <!-- ========================================================= -->
+
+    <style name="AppMaterialCardView"
+        parent="Widget.Material3.CardView.Elevated">
+
+        <item name="cardCornerRadius">18dp</item>
+
+        <item name="cardElevation">2dp</item>
+
+        <item name="strokeWidth">1dp</item>
+
+        <item name="strokeColor">?attr/colorOutline</item>
+
+        <item name="cardBackgroundColor">?attr/colorSurface</item>
+
+    </style>
+
+
+    <!-- ========================================================= -->
+    <!-- MATERIAL BUTTON -->
+    <!-- ========================================================= -->
+
+    <style name="AppMaterialButton"
+        parent="Widget.Material3.Button">
+
+        <item name="cornerRadius">24dp</item>
+
+        <item name="backgroundTint">?attr/colorPrimary</item>
+
+        <item name="android:textColor">@color/colorOnPrimary</item>
+
+        <item name="android:textAllCaps">false</item>
+
+    </style>
+
+
+    <!-- ========================================================= -->
+    <!-- TEXT INPUT LAYOUT -->
+    <!-- ========================================================= -->
+
+    <style name="AppTextInputLayout"
+        parent="Widget.Material3.TextInputLayout.OutlinedBox">
+
+        <item name="boxBackgroundMode">outline</item>
+
+        <item name="boxStrokeColor">?attr/colorPrimary</item>
+
+        <item name="hintTextColor">@color/colorOnSurface</item>
+
+        <item name="android:textColorHint">@color/colorOnSurface</item>
+
+    </style>
+
+
+    <!-- ========================================================= -->
+    <!-- TEXT INPUT EDITTEXT -->
+    <!-- ========================================================= -->
+
+    <style name="AppTextInputEditText"
+        parent="Widget.Material3.TextInputEditText.OutlinedBox">
+
+        <item name="android:textColor">@color/colorOnSurface</item>
+
+        <item name="android:textColorHint">@color/colorOnSurface</item>
+
+        <item name="android:textSize">16sp</item>
+
+    </style>
+
+
+    <!-- ========================================================= -->
+    <!-- DASHBOARD CARD -->
+    <!-- ========================================================= -->
+
+    <style name="DashboardCardStyle">
+
+        <item name="cardCornerRadius">20dp</item>
+
+        <item name="cardElevation">3dp</item>
+
+        <item name="strokeWidth">1dp</item>
+
+        <item name="strokeColor">?attr/colorOutline</item>
+
+        <item name="cardBackgroundColor">?attr/colorSurface</item>
+
+        <item name="android:layout_width">match_parent</item>
+
+        <item name="android:layout_height">wrap_content</item>
+
+    </style>
+
+
+    <!-- ========================================================= -->
+    <!-- DASHBOARD TEXT -->
+    <!-- ========================================================= -->
+
+    <style name="DashboardCardTextStyle">
+
+        <item name="android:textColor">@color/colorOnSurface</item>
+
+        <item name="android:textSize">15sp</item>
+
+        <item name="android:textStyle">bold</item>
+
+    </style>
+
+
+    <!-- ========================================================= -->
+    <!-- OPTION STYLE -->
+    <!-- ========================================================= -->
+
+    <style name="PrepLadderOptionStyle">
+
+        <item name="android:layout_width">match_parent</item>
+
+        <item name="android:layout_height">wrap_content</item>
+
+        <item name="android:layout_marginBottom">12dp</item>
+
+        <item name="android:padding">16dp</item>
+
+        <item name="android:textColor">@color/colorOnSurface</item>
+
+        <item name="android:textSize">16sp</item>
+
+        <item name="android:background">@drawable/option_selector_rounded</item>
+
+        <item name="android:button">@null</item>
+
+    </style>
+
+
+    <!-- ========================================================= -->
+    <!-- SUBMIT BUTTON -->
+    <!-- ========================================================= -->
+
+    <style name="SubmitButtonStyle"
+        parent="Widget.Material3.Button">
+
+        <item name="backgroundTint">?attr/colorPrimary</item>
+
+        <item name="android:textColor">@color/colorOnPrimary</item>
+
+        <item name="cornerRadius">26dp</item>
+
+        <item name="android:textStyle">bold</item>
+
+        <item name="android:textAllCaps">false</item>
+
+    </style>
+
+</resources>

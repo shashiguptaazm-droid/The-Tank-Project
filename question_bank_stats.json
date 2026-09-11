@@ -1,0 +1,1956 @@
+{
+  "generated": "question-bank subject/topic inventory",
+  "total_rows": 280963,
+  "distinct_subjects_raw": 150,
+  "distinct_topics_raw": 9535,
+  "data_quality": {
+    "empty_subject_rows": 0,
+    "empty_topic_rows": 10445,
+    "placeholder_topic_rows": 1557
+  },
+  "neet_pg_topics": [
+    {
+      "topic": "Pathology",
+      "count": 10845
+    },
+    {
+      "topic": "Microbiology",
+      "count": 10058
+    },
+    {
+      "topic": "Anatomy",
+      "count": 8472
+    },
+    {
+      "topic": "Physiology",
+      "count": 5996
+    },
+    {
+      "topic": "Biochemistry",
+      "count": 5124
+    },
+    {
+      "topic": "Uncategorized NEET Questions",
+      "count": 3847
+    },
+    {
+      "topic": "Image Based Questions",
+      "count": 3412
+    },
+    {
+      "topic": "Medicine",
+      "count": 3114
+    },
+    {
+      "topic": "Pharmacology",
+      "count": 935
+    },
+    {
+      "topic": "Psm",
+      "count": 763
+    },
+    {
+      "topic": "Ophthalmology",
+      "count": 753
+    },
+    {
+      "topic": "Surgery",
+      "count": 730
+    },
+    {
+      "topic": "Otolaryngology",
+      "count": 649
+    },
+    {
+      "topic": "Surgery finale",
+      "count": 530
+    },
+    {
+      "topic": "Orthopaedics",
+      "count": 491
+    },
+    {
+      "topic": "Forensic medicine",
+      "count": 438
+    },
+    {
+      "topic": "Pediatrics",
+      "count": 388
+    },
+    {
+      "topic": "Dermatology",
+      "count": 380
+    },
+    {
+      "topic": "Obstetrics",
+      "count": 374
+    },
+    {
+      "topic": "Gynaecology",
+      "count": 355
+    },
+    {
+      "topic": "Psychiatry",
+      "count": 306
+    },
+    {
+      "topic": "Radiology",
+      "count": 247
+    },
+    {
+      "topic": "Anaesthesia",
+      "count": 196
+    },
+    {
+      "topic": "Adaptive Questions",
+      "count": 126
+    },
+    {
+      "topic": "Paediatrics",
+      "count": 118
+    },
+    {
+      "topic": "Surgery image quiz",
+      "count": 30
+    },
+    {
+      "topic": "Surgeryimages",
+      "count": 12
+    },
+    {
+      "topic": "Surgery image challenge",
+      "count": 8
+    },
+    {
+      "topic": "Gynecology",
+      "count": 3
+    },
+    {
+      "topic": "Ent",
+      "count": 2
+    },
+    {
+      "topic": "Obstetrics and gynecology",
+      "count": 2
+    },
+    {
+      "topic": "General medicine",
+      "count": 2
+    },
+    {
+      "topic": "Orthopedics",
+      "count": 2
+    }
+  ],
+  "neet_ug_topics": [
+    {
+      "topic": "Biology",
+      "count": 16431
+    },
+    {
+      "topic": "Physics",
+      "count": 5167
+    },
+    {
+      "topic": "Chemistry",
+      "count": 3066
+    },
+    {
+      "topic": null,
+      "count": 567
+    }
+  ],
+  "per_subject_summary": [
+    {
+      "subject": "NEET PG",
+      "questions": 58708,
+      "topics": 33,
+      "top_topics": [
+        "Pathology (10845)",
+        "Microbiology (10058)",
+        "Anatomy (8472)",
+        "Physiology (5996)",
+        "Biochemistry (5124)",
+        "Uncategorized NEET Questions (3847)",
+        "Image Based Questions (3412)",
+        "Medicine (3114)",
+        "Pharmacology (935)",
+        "Psm (763)",
+        "Ophthalmology (753)",
+        "Surgery (730)",
+        "Otolaryngology (649)",
+        "Surgery finale (530)",
+        "Orthopaedics (491)",
+        "Forensic medicine (438)",
+        "Pediatrics (388)",
+        "Dermatology (380)",
+        "Obstetrics (374)",
+        "Gynaecology (355)",
+        "Psychiatry (306)",
+        "Radiology (247)",
+        "Anaesthesia (196)",
+        "Adaptive Questions (126)",
+        "Paediatrics (118)"
+      ]
+    },
+    {
+      "subject": "NEET UG",
+      "questions": 25231,
+      "topics": 3,
+      "top_topics": [
+        "Biology (16431)",
+        "Physics (5167)",
+        "Chemistry (3066)"
+      ]
+    },
+    {
+      "subject": "Law",
+      "questions": 24419,
+      "topics": 23,
+      "top_topics": [
+        "practice mcq question on indian penal code (5432)",
+        "practice mcq question on constitution of india (3782)",
+        "practice mcq question on indian evidence act (3656)",
+        "practice mcq question on code of civil procedure (2019)",
+        "practice mcq question on indian contract act (1400)",
+        "practice mcq question on hindu law (1290)",
+        "practice mcq question on indian partnership act (1198)",
+        "practice mcq question on transfer of property act (900)",
+        "practice mcq question on law of torts (899)",
+        "practice mcq question on muslim law (700)",
+        "practice mcq question on miscellaneous in law (699)",
+        "practice mcq question on sale of goods act (500)",
+        "practice mcq question on limitation act (400)",
+        "practice mcq question on specific relief act (399)",
+        "practice mcq question on arbitration and conciliation act (300)",
+        "practice mcq question on negotiable instruments act (300)",
+        "practice mcq question on information technology act (100)",
+        "practice mcq question on human rights (100)",
+        "practice mcq question on domestic violence (99)",
+        "practice mcq question on motor vehicle act (87)",
+        "practice mcq question on juvenile justice act (58)",
+        "practice mcq question on indian easements act (56)",
+        "practice mcq question on indian trusts act (45)"
+      ]
+    },
+    {
+      "subject": "State",
+      "questions": 19471,
+      "topics": 1,
+      "top_topics": [
+        "gk (19471)"
+      ]
+    },
+    {
+      "subject": "Marine engineering",
+      "questions": 18155,
+      "topics": 2141,
+      "top_topics": [
+        "Electrical Machine Design MCQ (Multiple Choice Questions) (36)",
+        "Outward Radial Flow Reaction Turbines (26)",
+        "Hydraulic Machines   Outward Radial Flow Reaction Turbi... (25)",
+        "Degree of Reaction  Hydraulic Machines (21)",
+        "Algebraic Equations   Solution of Linear Simultaneous E... (19)",
+        "Rotor Frequency  Electrical Machines (18)",
+        "Solids Types, Crystal Structures &amp; Lattices (17)",
+        "Thermosetting Plastics &amp; Particle Reinforced Composites (17)",
+        "Polymer Additives, Polymers &amp; Polymerization (16)",
+        "Armature Windings  Electrical Machines Multiple Choice Questions (16)",
+        "Diesel Engine Analysis  Power Plant (15)",
+        "Hydraulic Machines   Hydraulic Intensifier and Hydrauli... (15)",
+        "Thermodynamics   Entropy Generation in a Closed and Ope...  2 (15)",
+        "Air Preheaters, ESP &amp; Deareration  Power Plant (15)",
+        "Superheaters, Reheaters &amp; Steam Generator Control (15)",
+        "Cooling Ponds &amp; Towers  Energy Engineering (15)",
+        "Engineering Materials and Metallurgy   Sintering and Co... (15)",
+        "Work in Reversible Process  Thermodynamics   2 (15)",
+        "Power Plant   Radioactive Decay &amp; Half Life  II (15)",
+        "Electrical Machines   Parallel Operation of Single Phas... (15)",
+        "Boiler Mounting Accessories  Energy Engineering (15)",
+        "Variable Resistors  Basic Electronics Engineering (15)",
+        "Electro Chemical Drilling Basics (15)",
+        "Thermodynamics   Entropy Generation in a Closed and Ope... (15)",
+        "Rectangular Dam  Strength of Materials (15)"
+      ]
+    },
+    {
+      "subject": "Commerce",
+      "questions": 16858,
+      "topics": 19,
+      "top_topics": [
+        "practice mcq question on accounting (2893)",
+        "practice mcq question on economics (1498)",
+        "practice mcq question on costing (1299)",
+        "practice mcq question on financial management (1197)",
+        "practice mcq question on business statistics and research methods (1092)",
+        "practice mcq question on banking and financial institutions (1000)",
+        "practice mcq question on marketing management (1000)",
+        "practice mcq question on legal aspects of business (995)",
+        "practice mcq question on insurance (900)",
+        "practice mcq question on income tax and corporate tax (799)",
+        "practice mcq question on business finance (700)",
+        "practice mcq question on business environment and international business (600)",
+        "practice mcq question on business management (600)",
+        "practice mcq question on business and commerce (597)",
+        "practice mcq question on hrm in commerce (500)",
+        "practice mcq question on miscellaneous in commerce (397)",
+        "practice mcq question on auditing (396)",
+        "practice mcq question on ecommerce (300)",
+        "practice mcq question on gst (95)"
+      ]
+    },
+    {
+      "subject": "Competitive",
+      "questions": 14320,
+      "topics": 2,
+      "top_topics": [
+        "english (11317)",
+        "reasoning (3003)"
+      ]
+    },
+    {
+      "subject": "Computer software",
+      "questions": 14230,
+      "topics": 1780,
+      "top_topics": [
+        "MySQL MCQ (Multiple Choice Questions)    2 (41)",
+        "1000 SQL Server MCQ (Multiple Choice Questions) (34)",
+        "1000 SQL Server MCQ (Multiple Choice Questions)    2 (34)",
+        "Program &amp; System Threats   Operating System Questions &amp; Answers (16)",
+        "HTML Questions &amp; Answers   Responsive Overview   7 (15)",
+        "CPU Scheduling Benefits   Operating System (15)",
+        "Memory Management   Paging   Operating System (15)",
+        "Assembly Language   Computer Organization (15)",
+        "HTML Questions &amp; Answers   Responsive Overview   4 (15)",
+        "R Programming    Distribution   2 (15)",
+        "Bus Arbitration   Computer Organization (15)",
+        "Computer Organization    Functional Units of a Computer (15)",
+        "Server Specific CSS Questions &amp; Answers (15)",
+        "Operating System (15)",
+        "Web Applications Elements &amp; Attributes   HTML Questions &amp; Answers (15)",
+        "HTML Geolocation Questions &amp; Answers (15)",
+        "HTML5 Semantics Questions &amp; Answers (15)",
+        "R Programming    Textual Data Formats   2 (15)",
+        "Computer Organization    Numbers and Arithmetic Operations (15)",
+        "HTML Google Maps Questions &amp; Answers (15)",
+        "R Programming    Basics   4 (15)",
+        "Protection   Memory Protection   Operating System Questions &amp; Answers (15)",
+        "HTML Questions &amp; Answers   HTML5 Semantics   2 (15)",
+        "R Programming    Data Types   5 (15)",
+        "Static Memories   Computer Organization (15)"
+      ]
+    },
+    {
+      "subject": "Chemical engineering",
+      "questions": 12223,
+      "topics": 1591,
+      "top_topics": [
+        "Amino Acids, DNA &amp; RNA  Organic Chemistry (16)",
+        "Pollution Control   Effects of Pollution on Ecosystem  Set 2 (15)",
+        "Air Pollutants Behaviour (15)",
+        "Thermodynamics   Work in a Reversible Process3 (15)",
+        "Thermodynamics   Entropy Generation in a Closed and Ope... (15)",
+        "Recycle without Chemical Reaction (15)",
+        "Pollution Control   Sources and Classification of Air Pollutants  Set 5 (15)",
+        "Steady &amp; Unsteady State Systems (15)",
+        "Energy Balances Terminology  Chemical Engineering (15)",
+        "Chemical Engineering   Effects of Mixing into Energy Ba... (15)",
+        "Efficiency  Chemical Engineering (15)",
+        "Humidity Chart  Chemical Engineering (15)",
+        "Pollution Control   Effects of Air Pollutants on Materials (15)",
+        "Material and Energy Balances Using Process Simulator Multiple Choice Questions (15)",
+        "Pollution Control   Behaviour of Air Pollutants  Set 2 (15)",
+        "Chemical Engineering   UnsteadyState Material and Ener... (15)",
+        "Open &amp; Closed Systems  Chemical Engineering (15)",
+        "Partial Saturation Terminology  Chemical Engineering (15)",
+        "Work in Reversible Process  Thermodynamics (15)",
+        "Nanotechnology   Production of Graphene  Set 2 (15)",
+        "Material Balances Problems  Chemical Engineering (15)",
+        "Quantum Dots Application  Nanotechnology (14)",
+        "Nanotechnology   Nanofabrication of Nanoscale Material (14)",
+        "Pollution Control   Global Warming  Set 2 (14)",
+        "Separation Processes   Introduction to Bioseparations (14)"
+      ]
+    },
+    {
+      "subject": "Civil engineering",
+      "questions": 11969,
+      "topics": 1468,
+      "top_topics": [
+        "Surveying Definitions (19)",
+        "Beams Deflection &amp; Holes  Design of Steel Structures (16)",
+        "Excavating Equipments  Construction &amp; Building Materials (15)",
+        "Hoisting Equipments  Construction &amp; Building Materials (15)",
+        "Calcination &amp; Slaking of Lime  Basic Civil Engineering (15)",
+        "Drills Types  Construction &amp; Building Materials (15)",
+        "Site Exploration Method  Foundation Engineering (15)",
+        "Conveying Equipment  Construction &amp; Building Materials (15)",
+        "Linear Measurement Methods (15)",
+        "Vehicular Characteristics (15)",
+        "Linear Measurement Accessories (15)",
+        "Data Collection Methods  Traffic Engineering (15)",
+        "Drill Bits  Construction &amp; Building Materials (15)",
+        "Health Effects &amp; Regulations (15)",
+        "Mass Movements Types  Engineering Geology (15)",
+        "Road Accidents  Collision Diagram (15)",
+        "Ventilation Types  Construction &amp; Building Materials (15)",
+        "Pollution Control   Effects of Pollution on Ecosystem  Set 2 (15)",
+        "Soil Mechanics   Modified Proctor Test and Harvard Miniature Compaction Test (15)",
+        "Surveying   Introduction  Accessories For Linear Measu... (15)",
+        "Earth Compaction Equipments  Construction &amp; Building Materials (15)",
+        "Pollution Control   Sources and Classification of Air Pollutants  Set 5 (15)",
+        "Pollution Control   Global Warming  Set 2 (14)",
+        "Piles Types  Foundation Engineering (14)",
+        "Faulting Effects  Engineering Geology (14)"
+      ]
+    },
+    {
+      "subject": "Electronics communication engineering",
+      "questions": 11376,
+      "topics": 1389,
+      "top_topics": [
+        "Cyclic &amp; Linear Block Codes  Digital Communications Questions and Answers (17)",
+        "Digital Communications Questions and Answers  Spread Spectrum, TDMA and FDMA (17)",
+        "Digital Communications Questions and Answers  Equalization and Non Coherent ... (17)",
+        "80386 Architecture &amp; Signal Descriptions Questions and Answers (17)",
+        "Error Detecting and Correcting Capability  Digital Communication Multiple Choice Questions (17)",
+        "Digital Circuits Questions and Answers  Read Only Memory (ROM)  3 (16)",
+        "Digital Communications Questions and Answers  Link Budget Analysis and Error... (16)",
+        "Pseudo Noise Sequence &amp; Jamming Questions and Answers (16)",
+        "Signal Time Spreading  Digital Communications Questions and Answers (16)",
+        "Signals  Digital Communications Questions and Answers (16)",
+        "Synchronization &amp; Network Synchronization  Digital Communications Questions and Answers (16)",
+        "Celullar Systems  Digital Communications Questions and Answers (16)",
+        "Process Types  Digital Communications Questions and Answers (16)",
+        "80868088 Instruction Set Questions and Answers (15)",
+        "Digital Communications Questions and Answers  Evaluating Digital Communicati... (15)",
+        "Programmable Logic Array  Digital Circuits Questions and Answers (15)",
+        "Convolution and ReedSolomon Codes  Digital Communication Multiple Choice Questions (15)",
+        "Modulation &amp; Multiplexing  Digital Communications Questions and Answers (15)",
+        "Wireless &amp; Mobile Communications Questions &amp; Answers  Second Generation (2G)... (15)",
+        "Fading &amp; Decision Theory Effects  Digital Communications Questions and Answers (15)",
+        "Memory Devices Basics  Digital Circuits Multiple Choice Questions 2 (15)",
+        "Design for Testability  VLSI Questions and Answers (15)",
+        "Programmable Array Logic  Digital Circuits Questions and Answers (15)",
+        "Microprocessors Questions and Answers  Protected Virtual Address Mode (PVAM) 2 (15)",
+        "Noise Margin  VLSI Questions and Answers (15)"
+      ]
+    },
+    {
+      "subject": "Agriculture",
+      "questions": 9077,
+      "topics": 13,
+      "top_topics": [
+        "practice mcq question on horticulture (1000)",
+        "practice mcq question on plant pathology (1000)",
+        "practice mcq question on agronomy (999)",
+        "practice mcq question on soil science (900)",
+        "practice mcq question on genetics and plant breeding (880)",
+        "practice mcq question on agricultural miscellaneous (800)",
+        "practice mcq question on animal husbandry (600)",
+        "practice mcq question on agricultural engineering (600)",
+        "practice mcq question on agricultural entomology (599)",
+        "practice mcq question on agricultural economics (500)",
+        "practice mcq question on agricultural biotechnology (500)",
+        "practice mcq question on agricultural statistics (499)",
+        "practice mcq question on environmental science in agricultural (200)"
+      ]
+    },
+    {
+      "subject": "Agricultural engineering",
+      "questions": 9071,
+      "topics": 1075,
+      "top_topics": [
+        "Outward Radial Flow Reaction Turbines (26)",
+        "Hydraulic Machines   Outward Radial Flow Reaction Turbi... (25)",
+        "Degree of Reaction  Hydraulic Machines (21)",
+        "Gear Terminology  Theory of Machines (17)",
+        "Fuel Supply System Components (15)",
+        "Dairy Products interview (15)",
+        "Fungi  Dairy Engineering (15)",
+        "Thermodynamics   Entropy Generation in a Closed and Ope... (15)",
+        "Hydraulic Lift &amp; Crane (15)",
+        "Dairy Facts (15)",
+        "Milk Storage  Dairy Engineering (15)",
+        "Rectangular Dam  Strength of Materials (15)",
+        "Measuring Equipment &amp; Technique  Dairy Engineering (15)",
+        "Dairy Engineering   Dairy Products  4 (15)",
+        "Cattle Health  Dairy Engineering (15)",
+        "Hydraulic Machines   Hydraulic Intensifier and Hydrauli... (15)",
+        "Dairy Engineering   Regulations  3 (15)",
+        "Dairy Engineering   Regulations  4 (15)",
+        "Milk Quality Farm (15)",
+        "Dairy Engineering   Dairy Farm  4 (15)",
+        "Dairy Engineering   Dairy Facts  3 (15)",
+        "Dairy Products (15)",
+        "Quality  Dairy Engineering (15)",
+        "Milk Reception  Dairy Engineering (15)",
+        "Testing Milk for Quality  Dairy Engineering (15)"
+      ]
+    },
+    {
+      "subject": "Aerospace engineering",
+      "questions": 6922,
+      "topics": 836,
+      "top_topics": [
+        "Outward Radial Flow Reaction Turbines (26)",
+        "Hydraulic Machines   Outward Radial Flow Reaction Turbi... (25)",
+        "Degree of Reaction  Hydraulic Machines (21)",
+        "InstalledThrust Methodology (15)",
+        "Hydraulic Machines   Hydraulic Intensifier and Hydrauli... (15)",
+        "Hydraulic Lift &amp; Crane (15)",
+        "Point Source Radio Systems (15)",
+        "Aircraft Design   Propulsion  PistonEngine and Turbop... (15)",
+        "Hydraulic Press &amp; Accumulator (15)",
+        "Propulsion Selection (15)",
+        "Conic Fuselage Development (14)",
+        "Landing Gear Arrangements (14)",
+        "Hydraulic Machines   Inward Radial Flow Reaction Turbines (14)",
+        "Hydraulic Machines   Air Lift Pump and Gear Wheel Pump  2 (14)",
+        "Aircraft Design   LateralDirectional Static Stability ... (14)",
+        "Longitudinal Static Stability &amp; Control (14)",
+        "Aerodynamic Forces (14)",
+        "Shock Absorbers (14)",
+        "Structural Considerations (14)",
+        "Centrifugal Pumps Main Parts  Hydraulic Machines (14)",
+        "Double Acting Pumps  Hydraulic Machines (13)",
+        "Airbus A330 Aircraft Family (13)",
+        "JetEngine Integration (13)",
+        "Pelton Wheel Design  Hydraulic Machines (13)",
+        "Hydraulic Machines   Net Positive Suction Head  NPSH (13)"
+      ]
+    },
+    {
+      "subject": "Political",
+      "questions": 5400,
+      "topics": 1,
+      "top_topics": [
+        "science (5400)"
+      ]
+    },
+    {
+      "subject": "History",
+      "questions": 3250,
+      "topics": 22,
+      "top_topics": [
+        "practice mcq question on modern indian history (799)",
+        "practice mcq question on mughal empire (600)",
+        "practice mcq question on world history (499)",
+        "practice mcq question on ancient history art and culture (200)",
+        "practice mcq question on jainism and buddhism (200)",
+        "practice mcq question on british rule in india (200)",
+        "practice mcq question on struggle for independence of india (200)",
+        "practice mcq question on indian history (199)",
+        "practice mcq question on medieval history art and culture (100)",
+        "practice mcq question on bhakti movement (100)",
+        "practice mcq question on 18th century revolts and reform (100)",
+        "British India (25)",
+        "indian freedom struggle (6)",
+        "ancient (4)",
+        "medieval (4)",
+        "indus valley civilization (4)",
+        "sultanate period (4)",
+        "Mughal Period (2)",
+        "indian_freedom_struggle (1)",
+        "Initial Modern History (1)",
+        "Modern World (1)",
+        "Modern History (1)"
+      ]
+    },
+    {
+      "subject": "Geography",
+      "questions": 3078,
+      "topics": 33,
+      "top_topics": [
+        "practice mcq question on miscellaneous world geography (600)",
+        "practice mcq question on political geography of india (300)",
+        "practice mcq question on lithosphere (200)",
+        "practice mcq question on world climate and weather (200)",
+        "practice mcq question on agriculture and soil in indian geography (200)",
+        "practice mcq question on earth (199)",
+        "practice mcq question on miscellaneous indian geography (199)",
+        "practice mcq question on indian rivers, lakes and water (199)",
+        "practice mcq question on indian geography (198)",
+        "practice mcq question on universe (100)",
+        "practice mcq question on world agriculture, minerals and industries (100)",
+        "practice mcq question on environment and ecology in indian geography (100)",
+        "practice mcq question on natural resources and industries in indian  geography (100)",
+        "practice mcq question on climate and weather in indian geography (100)",
+        "practice mcq question on atmosphere (100)",
+        "practice mcq question on hydrosphere (100)",
+        "Atmosphere (25)",
+        "Physical Geography (24)",
+        "World Geography (9)",
+        "world (7)",
+        "Census (3)",
+        "Economic Geography (3)",
+        "population (2)",
+        "rivers (1)",
+        "water_resources (1)"
+      ]
+    },
+    {
+      "subject": "Neet pg 2014",
+      "questions": 2122,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Neet pg 2013",
+      "questions": 1869,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Neet pg 2016",
+      "questions": 1779,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Neet pg 2015",
+      "questions": 1724,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Cat",
+      "questions": 1134,
+      "topics": 205,
+      "top_topics": [
+        "Reading-Comprehension (169)",
+        "Data Interpretation (94)",
+        "Reading Comprehension (77)",
+        "CAT-Reading Comprehension (46)",
+        "Para Jumbles (45)",
+        "CAT-Logical Reasoning (36)",
+        "Paragraph Completion (22)",
+        "Verbal Ability - Reading Comprehension (21)",
+        "CAT-Data Interpretation (17)",
+        "Logical-Reasoning (14)",
+        "CAT-ReadingComprehension (13)",
+        "Quantitative Ability (9)",
+        "Reading Comprehension-Space Exploration (8)",
+        "Logical Reasoning (8)",
+        "Logical-Data Interpretation (8)",
+        "Data-Interpretation (7)",
+        "DI-LR (7)",
+        "logical-puzzles (6)",
+        "CAT-DI/LR (6)",
+        "RC (6)",
+        "Logical Reasoning-Object Distribution (5)",
+        "Logical Reasoning - Scheduling (5)",
+        "Verbal Ability (5)",
+        "RC-Reading Comprehension (5)",
+        "Logical Reasoning-Ratings Puzzle (5)"
+      ]
+    },
+    {
+      "subject": "Arithmetic",
+      "questions": 681,
+      "topics": 1,
+      "top_topics": [
+        "ability (681)"
+      ]
+    },
+    {
+      "subject": "Non",
+      "questions": 668,
+      "topics": 1,
+      "top_topics": [
+        "reasoning (668)"
+      ]
+    },
+    {
+      "subject": "Neet pg 2020",
+      "questions": 538,
+      "topics": 1,
+      "top_topics": [
+        "PG 2020 (538)"
+      ]
+    },
+    {
+      "subject": "Bcbr",
+      "questions": 531,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "General awareness",
+      "questions": 306,
+      "topics": 2,
+      "top_topics": [
+        "Modern History of India (262)",
+        "Awards and Honours (25)"
+      ]
+    },
+    {
+      "subject": "Indian polity",
+      "questions": 300,
+      "topics": 11,
+      "top_topics": [
+        "Laxmikant Chapter Wise MCQ (200)",
+        "Preamble of the Indian Constitution (20)",
+        "Fundamental Rights (10)",
+        "Directive Principles of State Policy (10)",
+        "Separation of Powers (10)",
+        "Judicial Review (10)",
+        "Constitutional Amendments (10)",
+        "Union and State Governments (10)",
+        "Indian Parliament (10)",
+        "Fundamental Duties (5)",
+        "Judiciary (5)"
+      ]
+    },
+    {
+      "subject": "Neet pg 2019",
+      "questions": 293,
+      "topics": 1,
+      "top_topics": [
+        "PG 2019 (293)"
+      ]
+    },
+    {
+      "subject": "Automobile",
+      "questions": 241,
+      "topics": 1,
+      "top_topics": [
+        "engineering (241)"
+      ]
+    },
+    {
+      "subject": "Indian",
+      "questions": 150,
+      "topics": 1,
+      "top_topics": [
+        "mcqs (150)"
+      ]
+    },
+    {
+      "subject": "Environment",
+      "questions": 132,
+      "topics": 4,
+      "top_topics": [
+        "affairs (80)",
+        "mcqs (50)",
+        "Wildlife Sanctuaries (1)",
+        "International Conventions (1)"
+      ]
+    },
+    {
+      "subject": "Ent ss",
+      "questions": 131,
+      "topics": 30,
+      "top_topics": [
+        "Embryology and Anatomy of Ear (27)",
+        "Audiology (13)",
+        "Serous Otitis Media (11)",
+        "Physiology of Hearing and Audiology (9)",
+        "topic (9)",
+        "Complications of Suppurative Otitis Media (7)",
+        "Embryology and Anatomy (6)",
+        "Vestibular Evaluation (4)",
+        "Tubotympanic or Chronic Mucosal Otitis Media (4)",
+        "Chronic Otitis Media (4)",
+        "Cholesteatoma (4)",
+        "Otosclerosis (3)",
+        "Vestibular Testing (3)",
+        "Eustachian Tube (3)",
+        "Facial Nerve (3)",
+        "Vestibular Function Tests (2)",
+        "Complications of Otitis Media (2)",
+        "Atticoantral CSOM (2)",
+        "Vestibular Function (2)",
+        "Diseases of External Ear (2)",
+        "Tuning Fork Tests (2)",
+        "External Auditory Canal (1)",
+        "Middle Ear Cavity (1)",
+        "Middle Ear Joints (1)",
+        "Pneumatic Otoscopy (1)"
+      ]
+    },
+    {
+      "subject": "Sports",
+      "questions": 130,
+      "topics": 2,
+      "top_topics": [
+        "affairs (80)",
+        "gk (50)"
+      ]
+    },
+    {
+      "subject": "Child pugh score",
+      "questions": 120,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Anatomy",
+      "questions": 118,
+      "topics": 21,
+      "top_topics": [
+        "Endocrine Glands (10)",
+        "Digestive system (7)",
+        "Cardiovascular system (7)",
+        "Nervous system (6)",
+        "Urinary System (6)",
+        "Muscular system (6)",
+        "Embryology (4)",
+        "Head and Neck Anatomy (3)",
+        "Histology (3)",
+        "sense organs (3)",
+        "Human Anatomy (2)",
+        "The respiratory system (2)",
+        "Gross Anatomy (2)",
+        "Microanatomy (2)",
+        "Organ And Organ System (1)",
+        "Gastrointestinal tract (1)",
+        "organs and structures (1)",
+        "Lower Limb (1)",
+        "Accessory Nerve Injury (1)",
+        "Kidney Embryology (1)"
+      ]
+    },
+    {
+      "subject": "Biology",
+      "questions": 102,
+      "topics": 2,
+      "top_topics": [
+        "Human Disease (87)",
+        "General Science (15)"
+      ]
+    },
+    {
+      "subject": "Medical officer",
+      "questions": 100,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Gcs score",
+      "questions": 99,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Pharmacology",
+      "questions": 94,
+      "topics": 17,
+      "top_topics": [
+        "Drug therapy (43)",
+        "Cardiovascular system (20)",
+        "General Pharmacology (5)",
+        "Autacoids and their Antagonists (4)",
+        "Chemotherapy (4)",
+        "The respiratory system (3)",
+        "Immunomodulators (3)",
+        "Classification of infectious diseases (2)",
+        "Treatment of poisoning (2)",
+        "Pharmacology of cardiovascular system (1)",
+        "Gastrointestinal Surgery (1)",
+        "Oncology (1)",
+        "Pharmacology of central nervous System (1)",
+        "Hormones (1)",
+        "Opioid Overdose Treatment (1)",
+        "Vericiguat Mechanism (1)",
+        "Mirabegron Mechanism (1)"
+      ]
+    },
+    {
+      "subject": "Upsc",
+      "questions": 91,
+      "topics": 3,
+      "top_topics": [
+        "awareness (20)",
+        "Disaster Management (16)",
+        "commerce (12)"
+      ]
+    },
+    {
+      "subject": "Abg analysis",
+      "questions": 90,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Alvarado score",
+      "questions": 90,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Apache ii score",
+      "questions": 90,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Chads score",
+      "questions": 90,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Curb",
+      "questions": 90,
+      "topics": 1,
+      "top_topics": [
+        "65 Score (90)"
+      ]
+    },
+    {
+      "subject": "Gynaecology and Obstetrics",
+      "questions": 90,
+      "topics": 14,
+      "top_topics": [
+        "Role of Hormones in Initiating Reproductive Function (19)",
+        "Diagnosis of Pregnancy (15)",
+        "Gynecology (13)",
+        "Urogenital Systems (10)",
+        "Physiology of normal pregnancy (8)",
+        "Obstetrics (6)",
+        "Normal and abnormal development (5)",
+        "Carcinoma Cervix (4)",
+        "Contraception (3)",
+        "Gametogenesis (2)",
+        "Neonatology (2)",
+        "The reproductive system (1)",
+        "Humoral and cell mediated immunity (1)",
+        "Menstrual Cycle (1)"
+      ]
+    },
+    {
+      "subject": "Meld score",
+      "questions": 90,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Mods score",
+      "questions": 90,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Rifle score",
+      "questions": 90,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Sofa score",
+      "questions": 90,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Wells score",
+      "questions": 90,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Medicine",
+      "questions": 89,
+      "topics": 14,
+      "top_topics": [
+        "Common clinical disorders (8)",
+        "Neuroanatomy (5)",
+        "Cardiology (3)",
+        "Rheumatology (2)",
+        "Drug therapy (2)",
+        "Medical Diagnostics (2)",
+        "The respiratory system (1)",
+        "Opportunistic infections (1)",
+        "Oncology (1)",
+        "Human Endocrine System (1)",
+        "Parts of the digestive system (1)",
+        "Emergency Medicine (1)",
+        "Nephrons (1)"
+      ]
+    },
+    {
+      "subject": "Surgery",
+      "questions": 89,
+      "topics": 17,
+      "top_topics": [
+        "Surgical techniques (38)",
+        "Comprehensive Diagnosis (14)",
+        "Metabolic bone diseases (5)",
+        "Manual reduction (5)",
+        "Gastrointestinal Surgery (4)",
+        "Therapeutic Orthopaedics (4)",
+        "Oncology (4)",
+        "Pancreatic Disorders (2)",
+        "Gastrointestinal tract (2)",
+        "Cardiothoracic Vascular Surgery (2)",
+        "Neuroanatomy (2)",
+        "Human Endocrine System (2)",
+        "Plastic Surgery (1)",
+        "Cardiovascular system (1)",
+        "Diabetes (1)",
+        "Critical Care (1)",
+        "Medical Procedures (1)"
+      ]
+    },
+    {
+      "subject": "Current affairs",
+      "questions": 86,
+      "topics": 5,
+      "top_topics": [
+        "Sports (2)",
+        "Events and Sports (1)",
+        "Business and Economy (1)",
+        "Awards (1)",
+        "Demographics (1)"
+      ]
+    },
+    {
+      "subject": "General studies",
+      "questions": 84,
+      "topics": 2,
+      "top_topics": [
+        "Indian History (54)",
+        "Cultural Heritage (30)"
+      ]
+    },
+    {
+      "subject": "Science",
+      "questions": 81,
+      "topics": 2,
+      "top_topics": [
+        "affairs (80)",
+        "Astronomy (1)"
+      ]
+    },
+    {
+      "subject": "Art",
+      "questions": 80,
+      "topics": 1,
+      "top_topics": [
+        "affairs (80)"
+      ]
+    },
+    {
+      "subject": "Awards",
+      "questions": 80,
+      "topics": 1,
+      "top_topics": [
+        "affairs (80)"
+      ]
+    },
+    {
+      "subject": "Business",
+      "questions": 80,
+      "topics": 1,
+      "top_topics": [
+        "affairs (80)"
+      ]
+    },
+    {
+      "subject": "Defence",
+      "questions": 80,
+      "topics": 1,
+      "top_topics": [
+        "affairs (80)"
+      ]
+    },
+    {
+      "subject": "Government",
+      "questions": 80,
+      "topics": 1,
+      "top_topics": [
+        "affairs (80)"
+      ]
+    },
+    {
+      "subject": "Important",
+      "questions": 80,
+      "topics": 1,
+      "top_topics": [
+        "affairs (80)"
+      ]
+    },
+    {
+      "subject": "International",
+      "questions": 80,
+      "topics": 1,
+      "top_topics": [
+        "affairs (80)"
+      ]
+    },
+    {
+      "subject": "Places",
+      "questions": 80,
+      "topics": 1,
+      "top_topics": [
+        "affairs (80)"
+      ]
+    },
+    {
+      "subject": "Reports",
+      "questions": 80,
+      "topics": 1,
+      "top_topics": [
+        "affairs (80)"
+      ]
+    },
+    {
+      "subject": "Summits",
+      "questions": 80,
+      "topics": 1,
+      "top_topics": [
+        "affairs (80)"
+      ]
+    },
+    {
+      "subject": "Computer science",
+      "questions": 73,
+      "topics": 4,
+      "top_topics": [
+        "Software Engineering (55)",
+        "Requirement Engineering (9)",
+        "Software Testing (5)",
+        "Software Project Management (4)"
+      ]
+    },
+    {
+      "subject": "Infectious diseases",
+      "questions": 68,
+      "topics": 1,
+      "top_topics": [
+        "Mycetoma (68)"
+      ]
+    },
+    {
+      "subject": "Biochemistry",
+      "questions": 67,
+      "topics": 22,
+      "top_topics": [
+        "Vitamins (9)",
+        "Cell Biology (8)",
+        "Lipids (6)",
+        "Concepts and regulation of metabolism of amino acids (6)",
+        "Molecular Biology (4)",
+        "Immunology (3)",
+        "Enzymes (3)",
+        "Metabolic pathways and their regulation (3)",
+        "Biomolecules (3)",
+        "Regulation of major metabolic pathways (3)",
+        "Cancer (3)",
+        "Biochemistry (2)",
+        "Hormones (2)",
+        "Nutrition (2)",
+        "Carbohydrates (2)",
+        "Genetics (2)",
+        "Human Endocrine System (1)",
+        "Physiological buffer systems (1)",
+        "Proteinoids (1)",
+        "Treatment of poisoning (1)",
+        "TCA cycle (1)",
+        "Amino Acids (1)"
+      ]
+    },
+    {
+      "subject": "Ranson score",
+      "questions": 60,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Pathology",
+      "questions": 56,
+      "topics": 20,
+      "top_topics": [
+        "Hematology (9)",
+        "Classification of infectious diseases (8)",
+        "Hematopathology (5)",
+        "Liver and Biliary Tract (4)",
+        "Osteopathology (4)",
+        "Blood (3)",
+        "Disorders Of Circulatory System (3)",
+        "The respiratory system (2)",
+        "Pediatric Disorders (2)",
+        "Genetics (2)",
+        "Basic mechanisms of inflammation and repair (2)",
+        "Lymphoreticular System (2)",
+        "Immunopathology including amyloidosis (2)",
+        "Endocrine Pathology (2)",
+        "Neuropathology (1)",
+        "Phyllodes Tumor (1)",
+        "Small Cell Lung Cancer (1)",
+        "Seminoma Histology (1)",
+        "Renal System (1)",
+        "Cardiovascular system (1)"
+      ]
+    },
+    {
+      "subject": "Physiology",
+      "questions": 56,
+      "topics": 13,
+      "top_topics": [
+        "Neurophysiology (12)",
+        "The respiratory system (7)",
+        "General Physiology (7)",
+        "Regulation Of Kidney Function (7)",
+        "Cardiovascular system (5)",
+        "Nutrition (4)",
+        "Blood (4)",
+        "Nerve–Muscle (3)",
+        "Gastrointestinal system (2)",
+        "Motor system (2)",
+        "Nervous system (1)",
+        "EEG (1)",
+        "Hypokalemia Refractory to KCl (1)"
+      ]
+    },
+    {
+      "subject": "Microbiology",
+      "questions": 53,
+      "topics": 26,
+      "top_topics": [
+        "Virology and Mycology (10)",
+        "Bacteriology (9)",
+        "Laboratory Diagnosis (3)",
+        "Disinfection and sterilization (3)",
+        "Emerging infectious diseases (2)",
+        "Vaccines (2)",
+        "Host parasite relation (2)",
+        "Bacteria, Archea, Virus, and their broad classification (2)",
+        "Parasites (2)",
+        "Classification of infectious diseases (2)",
+        "EHEC Diagnosis (1)",
+        "Giardiasis Treatment (1)",
+        "Cholera Pathogenesis (1)",
+        "Microbiology (1)",
+        "Parasitology (1)",
+        "Immune System (1)",
+        "Immunology (1)",
+        "Viral Infection (1)",
+        "Opportunistic infections (1)",
+        "Gastrointestinal infections (1)",
+        "Bacterial Structures (1)",
+        "Sexually Transmitted Infections (STIs) (1)",
+        "Central Nervous system (1)",
+        "Epidemiology (1)",
+        "Blood (1)"
+      ]
+    },
+    {
+      "subject": "Dermatology",
+      "questions": 51,
+      "topics": 10,
+      "top_topics": [
+        "Common clinical disorders (14)",
+        "Fungal infections (8)",
+        "Allergic disorders (6)",
+        "Sexually Transmitted Infections (STIs) (5)",
+        "Disorders of Pigmentation (5)",
+        "Medical Diagnostics (5)",
+        "Dermatology (3)",
+        "Drug therapy (2)",
+        "Papule vesicular disorders (2)",
+        "Vitiligo Depigmentation (1)"
+      ]
+    },
+    {
+      "subject": "Ancient",
+      "questions": 50,
+      "topics": 1,
+      "top_topics": [
+        "history (50)"
+      ]
+    },
+    {
+      "subject": "General science",
+      "questions": 50,
+      "topics": 1,
+      "top_topics": [
+        "general science (50)"
+      ]
+    },
+    {
+      "subject": "General science biology",
+      "questions": 50,
+      "topics": 1,
+      "top_topics": [
+        "general science biology (50)"
+      ]
+    },
+    {
+      "subject": "Indian economy",
+      "questions": 50,
+      "topics": 1,
+      "top_topics": [
+        "indian economy mcqs (50)"
+      ]
+    },
+    {
+      "subject": "Medieval",
+      "questions": 50,
+      "topics": 1,
+      "top_topics": [
+        "history (50)"
+      ]
+    },
+    {
+      "subject": "Modern",
+      "questions": 50,
+      "topics": 1,
+      "top_topics": [
+        "struggle (50)"
+      ]
+    },
+    {
+      "subject": "World",
+      "questions": 50,
+      "topics": 1,
+      "top_topics": [
+        "geography (50)"
+      ]
+    },
+    {
+      "subject": "World history",
+      "questions": 50,
+      "topics": 1,
+      "top_topics": [
+        "world history (50)"
+      ]
+    },
+    {
+      "subject": "Social And Preventive Medicine",
+      "questions": 49,
+      "topics": 13,
+      "top_topics": [
+        "Public Nutrition and Health (12)",
+        "Epidemiology (7)",
+        "Epidemiology of Specific Diseases (7)",
+        "Biostatistics (6)",
+        "Vaccines (5)",
+        "Nutrition (4)",
+        "Emerging infectious diseases (2)",
+        "Environment and Health: Efforts (1)",
+        "Cancer (1)",
+        "Sexually Transmitted Infections (STIs) (1)",
+        "School Health (1)",
+        "Demography and equity in planning (1)",
+        "Environmental Issues (1)"
+      ]
+    },
+    {
+      "subject": "Pediatrics",
+      "questions": 47,
+      "topics": 21,
+      "top_topics": [
+        "Growth and Development (8)",
+        "Genetics (7)",
+        "Neonatology (6)",
+        "Emerging infectious diseases (4)",
+        "Pediatric Disorders (3)",
+        "Urinary System (2)",
+        "Pediatrics Emergencies (2)",
+        "Hematology (2)",
+        "Post-streptococcal Glomerulonephritis (1)",
+        "PDA Management (1)",
+        "SVT Management (1)",
+        "X-linked Hypophosphatemia (1)",
+        "Severe Acute Malnutrition (1)",
+        "The respiratory system (1)",
+        "Gastrointestinal tract (1)",
+        "Fluid Electrolyte (1)",
+        "Classification of infectious diseases (1)",
+        "Pediatrics Surgical Problems (1)",
+        "Nutrition (1)",
+        "Growth (1)",
+        "Disorders of fluid, electrolyte and acid base balance (1)"
+      ]
+    },
+    {
+      "subject": "Forensic Medicine",
+      "questions": 33,
+      "topics": 10,
+      "top_topics": [
+        "Medical Jurisprudence (12)",
+        "Forensic Toxicology (8)",
+        "Forensic Pathology (3)",
+        "Clinical forensic medicine (2)",
+        "Forensic Psychiatry (2)",
+        "Forensic Science (2)",
+        "Sexual Jurisprudence (1)",
+        "Forensic Thanatology (1)",
+        "Classification of disorders (1)",
+        "Sexual Assault Examination (1)"
+      ]
+    },
+    {
+      "subject": "Reet",
+      "questions": 33,
+      "topics": 1,
+      "top_topics": [
+        "Rajasthan (33)"
+      ]
+    },
+    {
+      "subject": "Usmle",
+      "questions": 33,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Ophthalmology",
+      "questions": 30,
+      "topics": 14,
+      "top_topics": [
+        "Disease of the cornea (6)",
+        "Vision ophthalmology (3)",
+        "Retina (3)",
+        "Optics (3)",
+        "The Human Eye (3)",
+        "Glaucoma (3)",
+        "Disease of the Uveal tract (2)",
+        "Photostress Test (1)",
+        "Pediatric Disorders (1)",
+        "Defects Of Vision And Their Correction (1)",
+        "Central Nervous system (1)",
+        "Disease of the sclera (1)",
+        "spherical lenses (1)",
+        "Disease of the orbit (1)"
+      ]
+    },
+    {
+      "subject": "Quant",
+      "questions": 30,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Radiodiagnosis and Radiotherapy",
+      "questions": 29,
+      "topics": 6,
+      "top_topics": [
+        "Imaging techniques (15)",
+        "Radio diagnostic tools (9)",
+        "Radiotherapy (2)",
+        "Gastrointestinal tract (1)",
+        "Head and Neck Anatomy (1)",
+        "Basic hazards and precautions (1)"
+      ]
+    },
+    {
+      "subject": "Nephrology",
+      "questions": 26,
+      "topics": 7,
+      "top_topics": [
+        "Diabetic Kidney Disease (2)",
+        "Glomerular Diseases (2)",
+        "Renal Histology (1)",
+        "Infective Renal Disorders (1)",
+        "Chronic Renal Diseases (1)",
+        "Nephrotic Syndrome (1)",
+        "Bartter Syndrome (1)"
+      ]
+    },
+    {
+      "subject": "Economy",
+      "questions": 25,
+      "topics": 1,
+      "top_topics": [
+        "International Organisations (25)"
+      ]
+    },
+    {
+      "subject": "Ancient history",
+      "questions": 23,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Genetics",
+      "questions": 23,
+      "topics": 6,
+      "top_topics": [
+        "Modes of Inheritance (5)",
+        "Chromosomal Disorders (4)",
+        "Mitochondrial Inheritance (2)",
+        "Sex-linked Inheritance (2)",
+        "Types of Inherited Disorders (1)",
+        "Mendelian Inheritance (1)"
+      ]
+    },
+    {
+      "subject": "Hematology",
+      "questions": 23,
+      "topics": 6,
+      "top_topics": [
+        "Hemoglobinopathies (2)",
+        "Leukemias (2)",
+        "Anemia (2)",
+        "Transfusion Medicine (1)",
+        "Bleeding Disorders (1)",
+        "Pancytopenia (1)"
+      ]
+    },
+    {
+      "subject": "Psychiatry",
+      "questions": 23,
+      "topics": 11,
+      "top_topics": [
+        "Psychological Disorders (8)",
+        "Drug and Alcohol Addiction (5)",
+        "Neurotic, Stress Related and Somatoform Disorders (2)",
+        "Major psychological disorders (1)",
+        "Sexual Disorders (1)",
+        "Mental Health (1)",
+        "Schizophrenia Spectrum and Other Psychotic Disorders (1)",
+        "Behavioral Sciences (1)",
+        "Delirium Assessment (1)",
+        "Lithium Toxicity (1)",
+        "Schizoid Personality Disorder (1)"
+      ]
+    },
+    {
+      "subject": "Upsc mcqs on indian geography",
+      "questions": 23,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Mcqs on anthropology",
+      "questions": 20,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "ENT",
+      "questions": 15,
+      "topics": 8,
+      "top_topics": [
+        "Comprehensive Diagnosis (7)",
+        "The respiratory system (2)",
+        "Hearing Disorders (1)",
+        "Nose and Paranasal Sinuses (1)",
+        "Reinke's Edema (1)",
+        "Vestibular Schwannoma Diagnosis (1)",
+        "JNA Pathophysiology (1)",
+        "Otosclerosis (1)"
+      ]
+    },
+    {
+      "subject": "Internal security",
+      "questions": 14,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Indian society",
+      "questions": 13,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Immunology",
+      "questions": 10,
+      "topics": 3,
+      "top_topics": [
+        "Phagocytosis (3)",
+        "Macrophages (2)",
+        "Tumor Immune Evasion (1)"
+      ]
+    },
+    {
+      "subject": "Arithmetic ability",
+      "questions": 9,
+      "topics": 1,
+      "top_topics": [
+        "Average (9)"
+      ]
+    },
+    {
+      "subject": "Gastroenterology",
+      "questions": 9,
+      "topics": 2,
+      "top_topics": [
+        "Cholestatic Liver Disease (2)",
+        "Malabsorption (1)"
+      ]
+    },
+    {
+      "subject": "Endocrinology",
+      "questions": 8,
+      "topics": 4,
+      "top_topics": [
+        "Thyroid Cancer (2)",
+        "Parathyroid Disorders (1)",
+        "Primary Hyperparathyroidism (1)",
+        "Primary Hyperaldosteronism (1)"
+      ]
+    },
+    {
+      "subject": "Orthopedics",
+      "questions": 8,
+      "topics": 4,
+      "top_topics": [
+        "Therapeutic Orthopaedics (4)",
+        "Peripheral nerve injuries (2)",
+        "Oncology (1)",
+        "Pediatric Disorders (1)"
+      ]
+    },
+    {
+      "subject": "Astronomy",
+      "questions": 7,
+      "topics": 7,
+      "top_topics": [
+        "planetary science (1)",
+        "celestial mechanics (1)",
+        "planetary motion (1)",
+        "optical phenomena (1)",
+        "eclipses (1)",
+        "Galaxies (1)",
+        "Earth Structure (1)"
+      ]
+    },
+    {
+      "subject": "Null",
+      "questions": 7,
+      "topics": 3,
+      "top_topics": [
+        "Null (3)",
+        "\"PATHOLOGY\" (3)",
+        "\"MICROBIOLOGY\" (1)"
+      ]
+    },
+    {
+      "subject": "A1",
+      "questions": 6,
+      "topics": 1,
+      "top_topics": []
+    },
+    {
+      "subject": "Electronics",
+      "questions": 5,
+      "topics": 3,
+      "top_topics": [
+        "Semiconductor Devices (1)",
+        "Circuit Components (1)",
+        "Digital Logic (1)"
+      ]
+    },
+    {
+      "subject": "Geology",
+      "questions": 5,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "Oral Pathology",
+      "questions": 5,
+      "topics": 5,
+      "top_topics": [
+        "Periapical Lesions (1)",
+        "Cystic Lesions (1)",
+        "Odontogenic Tumors (1)",
+        "Jaw Disorders (1)",
+        "Syndromes (1)"
+      ]
+    },
+    {
+      "subject": "67a1",
+      "questions": 4,
+      "topics": 1,
+      "top_topics": []
+    },
+    {
+      "subject": "Child development and pedagogy",
+      "questions": 4,
+      "topics": 4,
+      "top_topics": [
+        "Learning Theories (1)",
+        "Multiple Intelligences (1)",
+        "Personality Development (1)",
+        "Research Methodology (1)"
+      ]
+    },
+    {
+      "subject": "subject",
+      "questions": 4,
+      "topics": 1,
+      "top_topics": [
+        "topic (4)"
+      ]
+    },
+    {
+      "subject": "Anaesthesia",
+      "questions": 3,
+      "topics": 2,
+      "top_topics": [
+        "Anaesthesia (2)",
+        "Pre Anaesthetic Evaluation (1)"
+      ]
+    },
+    {
+      "subject": "Cell biology",
+      "questions": 3,
+      "topics": 1,
+      "top_topics": [
+        "Stem Cells (1)"
+      ]
+    },
+    {
+      "subject": "Neurology",
+      "questions": 3,
+      "topics": 2,
+      "top_topics": [
+        "Neurological signs (1)",
+        "Diabetes Insipidus (1)"
+      ]
+    },
+    {
+      "subject": "Urology",
+      "questions": 3,
+      "topics": 1,
+      "top_topics": [
+        "Renal Cell Carcinoma (2)"
+      ]
+    },
+    {
+      "subject": "Cardiology",
+      "questions": 2,
+      "topics": 1,
+      "top_topics": [
+        "Myocardial Infarction (2)"
+      ]
+    },
+    {
+      "subject": "Oncology",
+      "questions": 2,
+      "topics": 1,
+      "top_topics": [
+        "Breast Cancer (1)"
+      ]
+    },
+    {
+      "subject": "Oral Medicine",
+      "questions": 2,
+      "topics": 2,
+      "top_topics": [
+        "Fibrous Dysplasia (1)",
+        "Salivary Glands (1)"
+      ]
+    },
+    {
+      "subject": "Parasitology",
+      "questions": 2,
+      "topics": 0,
+      "top_topics": []
+    },
+    {
+      "subject": "\"BIOCHEMISTRY\"",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "\"protein purification\" (1)"
+      ]
+    },
+    {
+      "subject": "\"d\"",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "\"Microcytic hypochromic cells are seen in iron deficiency anemia (1)"
+      ]
+    },
+    {
+      "subject": "\"PHARMACOLOGY\"",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "\"PHARMACOLOGY-Adrenergic Drugs\" (1)"
+      ]
+    },
+    {
+      "subject": "and anemia.\"",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Null (1)"
+      ]
+    },
+    {
+      "subject": "and increased cancer risk.\"",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Null (1)"
+      ]
+    },
+    {
+      "subject": "and pancreatic insufficiency. Distal intestinal obstruction syndrome is a common complication in these patients.\"",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Null (1)"
+      ]
+    },
+    {
+      "subject": "Anesthesia",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Glasgow Coma Scale (1)"
+      ]
+    },
+    {
+      "subject": "Conservative Dentistry",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Caries Detection (1)"
+      ]
+    },
+    {
+      "subject": "Culture",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Festivals (1)"
+      ]
+    },
+    {
+      "subject": "Dental Anatomy",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Tooth Anomalies (1)"
+      ]
+    },
+    {
+      "subject": "Environmental science",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Environmental Policy (1)"
+      ]
+    },
+    {
+      "subject": "Hepatology",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Primary Biliary Cirrhosis (1)"
+      ]
+    },
+    {
+      "subject": "however",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "presents with non-scarring hair loss without scales.\" (1)"
+      ]
+    },
+    {
+      "subject": "Infectious Disease",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Waterhouse-Friderichsen Syndrome (1)"
+      ]
+    },
+    {
+      "subject": "it marks the age for consent for sexual intercourse and surgical procedures",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "while 21 years represents the age of majority for guardianship from the court.\" (1)"
+      ]
+    },
+    {
+      "subject": "Miscellaneous",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Awards and Recognitions (1)"
+      ]
+    },
+    {
+      "subject": "OBG",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "OBG-Gestational Trophoblastic Neoplasia (1)"
+      ]
+    },
+    {
+      "subject": "Obstetrics and Gynecology",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Uterine Fibroid Management (1)"
+      ]
+    },
+    {
+      "subject": "Oral Radiology",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Mandibular Canal (1)"
+      ]
+    },
+    {
+      "subject": "Oral Surgery",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Fractures (1)"
+      ]
+    },
+    {
+      "subject": "Orthodontics",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Developmental Disorders (1)"
+      ]
+    },
+    {
+      "subject": "Radiology",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Radiation Safety Regulations (1)"
+      ]
+    },
+    {
+      "subject": "Severe vomiting",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Severe diarrhea (1)"
+      ]
+    },
+    {
+      "subject": "whereas leukoplakia is usually painless and does not present with burning on eating spicy food",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "making it the least likely diagnosis.\" (1)"
+      ]
+    },
+    {
+      "subject": "which is characteristic of central diabetes insipidus due to deficient ADH secretion.\"",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "Null (1)"
+      ]
+    },
+    {
+      "subject": "which leads to distinctive facial features",
+      "questions": 1,
+      "topics": 1,
+      "top_topics": [
+        "supravalvular aortic stenosis (1)"
+      ]
+    }
+  ]
+}

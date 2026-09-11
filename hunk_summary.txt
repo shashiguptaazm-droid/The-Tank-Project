@@ -1,0 +1,934 @@
+Total hunks: 39
+
+=== Hunk 1: @@ -7,7 +7,7 @@ ===
+  -import android.graphics.Paint
+  +import android.graphics.Typeface
+
+=== Hunk 3: @@ -179,6 +178,7 @@ ===
+  +    private lateinit var tvBattleStatusTitle:   TextView
+
+=== Hunk 6: @@ -323,10 +313,11 @@ ===
+  -        currentUserName = prefs.getString("user_name", "Doctor") ?: "Doctor"
+  +        currentUserName = prefs.getString("name", "Doctor") ?: "Doctor"
+  +            ?: prefs.getString("selected_subject_preference", null)
+
+=== Hunk 8: @@ -560,12 +547,10 @@ ===
+  -            setupPlayersListener()
+  -        } else {
+  -            observeChallengeMetaAndStartQuestions()
+  -        }
+  +        }
+  +        observeChallengeMetaAndStartQuestions()
+
+=== Hunk 9: @@ -588,6 +573,7 @@ ===
+  +        tvBattleStatusTitle   = findViewById(R.id.tvBattleStatusTitle)
+
+=== Hunk 11: @@ -633,59 +608,36 @@ ===
+  -            setBackgroundResource(R.drawable.vignette_low_hp)
+  +            setBackgroundColor(Color.parseColor("#80FF0000"))
+  -            text = "⚠️ CRITICAL HP"
+  +            text = "LOW HEALTH"
+  -            setShadowLayer(8f, 0f, 0f, Color.BLACK)
+  +            setShadowLayer(4f, 0f, 0f, Color.BLACK)
+  -            ).apply { topMargin = 110 }
+  +            ).apply { topMargin = 100 }
+  -        repeat(12) {
+  +        repeat(10) {
+  -                setShadowLayer(4f, 0f, 0f, Color.BLACK)
+  +                setShadowLayer(2f, 0f, 0f, Color.BLACK)
+  -                elevation = 32f
+  -    }
+  -
+  -    private fun startHeartbeatVignette() {
+  -        if (heartbeatVignetteAnimator != null) return
+  -        hpFlashOverlay?.visibility = View.VISIBLE
+  -        heartbeatVignetteAnimator = ValueAnimator.ofFloat(0.15f, 0.75f).apply {
+  -            duration = 550
+  -            repeatMode = ValueAnimator.REVERSE
+  -            repeatCount = ValueAnimator.INFINITE
+  -            addUpdateListener { anim ->
+  -                hpFlashOverlay?.alpha = anim.animatedValue as Float
+  -            }
+  -            start()
+  -        }
+  -    }
+  -
+  -    private fun stopHeartbeatVignette() {
+  -        heartbeatVignetteAnimator?.cancel()
+  -        heartbeatVignetteAnimator = null
+  -        hpFlashOverlay?.animate()?.alpha(0f)?.setDuration(300)?.withEndAction {
+  -            hpFlashOverlay?.visibility = View.GONE
+  -        }?.start()
+
+=== Hunk 12: @@ -700,17 +652,15 @@ ===
+  -            showFloatingText("+15 HP 💖", Color.parseColor("#00E676"))
+  -            showAdrenalineAnimation()
+  +            showFloatingText("+15 HP", Color.GREEN)
+  -            checkLowHealth(currentHp)
+  -            showFloatingText("🛡️ SHIELD UP!", Color.CYAN)
+  +            showFloatingText("SHIELD UP", Color.CYAN)
+
+=== Hunk 13: @@ -718,7 +668,7 @@ ===
+  -            showFloatingText("⚡ SHOCK CHARGED!", Color.YELLOW)
+  +            showFloatingText("SHOCK CHARGED", Color.YELLOW)
+
+=== Hunk 14: @@ -729,54 +679,27 @@ ===
+  -                showFloatingText("💫 ${target.name} confused!", Color.MAGENTA)
+  -                showConfuseEffect(target.id)
+  +                showFloatingText("${target.name} confused!", Color.MAGENTA)
+  -        startPowerupIdleAnimations()
+  -        val matching = powerupAnimators.filter { (it as? ObjectAnimator)?.target == btn }
+  -        matching.forEach { it.cancel() }
+  -        powerupAnimators.removeAll(matching)
+  -
+  -        btn.animate().scaleX(1.35f).scaleY(1.35f).rotation(12f).setDuration(130).withEndAction {
+  -            btn.animate().scaleX(1f).scaleY(1f).rotation(0f).alpha(0.35f).setDuration(160).start()
+  -        }.start()
+  +        // press_pop + wiggle combo, then dim/settle
+  +        val combo = AnimationUtils.loadAnimation(this, R.anim.power_pop)
+  +        combo.setAnimationListener(object : Animation.AnimationListener {
+  +            override fun onAnimationStart(a: Animation?) {}
+  +            override fun onAnimationRepeat(a: Animation?) {}
+  +            override fun onAnimationEnd(a: Animation?) {
+  +                btn.animate().alpha(0.35f).setDuration(150).start()
+  +            }
+  +        })
+  +        btn.clearAnimation()
+  +        btn.startAnimation(combo)
+  -    }
+  -
+  -    private fun startPowerupIdleAnimations() {
+  -        powerupAnimators.forEach { it.cancel() }
+  -        powerupAnimators.clear()
+  -
+  -        val readyButtons = listOfNotNull(
+  -            if (canHeal) btnAdrenaline else null,
+  -            if (canShield) btnShield else null,
+  -            if (canShock) btnShock else null,
+  -            if (canConfuse) btnConfuse else null
+  -        )
+  -
+  -        for (btn in readyButtons) {
+  -            val animX = ObjectAnimator.ofFloat(btn, "scaleX", 1f, 1.08f).apply {
+  -                duration = 850
+  -                repeatCount = ValueAnimator.INFINITE
+  -                repeatMode = ValueAnimator.REVERSE
+  -                start()
+  -            }
+  -            val animY = ObjectAnimator.ofFloat(btn, "scaleY", 1f, 1.08f).apply {
+  -                duration = 850
+  -                repeatCount = ValueAnimator.INFINITE
+  -                repeatMode = ValueAnimator.REVERSE
+  -                start()
+  -            }
+  -            powerupAnimators.add(animX)
+  -            powerupAnimators.add(animY)
+  -        }
+
+=== Hunk 15: @@ -793,136 +716,26 @@ ===
+  -    private fun showAdrenalineAnimation() {
+  -        val loc = IntArray(2)
+  -        btnAdrenaline.getLocationOnScreen(loc)
+  -        val startX = loc[0] + btnAdrenaline.width / 2f
+  -        val startY = loc[1] + btnAdrenaline.height / 2f
+  -
+  -        repeat(6) { i ->
+  -            val cross = ImageView(this).apply {
+  -                setImageDrawable(ContextCompat.getDrawable(this@ClassicGameActivity, R.drawable.ic_healing_cross))
+  -                layoutParams = FrameLayout.LayoutParams(42, 42)
+  -                x = startX - 21f + Random.nextInt(-35, 35)
+  -                y = startY - 21f
+  -                alpha = 0f
+  -                elevation = 32f
+  -            }
+  -            rootLayout.addView(cross)
+  -            cross.animate()
+  -                .alpha(1f)
+  -                .translationYBy(-Random.nextInt(200, 360).toFloat())
+  -                .translationXBy(Random.nextInt(-70, 70).toFloat())
+  -                .rotation(Random.nextInt(-60, 60).toFloat())
+  -                .setDuration(Random.nextLong(750, 1150))
+  -                .setStartDelay((i * 70).toLong())
+  -                .withEndAction {
+  -                    cross.animate().alpha(0f).scaleX(0.5f).scaleY(0.5f).setDuration(220).withEndAction {
+  -                        rootLayout.removeView(cross)
+  -                    }.start()
+  -                }
+  -                .start()
+  -        }
+  -    }
+  -
+  -        val userBar = playerBars[userId.toString()] ?: battleCard
+  -        val loc = IntArray(2)
+  -        userBar.getLocationOnScreen(loc)
+  -        val shieldRing = View(this).apply {
+  -            layoutParams = FrameLayout.LayoutParams(160, 160)
+  -            background = android.graphics.drawable.GradientDrawable().apply {
+  -                shape = android.graphics.drawable.GradientDrawable.OVAL
+  -                setColor(Color.parseColor("#3300E5FF"))
+  -                setStroke(4, Color.parseColor("#00E5FF"))
+  -            }
+  -            x = loc[0] + userBar.width / 2f - 80f
+  -            y = loc[1] + userBar.height / 2f - 80f
+  -            scaleX = 0.2f
+  -            scaleY = 0.2f
+  -            alpha = 0f
+  -            elevation = 30f
+  -        }
+  -        rootLayout.addView(shieldRing)
+  -        shieldRing.animate()
+  -            .alpha(1f)
+  -            .scaleX(1.8f)
+  -            .scaleY(1.8f)
+  -            .setDuration(450)
+  -            .setInterpolator(OvershootInterpolator(1.8f))
+  -            .withEndAction {
+  -                shieldRing.animate()
+  -                    .alpha(0f)
+  -                    .scaleX(2.4f)
+  -                    .scaleY(2.4f)
+  -                    .setDuration(400)
+  -                    .withEndAction { rootLayout.removeView(shieldRing) }
+  -                    .start()
+  -            }
+  -            .start()
+  +        val icon = ImageView(this).apply {
+  +            setImageDrawable(ContextCompat.getDrawable(this@ClassicGameActivity, R.drawable.ic_shield_effect))
+  +            scaleType   = ImageView.ScaleType.CENTER_INSIDE
+  +            layoutParams = FrameLayout.LayoutParams(120, 120, Gravity.CENTER)
+  +        }
+  +        rootLayout.addView(icon)
+  +        icon.animate().scaleX(1.5f).scaleY(1.5f).alpha(0f).setDuration(1000)
+  +            .withEndAction { rootLayout.removeView(icon) }.start()
+  -        val flash = View(this).apply {
+  -            layoutParams = ViewGroup.LayoutParams(
+  -                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+  -            )
+  -            setBackgroundColor(Color.parseColor("#55FFEA00"))
+  -            alpha = 0f
+  -            elevation = 38f
+  -        }
+  -        rootLayout.addView(flash)
+  -        flash.animate()
+  -            .alpha(1f)
+  -            .setDuration(90)
+  -            .withEndAction {
+  -                flash.animate()
+  -                    .alpha(0f)
+  -                    .setDuration(320)
+  -                    .withEndAction { rootLayout.removeView(flash) }
+  -                    .start()
+  -            }
+  -            .start()
+  -
+  -            setImageDrawable(ContextCompat.getDrawable(this@ClassicGameActivity, R.drawable.ic_lightning_spark))
+  -            scaleType = ImageView.ScaleType.CENTER_INSIDE
+  -            layoutParams = FrameLayout.LayoutParams(130, 130, Gravity.CENTER)
+  -            elevation = 40f
+  +            setImageDrawable(ContextCompat.getDrawable(this@ClassicGameActivity, R.drawable.ic_shock_effect))
+  +            scaleType   = ImageView.ScaleType.CENTER_INSIDE
+  +            layoutParams = FrameLayout.LayoutParams(120, 120, Gravity.CENTER)
+  -        icon.animate().rotation(720f).scaleX(1.7f).scaleY(1.7f).alpha(0f).setDuration(700)
+  +        icon.animate().rotation(360f).scaleX(1.3f).scaleY(1.3f).alpha(0f).setDuration(800)
+  -    }
+  -
+  -    private fun showConfuseEffect(targetId: String) {
+  -        val bar = playerBars[targetId] ?: return
+  -        val wobble = ObjectAnimator.ofFloat(bar, "rotation", 0f, -8f, 8f, -6f, 6f, 0f).apply {
+  -            duration = 650
+  -        }
+  -        wobble.start()
+  -
+  -        val loc = IntArray(2)
+  -        bar.getLocationOnScreen(loc)
+  -        val questionIcon = TextView(this).apply {
+  -            text = "💫😵❓"
+  -            textSize = 24f
+  -            x = loc[0] + bar.width / 2f - 40f
+  -            y = loc[1] - 40f
+  -            alpha = 0f
+  -            elevation = 32f
+  -        }
+  -        rootLayout.addView(questionIcon)
+  -        questionIcon.animate()
+  -            .alpha(1f)
+  -            .translationYBy(-60f)
+  -            .setDuration(500)
+  -            .withEndAction {
+  -                questionIcon.animate().alpha(0f).setDuration(400).withEndAction {
+  -                    rootLayout.removeView(questionIcon)
+  -                }.start()
+  -            }
+  -            .start()
+
+=== Hunk 18: @@ -1173,7 +984,8 @@ ===
+  -        val url = "${BASE_URL}api/get_test_structure.php?unique_id=${normalizeUniqueId(uniqueId)}"
+  +        val safeId = normalizeUniqueId(uniqueId)
+  +        val url = "${BASE_URL}api/get_test_structure.php?unique_id=$safeId&subject=${Uri.encode(selectedSubject ?: "NEET PG")}"
+
+=== Hunk 20: @@ -1236,35 +1041,23 @@ ===
+  -        val rawA: String
+  -        val rawB: String
+  -        val rawC: String
+  -        val rawD: String
+  -                rawA = match.groupValues[1].trim()
+  -                rawB = match.groupValues[2].trim()
+  -                rawC = match.groupValues[3].trim()
+  -                rawD = match.groupValues[4].trim()
+  +                optionA.text = match.groupValues[1].trim(); optionB.text = match.groupValues[2].trim()
+  +                optionC.text = match.groupValues[3].trim(); optionD.text = match.groupValues[4].trim()
+  -                rawA = q.a ?: ""; rawB = q.b ?: ""; rawC = q.c ?: ""; rawD = q.d ?: ""
+  +                optionA.text = q.a ?: ""; optionB.text = q.b ?: ""
+  +                optionC.text = q.c ?: ""; optionD.text = q.d ?: ""
+  -            rawA = q.a; rawB = q.b; rawC = q.c; rawD = q.d
+  -        }
+  -        optionA.text = formatOptionText("A", rawA)
+  -        optionB.text = formatOptionText("B", rawB)
+  -        optionC.text = formatOptionText("C", rawC)
+  -        optionD.text = formatOptionText("D", rawD)
+  +            optionA.text = q.a; optionB.text = q.b; optionC.text = q.c; optionD.text = q.d
+  +        }
+  -            btn.paintFlags = btn.paintFlags and android.graphics.Paint.STRIKE_THRU_TEXT_FLAG.inv()
+  -            btn.scaleX = 1f
+  -            btn.scaleY = 1f
+
+=== Hunk 21: @@ -1274,15 +1067,10 @@ ===
+  -            val finalImgUrl = imgUrl.replace(" ", "%20")
+  -            Glide.with(this).load(finalImgUrl).into(questionImageView)
+  -            questionImageView.setOnClickListener {
+  -                showImageLightbox(finalImgUrl)
+  -            }
+  +            Glide.with(this).load(imgUrl.replace(" ", "%20")).into(questionImageView)
+  -            questionImageView.setOnClickListener(null)
+
+=== Hunk 22: @@ -1292,102 +1080,19 @@ ===
+  -    private fun formatOptionText(badge: String, rawText: String): CharSequence {
+  -        val clean = rawText.trim()
+  -            .replace(Regex("""^(?i)[a-d][\)\].:]\s*"""), "")
+  -            .trim()
+  -        val spannable = android.text.SpannableString("  $badge   $clean")
+  -        spannable.setSpan(
+  -            android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+  -            2, 3,
+  -            android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+  -        )
+  -        val badgeColor = when (badge) {
+  -            "A" -> Color.parseColor("#00E5FF")
+  -            "B" -> Color.parseColor("#BB86FC")
+  -            "C" -> Color.parseColor("#00E676")
+  -            else -> Color.parseColor("#FF9100")
+  -        }
+  -        spannable.setSpan(
+  -            android.text.style.ForegroundColorSpan(badgeColor),
+  -            2, 3,
+  -            android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+  -        )
+  -        return spannable
+  -    }
+  -
+  -    private fun showImageLightbox(imageUrl: String) {
+  -        val dialog = android.app.Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+  -        val frame = FrameLayout(this).apply {
+  -            setBackgroundColor(Color.parseColor("#F2000000"))
+  -            layoutParams = ViewGroup.LayoutParams(
+  -                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+  -            )
+  -        }
+  -        val imgView = ImageView(this).apply {
+  -            layoutParams = FrameLayout.LayoutParams(
+  -                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+  -            )
+  -            scaleType = ImageView.ScaleType.FIT_CENTER
+  -        }
+  -        Glide.with(this).load(imageUrl).into(imgView)
+  -        frame.addView(imgView)
+  -
+  -        val closeBtn = ImageButton(this).apply {
+  -            setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
+  -            setBackgroundColor(Color.parseColor("#66000000"))
+  -            setColorFilter(Color.WHITE)
+  -            layoutParams = FrameLayout.LayoutParams(120, 120, Gravity.TOP or Gravity.END).apply {
+  -                topMargin = 50
+  -                marginEnd = 40
+  -            }
+  -            setOnClickListener { dialog.dismiss() }
+  -        }
+  -        frame.addView(closeBtn)
+  -
+  -        val hintTv = TextView(this).apply {
+  -            text = "🔍 Tap anywhere or ✕ to close"
+  -            setTextColor(Color.parseColor("#B0BEC5"))
+  -            textSize = 13f
+  -            gravity = Gravity.CENTER
+  -            layoutParams = FrameLayout.LayoutParams(
+  -                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
+  -                Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+  -            ).apply { bottomMargin = 60 }
+  -        }
+  -        frame.addView(hintTv)
+  -        frame.setOnClickListener { dialog.dismiss() }
+  -
+  -        dialog.setContentView(frame)
+  -        dialog.show()
+  -    }
+  -
+  -            correctStreak >= 10 -> "💎 x$correctStreak DIAMOND!"
+  -            correctStreak >= 7  -> "👑 x$correctStreak GODLIKE!"
+  -            correctStreak >= 5  -> "⚡ x$correctStreak UNSTOPPABLE!"
+  -            correctStreak >= 3  -> "🔥 x$correctStreak ON FIRE!"
+  -            correctStreak >= 1  -> "✅ x$correctStreak"
+  -            else                -> ""
+  -        }
+  -        val streakColor = when {
+  -            correctStreak >= 10 -> Color.parseColor("#E040FB")
+  -            correctStreak >= 7  -> Color.parseColor("#FFD700")
+  -            correctStreak >= 5  -> Color.parseColor("#00E5FF")
+  -            correctStreak >= 3  -> Color.parseColor("#FF6F00")
+  -            else                -> Color.parseColor("#4CAF50")
+  -        }
+  -        streakLabel.setTextColor(streakColor)
+  -
+  +            correctStreak >= 5 -> "🔥 x$correctStreak STREAK!"
+  +            correctStreak >= 3 -> "x$correctStreak"
+  +            correctStreak >= 1 -> "✅ x$correctStreak"
+  +            else               -> ""
+  +        }
+  -            streakLabel.animate()
+  -                .scaleX(1.35f).scaleY(1.35f).rotation(if (correctStreak % 2 == 0) 6f else -6f)
+  -                .setDuration(160)
+  -                .setInterpolator(OvershootInterpolator(2.0f))
+  -                .withEndAction {
+  -                    streakLabel.animate().scaleX(1f).scaleY(1f).rotation(0f).setDuration(160).start()
+  -                }.start()
+  +            streakLabel.setTextColor(Color.parseColor("#FF6F00"))
+  +            streakLabel.animate().scaleX(1.15f).scaleY(1.15f).setDuration(150)
+  +                .withEndAction { streakLabel.animate().scaleX(1f).scaleY(1f).setDuration(150).start() }.start()
+  +        } else {
+  +            streakLabel.setTextColor(Color.parseColor("#4CAF50"))
+
+=== Hunk 23: @@ -1411,34 +1116,8 @@ ===
+  -            val responseDurationMs = if (questionStartTime > 0L) System.currentTimeMillis() - questionStartTime else 10000L
+  -            val isLightningFast = isCorrect && responseDurationMs in 1..3500L
+  -
+  -            val priorStreak = correctStreak
+  -            if (isCorrect) {
+  -                totalCorrect++
+  -                correctStreak++
+  -            } else {
+  -                correctStreak = 0
+  -            }
+  -
+  -            if (!isCorrect && priorStreak >= 3) {
+  -                showFloatingText("💔 STREAK BROKEN! (x$priorStreak)", Color.parseColor("#FF5252"))
+  -                playDamageGifAndScreenRumble(true)
+  -            }
+  -
+  -            if (isLightningFast) {
+  -                showSpeedBonusBadge()
+  -                try {
+  -                    val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+  -                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+  -                        vibrator?.vibrate(VibrationEffect.createOneShot(60, VibrationEffect.DEFAULT_AMPLITUDE))
+  -                    } else {
+  -                        vibrator?.vibrate(60)
+  -                    }
+  -                } catch (_: Exception) {}
+  -            }
+  +            if (isCorrect) { totalCorrect++; correctStreak++ } else correctStreak = 0
+
+=== Hunk 24: @@ -1464,16 +1143,8 @@ ===
+  -            val chosenBtn: RadioButton = radioGroup.findViewById(selectedId)
+  -            flashOption(chosenBtn, isCorrect)
+  -            if (isCorrect) {
+  -                spawnConfettiBurst(chosenBtn)
+  -                launchAttackProjectilesToEnemies(chosenBtn)
+  -                if (correctStreak >= 3) showComboBanner(correctStreak)
+  -            } else {
+  -                shakeView(battleCard)
+  -            }
+  -            handleScoringAndDamage(isCorrect, isLightningFast)
+  +            flashOption(radioGroup.findViewById(selectedId), isCorrect)
+  +            handleScoringAndDamage(isCorrect)
+
+=== Hunk 25: @@ -1485,8 +1156,8 @@ ===
+  -        btn.animate().scaleX(1.12f).scaleY(1.12f).setDuration(130).withEndAction {
+  -            btn.animate().scaleX(1f).scaleY(1f).setDuration(130).start()
+  +        btn.animate().scaleX(1.08f).scaleY(1.08f).setDuration(120).withEndAction {
+  +            btn.animate().scaleX(1f).scaleY(1f).setDuration(120).start()
+
+=== Hunk 26: @@ -1501,12 +1172,11 @@ ===
+  -    private fun handleScoringAndDamage(isCorrect: Boolean, isSpeedBonus: Boolean = false) {
+  +    private fun handleScoringAndDamage(isCorrect: Boolean) {
+  -                var bonus = when { correctStreak >= 5 -> 8; correctStreak >= 3 -> 6; else -> 4 }
+  -                if (isSpeedBonus) bonus += 2
+  +                val bonus = when { correctStreak >= 5 -> 8; correctStreak >= 3 -> 6; else -> 4 }
+
+=== Hunk 27: @@ -1537,7 +1207,7 @@ ===
+  -            showFloatingText("🛡️ BLOCKED!", Color.CYAN)
+  +            showFloatingText("Blocked!", Color.CYAN)
+
+=== Hunk 28: @@ -1563,45 +1233,26 @@ ===
+  -            playDamageGifAndScreenRumble(dmg >= 10)
+  -        explanationText.text = if (isCorrect) "CORRECT! ✅\n$explanation" else "INCORRECT ❌\n$explanation"
+  +        explanationText.text = aiMarkdownSpannable(if (isCorrect) "CORRECT! ✅$explanation" else "INCORRECT ❌$explanation")
+  -
+  -        // Strikethrough wrong options & bounce the correct answer
+  -        val correctLetter = currentQuestion?.correctAnswer?.trim()?.uppercase() ?: ""
+  -        val optionsMap = mapOf("A" to optionA, "B" to optionB, "C" to optionC, "D" to optionD)
+  -        for ((letter, btn) in optionsMap) {
+  -            if (letter != correctLetter) {
+  -                btn.paintFlags = btn.paintFlags or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
+  -                btn.animate().alpha(0.32f).setDuration(220).start()
+  -            } else {
+  -                btn.animate().scaleX(1.04f).scaleY(1.04f).setDuration(220).start()
+  -            }
+  -        }
+  -            optionsMap.values.forEach {
+  -                it.scaleX = 1f
+  -                it.scaleY = 1f
+  -            }
+  -                questionText.animate().translationX(-100f).alpha(0f).setDuration(160).withEndAction {
+  -                    moveNext()
+  -                    submitBtn.isEnabled = true
+  -                    radioGroup.clearCheck()
+  -                }.start()
+  +                moveNext()
+  +                submitBtn.isEnabled = true
+  +                radioGroup.clearCheck()
+
+=== Hunk 29: @@ -1760,7 +1411,7 @@ ===
+  -            val hpVal = playerHps[pid] ?: (if (pid == userId.toString()) currentHp else (botStates[pid]?.hp ?: 100))
+  +            val hpVal = if (pid == userId.toString()) currentHp else (botStates[pid]?.hp ?: 0)
+
+=== Hunk 30: @@ -1805,115 +1456,38 @@ ===
+  -        timerPulseAnimator?.cancel()
+  -        timerPulseAnimator = null
+  -        timerText.setBackgroundResource(R.drawable.timer_bg_rounded)
+  -        timerText.setTextColor(Color.parseColor("#E53935"))
+  -        timerText.scaleX = 1f; timerText.scaleY = 1f
+  -
+  -
+  -                if (millisUntilFinished <= 60000) {
+  -                    timerText.setBackgroundResource(R.drawable.timer_bg_urgent)
+  -                    timerText.setTextColor(Color.parseColor("#FF1744"))
+  -                    if (timerPulseAnimator == null) {
+  -                        timerPulseAnimator = ObjectAnimator.ofFloat(timerText, "scaleX", 1f, 1.14f).apply {
+  -                            duration = 450
+  -                            repeatCount = ValueAnimator.INFINITE
+  -                            repeatMode = ValueAnimator.REVERSE
+  -                            start()
+  -                        }
+  -                        ObjectAnimator.ofFloat(timerText, "scaleY", 1f, 1.14f).apply {
+  -                            duration = 450
+  -                            repeatCount = ValueAnimator.INFINITE
+  -                            repeatMode = ValueAnimator.REVERSE
+  -                            start()
+  -                        }
+  -                    }
+  +                if (millisUntilFinished < 30000) {
+  +                    timerText.setTextColor(Color.RED)
+  +                    timerText.alpha = (sin(millisUntilFinished / 500.0) * 0.3 + 0.7).toFloat()
+  -                if (millisUntilFinished < 15000) {
+  -                    timerText.alpha = (sin(millisUntilFinished / 300.0) * 0.3 + 0.7).toFloat()
+  -                }
+  -                timerPulseAnimator?.cancel()
+  -                timerPulseAnimator = null
+  -                timerText.scaleX = 1f; timerText.scaleY = 1f
+  -    private fun showSpeedBonusBadge() {
+  -        val badge = TextView(this).apply {
+  -            text = "⚡ LIGHTNING SPEED! +2"
+  -            textSize = 14f
+  -            setTextColor(Color.WHITE)
+  -            setTypeface(null, android.graphics.Typeface.BOLD)
+  -            setBackgroundResource(R.drawable.bg_speed_badge)
+  -            setPadding(36, 16, 36, 16)
+  -            elevation = 40f
+  -            scaleX = 0.3f
+  -            scaleY = 0.3f
+  -            alpha = 0f
+  -        }
+  -        rootLayout.addView(badge, FrameLayout.LayoutParams(
+  -            FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER
+  -        ))
+  -        badge.animate()
+  -            .scaleX(1.15f).scaleY(1.15f).alpha(1f)
+  -            .setDuration(220)
+  -            .setInterpolator(OvershootInterpolator(2.5f))
+  -            .withEndAction {
+  -                badge.animate()
+  -                    .translationY(-220f)
+  -                    .scaleX(0.85f).scaleY(0.85f).alpha(0f)
+  -                    .setDuration(800)
+  -                    .setStartDelay(250)
+  -                    .withEndAction { rootLayout.removeView(badge) }
+  -                    .start()
+  -            }.start()
+  -    }
+  -
+  -            this.text = text; setTextColor(color); textSize = 24f
+  +            this.text = text; setTextColor(color); textSize = 22f
+  -            setShadowLayer(10f, 0f, 0f, Color.BLACK)
+  -            scaleX = 0.4f
+  -            scaleY = 0.4f
+  -            alpha = 0f
+  -            elevation = 35f
+  +            setShadowLayer(8f, 0f, 0f, Color.BLACK)
+  -        tv.animate()
+  -            .scaleX(1.25f)
+  -            .scaleY(1.25f)
+  -            .alpha(1f)
+  -            .setDuration(160)
+  -            .setInterpolator(OvershootInterpolator(2f))
+  -            .withEndAction {
+  -                tv.animate()
+  -                    .translationY(-260f)
+  -                    .alpha(0f)
+  -                    .scaleX(0.9f)
+  -                    .scaleY(0.9f)
+  -                    .setDuration(900)
+  -                    .withEndAction { rootLayout.removeView(tv) }
+  -                    .start()
+  -            }
+  -            .start()
+  +        tv.animate().translationY(-300f).alpha(0f).setDuration(1200)
+  +            .withEndAction { rootLayout.removeView(tv) }.start()
+
+=== Hunk 31: @@ -1954,6 +1528,8 @@ ===
+  +        playerScores[pId] = score
+  +
+
+=== Hunk 32: @@ -1971,42 +1547,29 @@ ===
+  -                text = if (isMe) currentUserName else name; textSize = 14f; setTextColor(Color.BLACK)
+  -                setTypeface(null, android.graphics.Typeface.BOLD)
+  -            }
+  -            val scoreLabel = TextView(this).apply { text = "Score: $score"; textSize = 12f }
+  +                text = if (isMe) currentUserName else name; textSize = 14f
+  +                setTextColor(ContextCompat.getColor(this@ClassicGameActivity, R.color.text_primary))
+  +                setTypeface(null, Typeface.BOLD)
+  +            }
+  +            val scoreLabel = TextView(this).apply {
+  +                text = "Score: $score"; textSize = 12f
+  +                setTextColor(ContextCompat.getColor(this@ClassicGameActivity, R.color.text_secondary))
+  +            }
+  -            val barContainer = FrameLayout(this).apply {
+  -                layoutParams = LinearLayout.LayoutParams(0, 35, 2.5f)
+  -            }
+  -            val ghostBar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+  -                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+  -                max = 100; progress = hp
+  -                progressDrawable = ContextCompat.getDrawable(this@ClassicGameActivity, R.drawable.ghost_health_bar)
+  -            }
+  -                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+  +                layoutParams     = LinearLayout.LayoutParams(0, 35, 2.5f)
+  -            barContainer.addView(ghostBar)
+  -            barContainer.addView(bar)
+  -            row.addView(avatar); row.addView(infoLayout); row.addView(barContainer)
+  +            row.addView(avatar); row.addView(infoLayout); row.addView(bar)
+  -            playerGhostBars[pId]   = ghostBar
+  -            playerNameLabels[pId]  = nameLabel
+  -            playerRows[pId]        = row
+  -            playerScores[pId]      = score
+  -            playerHps[pId]         = hp
+  -            playerNames[pId]       = if (isMe) currentUserName else name
+  -            refreshLeaderCrowns()
+
+=== Hunk 33: @@ -2021,77 +1584,11 @@ ===
+  -            val ghostBar = playerGhostBars[pId]
+  -            val nameLbl = playerNameLabels[pId]
+  -            val scoreLbl = playerScoreLabels[pId]
+  -            val rowView = playerRows[pId]
+  -
+  -            playerScores[pId] = score
+  -            playerHps[pId]    = hp
+  -            playerNames[pId]  = if (isMe) currentUserName else name
+  -
+  -            if (hp <= 0) {
+  -                rowView?.animate()?.alpha(0.45f)?.setDuration(400)?.start()
+  -                nameLbl?.text = "💀 " + (if (isMe) currentUserName else name)
+  -                nameLbl?.setTextColor(Color.parseColor("#9E9E9E"))
+  -                scoreLbl?.text = "ELIMINATED • Score: $score"
+  -                scoreLbl?.setTextColor(Color.parseColor("#E57373"))
+  -            } else {
+  -                rowView?.alpha = 1.0f
+  -                scoreLbl?.text = "Score: $score"
+  -                scoreLbl?.setTextColor(Color.parseColor("#616161"))
+  -                refreshLeaderCrowns()
+  -            }
+  -
+  -            val oldHp = bar.progress
+  -            if (hp < oldHp) {
+  -                triggerDamageVisuals(bar, isMe, pId)
+  -                showDamageNumber(oldHp - hp)
+  -
+  -                ObjectAnimator.ofInt(bar, "progress", oldHp, hp).apply {
+  -                    duration = 200
+  -                    interpolator = DecelerateInterpolator()
+  -                    start()
+  -                }
+  -
+  -                if (ghostBar != null) {
+  -                    uiHandler.postDelayed({
+  -                        if (!isFinishing && !isDestroyed) {
+  -                            ObjectAnimator.ofInt(ghostBar, "progress", ghostBar.progress, hp).apply {
+  -                                duration = 650
+  -                                interpolator = DecelerateInterpolator()
+  -                                start()
+  -                            }
+  -                        }
+  -                    }, 250)
+  -                }
+  -            } else {
+  -                bar.progress = hp
+  -                ghostBar?.progress = hp
+  -            }
+  +            playerScoreLabels[pId]?.text = "Score: $score"
+  +            if (hp < bar.progress) { triggerDamageVisuals(bar, isMe, pId); showDamageNumber(bar.progress - hp) }
+  +            ObjectAnimator.ofInt(bar, "progress", bar.progress, hp).setDuration(400).start()
+  -        }
+  -    }
+  -
+  -    private fun refreshLeaderCrowns() {
+  -        val topEntry = playerScores.filter { (playerHps[it.key] ?: 100) > 0 }.maxByOrNull { it.value }
+  -        val topPid = if (topEntry != null && topEntry.value > 0) topEntry.key else null
+  -
+  -        for ((pid, nameLbl) in playerNameLabels) {
+  -            val isMe = pid == userId.toString()
+  -            val baseName = if (isMe) currentUserName else (playerNames[pid] ?: "Player")
+  -            val hp = playerHps[pid] ?: 100
+  -            if (hp <= 0) continue
+  -
+  -            val statusSuffix = when {
+  -                isMe && shieldRoundsActive > 0 -> " 🛡️"
+  -                isMe && isShockCharged -> " ⚡"
+  -                botStates[pid]?.confusedThisRound == true -> " 💫"
+  -                else -> ""
+  -            }
+  -            val crownPrefix = if (pid == topPid) "👑 " else ""
+  -            nameLbl.text = crownPrefix + baseName + statusSuffix
+  -            nameLbl.setTextColor(if (pid == topPid) Color.parseColor("#FFD700") else Color.BLACK)
+  +            if (!battleStatusExpanded) applyBattleStatusVisibility()
+
+=== Hunk 34: @@ -2101,12 +1598,19 @@ ===
+  -        if (!::challengeBattleHeader.isInitialized || !::btnBattleToggle.isInitialized) return
+  -
+  -        val visibleLimit = if (battleStatusExpanded) Int.MAX_VALUE else maxVisibleBattleRows
+  -        for (index in 0 until challengeBattleHeader.childCount) {
+  -            challengeBattleHeader.getChildAt(index).visibility =
+  -                if (index < visibleLimit) View.VISIBLE else View.GONE
+  +        if (!::challengeBattleHeader.isInitialized || !::btnBattleToggle.isInitialized || !::tvBattleStatusTitle.isInitialized) return
+  +
+  +        if (!battleStatusExpanded) {
+  +            val myScore = playerScores[userId.toString()] ?: 0
+  +            tvBattleStatusTitle.text = "YOUR SCORE: $myScore"
+  +            for (index in 0 until challengeBattleHeader.childCount) {
+  +                challengeBattleHeader.getChildAt(index).visibility = View.GONE
+  +            }
+  +        } else {
+  +            tvBattleStatusTitle.text = "BATTLE STATUS"
+  +            for (index in 0 until challengeBattleHeader.childCount) {
+  +                challengeBattleHeader.getChildAt(index).visibility = View.VISIBLE
+  +            }
+
+=== Hunk 35: @@ -2128,46 +1632,30 @@ ===
+  -            startHeartbeatVignette()
+  +            hpFlashOverlay?.let {
+  +                it.visibility = View.VISIBLE; it.alpha = 0.3f
+  +                it.animate().alpha(0f).setDuration(500).withEndAction { it.visibility = View.GONE }.start()
+  +            }
+  -            stopHeartbeatVignette()
+  -        val isCrit = damage >= 10
+  -        freeTv.text = if (isCrit) "⚡ -$damage CRITICAL!" else "-$damage"
+  -        freeTv.setTextColor(if (isCrit) Color.parseColor("#FFD600") else Color.parseColor("#FF1744"))
+  -        freeTv.textSize = if (isCrit) 22f else 18f
+  -        freeTv.alpha = 1f; freeTv.scaleX = 0.4f; freeTv.scaleY = 0.4f; freeTv.visibility = View.VISIBLE
+  +        freeTv.text = "-$damage"; freeTv.setTextColor(Color.RED)
+  +        freeTv.alpha = 1f; freeTv.scaleX = 1f; freeTv.scaleY = 1f; freeTv.visibility = View.VISIBLE
+  -            freeTv.x = loc[0] + userBar.width / 2f - 50f + Random.nextInt(-30, 30); freeTv.y = loc[1] - 40f
+  +            freeTv.x = loc[0] + userBar.width / 2f - 50f; freeTv.y = loc[1] - 50f
+  -
+  -        freeTv.animate()
+  -            .scaleX(1.3f).scaleY(1.3f)
+  -            .translationYBy(-130f)
+  -            .translationXBy(Random.nextInt(-40, 40).toFloat())
+  -            .setDuration(260)
+  -            .setInterpolator(OvershootInterpolator(1.8f))
+  -            .withEndAction {
+  -                freeTv.animate()
+  -                    .scaleX(0.7f).scaleY(0.7f)
+  -                    .alpha(0f)
+  -                    .translationYBy(-80f)
+  -                    .setDuration(450)
+  -                    .withEndAction { freeTv.visibility = View.GONE }
+  -                    .start()
+  -            }
+  -            .start()
+  +        freeTv.animate().translationYBy(-150f).alpha(0f).setDuration(1000)
+  +            .withEndAction { freeTv.visibility = View.GONE }.start()
+
+=== Hunk 37: @@ -2462,139 +1686,39 @@ ===
+  -        val myScore    = playerScores[userId.toString()] ?: 0
+  -            if (win) {
+  -                spawnVictoryConfettiShower()
+  -            }
+  -
+  -            val dialog = android.app.Dialog(this)
+  -            dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
+  -            dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(Color.TRANSPARENT))
+  -            dialog.setCancelable(false)
+  -
+  -            val card = LinearLayout(this).apply {
+  -                orientation = LinearLayout.VERTICAL
+  -                gravity = Gravity.CENTER_HORIZONTAL
+  -                setBackgroundResource(R.drawable.bg_victory_defeat_card)
+  -                setPadding(52, 48, 52, 48)
+  -                layoutParams = ViewGroup.LayoutParams(
+  -                    (resources.displayMetrics.widthPixels * 0.88f).toInt(),
+  -                    ViewGroup.LayoutParams.WRAP_CONTENT
+  -                )
+  -            }
+  -
+  -            val iconTv = TextView(this).apply {
+  -                text = if (win) "🏆" else "💀"
+  -                textSize = 52f
+  -                gravity = Gravity.CENTER
+  -                scaleX = 0.3f
+  -                scaleY = 0.3f
+  -                animate().scaleX(1.15f).scaleY(1.15f).setDuration(350).setInterpolator(OvershootInterpolator(2.5f))
+  -                    .withEndAction { animate().scaleX(1f).scaleY(1f).setDuration(150).start() }.start()
+  -            }
+  -            card.addView(iconTv)
+  -
+  -            val titleTv = TextView(this).apply {
+  -                text = if (win) "VICTORY!" else "DEFEAT"
+  -                textSize = 26f
+  -                setTypeface(typeface, android.graphics.Typeface.BOLD)
+  -                setTextColor(if (win) Color.parseColor("#FFD700") else Color.parseColor("#FF5252"))
+  -                setShadowLayer(8f, 0f, 0f, if (win) Color.parseColor("#FF8F00") else Color.parseColor("#B71C1C"))
+  -                gravity = Gravity.CENTER
+  -                setPadding(0, 8, 0, 6)
+  -            }
+  -            card.addView(titleTv)
+  -
+  -            val subtitleTv = TextView(this).apply {
+  -                text = if (win) "You conquered the arena!" else "You were eliminated."
+  -                textSize = 14f
+  -                setTextColor(Color.parseColor("#B0BEC5"))
+  -                gravity = Gravity.CENTER
+  -                setPadding(0, 0, 0, 24)
+  -            }
+  -            card.addView(subtitleTv)
+  -
+  -            val statsLayout = LinearLayout(this).apply {
+  -                orientation = LinearLayout.HORIZONTAL
+  -                gravity = Gravity.CENTER
+  -                layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+  -                    bottomMargin = 32
+  -                }
+  -            }
+  -
+  -            fun createStatBadge(label: String, initialVal: String, accentColor: Int): Pair<LinearLayout, TextView> {
+  -                val box = LinearLayout(this).apply {
+  -                    orientation = LinearLayout.VERTICAL
+  -                    gravity = Gravity.CENTER
+  -                    layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
+  -                        setMargins(6, 0, 6, 0)
+  -                    }
+  -                    background = android.graphics.drawable.GradientDrawable().apply {
+  -                        setColor(Color.parseColor("#141D38"))
+  -                        cornerRadius = 14f
+  -                    }
+  -                    setPadding(12, 16, 12, 16)
+  -                }
+  -                val valTv = TextView(this).apply {
+  -                    text = initialVal
+  -                    textSize = 17f
+  -                    setTypeface(typeface, android.graphics.Typeface.BOLD)
+  -                    setTextColor(accentColor)
+  -                    gravity = Gravity.CENTER
+  -                }
+  -                val lblTv = TextView(this).apply {
+  -                    text = label
+  -                    textSize = 10f
+  -                    setTextColor(Color.parseColor("#90A4AE"))
+  -                    gravity = Gravity.CENTER
+  -                    setPadding(0, 4, 0, 0)
+  -                }
+  -                box.addView(valTv)
+  -                box.addView(lblTv)
+  -                return Pair(box, valTv)
+  -            }
+  -
+  -            val (scoreBox, scoreValTv) = createStatBadge("SCORE", "0", Color.parseColor("#00E5FF"))
+  -            val (accBox, accValTv) = createStatBadge("ACCURACY", "$accuracy%", Color.parseColor("#00E676"))
+  -            val (streakBox, streakValTv) = createStatBadge("STREAK", "x$bestStreak", Color.parseColor("#FF9100"))
+  -
+  -            statsLayout.addView(scoreBox)
+  -            statsLayout.addView(accBox)
+  -            statsLayout.addView(streakBox)
+  -            card.addView(statsLayout)
+  -
+  -            ValueAnimator.ofInt(0, myScore).apply {
+  -                duration = 800
+  -                addUpdateListener { scoreValTv.text = "${it.animatedValue}" }
+  -                start()
+  -            }
+  -
+  -            val actionBtn = Button(this).apply {
+  -                text = "VIEW LEADERBOARD ➔"
+  -                textSize = 14f
+  -                setTextColor(Color.BLACK)
+  -                setTypeface(typeface, android.graphics.Typeface.BOLD)
+  -                background = android.graphics.drawable.GradientDrawable().apply {
+  -                    setColor(Color.parseColor("#00E5FF"))
+  -                    cornerRadius = 24f
+  -                }
+  -                setPadding(30, 20, 30, 20)
+  -                setOnClickListener {
+  -                    dialog.dismiss()
+  -                    finalizeChallenge()
+  -                }
+  -            }
+  -            card.addView(actionBtn)
+  -
+  -            dialog.setContentView(card)
+  -            dialog.show()
+  +            AlertDialog.Builder(this)
+  +                .setTitle(if (win) "VICTORY! 🏆" else "DEFEAT! 💀")
+  +                .setMessage(buildString {
+  +                    append(if (win) "You defeated all opponents!" else "You have been eliminated.")
+  +                    append("Accuracy: $accuracy%")
+  +                    append("Best streak: $bestStreak")
+  +                    append("Score: ${playerScores[userId.toString()] ?: 0}")
+  +                })
+  +                .setCancelable(false)
+  +                .setPositiveButton("View Leaderboard") { _, _ -> finalizeChallenge() }
+  +                .show()
+  +        val totalWrong = totalAnswered - totalCorrect
+  +        val score = playerScores[userId.toString()] ?: 0
+  +        val topic = currentTopic ?: selectedSubject ?: ""
+  +        HistoryManager.saveHistory(
+  +            context = this,
+  +            mode = "CHALLENGE",
+  +            title = if (isRealMultiplayer) "Real Multiplayer Challenge" else "Classic Bot Challenge",
+  +            topic = topic,
+  +            score = score,
+  +            totalQuestions = totalAnswered,
+  +            correctAnswers = totalCorrect,
+  +            wrongAnswers = totalWrong,
+  +            challengeId = challengeId,
+  +            reviewJson = reviewJson.toString()
+  +        )
+
+=== Hunk 38: @@ -2610,6 +1734,13 @@ ===
+  +        Log.d(TAG, "launchResultActivity: reviewJson length=${reviewJson.length()}")
+  +        if (reviewJson.length() == 0) {
+  +            Log.w(TAG, "No review data, skipping result activity")
+  +            Toast.makeText(this, "No questions answered", Toast.LENGTH_SHORT).show()
+  +            finish()
+  +            return
+  +        }
+
+=== Hunk 39: @@ -2644,6 +1775,9 @@ ===
+  +        // If ID is in a special subject range (e.g. 701), don't normalize it down to 1-50
+  +        if (id > 100) return id
+  +

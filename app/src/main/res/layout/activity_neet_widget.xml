@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/neetTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NEET PG 2026"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#111111" />
+
+        <TextView
+            android:id="@+id/neetDateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="NEET PG: --"
+            android:textSize="16sp"
+            android:textColor="#444444" />
+
+        <TextView
+            android:id="@+id/neetDaysText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="18dp"
+            android:text="-- days left"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#1565C0" />
+
+        <ImageView
+            android:id="@+id/questionImage"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginBottom="12dp"
+            android:scaleType="centerCrop"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/questionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Question here"
+            android:textColor="#111111"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/optionsGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/optionA"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp"
+                android:text="Option A"
+                android:textSize="16sp" />
+
+            <RadioButton
+                android:id="@+id/optionB"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp"
+                android:text="Option B"
+                android:textSize="16sp" />
+
+            <RadioButton
+                android:id="@+id/optionC"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp"
+                android:text="Option C"
+                android:textSize="16sp" />
+
+            <RadioButton
+                android:id="@+id/optionD"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp"
+                android:text="Option D"
+                android:textSize="16sp" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/submitBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Submit Answer" />
+
+        <TextView
+            android:id="@+id/resultText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text=""
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#222222" />
+
+        <TextView
+            android:id="@+id/explanationText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text=""
+            android:textSize="15sp"
+            android:textColor="#555555" />
+
+        <Button
+            android:id="@+id/challengeBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Challenge a Friend ⚔️" />
+
+    </LinearLayout>
+</ScrollView>

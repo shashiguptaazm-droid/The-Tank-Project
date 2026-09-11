@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medigyaan AI - Medical Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="chat-container">
+        <header>
+            <div class="header-left">
+                <div class="avatar">MG</div>
+                <div class="header-info">
+                    <h1>Medigyaan AI</h1>
+                    <span class="status"><i class="fas fa-circle"></i> Always Active</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button title="History"><i class="fas fa-history"></i></button>
+                <button title="More"><i class="fas fa-ellipsis-v"></i></button>
+            </div>
+        </header>
+
+        <div class="tools-bar">
+            <button class="tool-chip"><i class="fas fa-file-pdf"></i> Chat PDF</button>
+            <button class="tool-chip"><i class="fas fa-microscope"></i> PubMed</button>
+            <button class="tool-chip"><i class="fas fa-graduation-cap"></i> Thesis</button>
+            <button class="tool-chip"><i class="fas fa-bullseye"></i> Counselor</button>
+            <button class="tool-chip"><i class="fas fa-image"></i> Poster</button>
+            <button class="tool-chip"><i class="fas fa-book"></i> Chapter</button>
+        </div>
+
+        <main id="chat-messages">
+            <div class="welcome-hint">
+                <div class="welcome-icon">🧠</div>
+                <h2>How can I help you today?</h2>
+                <p>Ask about NEET PG, diseases, drugs — or use the tools above.</p>
+                <div class="suggestions">
+                    <button onclick="fillInput('Explain typhoid fever presentation and treatment')">🦠 Explain typhoid fever...</button>
+                    <button onclick="fillInput('Give me 3 PubMed references for dengue fever')">🔬 PubMed references...</button>
+                    <button onclick="fillInput('Search thesis topics on diabetes mellitus')">🎓 Thesis topics...</button>
+                    <button onclick="fillInput('Predict NEET PG colleges: rank 12000, GEN, MD Medicine')">🎯 Predict colleges...</button>
+                </div>
+            </div>
+        </main>
+
+        <div id="typing-indicator" class="typing-indicator hidden">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div id="attachment-status" class="attachment-status hidden">
+            <span id="attachment-name"></span>
+            <button onclick="clearAttachment()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <footer>
+            <div class="input-wrapper">
+                <input type="file" id="file-input" class="hidden" accept=".pdf,.txt,.jpg,.png">
+                <button class="attach-btn" onclick="document.getElementById('file-input').click()"><i class="fas fa-paperclip"></i></button>
+                <textarea id="user-input" placeholder="Ask anything..." rows="1"></textarea>
+                <button id="send-btn" class="send-btn" disabled><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

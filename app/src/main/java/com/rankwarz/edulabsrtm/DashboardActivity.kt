@@ -1,0 +1,1187 @@
+package com.rankwarz.edulabsrtm
+
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.net.Uri
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.view.animation.AnimationUtils
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.activity.result.contract.ActivityResultContracts
+import com.android.volley.DefaultRetryPolicy
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.bumptech.glide.Glide
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import org.json.JSONArray
+import org.json.JSONObject
+import kotlin.random.Random
+import java.util.Calendar
+
+data class RankInfo(
+    val title: String,
+    val drawable: Int,
+    val emoji: String,
+    val minXp: Int
+)
+
+fun getRankInfo(rankTitle: String): RankInfo {
+    val normalized = rankTitle.lowercase().trim()
+    return when (normalized) {
+        "legend" -> RankInfo("LEGEND", R.drawable.ic_legend, "🏆", 50000)
+        "grandmaster" -> RankInfo("GRANDMASTER", R.drawable.ic_master, "👑", 25000)
+        "master" -> RankInfo("MASTER", R.drawable.ic_master, "🔱", 15000)
+        "scholar" -> RankInfo("SCHOLAR", R.drawable.ic_skilled, "📚", 10000)
+        "expert" -> RankInfo("EXPERT", R.drawable.ic_warrior, "⚔️", 7500)
+        "warrior" -> RankInfo("WARRIOR", R.drawable.ic_warrior, "🛡️", 5000)
+        "skilled" -> RankInfo("SKILLED", R.drawable.ic_skilled, "🎯", 2500)
+        "rookie" -> RankInfo("ROOKIE", R.drawable.ic_rookie, "🚀", 1000)
+        "aspirant" -> RankInfo("ASPIRANT", R.drawable.ic_beginner, "🌱", 0)
+        else -> RankInfo("BEGINNER", R.drawable.ic_beginner, "✨", 0)
+    }
+}
+
+private fun getRankInfoFromExp(exp: Int): RankInfo {
+    val tier = when {
+        exp >= 100000 -> RankManager.tiers.first { it.name == "LEGEND" }
+        exp >= 60000 -> RankManager.tiers.first { it.name == "GRANDMASTER" }
+        exp >= 30000 -> RankManager.tiers.first { it.name == "MASTER" }
+        exp >= 15000 -> RankManager.tiers.first { it.name == "SCHOLAR" }
+        exp >= 7500 -> RankManager.tiers.first { it.name == "EXPERT" }
+        exp >= 3500 -> RankManager.tiers.first { it.name == "WARRIOR" }
+        exp >= 1500 -> RankManager.tiers.first { it.name == "SKILLED" }
+        exp >= 500 -> RankManager.tiers.first { it.name == "ROOKIE" }
+        else -> RankManager.tiers.first { it.name == "ASPIRANT" }
+    }
+    val tierInfo = getRankInfo(tier.name)
+    return tierInfo.copy(title = tier.name, drawable = tier.iconRes)
+}
+
+class DashboardActivity : AppCompatActivity() {
+
+    data class TopicData(val name: String, val count: Int)
+
+    private lateinit var prefs: SharedPreferences
+    private var selectedSubject: String = ""
+
+    private var drawerLayout: DrawerLayout? = null
+    private var btnThemeToggle: ImageButton? = null
+
+    private var userId: Int = 0
+    private val DASHBOARD_API_URL = "https://medigyaan.xyz/Neurons/dash_api.php"
+
+    private var invitationCard: View? = null
+    private var txtInviterName: TextView? = null
+    private var btnAcceptInvite: Button? = null
+
+    private var expProgressBar: ProgressBar? = null
+    private var txtLevel: TextView? = null
+    private var txtMotivation: TextView? = null
+    private var txtRankTitle: TextView? = null
+    private var txtWins: TextView? = null
+    private var txtStreak: TextView? = null
+
+    private var txtCreatedCount: TextView? = null
+    private var txtLastAccuracy: TextView? = null
+    private var txtSharedCount: TextView? = null
+
+    private var txtUserName: TextView? = null
+    private var txtDailyStreak: TextView? = null
+    private var txtStreakCardDaily: TextView? = null
+    private var txtXpText: TextView? = null
+    
+    // Badge views
+    private var ivBadgeBg: ImageView? = null
+    private var badgeProgress: ProgressBar? = null
+    private var txtBadgeEmoji: TextView? = null
+    private var currentRankTitle: String = "BEGINNER"
+
+    private var txtStatsWins: TextView? = null
+    private var txtStatsAccuracy: TextView? = null
+    private var txtStatsStreak: TextView? = null
+    private var txtStatsBattles: TextView? = null
+
+    private var btnStartTodayChallenge: Button? = null
+    private var txtChallengeTimer: TextView? = null
+    private var todayChallengeContent: View? = null
+    private var txtTodayQuestion: TextView? = null
+
+    private var txtPredictedRank: TextView? = null
+    private var txtPredictedConfidence: TextView? = null
+
+    private val PREDICT_RANK_URL = "https://medigyaan.xyz/Neurons/predict_rank.php"
+
+    private var inviteListener: ValueEventListener? = null
+    private val lobbiesRef: DatabaseReference =
+        FirebaseDatabase.getInstance().reference.child("lobbies")
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        prefs = getSharedPreferences("MY_APP", MODE_PRIVATE)
+        applySavedTheme()
+        super.onCreate(savedInstanceState)
+
+        selectedSubject = prefs.getString(KEY_SELECTED_SUBJECT, "") ?: ""
+
+        if (selectedSubject.isEmpty()) {
+            startActivity(Intent(this, GoalActivity::class.java))
+            finish()
+            return
+        }
+
+        setContentView(R.layout.activity_dashboard)
+
+        userId = readUserId()
+        if (userId == 0) {
+            logout()
+            return
+        }
+
+        initViews()
+        setupToolbarAndSidebar()
+        setupThemeToggle()
+        setupBottomNavigation()
+        setupHeader()
+        setupCategoryCards()
+        setupActionButtons()
+        setupBattleModeCards()
+
+        setupSearchBox()
+        setupDashboardNavigationCards()
+        setupDetailsButton()
+        setupTodayChallenge()
+        setupQuickActionCards()
+        setupStatsClicks()
+        setupMotivationCard()
+        setupRankBadgeClick()
+        setupAccuracyClick()
+        fetchDatabaseData()
+        fetchProfileData()
+        setupTopicSelector()
+        loadDashboardAccuracyStats()
+        checkActiveInvitations()
+        animateDashboardEntrance()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        view<ImageView>(R.id.iv_profile_dashboard)?.let { AvatarManager.loadAvatar(this, it, isMe = true) }
+        selectedSubject = prefs.getString(KEY_SELECTED_SUBJECT, "") ?: ""
+        loadDashboardAccuracyStats()
+        setupCategoryCards()
+        setupTopicSelector()
+        setupBattleModeCards()
+    }
+
+    private inline fun <reified T : View> view(id: Int): T? {
+        return findViewById<View>(id) as? T
+    }
+
+    private fun applySavedTheme() {
+        AppCompatDelegate.setDefaultNightMode(
+            if (prefs.getBoolean(KEY_DARK_MODE, false)) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
+    }
+
+    private fun setupTopicSelector() {
+        findViewById<ComposeView>(R.id.compose_topic_selector)?.setContent {
+            TopicSelectorList(selectedSubject, "PRACTICE") { topicName ->
+                val intent = Intent(this@DashboardActivity, MCQActivity::class.java).apply {
+                    putExtra("SELECTED_SUBJECT", selectedSubject)
+                    putExtra("SELECTED_TOPIC", topicName)
+                    putExtra("USER_ID", userId)
+                }
+                startActivity(intent)
+            }
+        }
+    }
+
+    @Composable
+    fun TopicSelectorList(subject: String, mode: String = "PRACTICE", onTopicClick: (String) -> Unit) {
+        var topics by remember { mutableStateOf<List<TopicData>>(emptyList()) }
+        var isLoading by remember { mutableStateOf(true) }
+
+        LaunchedEffect(subject) {
+            isLoading = true
+            // Updated to use the correct getTopics.php endpoint - Para 118
+            val url = "https://medigyaan.xyz/Neurons/api/getTopics.php?subject=${Uri.encode(subject)}"
+            val cacheKey = "GET:$url"
+            fun applyTopicsResponse(response: String) {
+                try {
+                    val json = JSONObject(response)
+                    if (json.optBoolean("success")) {
+                        val array = json.optJSONArray("data") ?: JSONArray()
+                        val list = mutableListOf<TopicData>()
+                        for (i in 0 until array.length()) {
+                            val item = array.get(i)
+                            if (item is JSONObject) {
+                                list.add(TopicData(item.getString("name"), item.optInt("count", 0)))
+                            } else if (item is String) {
+                                list.add(TopicData(item, 0))
+                            }
+                        }
+                        // Fix duplicates in the distinct topic list - Para 118
+                        topics = list.distinctBy { it.name }.sortedBy { it.name }
+                    }
+                } catch (e: Exception) { Log.e("TOPICS", "Error", e) }
+                isLoading = false
+            }
+            FirebaseOnlineCache.getString(cacheKey, 24 * 60 * 60 * 1000L) { cached ->
+                cached?.let { applyTopicsResponse(it) }
+            }
+            val request = StringRequest(Request.Method.GET, url, { response ->
+                FirebaseOnlineCache.putString(cacheKey, response)
+                applyTopicsResponse(response)
+            }, { isLoading = false })
+            Volley.newRequestQueue(this@DashboardActivity).add(request)
+        }
+
+        Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+            Text("Quick Practice: $subject", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Gray)
+            Spacer(modifier = Modifier.height(8.dp))
+            if (isLoading) {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp).align(Alignment.CenterHorizontally))
+            } else if (topics.isEmpty()) {
+                Text("No topics available for this subject.", fontSize = 12.sp)
+            } else {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(topics) { topic ->
+                        val isLocked = mode == "KING_OF_TOPIC" && topic.count < 200
+                        
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
+                            elevation = 2.dp,
+                            backgroundColor = if (isLocked) Color.LightGray.copy(alpha = 0.5f) else MaterialTheme.colors.surface,
+                            modifier = Modifier.clickable { 
+                                if (!isLocked) onTopicClick(topic.name) 
+                            }
+                        ) {
+                            Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        text = topic.name,
+                                        style = MaterialTheme.typography.body2,
+                                        fontWeight = FontWeight.Medium,
+                                        color = if (isLocked) Color.Gray else Color.Unspecified
+                                    )
+                                    if (isLocked) {
+                                        Text(
+                                            text = "Need 200 Qs (${topic.count} now)",
+                                            style = MaterialTheme.typography.caption,
+                                            color = Color.Red,
+                                            fontSize = 9.sp
+                                        )
+                                    }
+                                }
+                                if (isLocked) {
+                                     // "Coming Soon" Overlay logic - Para 74
+                                     Box(
+                                         modifier = Modifier
+                                             .matchParentSize()
+                                             .background(Color.Black.copy(alpha = 0.1f))
+                                     )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupThemeToggle() {
+        btnThemeToggle = view(R.id.btnThemeToggle)
+        refreshThemeToggleIcon()
+        btnThemeToggle?.setOnClickListener {
+            val next = !prefs.getBoolean(KEY_DARK_MODE, false)
+            prefs.edit().putBoolean(KEY_DARK_MODE, next).apply()
+            AppCompatDelegate.setDefaultNightMode(
+                if (next) AppCompatDelegate.MODE_NIGHT_YES
+                else AppCompatDelegate.MODE_NIGHT_NO
+            )
+            recreate()
+        }
+    }
+
+    private fun refreshThemeToggleIcon() {
+        val toggle = btnThemeToggle ?: return
+        val darkModeEnabled = prefs.getBoolean(KEY_DARK_MODE, false)
+        toggle.setImageResource(
+            if (darkModeEnabled) R.drawable.light_mode_24px
+            else R.drawable.dark_mode_24px
+        )
+    }
+
+    private fun readUserId(): Int {
+        val savedInt = prefs.getInt("user_id", 0)
+        if (savedInt != 0) return savedInt
+        return prefs.getString("user_id", null)?.toIntOrNull() ?: 0
+    }
+
+    private fun initViews() {
+        invitationCard = view(R.id.invitationCard)
+        txtInviterName = view(R.id.txtInviterName)
+        btnAcceptInvite = view(R.id.btnAcceptInvite)
+
+        expProgressBar = view(R.id.expProgressBar)
+        txtLevel = view(R.id.txtLevel)
+        txtRankTitle = view(R.id.txtRankTitle)
+        txtWins = view(R.id.txtWins)
+        txtStreak = view(R.id.txtStreak)
+        txtMotivation = view(R.id.txtMotivation)
+
+        txtCreatedCount = view(R.id.txtCreatedCount)
+        txtLastAccuracy = view(R.id.txtLastAccuracy)
+        txtSharedCount = view(R.id.txtSharedCount)
+
+        txtUserName = view(R.id.txtUserName)
+        txtDailyStreak = view(R.id.txtDailyStreak)
+        txtStreakCardDaily = view(R.id.txtStreakCardDaily)
+        txtXpText = view(R.id.txtXpText)
+        
+        ivBadgeBg = view(R.id.ivBadgeBg)
+        badgeProgress = view(R.id.badgeProgress)
+        txtBadgeEmoji = view(R.id.txtBadgeEmoji)
+
+        txtStatsWins = view(R.id.txtStatsWins)
+        txtStatsAccuracy = view(R.id.txtStatsAccuracy)
+        txtStatsStreak = view(R.id.txtStatsStreak)
+        txtStatsBattles = view(R.id.txtStatsBattles)
+
+        txtChallengeTimer = view(R.id.txtChallengeTimer)
+        todayChallengeContent = view(R.id.todayChallengeContent)
+        txtTodayQuestion = view(R.id.txtTodayQuestion)
+
+        btnStartTodayChallenge = view(R.id.btnStartTodayChallenge)
+        txtChallengeTimer = view(R.id.txtChallengeTimer)
+
+        txtPredictedRank = view(R.id.txtPredictedRank)
+        txtPredictedConfidence = view(R.id.txtPredictedConfidence)
+        loadPredictedRankFromServer()
+    }
+
+    private fun loadPredictedRankFromServer() {
+        val url = "https://medigyaan.xyz/Neurons/api_load_predicted_rank.php?user_id=$userId"
+        val request = object : StringRequest(
+            Method.GET, url,
+            Response.Listener<String> { response ->
+                try {
+                    val json = JSONObject(response)
+                    if (json.optBoolean("success")) {
+                        val minRank = json.optString("predicted_min_rank")
+                        val maxRank = json.optString("predicted_max_rank")
+                        val tier = json.optString("tier")
+                        val confidence = json.optInt("confidence")
+                        txtPredictedRank?.text = "$minRank - $maxRank"
+                        txtPredictedConfidence?.text = "Confidence ${confidence}% - $tier"
+                        val timestamp = json.optLong("timestamp")
+                        prefs.edit().apply {
+                            putString("predicted_rank", "$minRank - $maxRank")
+                            putString("predicted_tier", tier)
+                            putInt("predicted_confidence", confidence)
+                            putLong("predicted_timestamp", timestamp)
+                            apply()
+                        }
+                    } else {
+                        loadPredictedRankFromPrefs()
+                    }
+                } catch (e: Exception) {
+                    loadPredictedRankFromPrefs()
+                }
+            },
+            Response.ErrorListener { loadPredictedRankFromPrefs() }
+        ) {
+            override fun getHeaders() = hashMapOf(
+                "X-App-Signature" to "EduLabsRTM_Secure_v1_2026",
+                "Accept" to "application/json"
+            )
+        }
+        Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun loadPredictedRankFromPrefs() {
+        val savedRank = prefs.getString("predicted_rank", null)
+        val savedTier = prefs.getString("predicted_tier", null)
+        val savedConf = prefs.getInt("predicted_confidence", 0)
+        if (savedRank != null) txtPredictedRank?.text = savedRank
+        if (savedTier != null) txtPredictedConfidence?.text = "Confidence ${savedConf}% - $savedTier"
+    }
+
+    private fun savePredictedRankToServer(minRank: String, maxRank: String, tier: String, confidence: Int, timestamp: Long) {
+        val url = "https://medigyaan.xyz/Neurons/api_save_predicted_rank.php"
+        val request = object : StringRequest(Method.POST, url, { }, { }) {
+            override fun getParams() = hashMapOf(
+                "user_id" to userId.toString(),
+                "predicted_min_rank" to minRank,
+                "predicted_max_rank" to maxRank,
+                "tier" to tier,
+                "confidence" to confidence.toString(),
+                "timestamp" to timestamp.toString()
+            )
+            override fun getHeaders() = hashMapOf(
+                "X-App-Signature" to "EduLabsRTM_Secure_v1_2026",
+                "Accept" to "application/json"
+            )
+        }
+        Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun setupAccuracyClick() {
+        txtLastAccuracy?.setOnClickListener {
+            startActivity(Intent(this, AccuracyActivity::class.java).apply { putExtra("USER_ID", userId) })
+        }
+    }
+
+    private fun setupHeader() {
+        val name = prefs.getString("name", "User") ?: "User"
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val greeting = when (hour) {
+            in 5..11 -> "Good Morning ☀️"
+            in 12..16 -> "Good Afternoon 🌤️"
+            in 17..21 -> "Good Evening 🌙"
+            else -> "Welcome Back 🌌"
+        }
+        txtUserName?.text = "$greeting, $name"
+        
+        var photoUrl = prefs.getString("photo_url", "") ?: ""
+        if (photoUrl.isNotEmpty() && !photoUrl.startsWith("http")) {
+            val cleanPath = photoUrl.replace("../", "").replace("./", "").trimStart('/')
+            photoUrl = "https://medigyaan.xyz/Neurons/$cleanPath"
+        }
+
+        val headerImage = view<ImageView>(R.id.iv_profile_dashboard)
+        headerImage?.let { iv ->
+            AvatarManager.loadAvatar(this, iv, customUrlOrName = photoUrl, isMe = true)
+            iv.setOnClickListener {
+                AvatarManager.showAvatarPicker(this) { _, _ ->
+                    AvatarManager.loadAvatar(this, iv, isMe = true)
+                    view<NavigationView>(R.id.navigationView)?.getHeaderView(0)?.findViewById<ImageView?>(R.id.nav_user_image)?.let { navIv ->
+                        AvatarManager.loadAvatar(this, navIv, isMe = true)
+                    }
+                }
+            }
+        }
+
+        view<NavigationView>(R.id.navigationView)?.let { nav ->
+            if (nav.headerCount > 0) {
+                val header = nav.getHeaderView(0)
+                header.findViewById<TextView?>(R.id.nav_user_name)?.text = prefs.getString("name", "User")
+                header.findViewById<TextView?>(R.id.nav_user_subtitle)?.text = prefs.getString("email", "Student")
+                val navUserImage = header.findViewById<ImageView?>(R.id.nav_user_image)
+                navUserImage?.let { navIv ->
+                    AvatarManager.loadAvatar(this, navIv, customUrlOrName = photoUrl, isMe = true)
+                    navIv.setOnClickListener {
+                        AvatarManager.showAvatarPicker(this) { _, _ ->
+                            headerImage?.let { hi -> AvatarManager.loadAvatar(this, hi, isMe = true) }
+                            AvatarManager.loadAvatar(this, navIv, isMe = true)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupToolbarAndSidebar() {
+        drawerLayout = view(R.id.drawerLayout)
+        view<ImageView>(R.id.menuBtn)?.setOnClickListener { drawerLayout?.openDrawer(GravityCompat.START) }
+
+        view<NavigationView>(R.id.navigationView)?.setNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.side_research_workspace -> startActivity(Intent(this, ResearchWorkspaceActivity::class.java))
+                R.id.side_profile -> startActivity(Intent(this, ProfileActivity::class.java).apply { putExtra("USER_ID", userId) })
+                R.id.side_edit_profile -> startActivity(Intent(this, EditProfileActivity::class.java))
+                R.id.side_pdfs -> startActivity(Intent(this, SharedQuestionsActivity::class.java).apply { putExtra("USER_ID", userId) })
+                R.id.side_scores -> startActivity(Intent(this, QuizManagerActivity::class.java).apply { putExtra("USER_ID", userId) })
+                R.id.side_referral -> startActivity(Intent(this, ReferralActivity::class.java).apply { putExtra("USER_ID", userId) })
+                R.id.side_settings -> startActivity(Intent(this, SettingsActivity::class.java))
+                R.id.side_widget_settings -> startActivity(Intent(this, WidgetSettingsActivity::class.java))
+                R.id.side_goal -> startActivity(Intent(this, GoalActivity::class.java))
+                R.id.side_delete_account -> showDeleteAccountDialog()
+                R.id.side_contact -> startActivity(Intent(this, SupportActivity::class.java))
+                R.id.side_help -> startActivity(Intent(this, HelpActivity::class.java))
+                R.id.nav_logout -> confirmLogout()
+            }
+            drawerLayout?.closeDrawers()
+            true
+        }
+    }
+
+    private fun setupBottomNavigation() {
+        view<BottomNavigationView>(R.id.bottomNavigation)?.let { nav ->
+            setupAppBottomNavigation(nav, R.id.nav_home)
+        }
+    }
+
+    private fun setupCategoryCards() {
+        val categories = mapOf(
+            R.id.cardNeetPg to "NEET PG", R.id.cardNeetUg to "NEET UG", R.id.cardUpsc to "UPSC", R.id.cardCat to "CAT",
+            R.id.cardCommerce to "Commerce", R.id.cardLaw to "Law", R.id.cardSoftware to "Computer Software", R.id.cardBcbr to "BCBR"
+        )
+        val cleanSelected = selectedSubject.replace(Regex("[^\\p{L}\\p{N} ]"), "").trim()
+        for ((id, subjectKey) in categories) {
+            view<View>(id)?.let { card ->
+                val isMatch = cleanSelected.equals(subjectKey, ignoreCase = true)
+                card.visibility = if (isMatch) View.VISIBLE else View.GONE
+                if (isMatch) card.setOnClickListener { animateClick(it); handleCategorySelection(subjectKey) }
+            }
+        }
+    }
+
+    private fun setupBattleModeCards() {
+        val cleanSubject = selectedSubject.replace(Regex("[^\\p{L}\\p{N} ]"), "").trim()
+        
+        view<View>(R.id.cardRankedBattle)?.setOnClickListener {
+            animateClick(it)
+            if (cleanSubject.isEmpty()) { Toast.makeText(this, "Select a category!", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
+            startActivity(Intent(this, MatchmakingActivity::class.java).apply {
+                putExtra("SUBJECT", cleanSubject)
+                putExtra("SELECTED_SUBJECT", cleanSubject)
+                putExtra("USER_ID", userId)
+            })
+        }
+        view<View>(R.id.cardChallengeFriends)?.setOnClickListener {
+            animateClick(it)
+            openChallengeFriends(cleanSubject)
+        }
+        view<View>(R.id.cardCustomBattle)?.setOnClickListener {
+            animateClick(it)
+            if (cleanSubject.isEmpty()) {
+                Toast.makeText(this, "Select a category!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            showCustomRoomTopicDialog(cleanSubject)
+        }
+        view<View>(R.id.cardRapidFire)?.setOnClickListener {
+            animateClick(it)
+            if (cleanSubject.isEmpty()) return@setOnClickListener
+            startActivity(Intent(this, MCQActivity::class.java).apply { putExtra("SELECTED_SUBJECT", cleanSubject); putExtra("USER_ID", userId) })
+        }
+        view<View>(R.id.cardPracticeMode)?.setOnClickListener {
+            animateClick(it)
+            if (cleanSubject.isEmpty()) return@setOnClickListener
+            startActivity(Intent(this, TestSelectionActivity::class.java).apply {
+                putExtra("MODE", "TEST")
+                putExtra("SUBJECT", cleanSubject)
+                putExtra("SELECTED_SUBJECT", cleanSubject)
+                putExtra("USER_ID", userId.toString())
+            })
+        }
+        
+        // Survival Mode
+        view<View>(R.id.cardSurvivalMode)?.setOnClickListener {
+            animateClick(it)
+            if (cleanSubject.isEmpty()) return@setOnClickListener
+            startActivity(Intent(this, MCQActivity::class.java).apply {
+                putExtra("MODE", "SURVIVAL")
+                putExtra("SELECTED_SUBJECT", cleanSubject)
+                putExtra("SELECTED_TOPIC", "Uncategorized")
+                putExtra("USER_ID", userId)
+            })
+        }
+
+        // Subject Survival Mode
+        view<View>(R.id.cardSubjectSurvival)?.setOnClickListener {
+            animateClick(it)
+            if (cleanSubject.isEmpty()) {
+                Toast.makeText(this, "Select a category first!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            showTopicSelectorForMode("SURVIVAL")
+        }
+
+        // King of the Topic
+        view<View>(R.id.cardKingOfTopic)?.setOnClickListener {
+            animateClick(it)
+            if (cleanSubject.isEmpty()) {
+                Toast.makeText(this, "Select a category first!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            showTopicSelectorForMode("KING_OF_TOPIC")
+        }
+
+        // Custom Mode Battle Card - Para 7
+        view<View>(R.id.cardCustomModeBattle)?.setOnClickListener {
+            animateClick(it)
+            if (cleanSubject.isEmpty()) {
+                Toast.makeText(this, "Select a category first!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            showCustomModeBattleDialog(cleanSubject)
+        }
+    }
+
+    private fun showTopicSelectorForMode(mode: String) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_topic_selector, null)
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(if (mode == "KING_OF_TOPIC") "King of the Topic" else "Subject Survival")
+            .setView(dialogView)
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        val composeView = dialogView.findViewById<ComposeView>(R.id.compose_topic_selector_dialog)
+        composeView?.setContent {
+            TopicSelectorList(selectedSubject, mode) { topicName ->
+                dialog.dismiss()
+                val modeTitle = if (mode == "KING_OF_TOPIC") "Crown Battle" else "Topic Run"
+                AlertDialog.Builder(this@DashboardActivity)
+                    .setTitle("$topicName • $modeTitle")
+                    .setItems(arrayOf("Practice Solo", "Challenge Friends")) { _, which ->
+                        if (which == 0) {
+                            startActivity(Intent(this@DashboardActivity, MCQActivity::class.java).apply {
+                                putExtra("MODE", mode)
+                                putExtra("SELECTED_SUBJECT", selectedSubject)
+                                putExtra("SELECTED_TOPIC", topicName)
+                                putExtra("USER_ID", userId)
+                            })
+                        } else {
+                            startActivity(Intent(this@DashboardActivity, TopicChallengeSelectionActivity::class.java).apply {
+                                putExtra("SUBJECT", selectedSubject)
+                                putExtra("SELECTED_SUBJECT", selectedSubject)
+                                putExtra("TOPIC", topicName)
+                                putExtra("SELECTED_TOPIC", topicName)
+                                putExtra("MODE", TopicChallengeSelectionActivity.MODE_FRIENDS)
+                                putExtra("USER_ID", userId)
+                            })
+                        }
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
+        }
+        dialog.show()
+    }
+
+    private fun showCustomModeBattleDialog(subject: String) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_topic_selector, null)
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Custom Mode Battle")
+            .setView(dialogView)
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        val composeView = dialogView.findViewById<ComposeView>(R.id.compose_topic_selector_dialog)
+        composeView?.setContent {
+            TopicSelectorList(subject, "PRACTICE") { topicName ->
+                dialog.dismiss()
+                startActivity(Intent(this@DashboardActivity, MCQActivity::class.java).apply {
+                    putExtra("MODE", "CUSTOM_BATTLE")
+                    putExtra("SELECTED_SUBJECT", subject)
+                    putExtra("SELECTED_TOPIC", topicName)
+                    putExtra("USER_ID", userId)
+                })
+            }
+        }
+        dialog.show()
+    }
+
+    private fun openChallengeFriends(subject: String) {
+        if (subject.isEmpty()) {
+            Toast.makeText(this, "Select a category!", Toast.LENGTH_SHORT).show()
+            return
+        }
+        startActivity(Intent(this, TopicChallengeSelectionActivity::class.java).apply {
+            putExtra("SUBJECT", subject)
+            putExtra("SELECTED_SUBJECT", subject)
+            putExtra("MODE", TopicChallengeSelectionActivity.MODE_FRIENDS)
+            putExtra("USER_ID", userId)
+        })
+    }
+
+    private fun showCustomRoomTopicDialog(subject: String) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_topic_selector, null)
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Select Topic for Custom Room")
+            .setView(dialogView)
+            .setNegativeButton("Cancel", null)
+            .create()
+        
+        val composeView = dialogView.findViewById<ComposeView>(R.id.compose_topic_selector_dialog)
+        composeView?.setContent {
+            TopicSelectorList(subject, "PRACTICE") { topicName ->
+                dialog.dismiss()
+                startActivity(Intent(this, TopicChallengeSelectionActivity::class.java).apply {
+                    putExtra("SUBJECT", subject)
+                    putExtra("SELECTED_SUBJECT", subject)
+                    putExtra("TOPIC", topicName)
+                    putExtra("SELECTED_TOPIC", topicName)
+                    putExtra("MODE", TopicChallengeSelectionActivity.MODE_FRIENDS)
+                    putExtra("USER_ID", userId)
+                })
+            }
+        }
+        dialog.show()
+    }
+
+    private fun handleCategorySelection(subject: String) {
+        selectedSubject = subject
+        prefs.edit().putString(KEY_SELECTED_SUBJECT, subject).apply()
+        setupCategoryCards()
+        setupTopicSelector()
+        setupBattleModeCards()
+        showModeDialog(subject)
+    }
+
+    private fun setupDetailsButton() {
+        view<View>(R.id.details)?.setOnClickListener { animateClick(it); startActivity(Intent(this, PredictCollegeActivity::class.java)) }
+    }
+
+    private fun setupSearchBox() {
+        view<View>(R.id.searchEditText)?.setOnClickListener {
+            animateClick(it)
+            startActivity(Intent(this, GlobalSearchActivity::class.java))
+        }
+    }
+
+    private fun setupDashboardNavigationCards() {
+        view<View>(R.id.profileSummaryCard)?.setOnClickListener {
+            animateClick(it)
+            startActivity(Intent(this, ProfileActivity::class.java).apply { putExtra("TARGET_USER_ID", userId) })
+        }
+        view<View>(R.id.cardSubjects)?.setOnClickListener {
+            animateClick(it)
+            openGoalForChange()
+        }
+        view<View>(R.id.txtChangeGoal)?.setOnClickListener {
+            animateClick(it)
+            openGoalForChange()
+        }
+        view<View>(R.id.cardReferral)?.setOnClickListener {
+            animateClick(it)
+            startActivity(Intent(this, ReferralActivity::class.java).apply { putExtra("USER_ID", userId) })
+        }
+        view<View>(R.id.recentActivityCard)?.setOnClickListener {
+            animateClick(it)
+            startActivity(Intent(this, RecentChallengesActivity::class.java))
+        }
+    }
+
+    private fun openGoalForChange() {
+        startActivity(Intent(this, GoalActivity::class.java).apply {
+            putExtra(GoalActivity.EXTRA_CHANGE_GOAL, true)
+        })
+    }
+
+    private fun setupTodayChallenge() {
+        // Handle expand/collapse - Para 80
+        findViewById<View>(R.id.cardTodayChallenge)?.setOnClickListener {
+            animateClick(it)
+            val isExpanded = todayChallengeContent?.visibility == View.VISIBLE
+            if (!isExpanded) {
+                todayChallengeContent?.visibility = View.VISIBLE
+                loadTodayFirstQuestion()
+            } else {
+                todayChallengeContent?.visibility = View.GONE
+            }
+        }
+
+        btnStartTodayChallenge?.setOnClickListener {
+            animateClick(it)
+            startActivity(Intent(this, MCQActivity::class.java).apply {
+                putExtra("MODE", "TODAY_CHALLENGE")
+                putExtra("SELECTED_SUBJECT", "NEET PG")
+                putExtra("SELECTED_TOPIC", "Uncategorized")
+                putExtra("LIMIT", 10)
+                putExtra("USER_ID", userId)
+            })
+        }
+    }
+
+    private fun loadTodayFirstQuestion() {
+        val url = "https://medigyaan.xyz/Neurons/api/getQuestions.php?subject=NEET%20PG&topic=Uncategorized&limit=1&user_id=$userId"
+        val request = JsonObjectRequest(Request.Method.GET, url, null, { response ->
+            if (response.optBoolean("success")) {
+                val data = response.optJSONObject("data")
+                if (data != null) {
+                    txtTodayQuestion?.text = data.optString("question").replace(Regex("^\\d+[.\\s\\-)]+\\s*"), "")
+                    findViewById<ComposeView>(R.id.compose_today_options)?.setContent {
+                        val options = listOf(
+                            data.optString("option_a"),
+                            data.optString("option_b"),
+                            data.optString("option_c"),
+                            data.optString("option_d")
+                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            options.forEach { opt ->
+                                Card(
+                                    shape = RoundedCornerShape(8.dp),
+                                    backgroundColor = Color(0xFF1E2A3D),
+                                    modifier = Modifier.fillMaxWidth().clickable {
+                                        // Auto-start full challenge on option click
+                                        btnStartTodayChallenge?.performClick()
+                                    }
+                                ) {
+                                    Text(
+                                        text = opt,
+                                        modifier = Modifier.padding(8.dp),
+                                        color = Color.White,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }, {})
+        Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun setupQuickActionCards() {
+        view<View>(R.id.cardLeaderboard)?.setOnClickListener { animateClick(it); startActivity(Intent(this, LeaderboardActivity::class.java)) }
+        view<View>(R.id.cardBattleHistory)?.setOnClickListener { animateClick(it); startActivity(Intent(this, RecentChallengesActivity::class.java)) }
+    }
+
+    private fun setupStatsClicks() {
+        view<View>(R.id.rankCard)?.setOnClickListener { animateClick(it); startActivity(Intent(this, LeaderboardActivity::class.java)) }
+        view<View>(R.id.streakCard)?.setOnClickListener { animateClick(it); startActivity(Intent(this, AccuracyActivity::class.java).apply { putExtra("USER_ID", userId) }) }
+    }
+
+    private fun setupRankBadgeClick() {
+        findViewById<View>(R.id.badgeContainer)?.setOnClickListener {
+            startActivity(Intent(this, RankActivity::class.java))
+        }
+    }
+
+    private fun setupMotivationCard() {
+        txtMotivation?.text = "Success is the sum of small efforts repeated daily."
+        view<View>(R.id.motivationCard)?.setOnClickListener {
+            animateClick(it)
+            val messages = listOf(
+                "Small daily wins build rank.",
+                "Review wrong answers before the next battle.",
+                "Accuracy beats speed when the timer is calm.",
+                "One strong topic can carry a match."
+            )
+            txtMotivation?.text = messages[Random.nextInt(messages.size)]
+        }
+    }
+
+    private fun setupActionButtons() {
+        view<ImageButton>(R.id.btnMessenger)?.setOnClickListener { animateClick(it); startActivity(Intent(this, MessengerActivity::class.java)) }
+        view<Button>(R.id.btnFindMatch)?.setOnClickListener {
+            animateClick(it)
+            if (selectedSubject.isNotEmpty()) showModeDialog(selectedSubject)
+            else startActivity(Intent(this, GoalActivity::class.java))
+        }
+    }
+
+    private fun fetchDatabaseData() {
+        val cacheKey = "POST:$DASHBOARD_API_URL:user_id=$userId"
+        fun applyDashboardResponse(response: String) {
+            try {
+                val json = JSONObject(response)
+                if (json.optBoolean("success")) {
+                    val exp = json.optInt("exp", 0)
+                    val level = json.optInt("level", 1)
+                    txtLevel?.text = "Level $level"
+                    val progress = ((exp % 1000).toFloat() / 1000f) * 100f
+                    expProgressBar?.progress = progress.toInt()
+                    currentRankTitle = json.optString("rank_title", "BEGINNER")
+                    updateBadgeUI(getRankInfoFromExp(exp))
+                }
+            } catch (e: Exception) { Log.e("DASH", "Parsing error", e) }
+        }
+        FirebaseOnlineCache.getString(cacheKey, 5 * 60 * 1000L) { cached ->
+            cached?.let { applyDashboardResponse(it) }
+        }
+        val queue = Volley.newRequestQueue(this)
+        val request = object : StringRequest(Method.POST, DASHBOARD_API_URL, { response ->
+                FirebaseOnlineCache.putString(cacheKey, response)
+                applyDashboardResponse(response)
+        }, { Log.e("DASH", "Volley error", it) }) {
+            override fun getParams() = hashMapOf("user_id" to userId.toString())
+        }
+        queue.add(request)
+    }
+
+    private fun fetchProfileData() {
+        val url = "https://medigyaan.xyz/Neurons/get_profilev1.php?user_id=$userId&viewer_id=$userId"
+        val cacheKey = "GET:$url"
+        FirebaseOnlineCache.getString(cacheKey, 10 * 60 * 1000L) { cached ->
+            cached?.let { applyProfileResponse(it) }
+        }
+        val request = StringRequest(Request.Method.GET, url,
+            { response ->
+                FirebaseOnlineCache.putString(cacheKey, response)
+                applyProfileResponse(response)
+            },
+            { error -> Log.e("DASHBOARD_DEBUG", "Profile fetch network error", error) }
+        )
+        request.retryPolicy = DefaultRetryPolicy(5000, 1, 1f)
+        Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun applyProfileResponse(response: String) {
+        try {
+            val root = JSONObject(response)
+            val data = root.optJSONObject("data") ?: root
+            val name = data.optString("name", "")
+            val photo = data.optString("photo", "")
+            val wins = data.optInt("wins", 0)
+            val streak = data.optInt("streak", 0)
+            val level = data.optInt("level", 1)
+            val exp = data.optInt("exp", 0)
+            val rank = data.optString("rank_title", "ASPIRANT")
+
+            prefs.edit().apply {
+                if (name.isNotEmpty()) putString("name", name)
+                if (photo.isNotEmpty()) putString("photo_url", photo)
+                putInt("user_exp", exp)
+                apply()
+            }
+
+            txtLevel?.text = "Level $level"
+            txtWins?.text = "Wins: $wins"
+            txtStreak?.text = "Streak: $streak"
+            expProgressBar?.progress = if (exp > 0) (exp % 1000) * 100 / 1000 else 0
+            currentRankTitle = rank
+            updateBadgeUI(getRankInfoFromExp(exp))
+            setupHeader()
+        } catch (e: Exception) {
+            Log.e("DASHBOARD_DEBUG", "Cached profile parse error", e)
+        }
+    }
+
+    private fun updateBadgeUI(rankInfo: RankInfo) {
+        txtRankTitle?.text = rankInfo.title
+        txtBadgeEmoji?.visibility = View.GONE
+        ivBadgeBg?.let { it.setImageResource(rankInfo.drawable); it.visibility = View.VISIBLE }
+        badgeProgress?.let {
+            val currentExp = getCurrentExp()
+            val progress = ((currentExp % 1000).toFloat() / 10f).toInt()
+            it.progress = progress.coerceIn(0, 100)
+            it.visibility = View.VISIBLE
+        }
+    }
+
+    private fun getCurrentExp(): Int {
+        return prefs.getInt("user_exp", 0)
+    }
+
+    private fun showRankInfoDialog() {
+        val ranks = listOf(
+            getRankInfo("legend"), getRankInfo("grandmaster"), getRankInfo("master"),
+            getRankInfo("scholar"), getRankInfo("expert"), getRankInfo("warrior"),
+            getRankInfo("skilled"), getRankInfo("rookie"), getRankInfo("aspirant")
+        )
+        val sb = StringBuilder()
+        sb.append("Current Rank: $currentRankTitle\n\nRequired XP for Ranks:\n")
+        ranks.forEach { rank -> sb.append("${rank.title}: ${rank.minXp} XP\n") }
+        AlertDialog.Builder(this).setTitle("Rank Progression Info").setMessage(sb.toString()).setPositiveButton("Got it", null).show()
+    }
+
+    private fun loadDashboardAccuracyStats() {
+        val overallStats = DailyStatsManager.getOverallStats(this)
+        val totalAttempted = overallStats.first
+        val totalCorrect = overallStats.second
+        val overallAccuracy = DailyStatsManager.calculateAccuracy(totalAttempted, totalCorrect)
+        val streak = DailyStatsManager.getCurrentStreak(this)
+        val battles = DailyStatsManager.getTotalBattles(this)
+        val wins = DailyStatsManager.getTotalWins(this)
+
+        txtStatsWins?.text = wins.toString()
+        txtStatsAccuracy?.text = "$overallAccuracy%"
+        txtStatsStreak?.text = streak.toString()
+        txtStatsBattles?.text = battles.toString()
+
+        txtWins?.text = "Wins: $wins"
+        txtStreak?.text = "Streak: $streak"
+        txtLastAccuracy?.text = "$overallAccuracy%"
+        txtDailyStreak?.text = "$streak Days Active"
+        txtStreakCardDaily?.text = "$streak Days Active"
+
+        txtCreatedCount?.text = totalAttempted.toString()
+        txtSharedCount?.text = totalCorrect.toString()
+
+        fetchPredictionFromServer(overallAccuracy, streak, battles, wins)
+        txtMotivation?.text = when {
+            overallAccuracy >= 85 -> "Legend pace. Keep the streak clean."
+            overallAccuracy >= 70 -> "Excellent consistency. Push one more battle."
+            else -> "Keep practicing every day."
+        }
+    }
+
+    private fun fetchPredictionFromServer(accuracy: Int, streak: Int, attempted: Int, correct: Int) {
+        val queue = Volley.newRequestQueue(this)
+        val request = object : StringRequest(Method.POST, PREDICT_RANK_URL, { response ->
+                try {
+                    val json = JSONObject(response)
+                    if (json.optBoolean("success")) {
+                        val minRank = json.optString("predicted_min_rank")
+                        val maxRank = json.optString("predicted_max_rank")
+                        val tier = json.optString("tier")
+                        val confidence = json.optInt("confidence")
+                        txtPredictedRank?.text = "$minRank - $maxRank"
+                        txtPredictedConfidence?.text = "Confidence ${confidence}% - $tier"
+                        val timestamp = System.currentTimeMillis()
+                        prefs.edit().apply {
+                            putString("predicted_rank", "$minRank - $maxRank")
+                            putString("predicted_tier", tier)
+                            putInt("predicted_confidence", confidence)
+                            putLong("predicted_timestamp", timestamp)
+                            apply()
+                        }
+                        savePredictedRankToServer(minRank, maxRank, tier, confidence, timestamp)
+                    }
+                } catch (e: Exception) {}
+        }, {}) {
+            override fun getParams() = hashMapOf("accuracy" to accuracy.toString(), "streak" to streak.toString(), "attempted" to attempted.toString(), "correct" to correct.toString(), "user_id" to userId.toString())
+        }
+        queue.add(request)
+    }
+
+    private fun animateDashboardEntrance() {
+        val orderedViews = listOfNotNull(
+            view<View>(R.id.profileSummaryCard), view<View>(R.id.rankCard),
+            view<View>(R.id.cardRankedBattle), view<View>(R.id.cardChallengeFriends),
+            view<View>(R.id.cardRapidFire), view<View>(R.id.cardPracticeMode),
+            view<View>(R.id.cardCustomBattle), view<View>(R.id.cardCustomModeBattle),
+            view<View>(R.id.cardSubjectSurvival), view<View>(R.id.cardKingOfTopic),
+            view<View>(R.id.cardSurvivalMode), view<View>(R.id.cardLeaderboard),
+            view<View>(R.id.cardBattleHistory), view<View>(R.id.cardSubjects),
+            view<View>(R.id.cardReferral), view<View>(R.id.cardTodayChallenge),
+            view<View>(R.id.streakCard), view<View>(R.id.rankCard),
+            view<View>(R.id.motivationCard)
+        )
+        orderedViews.forEachIndexed { index, card ->
+            val anim = AnimationUtils.loadAnimation(this, R.anim.card_entrance)
+            anim.startOffset = (index * 55L).coerceAtMost(700L)
+            card.startAnimation(anim)
+        }
+        view<View>(R.id.badgeContainer)?.let { badge ->
+            val glow = AnimationUtils.loadAnimation(this, R.anim.glow_pulse)
+            badge.animation = glow
+            glow.start()
+        }
+    }
+
+    private fun checkActiveInvitations() {
+        inviteListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var foundLobby: DataSnapshot? = null
+                for (lobby in snapshot.children) {
+                    val invitedIds = lobby.child("invited_ids").value?.toString() ?: ""
+                    if (invitedIds.split(",").map { it.trim() }.contains(userId.toString())) { foundLobby = lobby; break }
+                }
+                if (foundLobby != null) showInviteBanner(foundLobby.child("host_name").getValue(String::class.java) ?: "Friend", foundLobby.key ?: "", foundLobby)
+                else invitationCard?.visibility = View.GONE
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        }
+        lobbiesRef.orderByChild("status").equalTo("waiting").addValueEventListener(inviteListener!!)
+    }
+
+    private fun showInviteBanner(host: String, lobbyId: String, snap: DataSnapshot) {
+        invitationCard?.visibility = View.VISIBLE
+        txtInviterName?.text = "$host invited you to battle!"
+        btnAcceptInvite?.setOnClickListener {
+            startActivity(Intent(this, LobbyActivity::class.java).apply {
+                putExtra("lobby_id", lobbyId)
+                putExtra("challenge_id", snap.child("challenge_id").value?.toString() ?: "")
+                putExtra("user_id", userId.toString())
+                putExtra("user_name", prefs.getString("name", "Player"))
+                putExtra("IS_CHALLENGE", true)
+            })
+        }
+    }
+
+    private fun showModeDialog(subject: String) {
+        AlertDialog.Builder(this).setTitle(subject).setItems(arrayOf("Challenge Friends", "Ranked Match")) { _, which ->
+            when (which) {
+                0 -> startActivity(Intent(this, TopicChallengeSelectionActivity::class.java).apply { putExtra("SUBJECT", subject); putExtra("MODE", TopicChallengeSelectionActivity.MODE_FRIENDS) })
+                1 -> startActivity(Intent(this, MatchmakingActivity::class.java).apply {
+                    putExtra("SUBJECT", subject)
+                    putExtra("SELECTED_SUBJECT", subject)
+                    putExtra("USER_ID", userId)
+                })
+            }
+        }.show()
+    }
+
+    private fun animateClick(v: View) {
+        val pop = AnimationUtils.loadAnimation(this, R.anim.press_pop)
+        pop.fillAfter = false
+        v.clearAnimation()
+        v.startAnimation(pop)
+    }
+
+    private fun showDeleteAccountDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Delete Account")
+            .setMessage("Are you sure you want to delete your account? This action cannot be undone.")
+            .setPositiveButton("Delete") { _, _ -> deleteAccount() }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun deleteAccount() {
+        val url = "https://medigyaan.xyz/Neurons/delete_account.php?user_id=$userId"
+        val request = StringRequest(
+            Request.Method.GET, url,
+            { response ->
+                try {
+                    val json = JSONObject(response)
+                    if (json.optBoolean("success")) {
+                        prefs.edit().clear().apply()
+                        FirebaseAuth.getInstance().signOut()
+                        Toast.makeText(this, "Account deleted", Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(this, LoginActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        })
+                        finish()
+                    } else { Toast.makeText(this, "Failed to delete account", Toast.LENGTH_SHORT).show() }
+                } catch (e: Exception) { Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show() }
+            },
+            { Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show() }
+        )
+        Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun confirmLogout() { AlertDialog.Builder(this).setTitle("Logout").setMessage("Are you sure?").setPositiveButton("Logout") { _, _ -> logout() }.setNegativeButton("Stay", null).show() }
+
+    private fun logout() { FirebaseAuth.getInstance().signOut(); prefs.edit().clear().apply(); startActivity(Intent(this, LoginActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK }); finish() }
+
+    override fun onStop() { super.onStop(); inviteListener?.let { lobbiesRef.removeEventListener(it) } }
+
+    companion object {
+        private const val KEY_DARK_MODE = "dark_mode_enabled"
+        private const val KEY_SELECTED_SUBJECT = "selected_subject_preference"
+    }
+}

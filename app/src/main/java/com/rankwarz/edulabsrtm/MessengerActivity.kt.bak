@@ -1,0 +1,844 @@
+package com.rankwarz.edulabsrtm
+
+import android.annotation.SuppressLint
+import android.widget.GridView
+import org.json.JSONObject
+import android.content.Context
+import android.content.Intent
+import android.graphics.Color
+import android.graphics.Paint
+import android.net.Uri
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.provider.OpenableColumns
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ListView
+import android.widget.ProgressBar
+import android.widget.RelativeLayout
+import android.widget.ScrollView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.DefaultRetryPolicy
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonArrayRequest
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.RequestBody
+import okhttp3.Response
+import okio.BufferedSink
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.concurrent.TimeUnit
+
+class MessengerActivity : BaseActivity() {
+
+    private lateinit var chatLayout: RelativeLayout
+    private lateinit var messageInput: EditText
+    private lateinit var sendBtn: ImageView
+    private lateinit var attachBtn: ImageView
+    private lateinit var messageRecyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var userListLayout: LinearLayout
+    private lateinit var userRecyclerView: RecyclerView
+    private lateinit var bottomNav: BottomNavigationView
+    private lateinit var emojiBtn: ImageView
+    private lateinit var emojiPanel: LinearLayout
+    private lateinit var emojiGridView: GridView
+    private lateinit var chatUserImage: ImageView
+    private lateinit var searchUsers: EditText
+    private lateinit var uploadOverlay: LinearLayout
+    private lateinit var uploadProgress: ProgressBar
+    private lateinit var uploadFileName: TextView
+    private lateinit var noUsersText: TextView
+    private lateinit var noMessagesText: TextView
+
+    private lateinit var messageAdapter: MessageAdapter
+    private lateinit var userAdapter: UserAdapter
+    private var allUsers = mutableListOf<ChatUserItem>()
+
+    private var selectedFileUri: Uri? = null
+    private val PICK_FILE = 100
+    private val TAG = "MESSENGER_DEBUG"
+    private val BASE_URL = "https://medigyaan.xyz/Neurons/messenger_api.php"
+    private val IMAGE_BASE_URL = "https://medigyaan.xyz/Neurons/"
+    private val PREF_NAME = "MY_APP"
+    private val KEY_FOLLOW_PREFIX = "follow_status_"
+
+    private var userId: Int = 0
+    private var receiverId: Int = 0
+    private var currentChatUser: ChatUserItem? = null
+    private val MAX_SHARED_HOSTING_FILE_SIZE = 2 * 1024 * 1024 // 2 MB
+
+    private val refreshHandler = Handler(Looper.getMainLooper())
+    private val refreshRunnable = object : Runnable {
+        override fun run() {
+            if (receiverId != 0) {
+                loadMessages(isPolling = true)
+            }
+            refreshHandler.postDelayed(this, 3000)
+        }
+    }
+
+    @SuppressLint("MissingInflatedId")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_messenger)
+
+        chatLayout = findViewById(R.id.chatLayout)
+        userListLayout = findViewById(R.id.userListLayout)
+        userRecyclerView = findViewById(R.id.userRecyclerView)
+        messageInput = findViewById(R.id.messageInput)
+        sendBtn = findViewById(R.id.sendBtn)
+        attachBtn = findViewById(R.id.attachBtn)
+        progressBar = findViewById(R.id.progressBar)
+        messageRecyclerView = findViewById(R.id.messageRecyclerView)
+        bottomNav = findViewById(R.id.bottomNavigation)
+        emojiBtn = findViewById(R.id.emojiBtn)
+        emojiPanel = findViewById(R.id.emojiPanel)
+        emojiGridView = findViewById(R.id.emojiGridView)
+        chatUserImage = findViewById(R.id.chatUserImage)
+        searchUsers = findViewById(R.id.searchUsers)
+        uploadOverlay = findViewById(R.id.uploadOverlay)
+        uploadProgress = findViewById(R.id.uploadProgress)
+        uploadFileName = findViewById(R.id.uploadFileName)
+        noUsersText = findViewById(R.id.noUsersText)
+        noMessagesText = findViewById(R.id.noMessagesText)
+
+        val prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        userId = prefs.getInt("user_id", 0)
+
+        setupAdapters()
+        setupSearch()
+
+        receiverId = intent.getStringExtra("SENDER_ID")?.toIntOrNull()
+            ?: intent.getIntExtra("receiver_id", 0)
+
+        if (userId == 0) {
+            Toast.makeText(this, "Please Login", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        setupBottomNavigation()
+        setupViewMode()
+        setupEmojiSupport()
+        setupEmojiPanel()
+
+        sendBtn.setOnClickListener {
+            if (messageInput.text.toString().trim().isNotEmpty() || selectedFileUri != null) {
+                uploadAndSendMessage()
+            }
+        }
+
+        attachBtn.setOnClickListener {
+            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                type = "*/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+            }
+            startActivityForResult(intent, PICK_FILE)
+        }
+
+        findViewById<ImageView>(R.id.backBtn).setOnClickListener { onBackPressed() }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_FILE && resultCode == RESULT_OK) {
+            selectedFileUri = data?.data
+            Toast.makeText(this, "File attached", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setupEmojiSupport() {
+        messageInput.setOnLongClickListener {
+            showEmojiDialog()
+            true
+        }
+    }
+
+    private fun showEmojiDialog() {
+        val emojis = listOf("😀", "😂", "😍", "🥰", "😁", "😢", "😭", "👍", "🙏", "❤️", "🔥", "🎉", "💯", "😉", "🤝")
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(16, 16, 16, 16)
+        }
+
+        val grid = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+
+        val rows = emojis.chunked(5)
+        for (rowEmojis in rows) {
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER
+            }
+            for (emoji in rowEmojis) {
+                val btn = TextView(this).apply {
+                    text = emoji
+                    textSize = 24f
+                    setPadding(18, 18, 18, 18)
+                    setOnClickListener {
+                        val start = messageInput.selectionStart.coerceAtLeast(0)
+                        messageInput.text?.insert(start, emoji)
+                    }
+                }
+                row.addView(btn)
+            }
+            grid.addView(row)
+        }
+
+        container.addView(grid)
+
+        AlertDialog.Builder(this)
+            .setTitle("Choose emoji")
+            .setView(container)
+            .setPositiveButton("Close", null)
+            .show()
+    }
+
+    private fun setupBottomNavigation() {
+        setupAppBottomNavigation(bottomNav, R.id.nav_messages)
+    }
+
+
+
+    private class ProgressFileRequestBody(
+        private val file: File,
+        private val mediaType: okhttp3.MediaType,
+        private val onProgress: (Int) -> Unit
+    ) : RequestBody() {
+        override fun contentType() = mediaType
+        override fun contentLength() = file.length()
+
+        override fun writeTo(sink: BufferedSink) {
+            val total = contentLength().coerceAtLeast(1L)
+            var uploaded = 0L
+            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+            FileInputStream(file).use { input ->
+                while (true) {
+                    val read = input.read(buffer)
+                    if (read == -1) break
+                    sink.write(buffer, 0, read)
+                    uploaded += read
+                    onProgress(((uploaded * 100) / total).toInt().coerceIn(0, 100))
+                }
+            }
+        }
+    }
+
+    private fun setupViewMode() {
+        if (receiverId == 0) {
+            currentChatUser = null
+            userListLayout.visibility = View.VISIBLE
+            chatLayout.visibility = View.GONE
+            chatUserImage.visibility = View.GONE
+            findViewById<TextView>(R.id.toolbarTitle)?.text = "Messages"
+            loadUserList()
+        } else {
+            userListLayout.visibility = View.GONE
+            chatLayout.visibility = View.VISIBLE
+            chatUserImage.visibility = View.VISIBLE
+            findViewById<TextView>(R.id.toolbarTitle)?.text = currentChatUser?.name ?: "Chat"
+            
+            currentChatUser?.image?.let {
+                val fullUrl = if (it.startsWith("http")) it else "https://medigyaan.xyz/Neurons/" + it.removePrefix("/")
+                Glide.with(this).load(fullUrl).apply(RequestOptions.circleCropTransform()).placeholder(R.drawable.ic_user_placeholder).into(chatUserImage)
+            }
+
+            noMessagesText.visibility = View.GONE
+            messageAdapter.setMessages(emptyList())
+            loadMessages(isPolling = false)
+        }
+    }
+
+    private fun setupAdapters() {
+        messageAdapter = MessageAdapter(
+            currentUserId = userId,
+            onImageClick = { url ->
+                startActivity(Intent(this, FullScreenImageActivity::class.java).putExtra("image_url", url))
+            },
+            onFileClick = { url ->
+                val viewerUrl = "https://docs.google.com/viewer?embedded=true&url=$url"
+                startActivity(Intent(this, WebViewActivity::class.java).putExtra("url", viewerUrl))
+            },
+            onCallInviteClick = { }
+        )
+        messageRecyclerView.layoutManager = LinearLayoutManager(this)
+        messageRecyclerView.adapter = messageAdapter
+
+        userAdapter = UserAdapter { user ->
+            receiverId = user.id
+            currentChatUser = user
+            setupViewMode()
+        }
+        userRecyclerView.layoutManager = LinearLayoutManager(this)
+        userRecyclerView.adapter = userAdapter
+    }
+
+    private fun setupSearch() {
+        searchUsers.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                filterUsers(s.toString())
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
+    private fun filterUsers(query: String) {
+        if (query.isEmpty()) {
+            userAdapter.setUsers(allUsers)
+            noUsersText.visibility = if (allUsers.isEmpty()) View.VISIBLE else View.GONE
+        } else {
+            val filtered = allUsers.filter { it.name.contains(query, ignoreCase = true) }
+            userAdapter.setUsers(filtered)
+            noUsersText.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun loadUserList() {
+        progressBar.visibility = View.VISIBLE
+
+        // SERVER-DRIVEN CONTACTS: pull the followed-user list from the server once,
+        // refresh the local cache, then rebuild the list below from that cache.
+        if (!serverConnectionsLoaded) {
+            serverConnectionsLoaded = true
+            loadConnectionsFromServer { ok ->
+                if (ok) {
+                    loadUserList()
+                } else {
+                    serverConnectionsLoaded = false
+                    progressBar.visibility = View.GONE
+                    Toast.makeText(this, "Couldn't load connections", Toast.LENGTH_SHORT).show()
+                }
+            }
+            return
+        }
+        serverConnectionsLoaded = false
+
+        val prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+
+        val followIds = prefs.all
+            .filter { it.key.startsWith(KEY_FOLLOW_PREFIX) && it.value == true }
+            .map { it.key.removePrefix(KEY_FOLLOW_PREFIX) }
+            .filter { it != userId.toString() }
+
+        if (followIds.isEmpty()) {
+            progressBar.visibility = View.GONE
+            Toast.makeText(this, "No connections yet — follow players to chat with them", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val queue = Volley.newRequestQueue(this)
+        val userList = mutableListOf<ChatUserItem>()
+        var finishedRequests = 0
+
+        fun checkDone() {
+            if (finishedRequests >= followIds.size) {
+                runOnUiThread {
+                    showUserList(userList)
+                }
+            }
+        }
+
+        for (id in followIds) {
+            val url = "https://medigyaan.xyz/Neurons/get_profilev1.php?user_id=$id&viewer_id=$userId"
+
+            val req = JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
+                { response ->
+                    try {
+                        val obj = response.optJSONObject("data") ?: response
+
+                        val name = obj.optString("name", "User $id")
+
+                        var photo = obj.optString("photo", "")
+                        if (photo.isBlank() || photo.equals("null", true)) {
+                            photo = obj.optString("profile_pic", "")
+                        }
+                        if (photo.isNotBlank() && !photo.startsWith("http")) {
+                            photo = IMAGE_BASE_URL + photo.trimStart('/')
+                        }
+
+                        userList.add(
+                            ChatUserItem(
+                                id = id.toIntOrNull() ?: 0,
+                                name = name,
+                                image = photo
+                            )
+                        )
+                    } catch (e: Exception) {
+                        Log.e(TAG, "parse error: ${e.message}", e)
+                    }
+
+                    finishedRequests++
+                    checkDone()
+                },
+                { error ->
+                    Log.e(TAG, "network error: $id", error)
+                    finishedRequests++
+                    checkDone()
+                }
+            )
+
+            req.retryPolicy = DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+            )
+
+            queue.add(req)
+        }
+    }
+
+    private var serverConnectionsLoaded = false
+
+    private fun loadConnectionsFromServer(onDone: (Boolean) -> Unit) {
+        val url = "$BASE_URL?get_connections&user_id=$userId"
+        val queue = Volley.newRequestQueue(this)
+        val request = JsonArrayRequest(
+            Request.Method.GET,
+            url,
+            null,
+            { response ->
+                try {
+                    val prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                    val editor = prefs.edit()
+                    // Clear any stale cached follow ids first
+                    for ((key, _) in prefs.all) {
+                        if (key.startsWith(KEY_FOLLOW_PREFIX)) editor.remove(key)
+                    }
+                    // Cache the users the server says this account follows
+                    for (i in 0 until response.length()) {
+                        val obj = response.getJSONObject(i)
+                        val id = obj.optInt("user_id", 0)
+                        if (id != 0 && id != userId) {
+                            editor.putBoolean("$KEY_FOLLOW_PREFIX$id", true)
+                        }
+                    }
+                    editor.apply()
+                    onDone(true)
+                } catch (e: Exception) {
+                    Log.e(TAG, "connections parse error: ${e.message}")
+                    onDone(false)
+                }
+            },
+            { error ->
+                Log.e(TAG, "connections network error: ${error.message}")
+                onDone(false)
+            }
+        )
+        queue.add(request)
+    }
+
+    private fun showUserList(list: List<ChatUserItem>) {
+        progressBar.visibility = View.GONE
+
+        if (list.isEmpty()) {
+            noUsersText.visibility = View.VISIBLE
+            userAdapter.setUsers(emptyList())
+            return
+        }
+
+        userAdapter.setUsers(list)
+        allUsers = list.toMutableList()
+        noUsersText.visibility = View.GONE
+    }
+
+    private fun loadMessages(isPolling: Boolean) {
+        if (isPolling && uploadOverlay.visibility == View.VISIBLE) return
+
+        val url = "$BASE_URL?fetch_messages=$receiverId&user_id=$userId"
+
+        val request = JsonArrayRequest(
+            Request.Method.GET,
+            url,
+            null,
+            { response ->
+                if (response.length() != messageAdapter.itemCount) {
+                    val newList = mutableListOf<ChatMessage>()
+                    for (i in 0 until response.length()) {
+                        val msg = response.getJSONObject(i)
+                        newList.add(
+                            ChatMessage(
+                                senderId = msg.optInt("sender_id"),
+                                text = msg.optString("message"),
+                                attachment = msg.optString("attachment"),
+                                sentAt = msg.optString("sent_at", ""),
+                                isRead = msg.optInt("is_read", 0)
+                            )
+                        )
+                    }
+                    messageAdapter.setMessages(newList)
+                    noMessagesText.visibility = if (newList.isEmpty()) View.VISIBLE else View.GONE
+                    messageRecyclerView.post { messageRecyclerView.smoothScrollToPosition((messageAdapter.itemCount - 1).coerceAtLeast(0)) }
+                }
+            },
+            { error ->
+                if (!isPolling)
+                    Log.e(TAG, "Fetch Error: ${error.message}", error)
+            }
+        )
+
+        Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun addUploadProgressBubble(file: File, message: String) {
+        uploadOverlay.visibility = View.VISIBLE
+        uploadFileName.text = "Uploading: ${file.name}"
+        uploadProgress.progress = 0
+    }
+
+    private fun updateUploadProgress(percent: Int, status: String = "Uploading") {
+        runOnUiThread {
+            uploadProgress.progress = percent.coerceIn(0, 100)
+            if (percent >= 100) {
+                uploadOverlay.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun markUploadFailed(message: String) {
+        runOnUiThread {
+            uploadOverlay.visibility = View.GONE
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun clearUploadProgressBubble() {
+        runOnUiThread {
+            uploadOverlay.visibility = View.GONE
+        }
+    }
+
+    private fun uploadAndSendMessage() {
+        val msgText = messageInput.text.toString()
+        messageInput.setText("")
+
+        progressBar.visibility = View.VISIBLE
+
+        val fileUri = selectedFileUri
+        if (fileUri != null) {
+            val path = getRealPathFromURI(this, fileUri)
+            if (path != null) {
+                val file = File(path)
+                progressBar.visibility = View.GONE
+                addUploadProgressBubble(file, msgText)
+                if (file.length() > MAX_SHARED_HOSTING_FILE_SIZE) {
+                    uploadToVpsAndSend(file, msgText)
+                } else {
+                    uploadToSharedHostingAndSend(file, msgText)
+                }
+                return
+            }
+        }
+
+        sendMessageToPhpBackend(msgText, "")
+    }
+
+    private fun uploadToVpsAndSend(file: File, msgText: String) {
+        val client = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .build()
+
+        val request = okhttp3.Request.Builder()
+            .url("http://213.199.61.156/api/upload?token=00b0e86a671d6635ca9cbdfc98bc5ff4dc2e")
+            .header("X-Filename", file.name)
+            .post(
+                ProgressFileRequestBody(file, "application/octet-stream".toMediaType()) { percent ->
+                    updateUploadProgress(percent, "Uploading")
+                }
+            )
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    markUploadFailed("Upload failed")
+                    Toast.makeText(this@MessengerActivity, "VPS upload failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val bodyStr = response.body?.string() ?: ""
+                if (!response.isSuccessful) {
+                    Log.e(TAG, "VPS upload HTTP ${response.code}: ${bodyStr.take(500)}")
+                    runOnUiThread {
+                        progressBar.visibility = View.GONE
+                        markUploadFailed("Upload failed")
+                        Toast.makeText(this@MessengerActivity, "VPS upload failed (${response.code})", Toast.LENGTH_SHORT).show()
+                    }
+                    return
+                }
+
+                try {
+                    val json = org.json.JSONObject(bodyStr)
+                    val fileUrl = json.optString("url")
+                        .ifBlank { json.optString("file_url") }
+                        .ifBlank { json.optString("fileUrl") }
+                    if (fileUrl.isBlank()) {
+                        throw IllegalStateException("VPS upload response missing url: ${bodyStr.take(500)}")
+                    }
+                    runOnUiThread {
+                        selectedFileUri = null
+                        updateUploadProgress(100, "Sending message")
+                        sendMessageToPhpBackend(msgText, fileUrl)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "VPS upload response parse failed. Body=${bodyStr.take(500)}", e)
+                    runOnUiThread {
+                        progressBar.visibility = View.GONE
+                        markUploadFailed("Upload response invalid")
+                        Toast.makeText(this@MessengerActivity, "VPS upload response invalid", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
+    }
+
+    private fun uploadToSharedHostingAndSend(file: File, msgText: String) {
+        val mimeType = contentResolver.getType(selectedFileUri!!) ?: "application/octet-stream"
+
+        val builder = MultipartBody.Builder().setType(MultipartBody.FORM)
+            .addFormDataPart("user_id", userId.toString())
+            .addFormDataPart("receiver_id", receiverId.toString())
+            .addFormDataPart("message", msgText)
+            .addFormDataPart(
+                "attachment",
+                file.name,
+                ProgressFileRequestBody(file, mimeType.toMediaType()) { percent ->
+                    updateUploadProgress(percent, "Uploading")
+                }
+            )
+
+        val client = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .build()
+
+        val request = okhttp3.Request.Builder()
+            .url(BASE_URL)
+            .post(builder.build())
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    markUploadFailed("Upload failed")
+                    Log.e(TAG, "Fail: ${e.message}", e)
+                    Toast.makeText(this@MessengerActivity, "Upload failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    if (response.isSuccessful) {
+                        selectedFileUri = null
+                        updateUploadProgress(100, "Sent")
+                        clearUploadProgressBubble()
+                        loadMessages(false)
+                    } else {
+                        markUploadFailed("Upload failed")
+                        Toast.makeText(this@MessengerActivity, "Upload failed (${response.code})", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
+    }
+
+    private fun sendMessageToPhpBackend(msgText: String, attachmentUrl: String) {
+        val builder = MultipartBody.Builder().setType(MultipartBody.FORM)
+            .addFormDataPart("user_id", userId.toString())
+            .addFormDataPart("receiver_id", receiverId.toString())
+            .addFormDataPart("message", msgText)
+            .addFormDataPart("attachment", attachmentUrl)
+
+        val client = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .build()
+
+        val request = okhttp3.Request.Builder()
+            .url(BASE_URL)
+            .post(builder.build())
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    if (uploadOverlay.visibility == View.VISIBLE) markUploadFailed("Message send failed")
+                    Toast.makeText(this@MessengerActivity, "Send message failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    if (response.isSuccessful) {
+                        clearUploadProgressBubble()
+                        loadMessages(false)
+                    } else {
+                        if (uploadOverlay.visibility == View.VISIBLE) markUploadFailed("Message send failed")
+                        Toast.makeText(this@MessengerActivity, "Send message failed (${response.code})", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
+    }
+
+    private fun setupEmojiPanel() {
+        val emojis = listOf(
+            "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗",
+            "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟",
+            "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶",
+            "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯", "😦", "😧",
+            "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈",
+            "👿", "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃", "😺", "😸", "😹", "😻", "😼", "😽",
+            "🙀", "😿", "😾", "👋", "🤚", "🖐️", "✋", "🖖", "👌", "🤏", "✌️", "🤞", "🤟", "🤘", "🤙", "👈", "👉", "👆",
+            "🖕", "👇", "☝️", "👍", "👎", "✊", "👊", "🤛", "🤜", "👏", "🙌", "👐", "🤲", "🤝", "🙏", "✍️", "💅", "🤳",
+            "💪", "🦾", "🦿", "🦵", "🦶", "👂", "🦻", "👃", "🧠", "🦷", "🦴", "👀", "👁️", "👅", "👄", "💋", "🩸", "❤️",
+            "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❤️‍🔥", "❤️‍🩹", "❣️", "💕", "💞", "💓", "💗", "💖", "💘"
+        )
+
+        val emojiAdapter = object : ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, emojis) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent) as TextView
+                view.text = getItem(position)
+                view.textSize = 26f
+                view.gravity = Gravity.CENTER
+                view.setPadding(0, 0, 0, 0)
+                view.setBackgroundColor(Color.TRANSPARENT)
+                return view
+            }
+        }
+
+        emojiGridView.adapter = emojiAdapter
+
+        emojiGridView.setOnItemClickListener { _, _, position, _ ->
+            val emoji = emojis[position]
+            val start = messageInput.selectionStart.coerceAtLeast(0)
+            messageInput.text?.insert(start, emoji)
+        }
+
+        emojiBtn.setOnClickListener {
+            if (emojiPanel.visibility == View.VISIBLE) {
+                emojiPanel.visibility = View.GONE
+                emojiBtn.setImageResource(R.drawable.ic_emoji_smile)
+                showKeyboard(messageInput)
+            } else {
+                hideKeyboard(messageInput)
+                Handler(Looper.getMainLooper()).postDelayed({
+                    emojiPanel.visibility = View.VISIBLE
+                    emojiBtn.setImageResource(R.drawable.ic_message)
+                }, 100)
+            }
+        }
+
+        messageInput.setOnClickListener {
+            if (emojiPanel.visibility == View.VISIBLE) {
+                emojiPanel.visibility = View.GONE
+                emojiBtn.setImageResource(R.drawable.ic_emoji_smile)
+            }
+        }
+    }
+
+    private fun hideKeyboard(view: View) {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    private fun showKeyboard(view: View) {
+        view.requestFocus()
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+        imm.showSoftInput(view, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    private fun getRealPathFromURI(context: Context, uri: Uri): String? {
+        return try {
+            val returnCursor = context.contentResolver.query(uri, null, null, null, null)
+            val nameIndex = returnCursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME) ?: -1
+            returnCursor?.moveToFirst()
+            val name = if (nameIndex != -1) returnCursor?.getString(nameIndex) else "temp_file"
+            returnCursor?.close()
+
+            val file = File(context.cacheDir, name ?: "temp_file")
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                FileOutputStream(file).use { output ->
+                    val buffer = ByteArray(8 * 1024)
+                    while (true) {
+                        val read = input.read(buffer)
+                        if (read == -1) break
+                        output.write(buffer, 0, read)
+                    }
+                }
+            }
+            file.absolutePath
+        } catch (e: Exception) {
+            Log.e(TAG, "getRealPathFromURI error: ${e.message}", e)
+            null
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshHandler.post(refreshRunnable)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        refreshHandler.removeCallbacks(refreshRunnable)
+    }
+
+    override fun onBackPressed() {
+        if (receiverId != 0) {
+            receiverId = 0
+            currentChatUser = null
+            setupViewMode()
+        } else {
+            super.onBackPressed()
+        }
+    }
+}
+
+data class ChatUserItem(
+    val id: Int,
+    val name: String,
+    val image: String
+)

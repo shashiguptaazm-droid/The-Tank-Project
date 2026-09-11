@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shareInterpolator="false">
+
+    <!-- Rise up -->
+    <translate
+        android:fromYDelta="55%"
+        android:toYDelta="0%"
+        android:duration="380"
+        android:interpolator="@anim/ease_out_back" />
+
+    <!-- Pop scale: overshoot in, settle at 1.0 -->
+    <scale
+        android:fromXScale="0.86"
+        android:toXScale="1.0"
+        android:fromYScale="0.86"
+        android:toYScale="1.0"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:duration="380"
+        android:interpolator="@anim/ease_out_back" />
+
+    <!-- Fade in -->
+    <alpha
+        android:fromAlpha="0.0"
+        android:toAlpha="1.0"
+        android:duration="300" />
+</set>

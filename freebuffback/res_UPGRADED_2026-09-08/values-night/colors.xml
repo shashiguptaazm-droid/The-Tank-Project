@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ===================================================== -->
+    <!-- DARK / NIGHT THEME -->
+    <!-- Optimized for readability + Material 3 -->
+    <!-- ===================================================== -->
+
+    <!-- PRIMARY -->
+    <color name="primary">#B8C0FF</color>
+    <color name="primary_variant">#8C9EFF</color>
+    <color name="primary_dark">#5C6BC0</color>
+    <color name="primary_light">#E8EAF6</color>
+
+    <!-- SECONDARY -->
+    <color name="secondary">#FFD54F</color>
+    <color name="secondary_variant">#FFC107</color>
+    <color name="secondary_dark">#FFA000</color>
+
+    <!-- BACKGROUND -->
+    <color name="background">#050816</color>
+    <color name="surface">#0B1023</color>
+    <color name="card_bg">#0D1A2B</color>
+
+    <!-- TEXT -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#C7C7C7</color>
+
+    <!-- ON COLORS -->
+    <color name="on_primary">#0F1115</color>
+    <color name="on_secondary">#0F1115</color>
+    <color name="on_background">#F5F5F5</color>
+    <color name="on_surface">#FFFFFF</color>
+
+    <!-- MATERIAL COLORS -->
+    <color name="colorPrimary">#B8C0FF</color>
+    <color name="colorPrimaryVariant">#8C9EFF</color>
+    <color name="colorOnPrimary">#0F1115</color>
+
+    <color name="colorPrimaryContainer">#2A325F</color>
+    <color name="colorOnPrimaryContainer">#E8EAF6</color>
+
+    <color name="colorSecondary">#FFD54F</color>
+    <color name="colorSecondaryVariant">#FFC107</color>
+    <color name="colorOnSecondary">#0F1115</color>
+
+    <color name="colorSurface">#1E1E1E</color>
+    <color name="colorOnSurface">#FFFFFF</color>
+
+    <color name="colorBackground">#121212</color>
+    <color name="colorOnBackground">#F5F5F5</color>
+
+    <color name="colorOutline">#4A4A4A</color>
+
+    <!-- STATUS -->
+    <color name="success">#81C784</color>
+    <color name="error">#EF5350</color>
+    <color name="warning">#FFB74D</color>
+
+    <!-- DIVIDERS -->
+    <color name="divider">#383838</color>
+
+    <!-- EXTRA UI -->
+    <color name="toolbar_bg">#121212</color>
+    <color name="bottom_nav_bg">#1A1A1A</color>
+
+    <!-- BASE -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+
+    <!-- LEGACY -->
+    <color name="purple_500">#B8C0FF</color>
+
+    <!-- WHATSAPP PROTOCOL THEME -->
+    <color name="whatsapp_chat_bg">#0B141A</color>
+    <color name="whatsapp_bubble_sent">#005C4B</color>
+    <color name="whatsapp_bubble_received">#202C33</color>
+    <color name="whatsapp_bubble_sent_text">#E9EDEF</color>
+    <color name="whatsapp_bubble_received_text">#E9EDEF</color>
+    <color name="message_input_bg">#1E2C33</color>
+    <color name="whatsapp_chat_bg_end">#070B0E</color>
+    <color name="option_card_bg_default">#1E2C33</color>
+    <color name="option_card_stroke_default">#303E46</color>
+    <color name="option_card_bg_selected">#074439</color>
+    <color name="option_card_stroke_selected">#00A884</color>
+</resources>

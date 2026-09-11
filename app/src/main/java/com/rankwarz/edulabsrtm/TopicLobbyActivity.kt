@@ -1,0 +1,869 @@
+package com.rankwarz.edulabsrtm
+
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.os.Bundle
+import android.util.Log
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ListView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.database.DataSnapshot
+import android.graphics.SurfaceTexture
+import android.media.MediaPlayer
+import android.view.Surface
+import android.view.TextureView
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ServerValue
+import com.google.firebase.database.ValueEventListener
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
+
+class TopicLobbyActivity : AppCompatActivity() {
+
+    private val TAG = "LOBBY_DEBUG"
+    private val MAX_PLAYERS = 2
+
+    private lateinit var btnInvite: Button
+    private lateinit var lobbyRef: DatabaseReference
+    private lateinit var challengeRef: DatabaseReference
+    private lateinit var listView: ListView
+    private lateinit var btnReady: Button
+    private lateinit var btnStart: Button
+    private lateinit var txtLobbyTitle: TextView
+    private lateinit var bottomNav: BottomNavigationView
+
+    private var bgMediaPlayer: MediaPlayer? = null
+    private var bgMusicPlayer: MediaPlayer? = null
+    private var isExploding = false
+
+    private val playersList = ArrayList<String>()
+    private lateinit var adapter: ArrayAdapter<String>
+
+    private var lobbyId = ""
+    private var userId = ""
+    private var userName = "User"
+
+    private var isHost = false
+    private var hasJoined = false
+    private var hasLaunchedGame = false
+    private var isNavigating = false
+
+    private var lobbyListener: ValueEventListener? = null
+
+    private var selectedSubject: String = ""
+    private var selectedTopic: String = ""
+    private var quizType: String = "NEET_PG"
+    private var currentVideoResId: Int = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_lobby)
+
+        val prefs = getSharedPreferences("MY_APP", Context.MODE_PRIVATE)
+
+        lobbyId = intent.getStringExtra("lobby_id").orEmpty()
+        userId = intent.getStringExtra("user_id").orEmpty()
+
+        userName = prefs.getString("user_name", null)
+            ?: prefs.getString("name", null)
+            ?: intent.getStringExtra("user_name")
+            ?: "User"
+
+        selectedSubject = intent.getStringExtra("SUBJECT")
+            ?: intent.getStringExtra("SELECTED_SUBJECT")
+            ?: prefs.getString("selected_subject_preference", "")
+            ?: ""
+        selectedTopic = intent.getStringExtra("TOPIC")
+            ?: intent.getStringExtra("SELECTED_TOPIC")
+            ?: ""
+        quizType = intent.getStringExtra("QUIZ_TYPE") ?: "NEET_PG"
+
+        Log.d(
+            TAG,
+            "onCreate -> lobbyId=$lobbyId, userId=$userId, userName=$userName, subject=$selectedSubject, topic=$selectedTopic, quizType=$quizType"
+        )
+
+        bindViews()
+        setupBottomNavigation()
+        setupInviteButton()
+        setupLobbyBackdrop()
+
+        if (lobbyId.isBlank() || userId.isBlank()) {
+            Toast.makeText(this, "Session Error", Toast.LENGTH_SHORT).show()
+            Log.e(TAG, "Missing lobbyId or userId")
+            finish()
+            return
+        }
+
+        val db = FirebaseDatabase.getInstance()
+        lobbyRef = db.reference.child("lobbies").child(lobbyId)
+        challengeRef = db.reference.child("challenges").child(lobbyId)
+
+        btnReady.setOnClickListener {
+            Log.d(TAG, "Ready clicked by user=$userId")
+            setReady()
+        }
+
+        btnStart.setOnClickListener {
+            Log.d(TAG, "Start clicked by host=$userId")
+            startGame()
+        }
+
+        listenLobby()
+    }
+
+    private fun bindViews() {
+        listView = findViewById(R.id.playerList)
+        btnReady = findViewById(R.id.btnReady)
+        btnStart = findViewById(R.id.btnStart)
+        txtLobbyTitle = findViewById(R.id.txtLobbyTitle)
+        bottomNav = findViewById(R.id.bottomNavigation)
+        btnInvite = findViewById(R.id.btnInvite)
+
+        val ivProfileLobby = findViewById<ImageView>(R.id.ivProfileLobby)
+        val txtPlayerName = findViewById<TextView>(R.id.txtPlayerName)
+        txtPlayerName?.text = userName
+        ivProfileLobby?.let { iv ->
+            AvatarManager.loadAvatar(this, iv, isMe = true)
+            iv.setOnClickListener {
+                AvatarManager.showAvatarPicker(this) { _, _ ->
+                    AvatarManager.loadAvatar(this, iv, isMe = true)
+                }
+            }
+        }
+
+        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, playersList)
+        listView.adapter = adapter
+    }
+
+    private fun setupInviteButton() {
+
+        btnInvite.setOnClickListener {
+
+            // ✅ IMPORTANT: use JOIN LOBBY (not livebattle)
+            val inviteLink =
+                "https://medigyaan.xyz/Neurons/join_lobby.php?lobby_id=$lobbyId"
+
+            val layout = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(40, 30, 40, 20)
+            }
+
+            // 🔗 Link Text
+            val linkText = TextView(this).apply {
+                text = inviteLink
+                textSize = 14f
+                setTextColor(Color.parseColor("#1F2937"))
+                setTextIsSelectable(true)
+                setPadding(0, 10, 0, 20)
+            }
+
+            // 📷 QR Image
+            val qrImage = ImageView(this).apply {
+                layoutParams = LinearLayout.LayoutParams(600, 600).apply {
+                    gravity = Gravity.CENTER_HORIZONTAL
+                    topMargin = 10
+                    bottomMargin = 10
+                }
+
+                val bitmap = generateQRCode(inviteLink)
+
+                if (bitmap != null) {
+                    setImageBitmap(bitmap)
+                } else {
+                    setImageResource(android.R.drawable.ic_delete)
+                }
+
+                setBackgroundColor(Color.WHITE)
+            }
+
+            layout.addView(linkText)
+            layout.addView(qrImage)
+
+            // 📲 Direct social sharing (WhatsApp / Messenger / Facebook / Instagram)
+            val shareMessage = """
+🔥 Live Quiz Challenge!
+
+Join my battle:
+$inviteLink
+
+📲 Tap or scan QR to join.
+            """.trimIndent()
+
+            val socialRow = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_HORIZONTAL
+                setPadding(0, 14, 0, 6)
+            }
+
+            val socialTargets = listOf(
+                "WhatsApp" to "com.whatsapp",
+                "Messenger" to "com.facebook.orca",
+                "Facebook" to "com.facebook.katana",
+                "Instagram" to "com.instagram.android"
+            )
+
+            socialTargets.forEach { (label, pkg) ->
+                val btn = Button(this).apply {
+                    text = label
+                    textSize = 12f
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply { marginEnd = 10 }
+                    setOnClickListener { launchSocialShare(pkg, shareMessage) }
+                }
+                socialRow.addView(btn)
+            }
+
+            layout.addView(socialRow)
+
+            val dialog = AlertDialog.Builder(this)
+                .setTitle("Invite Players")
+                .setView(layout)
+
+                // 📋 COPY
+                .setPositiveButton("Copy") { _, _ ->
+                    val clipboard =
+                        getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+                    val clip = ClipData.newPlainText("Invite Link", inviteLink)
+                    clipboard.setPrimaryClip(clip)
+
+                    Toast.makeText(this, "Link copied!", Toast.LENGTH_SHORT).show()
+                }
+
+                // 📤 SHARE
+                .setNeutralButton("Share") { _, _ ->
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(
+                            Intent.EXTRA_TEXT,
+                            """
+🔥 Live Quiz Challenge!
+
+Join my battle:
+$inviteLink
+
+📲 Tap or scan QR to join.
+                        """.trimIndent()
+                        )
+                    }
+
+                    startActivity(Intent.createChooser(shareIntent, "Share via"))
+                }
+
+                // ❌ CLOSE
+                .setNegativeButton("Close", null)
+                .create()
+
+            dialog.show()
+        }
+    }
+    /** Opens the given app with the invite pre-filled; falls back to the system share sheet. */
+    private fun launchSocialShare(packageName: String, message: String) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, message)
+            `package` = packageName
+        }
+        try {
+            startActivity(intent)
+        } catch (_: Exception) {
+            val fallback = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, message)
+            }
+            startActivity(Intent.createChooser(fallback, "Share via"))
+        }
+    }
+
+    private fun generateQRCode(text: String): Bitmap? {
+        return try {
+            val size = 600
+            val bitMatrix = QRCodeWriter().encode(
+                text,
+                BarcodeFormat.QR_CODE,
+                size,
+                size
+            )
+
+            val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565)
+
+            for (x in 0 until size) {
+                for (y in 0 until size) {
+                    bitmap.setPixel(
+                        x,
+                        y,
+                        if (bitMatrix[x, y]) Color.BLACK else Color.WHITE
+                    )
+                }
+            }
+
+            bitmap
+        } catch (e: Exception) {
+            Log.e(TAG, "QR generation failed: ${e.message}", e)
+            null
+        }
+    }
+    private fun setupBottomNavigation() {
+        setupAppBottomNavigation(bottomNav, R.id.nav_home)
+    }
+
+    private fun listenLobby() {
+        Log.d(TAG, "listenLobby() attached for lobby=$lobbyId")
+
+        lobbyListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                Log.d(TAG, "Lobby snapshot received. exists=${snapshot.exists()}")
+
+                if (isFinishing || isDestroyed) return
+
+                if (!snapshot.exists()) {
+                    Log.w(TAG, "Lobby deleted/closed")
+
+                    if (!isHost) {
+                        Toast.makeText(this@TopicLobbyActivity, "Lobby closed", Toast.LENGTH_SHORT).show()
+                        finish()
+                    }
+                    return
+                }
+
+                val hostId = snapshot.child("host_id").value?.toString().orEmpty()
+                isHost = hostId == userId
+
+                if (selectedSubject.isBlank()) {
+                    selectedSubject = snapshot.child("subject").getValue(String::class.java) ?: ""
+                }
+                if (selectedTopic.isBlank()) {
+                    selectedTopic = snapshot.child("topic").getValue(String::class.java) ?: ""
+                }
+                if (quizType.isBlank()) {
+                    quizType = snapshot.child("quiz_type").getValue(String::class.java) ?: "NEET_PG"
+                }
+
+                val fbSubject = snapshot.child("subject").getValue(String::class.java).orEmpty()
+                val fbTopic = snapshot.child("topic").getValue(String::class.java).orEmpty()
+                val targetVideoRes = resolveLobbyVideoRes(
+                    if (selectedSubject.isNotBlank()) selectedSubject else fbSubject,
+                    if (selectedTopic.isNotBlank()) selectedTopic else fbTopic
+                )
+                if (targetVideoRes != currentVideoResId) {
+                    playLobbyVideo(targetVideoRes)
+                }
+
+                Log.d(TAG, "Host detection -> hostId=$hostId, isHost=$isHost")
+                Log.d(TAG, "Lobby meta -> subject=$selectedSubject, topic=$selectedTopic, quizType=$quizType")
+
+                if (!hasJoined) {
+                    Log.d(TAG, "Joining lobby for the first time")
+                    joinLobby()
+                    hasJoined = true
+                }
+
+                btnStart.visibility = if (isHost) View.VISIBLE else View.GONE
+                btnReady.visibility = if (isHost) View.GONE else View.VISIBLE
+                btnInvite.visibility = if (isHost) View.VISIBLE else View.GONE
+                txtLobbyTitle.text = if (isHost) "Host Lobby" else "Waiting Room"
+
+                playersList.clear()
+
+                val playersSnap = snapshot.child("players")
+                var joinedPlayerCount = 0
+                var allReady = true
+
+                for (player in playersSnap.children) {
+                    val pid = player.key ?: continue
+                    val name = player.child("name").getValue(String::class.java) ?: "Player"
+                    val status = player.child("status").getValue(String::class.java) ?: "waiting"
+                    val role = player.child("role").getValue(String::class.java) ?: "guest"
+
+                    playersList.add("$name — ${status.uppercase()} ($role)")
+                    joinedPlayerCount++
+
+                    if (status != "ready") {
+                        allReady = false
+                    }
+
+                    Log.d(TAG, "Player -> pid=$pid, name=$name, status=$status, role=$role")
+                }
+
+                adapter.notifyDataSetChanged()
+
+                val lobbyStatus = snapshot.child("status").getValue(String::class.java) ?: "waiting"
+                val challengeId = snapshot.child("challenge_id").value?.toString().orEmpty()
+                val storedQuizId = snapshot.child("quiz_id").value?.toString().orEmpty()
+
+                Log.d(
+                    TAG,
+                    "Lobby state -> status=$lobbyStatus, challenge_id=$challengeId, quiz_id=$storedQuizId, players=$joinedPlayerCount, allReady=$allReady"
+                )
+
+                btnStart.isEnabled = isHost && joinedPlayerCount >= 2
+                Log.d(TAG, "btnStart enabled = ${btnStart.isEnabled}")
+
+                if (lobbyStatus == "started") {
+                    val finalChallengeId = challengeId.ifBlank { lobbyId }
+                    if (finalChallengeId.isNotBlank()) {
+                        goToGame(finalChallengeId)
+                    } else {
+                        Log.e(TAG, "Lobby started but challenge_id is missing")
+                        Toast.makeText(this@TopicLobbyActivity, "Challenge ID missing", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "listenLobby cancelled: ${error.message}", error.toException())
+            }
+        }
+
+        lobbyRef.addValueEventListener(lobbyListener!!)
+    }
+
+    private fun joinLobby() {
+        Log.d(TAG, "joinLobby() -> userId=$userId, lobbyId=$lobbyId")
+
+        val playerRef = lobbyRef.child("players").child(userId)
+
+        playerRef.get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    Log.d(TAG, "Player already exists in lobby, skipping create")
+                    return@addOnSuccessListener
+                }
+
+                val data = hashMapOf(
+                    "name" to userName,
+                    "status" to if (isHost) "ready" else "waiting",
+                    "role" to if (isHost) "host" else "guest",
+                    "joined_at" to ServerValue.TIMESTAMP,
+                    "isBot" to false
+                )
+
+                Log.d(TAG, "Writing player node -> $data")
+
+                playerRef.setValue(data)
+                    .addOnSuccessListener { Log.d(TAG, "Joined lobby successfully") }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Join failed: ${e.message}", e)
+                        Toast.makeText(this, "Join failed", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Failed to read player node: ${e.message}", e)
+                Toast.makeText(this, "Join failed", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun setReady() {
+        Log.d(TAG, "setReady() -> userId=$userId")
+
+        lobbyRef.child("players").child(userId).child("status")
+            .setValue("ready")
+            .addOnSuccessListener {
+                btnReady.isEnabled = false
+                btnReady.text = "READY ✔"
+                btnReady.alpha = 0.5f
+                Log.d(TAG, "Player marked ready")
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Failed to set ready: ${e.message}", e)
+                Toast.makeText(this, "Ready update failed", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun startGame() {
+        if (!isHost) {
+            Log.w(TAG, "Non-host tried to start the game")
+            return
+        }
+
+        if (isNavigating || hasLaunchedGame) {
+            Log.d(TAG, "startGame skipped: already navigating")
+            return
+        }
+
+        Log.d(TAG, "startGame() called for lobbyId=$lobbyId")
+
+        val subject = selectedSubject.ifBlank { "General" }
+        val topic = selectedTopic.ifBlank { "" }
+
+        lobbyRef.child("quiz_id").get()
+            .addOnSuccessListener { quizSnapshot ->
+                val finalQuizId = when (val raw = quizSnapshot.value) {
+                    is Long -> raw.toInt()
+                    is Int -> raw
+                    is String -> raw.toIntOrNull() ?: 0
+                    else -> 0
+                }.takeIf { it > 0 } ?: generateQuizId()
+
+                lobbyRef.child("players").get()
+                    .addOnSuccessListener { snapshot ->
+                if (snapshot.childrenCount < MAX_PLAYERS.toLong()) {
+                    Toast.makeText(this, "Need at least $MAX_PLAYERS players", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
+
+                val playersMap = HashMap<String, Any>()
+
+                for (player in snapshot.children) {
+                    val pid = player.key ?: continue
+                    val name = player.child("name").getValue(String::class.java) ?: "Player"
+
+                    playersMap[pid] = mapOf(
+                        "name" to name,
+                        "hp" to 100,
+                        "score" to 0,
+                        "isBot" to false
+                    )
+
+                    Log.d(TAG, "Challenge player added -> pid=$pid, name=$name")
+                }
+
+                val challengeData = hashMapOf<String, Any>(
+                    "players" to playersMap,
+                    "question_ids" to emptyMap<String, Any>(),
+                    "quiz_id" to finalQuizId,
+                    "quiz_type" to quizType,
+                    "subject" to subject,
+                    "topic" to topic,
+                    "created_at" to ServerValue.TIMESTAMP
+                )
+
+                Log.d(
+                    TAG,
+                    "Writing challenge root -> challengeId=$lobbyId, quiz_id=$finalQuizId, subject=$subject, topic=$topic"
+                )
+
+                challengeRef.setValue(challengeData)
+                    .addOnSuccessListener {
+                    val updates = hashMapOf<String, Any>(
+                        "challenge_id" to lobbyId,
+                        "quiz_id" to finalQuizId,
+                        "quiz_type" to quizType,
+                        "subject" to subject,
+                            "topic" to topic,
+                            "status" to "started"
+                        )
+
+                        lobbyRef.updateChildren(updates)
+                            .addOnSuccessListener {
+                                Log.d(TAG, "Lobby updated to started for lobbyId=$lobbyId")
+                                goToGame(lobbyId)
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e(TAG, "Failed to update lobby start data: ${e.message}", e)
+                                Toast.makeText(this, "Start failed", Toast.LENGTH_SHORT).show()
+                                hasLaunchedGame = false
+                                isNavigating = false
+                            }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Failed to create challenge root: ${e.message}", e)
+                        Toast.makeText(this, "Start failed", Toast.LENGTH_SHORT).show()
+                        hasLaunchedGame = false
+                        isNavigating = false
+                    }
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Failed to read lobby players: ${e.message}", e)
+                Toast.makeText(this, "Start failed", Toast.LENGTH_SHORT).show()
+            }
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Failed to read lobby quiz id: ${e.message}", e)
+                Toast.makeText(this, "Quiz configuration error", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun goToGame(challengeId: String) {
+        synchronized(this) {
+            if (isNavigating || hasLaunchedGame) {
+                Log.d(TAG, "goToGame already in progress, skipping duplicate call")
+                return
+            }
+            isNavigating = true
+            hasLaunchedGame = true
+        }
+
+        lobbyListener?.let {
+            lobbyRef.removeEventListener(it)
+            lobbyListener = null
+            Log.d(TAG, "Lobby listener detached successfully")
+        }
+
+        lobbyRef.get()
+            .addOnSuccessListener { snapshot ->
+                if (!snapshot.exists()) {
+                    Log.e(TAG, "goToGame failed: Snapshot does not exist")
+                    isNavigating = false
+                    hasLaunchedGame = false
+                    return@addOnSuccessListener
+                }
+
+                val qIdStr = snapshot.child("quiz_id").value?.toString()
+                val qId = qIdStr?.toIntOrNull() ?: 0
+
+                val qType = snapshot.child("quiz_type").value?.toString() ?: quizType
+                val subject = snapshot.child("subject").value?.toString() ?: selectedSubject
+                val topic = snapshot.child("topic").value?.toString() ?: selectedTopic
+
+                Log.d(TAG, "Nav Data Extraction -> qId: $qId, qType: $qType, Topic: $topic")
+
+                if (qId == 0) {
+                    Log.e(TAG, "Critical Error: Quiz ID is 0 or null in Firebase")
+                    Toast.makeText(this, "Quiz configuration error", Toast.LENGTH_SHORT).show()
+                    isNavigating = false
+                    hasLaunchedGame = false
+                    return@addOnSuccessListener
+                }
+
+                var opponentId = ""
+                val playersSnap = snapshot.child("players")
+                for (player in playersSnap.children) {
+                    val pid = player.key ?: continue
+                    if (pid != userId) {
+                        opponentId = pid
+                        break
+                    }
+                }
+
+                val intent = Intent(this, TopicLoadingActivity::class.java).apply {
+                    putExtra("CHALLENGE_ID", challengeId)
+                    putExtra("USER_ID", userId)
+                    putExtra("UNIQUE_ID", qId)
+                    putExtra("QUIZ_TYPE", qType)
+                    putExtra("SUBJECT", subject)
+                    putExtra("TOPIC", topic)
+                    putExtra("IS_CREATOR", isHost)
+                    putExtra("OPPONENT_ID", opponentId)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                }
+
+                Log.d(TAG, "SUCCESS -> Launching TopicLoadingActivity for Challenge: $challengeId")
+                stopContinuousMusic()
+                val textureView = findViewById<TextureView>(R.id.lobbyVideoTexture)
+                ScreenExplosionHelper.triggerExplosion(
+                    activity = this,
+                    textureView = textureView
+                ) {
+                    startActivity(intent)
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                    finish()
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "goToGame Firebase Get Failed: ${e.message}", e)
+                isNavigating = false
+                hasLaunchedGame = false
+            }
+    }
+
+    private fun setupLobbyBackdrop() {
+        val textureView = findViewById<TextureView>(R.id.lobbyVideoTexture) ?: return
+        textureView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
+            override fun onSurfaceTextureAvailable(st: SurfaceTexture, width: Int, height: Int) {
+                val targetRes = resolveLobbyVideoRes(selectedSubject, selectedTopic)
+                playLobbyVideo(targetRes)
+            }
+
+            override fun onSurfaceTextureSizeChanged(st: SurfaceTexture, width: Int, height: Int) {
+                bgMediaPlayer?.let { mp ->
+                    adjustTextureAspectRatio(textureView, mp.videoWidth, mp.videoHeight)
+                }
+            }
+
+            override fun onSurfaceTextureDestroyed(st: SurfaceTexture): Boolean {
+                try {
+                    bgMediaPlayer?.stop()
+                    bgMediaPlayer?.release()
+                } catch (_: Exception) {}
+                bgMediaPlayer = null
+                currentVideoResId = 0
+                return true
+            }
+
+            override fun onSurfaceTextureUpdated(st: SurfaceTexture) {}
+        }
+
+        if (textureView.isAvailable) {
+            val targetRes = resolveLobbyVideoRes(selectedSubject, selectedTopic)
+            playLobbyVideo(targetRes)
+        }
+
+        startContinuousMusic()
+    }
+
+    private fun playLobbyVideo(rawResId: Int) {
+        val textureView = findViewById<TextureView>(R.id.lobbyVideoTexture) ?: return
+        if (!textureView.isAvailable) return
+        if (currentVideoResId == rawResId && bgMediaPlayer != null) return
+
+        currentVideoResId = rawResId
+        try {
+            bgMediaPlayer?.stop()
+            bgMediaPlayer?.release()
+        } catch (_: Exception) {}
+
+        try {
+            val surface = Surface(textureView.surfaceTexture)
+            bgMediaPlayer = MediaPlayer().apply {
+                setSurface(surface)
+                val afd = resources.openRawResourceFd(rawResId)
+                setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                afd.close()
+                isLooping = false
+                setVolume(0f, 0f)
+                setOnPreparedListener { mp ->
+                    adjustTextureAspectRatio(textureView, mp.videoWidth, mp.videoHeight)
+                    mp.start()
+                }
+                setOnCompletionListener {
+                    triggerVideoReloadWithExplosion()
+                }
+                prepareAsync()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error starting lobby backdrop video for resId=$rawResId", e)
+        }
+    }
+
+    private fun adjustTextureAspectRatio(texture: TextureView, videoWidth: Int, videoHeight: Int) {
+        if (videoWidth <= 0 || videoHeight <= 0) return
+        val viewWidth = texture.width.toFloat()
+        val viewHeight = texture.height.toFloat()
+        if (viewWidth <= 0 || viewHeight <= 0) return
+
+        val scaleX: Float
+        val scaleY: Float
+
+        if (viewWidth / viewHeight > videoWidth.toFloat() / videoHeight.toFloat()) {
+            scaleX = 1.0f
+            scaleY = (viewWidth / videoWidth.toFloat()) / (viewHeight / videoHeight.toFloat())
+        } else {
+            scaleX = (viewHeight / videoHeight.toFloat()) / (viewWidth / videoWidth.toFloat())
+            scaleY = 1.0f
+        }
+
+        val pivotX = viewWidth / 2f
+        val pivotY = viewHeight / 2f
+
+        val matrix = android.graphics.Matrix()
+        matrix.setScale(scaleX, scaleY, pivotX, pivotY)
+        texture.setTransform(matrix)
+    }
+
+    private fun startContinuousMusic() {
+        if (bgMusicPlayer == null) {
+            try {
+                bgMusicPlayer = MediaPlayer.create(this, R.raw.vivaldi_winter).apply {
+                    isLooping = true
+                    setVolume(0.85f, 0.85f)
+                    start()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error starting lobby background music", e)
+            }
+        } else if (bgMusicPlayer?.isPlaying == false) {
+            try {
+                bgMusicPlayer?.start()
+            } catch (_: Exception) {}
+        }
+    }
+
+    private fun stopContinuousMusic() {
+        try {
+            bgMusicPlayer?.let { mp ->
+                if (mp.isPlaying) {
+                    mp.stop()
+                }
+                mp.release()
+            }
+        } catch (_: Exception) {}
+        bgMusicPlayer = null
+    }
+
+    private fun triggerVideoReloadWithExplosion() {
+        if (isFinishing || isDestroyed || isExploding) return
+        isExploding = true
+
+        val textureView = findViewById<TextureView>(R.id.lobbyVideoTexture)
+        ScreenExplosionHelper.triggerExplosion(
+            activity = this,
+            textureView = textureView,
+            onMidExplosion = {
+                try {
+                    bgMediaPlayer?.seekTo(0)
+                } catch (_: Exception) {}
+            },
+            onComplete = {
+                isExploding = false
+                try {
+                    bgMediaPlayer?.start()
+                } catch (_: Exception) {}
+            }
+        )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        try {
+            if (bgMediaPlayer?.isPlaying == true) bgMediaPlayer?.pause()
+            if (bgMusicPlayer?.isPlaying == true) bgMusicPlayer?.pause()
+        } catch (_: Exception) {}
+    }
+
+    override fun onResume() {
+        super.onResume()
+        try {
+            if (bgMediaPlayer != null && bgMediaPlayer?.isPlaying == false) {
+                bgMediaPlayer?.start()
+            }
+            if (bgMusicPlayer != null && bgMusicPlayer?.isPlaying == false) {
+                bgMusicPlayer?.start()
+            }
+        } catch (_: Exception) {}
+    }
+
+    private fun generateQuizId(): Int {
+        return ((System.currentTimeMillis() % 900000L) + 100000L).toInt()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        try {
+            bgMediaPlayer?.stop()
+            bgMediaPlayer?.release()
+        } catch (_: Exception) {}
+        bgMediaPlayer = null
+        stopContinuousMusic()
+
+        lobbyListener?.let {
+            lobbyRef.removeEventListener(it)
+            Log.d(TAG, "Lobby listener removed")
+        }
+
+        if (!hasLaunchedGame && userId.isNotEmpty() && ::lobbyRef.isInitialized) {
+            Log.d(TAG, "Leaving lobby -> removing self from players")
+            lobbyRef.child("players").child(userId).removeValue()
+        }
+    }
+}

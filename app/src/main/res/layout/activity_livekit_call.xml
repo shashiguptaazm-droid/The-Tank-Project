@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/callRootLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0D1117"
+    android:keepScreenOn="true">
+
+    <!-- Remote video fills the screen -->
+    <io.livekit.android.renderer.SurfaceViewRenderer
+        android:id="@+id/remoteVideo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <!-- Audio call / No-video fallback placeholder -->
+    <LinearLayout
+        android:id="@+id/audioCallPlaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/peerAvatar"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_user_placeholder"
+            android:contentDescription="Avatar" />
+
+        <TextView
+            android:id="@+id/audioPeerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="User"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/audioCallStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Connecting..."
+            android:textColor="#AAAAAA"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <!-- Local preview PiP -->
+    <FrameLayout
+        android:id="@+id/localVideoContainer"
+        android:layout_width="120dp"
+        android:layout_height="160dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_pip_border"
+        android:elevation="6dp"
+        android:visibility="gone">
+
+        <io.livekit.android.renderer.SurfaceViewRenderer
+            android:id="@+id/localVideo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+    <!-- Header info bar (for video mode) -->
+    <LinearLayout
+        android:id="@+id/headerBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="#44000000"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingTop="36dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="12dp">
+
+        <TextView
+            android:id="@+id/peerNameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/callStatusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Connecting to LiveKit..."
+            android:textColor="#CCCCCC"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <!-- Controls Bar -->
+    <LinearLayout
+        android:id="@+id/controlsBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#88000000"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="36dp">
+
+        <ImageButton
+            android:id="@+id/speakerButton"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/bg_circle_gray"
+            android:contentDescription="Speaker"
+            android:padding="12dp"
+            android:src="@android:drawable/ic_lock_silent_mode_off"
+            app:tint="#FFFFFF" />
+
+        <ImageButton
+            android:id="@+id/muteButton"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/bg_circle_gray"
+            android:contentDescription="Mute"
+            android:padding="12dp"
+            android:src="@drawable/ic_mic"
+            app:tint="#FFFFFF" />
+
+        <ImageButton
+            android:id="@+id/cameraButton"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/bg_circle_gray"
+            android:contentDescription="Camera"
+            android:padding="12dp"
+            android:src="@drawable/ic_videocam"
+            app:tint="#FFFFFF" />
+
+        <ImageButton
+            android:id="@+id/flipCameraButton"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/bg_circle_gray"
+            android:contentDescription="Flip Camera"
+            android:padding="12dp"
+            android:src="@android:drawable/ic_menu_rotate"
+            app:tint="#FFFFFF" />
+
+        <ImageButton
+            android:id="@+id/endCallButton"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/bg_circle_red"
+            android:contentDescription="End Call"
+            android:padding="14dp"
+            android:src="@drawable/ic_call_end"
+            app:tint="#FFFFFF" />
+    </LinearLayout>
+</FrameLayout>

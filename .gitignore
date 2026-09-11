@@ -1,0 +1,36 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Signing keystore and credentials (keep out of version control)
+app/keystore.properties
+app/keystore/
+
+# Release and large build outputs
+app/release/
+*.apk
+*.aab
+*.keystore
+keystore/
+
+# Secrets and keys
+app/src/main/java/com/rankwarz/edulabsrtm/ApiKeys.kt
+backend/api_key.php
+Medigyaan_Web_Ai/core/Config.php
+deploy_web/
+ROTATION_CHECKLIST.md
+backend/
+tmp_php/
+tmp_*

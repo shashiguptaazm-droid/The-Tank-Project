@@ -1,0 +1,21 @@
+package com.rankwarz.edulabsrtm
+
+object ApiKeys {
+    const val GROQ_API_KEY = ""
+    const val GEMINI_API_KEY = ""
+    const val OPENROUTER_API_KEY = ""
+    const val MISTRAL_API_KEY = ""
+    const val CLOUDFLARE_WORKER_API_KEY = ""
+    const val CLOUDFLARE_ACCOUNT_ID = ""
+    const val CEREBRAS_API_KEY = ""
+    const val COHERE_API_KEY = ""
+    const val REPLICATE_API_KEY = ""
+    const val HUGGINGFACE_API_KEY = ""
+    const val HUGGINGFACE_MODEL = ""
+    const val ENDPOINT_AI_API_KEY = ""
+    const val ENDPOINT_AI_BASE_URL = "https://endpointai-backend-production.up.railway.app/"
+    const val ENDPOINT_AI_MODEL = "deepseek-r1:70b"
+    const val THESIS_SESSION_BACKEND_URL = "https://medigyaan.xyz/Neurons/thesis_session_backend.php"
+    const val DEEPSEEK_API_KEY = ""
+    const val DEEPSEEK_MODEL = "deepseek-v4-flash"
+}

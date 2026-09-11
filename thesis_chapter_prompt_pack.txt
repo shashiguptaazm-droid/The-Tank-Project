@@ -1,0 +1,629 @@
+{
+  "purpose": "Activity-matched thesis PDF prompt pack for AI chat or iOS Shortcuts.",
+  "format": "JSON only",
+  "rules": [
+    "Return only JSON.",
+    "Extract every requested variable for the selected chapter.",
+    "Preserve wording, order, numbers, citations, PMID, DOI, page numbers, lists, tables, figures, charts, and abbreviations.",
+    "Do not summarize unless the requested field is a summary field.",
+    "If a field is not found, return an empty string or empty array."
+  ],
+  "variable_prompt_template": "You are extracting thesis variables from PDF text. Detect the chapter and return only the JSON fields requested for that chapter. Keep the output machine-readable and complete. Do not add markdown or explanations. Use the exact variable names from the activity.",
+  "chapter_prompts": [
+    {
+      "chapter": "Title",
+      "variable_groups": [
+        {
+          "group": "Title page metadata",
+          "variables": ["Title", "Subtitle", "Degree", "Department", "Institution", "Guide", "Co-guide", "Student Name", "Year", "Registration Number"]
+        }
+      ],
+      "prompt": "Extract the full title page metadata from the PDF. Return only Title, Subtitle, Degree, Department, Institution, Guide, Co-guide, Student Name, Year, and Registration Number. Preserve exact official wording and capitalization."
+    },
+    {
+      "chapter": "Certificate",
+      "variable_groups": [
+        {
+          "group": "Front matter text",
+          "variables": ["Certificate", "Declaration", "Acknowledgements", "Guide", "HOD", "Student Name", "Date"]
+        }
+      ],
+      "prompt": "Extract the certificate exactly as written. Preserve the body text, guide signature line, HOD signature line, student name, and date."
+    },
+    {
+      "chapter": "Declaration",
+      "variable_groups": [
+        {
+          "group": "Front matter text",
+          "variables": ["Certificate", "Declaration", "Acknowledgements", "Guide", "HOD", "Student Name", "Date"]
+        }
+      ],
+      "prompt": "Extract the declaration exactly as written. Preserve the declaration statement, student name, signature line, and date."
+    },
+    {
+      "chapter": "Acknowledgements",
+      "variable_groups": [
+        {
+          "group": "Front matter text",
+          "variables": ["Certificate", "Declaration", "Acknowledgements", "Guide", "HOD", "Student Name", "Date"]
+        }
+      ],
+      "prompt": "Extract the acknowledgements exactly as written. Keep each acknowledgement point or paragraph."
+    },
+    {
+      "chapter": "Abstract",
+      "variable_groups": [
+        {
+          "group": "Structured abstract",
+          "variables": ["Disease_or_Condition", "Abstract_structured", "Keywords", "Abstract", "Background", "Aim", "Methods", "Results", "Conclusion"]
+        }
+      ],
+      "prompt": "Extract the structured abstract variables exactly: Disease_or_Condition, Abstract_structured, Keywords, Abstract, Background, Aim, Methods, Results, Conclusion. Preserve the full abstract and keep the wording exact."
+    },
+    {
+      "chapter": "Keywords",
+      "variable_groups": [
+        {
+          "group": "Keyword list",
+          "variables": ["Disease_or_Condition", "Keywords"]
+        }
+      ],
+      "prompt": "Extract the keyword list exactly. Return Disease_or_Condition and Keywords only."
+    },
+    {
+      "chapter": "Introduction",
+      "variable_groups": [
+        {
+          "group": "Core thesis framing",
+          "variables": ["Disease_or_Condition", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Hypothesis_null", "Hypothesis_alternate"]
+        },
+        {
+          "group": "Source references",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the introduction and its supporting thesis framing variables exactly: Disease_or_Condition, Introduction_text, Background_text, Literature_Review_text, Research_Gap, Aim_of_Study, Objectives_primary, Objectives_secondary, Hypothesis_null, Hypothesis_alternate, and References_Vancouver."
+    },
+    {
+      "chapter": "Background",
+      "variable_groups": [
+        {
+          "group": "Core thesis framing",
+          "variables": ["Disease_or_Condition", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Hypothesis_null", "Hypothesis_alternate"]
+        },
+        {
+          "group": "Source references",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the background and its supporting framing variables exactly. Return all relevant thesis framing fields and references."
+    },
+    {
+      "chapter": "Disease Burden",
+      "variable_groups": [
+        {
+          "group": "Core thesis framing",
+          "variables": ["Disease_or_Condition", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Hypothesis_null", "Hypothesis_alternate"]
+        },
+        {
+          "group": "Source references",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the disease burden content and all relevant thesis framing fields. Preserve epidemiology, prevalence, incidence, clinical impact, and citations."
+    },
+    {
+      "chapter": "Epidemiology",
+      "variable_groups": [
+        {
+          "group": "Core thesis framing",
+          "variables": ["Disease_or_Condition", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Hypothesis_null", "Hypothesis_alternate"]
+        },
+        {
+          "group": "Source references",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the epidemiology content and all relevant thesis framing fields. Preserve prevalence, incidence, trends, risk groups, and citations."
+    },
+    {
+      "chapter": "Pathophysiology",
+      "variable_groups": [
+        {
+          "group": "Core thesis framing",
+          "variables": ["Disease_or_Condition", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Hypothesis_null", "Hypothesis_alternate"]
+        },
+        {
+          "group": "Source references",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the pathophysiology content and all relevant thesis framing fields. Preserve mechanisms, biology, and citations."
+    },
+    {
+      "chapter": "Current Treatment",
+      "variable_groups": [
+        {
+          "group": "Core thesis framing",
+          "variables": ["Disease_or_Condition", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Hypothesis_null", "Hypothesis_alternate"]
+        },
+        {
+          "group": "Source references",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the current treatment content and all relevant thesis framing fields. Preserve treatment details, limitations, and citations."
+    },
+    {
+      "chapter": "Research Gap",
+      "variable_groups": [
+        {
+          "group": "Core thesis framing",
+          "variables": ["Disease_or_Condition", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Hypothesis_null", "Hypothesis_alternate"]
+        },
+        {
+          "group": "Source references",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the research gap and all related thesis framing fields. Keep the missing knowledge statement exact."
+    },
+    {
+      "chapter": "Need for Study",
+      "variable_groups": [
+        {
+          "group": "Core thesis framing",
+          "variables": ["Disease_or_Condition", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Hypothesis_null", "Hypothesis_alternate"]
+        },
+        {
+          "group": "Source references",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the need-for-study rationale and all related thesis framing fields exactly. Include the justification and reference list if present."
+    },
+    {
+      "chapter": "Literature Review",
+      "variable_groups": [
+        {
+          "group": "Core thesis framing",
+          "variables": ["Disease_or_Condition", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Hypothesis_null", "Hypothesis_alternate"]
+        },
+        {
+          "group": "Source references",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the literature review and all related thesis framing fields exactly. Preserve study comparisons, results, and citations."
+    },
+    {
+      "chapter": "Aim of Study",
+      "variable_groups": [
+        {
+          "group": "Core thesis framing",
+          "variables": ["Disease_or_Condition", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Hypothesis_null", "Hypothesis_alternate"]
+        },
+        {
+          "group": "Source references",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the aim of study and the related thesis framing fields exactly."
+    },
+    {
+      "chapter": "Objectives",
+      "variable_groups": [
+        {
+          "group": "Core thesis framing",
+          "variables": ["Disease_or_Condition", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Hypothesis_null", "Hypothesis_alternate"]
+        },
+        {
+          "group": "Source references",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the objectives and the related thesis framing fields exactly. Preserve numbering and order."
+    },
+    {
+      "chapter": "Hypothesis",
+      "variable_groups": [
+        {
+          "group": "Core thesis framing",
+          "variables": ["Disease_or_Condition", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Hypothesis_null", "Hypothesis_alternate"]
+        },
+        {
+          "group": "Source references",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the hypothesis and all related thesis framing fields exactly."
+    },
+    {
+      "chapter": "Materials and Methods",
+      "variable_groups": [
+        {
+          "group": "Study design and setting",
+          "variables": ["Disease_or_Condition", "Study_Design", "Study_Setting", "Study_Duration", "Study_Population"]
+        },
+        {
+          "group": "Eligibility and sampling",
+          "variables": ["Inclusion_Criteria", "Exclusion_Criteria", "Sample_Size", "Sampling_Technique"]
+        },
+        {
+          "group": "Methods details",
+          "variables": ["Data_Collection", "Variables_Collected", "Investigations", "Study_Procedure", "Outcome_Measures_primary", "Outcome_Measures_secondary", "Statistical_Analysis", "Ethical_Considerations"]
+        }
+      ],
+      "prompt": "Extract the complete materials and methods section exactly using the study design and setting, eligibility and sampling, and methods detail variable groups."
+    },
+    {
+      "chapter": "Study Design",
+      "variable_groups": [
+        {
+          "group": "Study design and setting",
+          "variables": ["Disease_or_Condition", "Study_Design", "Study_Setting", "Study_Duration", "Study_Population"]
+        }
+      ],
+      "prompt": "Extract the study design and closely related study context fields exactly."
+    },
+    {
+      "chapter": "Study Setting",
+      "variable_groups": [
+        {
+          "group": "Study design and setting",
+          "variables": ["Disease_or_Condition", "Study_Design", "Study_Setting", "Study_Duration", "Study_Population"]
+        }
+      ],
+      "prompt": "Extract the study setting and closely related study context fields exactly."
+    },
+    {
+      "chapter": "Study Duration",
+      "variable_groups": [
+        {
+          "group": "Study design and setting",
+          "variables": ["Disease_or_Condition", "Study_Design", "Study_Setting", "Study_Duration", "Study_Population"]
+        }
+      ],
+      "prompt": "Extract the study duration and closely related study context fields exactly."
+    },
+    {
+      "chapter": "Study Population",
+      "variable_groups": [
+        {
+          "group": "Study design and setting",
+          "variables": ["Disease_or_Condition", "Study_Design", "Study_Setting", "Study_Duration", "Study_Population"]
+        }
+      ],
+      "prompt": "Extract the study population and closely related study context fields exactly."
+    },
+    {
+      "chapter": "Inclusion Criteria",
+      "variable_groups": [
+        {
+          "group": "Eligibility and sampling",
+          "variables": ["Inclusion_Criteria", "Exclusion_Criteria", "Sample_Size", "Sampling_Technique"]
+        }
+      ],
+      "prompt": "Extract the inclusion criteria and the other eligibility and sampling fields if present. Preserve exact conditions and order."
+    },
+    {
+      "chapter": "Exclusion Criteria",
+      "variable_groups": [
+        {
+          "group": "Eligibility and sampling",
+          "variables": ["Inclusion_Criteria", "Exclusion_Criteria", "Sample_Size", "Sampling_Technique"]
+        }
+      ],
+      "prompt": "Extract the exclusion criteria and the other eligibility and sampling fields if present. Preserve exact conditions and order."
+    },
+    {
+      "chapter": "Sample Size",
+      "variable_groups": [
+        {
+          "group": "Eligibility and sampling",
+          "variables": ["Inclusion_Criteria", "Exclusion_Criteria", "Sample_Size", "Sampling_Technique"]
+        }
+      ],
+      "prompt": "Extract the sample size and the other eligibility and sampling fields if present. Preserve calculation and assumptions."
+    },
+    {
+      "chapter": "Sampling Technique",
+      "variable_groups": [
+        {
+          "group": "Eligibility and sampling",
+          "variables": ["Inclusion_Criteria", "Exclusion_Criteria", "Sample_Size", "Sampling_Technique"]
+        }
+      ],
+      "prompt": "Extract the sampling technique and the other eligibility and sampling fields if present."
+    },
+    {
+      "chapter": "Data Collection",
+      "variable_groups": [
+        {
+          "group": "Methods details",
+          "variables": ["Data_Collection", "Variables_Collected", "Investigations", "Study_Procedure", "Outcome_Measures_primary", "Outcome_Measures_secondary", "Statistical_Analysis", "Ethical_Considerations"]
+        }
+      ],
+      "prompt": "Extract the data collection process and the other method-detail fields if present. Preserve workflow and procedure details."
+    },
+    {
+      "chapter": "Variables Collected",
+      "variable_groups": [
+        {
+          "group": "Methods details",
+          "variables": ["Data_Collection", "Variables_Collected", "Investigations", "Study_Procedure", "Outcome_Measures_primary", "Outcome_Measures_secondary", "Statistical_Analysis", "Ethical_Considerations"]
+        }
+      ],
+      "prompt": "Extract the variables collected and the other method-detail fields if present."
+    },
+    {
+      "chapter": "Investigations",
+      "variable_groups": [
+        {
+          "group": "Methods details",
+          "variables": ["Data_Collection", "Variables_Collected", "Investigations", "Study_Procedure", "Outcome_Measures_primary", "Outcome_Measures_secondary", "Statistical_Analysis", "Ethical_Considerations"]
+        }
+      ],
+      "prompt": "Extract the investigations and the other method-detail fields if present."
+    },
+    {
+      "chapter": "Study Procedure",
+      "variable_groups": [
+        {
+          "group": "Methods details",
+          "variables": ["Data_Collection", "Variables_Collected", "Investigations", "Study_Procedure", "Outcome_Measures_primary", "Outcome_Measures_secondary", "Statistical_Analysis", "Ethical_Considerations"]
+        }
+      ],
+      "prompt": "Extract the study procedure and the other method-detail fields if present."
+    },
+    {
+      "chapter": "Outcome Measures",
+      "variable_groups": [
+        {
+          "group": "Methods details",
+          "variables": ["Data_Collection", "Variables_Collected", "Investigations", "Study_Procedure", "Outcome_Measures_primary", "Outcome_Measures_secondary", "Statistical_Analysis", "Ethical_Considerations"]
+        }
+      ],
+      "prompt": "Extract the primary and secondary outcome measures and the other method-detail fields if present."
+    },
+    {
+      "chapter": "Statistical Analysis",
+      "variable_groups": [
+        {
+          "group": "Methods details",
+          "variables": ["Data_Collection", "Variables_Collected", "Investigations", "Study_Procedure", "Outcome_Measures_primary", "Outcome_Measures_secondary", "Statistical_Analysis", "Ethical_Considerations"]
+        }
+      ],
+      "prompt": "Extract the statistical analysis section and the other method-detail fields if present."
+    },
+    {
+      "chapter": "Ethical Considerations",
+      "variable_groups": [
+        {
+          "group": "Methods details",
+          "variables": ["Data_Collection", "Variables_Collected", "Investigations", "Study_Procedure", "Outcome_Measures_primary", "Outcome_Measures_secondary", "Statistical_Analysis", "Ethical_Considerations"]
+        }
+      ],
+      "prompt": "Extract the ethical considerations and the other method-detail fields if present."
+    },
+    {
+      "chapter": "Results",
+      "variable_groups": [
+        {
+          "group": "Results narrative",
+          "variables": ["Results_text", "Observations"]
+        },
+        {
+          "group": "Tables",
+          "variables": ["Tables"]
+        },
+        {
+          "group": "Figures",
+          "variables": ["Figures"]
+        },
+        {
+          "group": "Outcome references",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the results narrative, observations, tables, figures, and references exactly. Preserve every numeric finding and citation marker."
+    },
+    {
+      "chapter": "Observations",
+      "variable_groups": [
+        {
+          "group": "Results narrative",
+          "variables": ["Results_text", "Observations"]
+        },
+        {
+          "group": "Tables",
+          "variables": ["Tables"]
+        },
+        {
+          "group": "Figures",
+          "variables": ["Figures"]
+        },
+        {
+          "group": "Outcome references",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the observation narrative, tables, figures, and references exactly. Preserve the same order as the thesis."
+    },
+    {
+      "chapter": "Discussion",
+      "variable_groups": [
+        {
+          "group": "Discussion narrative",
+          "variables": ["Discussion_text", "Comparison_with_Literature", "Limitations"]
+        },
+        {
+          "group": "References",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the discussion narrative, comparison with literature, limitations, and references exactly."
+    },
+    {
+      "chapter": "Conclusion",
+      "variable_groups": [
+        {
+          "group": "Conclusion summary",
+          "variables": ["Conclusion_text"]
+        }
+      ],
+      "prompt": "Extract the conclusion summary exactly."
+    },
+    {
+      "chapter": "Summary",
+      "variable_groups": [
+        {
+          "group": "Summary",
+          "variables": ["Summary"]
+        }
+      ],
+      "prompt": "Extract the summary exactly."
+    },
+    {
+      "chapter": "Recommendations",
+      "variable_groups": [
+        {
+          "group": "Recommendations",
+          "variables": ["Recommendations", "Future_Scope", "References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the recommendations, future scope, and references exactly."
+    },
+    {
+      "chapter": "Limitations",
+      "variable_groups": [
+        {
+          "group": "Limitations",
+          "variables": ["Limitations"]
+        }
+      ],
+      "prompt": "Extract the limitations exactly."
+    },
+    {
+      "chapter": "Future Scope",
+      "variable_groups": [
+        {
+          "group": "Future scope",
+          "variables": ["Future_Scope", "Recommendations"]
+        }
+      ],
+      "prompt": "Extract the future scope and recommendations exactly."
+    },
+    {
+      "chapter": "References",
+      "variable_groups": [
+        {
+          "group": "Reference list",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the full reference list exactly as References_Vancouver."
+    },
+    {
+      "chapter": "Bibliography",
+      "variable_groups": [
+        {
+          "group": "Reference list",
+          "variables": ["References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the bibliography exactly as References_Vancouver."
+    },
+    {
+      "chapter": "Appendices",
+      "variable_groups": [
+        {
+          "group": "Appendices",
+          "variables": ["Appendices"]
+        }
+      ],
+      "prompt": "Extract the appendices exactly."
+    },
+    {
+      "chapter": "Proforma",
+      "variable_groups": [
+        {
+          "group": "Clinical form fields",
+          "variables": ["Patient Name", "Age", "Sex", "OPD/IP No", "Address", "History", "Examination", "Investigations", "Diagnosis"]
+        }
+      ],
+      "prompt": "Extract the proforma clinical fields exactly."
+    },
+    {
+      "chapter": "Patient Consent Form (English)",
+      "variable_groups": [
+        {
+          "group": "Consent form fields",
+          "variables": ["Introduction", "Procedure", "Risks", "Benefits", "Confidentiality", "Signature", "Date"]
+        }
+      ],
+      "prompt": "Extract the English consent form fields exactly."
+    },
+    {
+      "chapter": "Patient Consent Form (Hindi)",
+      "variable_groups": [
+        {
+          "group": "Consent form fields",
+          "variables": ["Introduction", "Procedure", "Risks", "Benefits", "Confidentiality", "Signature", "Date"]
+        }
+      ],
+      "prompt": "Extract the Hindi consent form fields exactly."
+    },
+    {
+      "chapter": "Table of Contents",
+      "variable_groups": [
+        {
+          "group": "Relevant thesis variables",
+          "variables": ["Title", "Degree", "Department", "Institution", "Guide", "Student Name", "Abstract_structured", "Keywords", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Study_Design", "Study_Setting", "Study_Duration", "Study_Population", "Inclusion_Criteria", "Exclusion_Criteria", "Sample_Size", "Sampling_Technique", "Data_Collection", "Variables_Collected", "Investigations", "Study_Procedure", "Outcome_Measures_primary", "Outcome_Measures_secondary", "Statistical_Analysis", "Ethical_Considerations", "Results_text", "Observations", "Discussion_text", "Conclusion_text", "Summary", "Recommendations", "Future_Scope", "References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the table of contents entries and page numbers."
+    },
+    {
+      "chapter": "List of Tables",
+      "variable_groups": [
+        {
+          "group": "Relevant thesis variables",
+          "variables": ["Title", "Degree", "Department", "Institution", "Guide", "Student Name", "Abstract_structured", "Keywords", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Study_Design", "Study_Setting", "Study_Duration", "Study_Population", "Inclusion_Criteria", "Exclusion_Criteria", "Sample_Size", "Sampling_Technique", "Data_Collection", "Variables_Collected", "Investigations", "Study_Procedure", "Outcome_Measures_primary", "Outcome_Measures_secondary", "Statistical_Analysis", "Ethical_Considerations", "Results_text", "Observations", "Discussion_text", "Conclusion_text", "Summary", "Recommendations", "Future_Scope", "References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the list of tables, table numbers, titles, and page numbers."
+    },
+    {
+      "chapter": "List of Figures",
+      "variable_groups": [
+        {
+          "group": "Relevant thesis variables",
+          "variables": ["Title", "Degree", "Department", "Institution", "Guide", "Student Name", "Abstract_structured", "Keywords", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Study_Design", "Study_Setting", "Study_Duration", "Study_Population", "Inclusion_Criteria", "Exclusion_Criteria", "Sample_Size", "Sampling_Technique", "Data_Collection", "Variables_Collected", "Investigations", "Study_Procedure", "Outcome_Measures_primary", "Outcome_Measures_secondary", "Statistical_Analysis", "Ethical_Considerations", "Results_text", "Observations", "Discussion_text", "Conclusion_text", "Summary", "Recommendations", "Future_Scope", "References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the list of figures, figure numbers, titles, and page numbers."
+    },
+    {
+      "chapter": "List of Abbreviations",
+      "variable_groups": [
+        {
+          "group": "Relevant thesis variables",
+          "variables": ["Title", "Degree", "Department", "Institution", "Guide", "Student Name", "Abstract_structured", "Keywords", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Study_Design", "Study_Setting", "Study_Duration", "Study_Population", "Inclusion_Criteria", "Exclusion_Criteria", "Sample_Size", "Sampling_Technique", "Data_Collection", "Variables_Collected", "Investigations", "Study_Procedure", "Outcome_Measures_primary", "Outcome_Measures_secondary", "Statistical_Analysis", "Ethical_Considerations", "Results_text", "Observations", "Discussion_text", "Conclusion_text", "Summary", "Recommendations", "Future_Scope", "References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the list of abbreviations with short form and full form."
+    },
+    {
+      "chapter": "List of References",
+      "variable_groups": [
+        {
+          "group": "Relevant thesis variables",
+          "variables": ["Title", "Degree", "Department", "Institution", "Guide", "Student Name", "Abstract_structured", "Keywords", "Introduction_text", "Background_text", "Literature_Review_text", "Research_Gap", "Aim_of_Study", "Objectives_primary", "Objectives_secondary", "Study_Design", "Study_Setting", "Study_Duration", "Study_Population", "Inclusion_Criteria", "Exclusion_Criteria", "Sample_Size", "Sampling_Technique", "Data_Collection", "Variables_Collected", "Investigations", "Study_Procedure", "Outcome_Measures_primary", "Outcome_Measures_secondary", "Statistical_Analysis", "Ethical_Considerations", "Results_text", "Observations", "Discussion_text", "Conclusion_text", "Summary", "Recommendations", "Future_Scope", "References_Vancouver"]
+        }
+      ],
+      "prompt": "Extract the list of references exactly and preserve full Vancouver formatting."
+    }
+  ],
+  "shortcut_usage": "Use the matching chapter block, paste in the extracted PDF text, and return only the JSON fields requested for that chapter."
+}

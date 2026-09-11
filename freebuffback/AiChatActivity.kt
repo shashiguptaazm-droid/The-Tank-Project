@@ -1,0 +1,6171 @@
+package com.rankwarz.edulabsrtm
+
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.Science
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material3.*
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import com.rankwarz.edulabsrtm.data.remote.ApiClient
+import com.rankwarz.edulabsrtm.data.remote.ChatRequest
+import com.rankwarz.edulabsrtm.data.remote.Message
+import com.rankwarz.edulabsrtm.model.ModelCandidate
+import com.rankwarz.edulabsrtm.model.ModelRotator
+import com.rankwarz.edulabsrtm.model.PubMedCitationValidator
+import com.rankwarz.edulabsrtm.model.Variable
+import com.rankwarz.edulabsrtm.ui.theme.EduLabsRTMThemeFromPreferences
+import com.rankwarz.edulabsrtm.utils.PdfTextExtractor
+import com.rankwarz.edulabsrtm.viewmodel.PdfThemeStyle
+import com.rankwarz.edulabsrtm.utils.TextChunker
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
+import com.google.android.gms.tasks.Tasks
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.File
+import java.net.URLEncoder
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.concurrent.TimeUnit
+
+/**
+ * Standalone general-purpose AI chat ("AI Chat" nav destination).
+ *
+ * Replies stream in with a ChatGPT-style typing effect, then the app searches the
+ * 280k question bank for related questions (via Neurons searchv2 full-text search)
+ * and lets the user jump straight into a practice test with those questions.
+ */
+class AiChatActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            EduLabsRTMThemeFromPreferences {
+                var selectedTab by remember { mutableStateOf(1) }
+                Scaffold(
+                    bottomBar = {
+                        // Pad above the system navigation bar so this bar matches the
+                        // Dashboard/XML bottom bar and never overlaps the Android nav icons.
+                        BottomNavigation(modifier = Modifier.navigationBarsPadding()) {
+                            BottomNavigationItem(
+                                selected = selectedTab == 0,
+                                onClick = {
+                                    selectedTab = 0
+                                    startActivity(Intent(this@AiChatActivity, DashboardActivity::class.java))
+                                    finish()
+                                },
+                                icon = { Icon(painterResource(R.drawable.ic_home), contentDescription = "Home") },
+                                label = { Text("Home") }
+                            )
+                            BottomNavigationItem(
+                                selected = selectedTab == 1,
+                                onClick = { selectedTab = 1 },
+                                icon = { Icon(painterResource(R.drawable.ic_comment), contentDescription = "AI Chat") },
+                                label = { Text("AI Chat") }
+                            )
+                            BottomNavigationItem(
+                                selected = selectedTab == 2,
+                                onClick = {
+                                    selectedTab = 2
+                                    startActivity(Intent(this@AiChatActivity, GlobalSearchActivity::class.java))
+                                    finish()
+                                },
+                                icon = { Icon(painterResource(R.drawable.ic_search), contentDescription = "Search") },
+                                label = { Text("Search") }
+                            )
+                            BottomNavigationItem(
+                                selected = selectedTab == 3,
+                                onClick = {
+                                    selectedTab = 3
+                                    startActivity(Intent(this@AiChatActivity, ChallengeListActivity::class.java))
+                                    finish()
+                                },
+                                icon = { Icon(painterResource(R.drawable.ic_feed), contentDescription = "History") },
+                                label = { Text("History") }
+                            )
+                            BottomNavigationItem(
+                                selected = selectedTab == 4,
+                                onClick = {
+                                    selectedTab = 4
+                                    startActivity(Intent(this@AiChatActivity, MessengerActivity::class.java))
+                                    finish()
+                                },
+                                icon = { Icon(painterResource(R.drawable.ic_message), contentDescription = "Messages") },
+                                label = { Text("Messages") }
+                            )
+                        }
+                    }
+                ) { innerPadding ->
+                    AiChatScreen(
+                        onBack = { finish() },
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
+            }
+        }
+    }
+}
+
+private data class ChatTurn(val role: String, val content: String, val feedback: Int = 0, val responseTimeMs: Long = 0)
+
+/** A queued export: either a plain text reply or a parsed chapter, in one of the export formats. */
+private data class AiExportRequest(
+    val format: AiExportFormat,
+    val title: String,
+    val text: String = "",
+    val chapter: ChatChapterJson? = null,
+    val theme: PdfThemeStyle? = null
+)
+
+private data class RelatedQuestion(
+    val id: Int,
+    val text: String,
+    val subject: String,
+    val topic: String,
+    val explanation: String = ""
+)
+
+private data class QuestionSet(
+    val keyword: String,
+    val questions: List<RelatedQuestion>,
+    val testIds: List<Int>,
+    val primarySubject: String
+)
+
+/** A community post (user_posts + users_merged + post_files) surfaced by the posts search. */
+private data class CommunityPost(
+    val postId: Int,
+    val author: String,
+    val authorPhoto: String,
+    val caption: String,
+    val images: List<String>,
+    val likes: Int,
+    val uploadDate: String
+)
+
+private data class PostSet(val keyword: String, val posts: List<CommunityPost>)
+
+/** A chat message's detectable reference list (as plain lines) plus its source intent. */
+private data class DetectedReferences(
+    val entries: List<PubMedCitationValidator.CitationEntry>,
+    val explicitIntent: Boolean // user actually asked to validate / format references
+)
+
+private data class CitationValidationState(
+    val ownerTurn: Int,           // index of the assistant turn this belongs to
+    val detected: List<PubMedCitationValidator.CitationEntry>,
+    val intentRequested: Boolean, // user asked for validation
+    val running: Boolean = false,
+    val note: String = "",        // status line shown while running
+    val current: Int = 0,
+    val total: Int = 0,
+    val results: List<PubMedCitationValidator.ValidationResult>? = null
+)
+
+/** A thesis topic found in the catalog (thesis table) with its paper PDF. */
+private data class ThesisTopicResult(
+    val thesisId: Int,
+    val subject: String,
+    val snippet: String,
+    val pdfUrl: String,
+    val studyType: String,
+    val difficulty: String
+) {
+    /** The catalog has no title column — the paper title is the leading sentence of the text. */
+    val displayTitle: String
+        get() {
+            val firstSentence = snippet.trim()
+                .substringBefore(". ")
+                .trimEnd('.', ' ')
+            return when {
+                firstSentence.length >= 12 ->
+                    if (firstSentence.length > 90) firstSentence.take(90).trimEnd() + "…" else firstSentence
+                subject.isNotBlank() -> subject
+                else -> "Thesis #$thesisId"
+            }
+        }
+}
+
+private data class ThesisSearchState(
+    val ownerTurn: Int,
+    val query: String,
+    var running: Boolean = false,
+    var note: String = "",
+    var results: List<ThesisTopicResult>? = null
+)
+
+/** A single college option returned by the NEET PG AI counselor (ai_predictor.php). */
+private data class CounselCollege(
+    val institute: String,
+    val course: String,
+    val closingRank: String,
+    val category: String,
+    val quota: String,
+    val state: String,
+    val year: String,
+    val round: String,
+    val feePerYear: String,
+    val totalFee: String,
+    val stipendYear1: String,
+    val bondYears: String,
+    val chance: String
+)
+
+/** NEET PG AI counseling module state: rank/course query -> Dream/Target/Safe options + AI advice. */
+private data class CounselState(
+    val ownerTurn: Int,
+    val query: String,
+    var running: Boolean = false,
+    var note: String = "",
+    var summary: String = "",
+    var results: List<CounselCollege>? = null,
+    var error: String = ""
+)
+
+/** Result of one AI counselor call to the server. */
+private data class CounselorOutcome(
+    val summary: String = "",
+    val results: List<CounselCollege>? = null,
+    val error: String = ""
+)
+
+/** Poster generation flow: abstract -> structured poster data (free text LLM) -> AI poster image (OpenRouter image model). */
+
+
+// ---------------------------------------------------------------- Chapter generation (PDF -> thesis chapter)
+
+/** Chapter generation from an uploaded PDF, mirroring the thesis analyzer's chapter schemas. */
+private data class ChapterGenState(
+    val ownerTurn: Int,
+    val chapterName: String = "",
+    var phase: Int = 0,          // 1 generating, 2 done, 3 error
+    var note: String = "",
+    var json: ChatChapterJson? = null,
+    var error: String = ""
+)
+
+/** Parsed chapter payload. Keys mirror the thesis analyzer's chapter JSON schemas exactly. */
+data class ChatChapterJson(
+    val chapterName: String = "",
+    val chapterType: String = "",
+    val sections: List<ChatSectionJson> = emptyList(),
+    val tables: List<ChatTableJson> = emptyList(),
+    val figures: List<ChatFigureJson> = emptyList(),
+    val charts: List<ChatChartJson> = emptyList(),
+    val abbreviations: List<ChatAbbreviationJson> = emptyList(),
+    val references: List<ChatReferenceJson> = emptyList()
+)
+
+data class ChatSectionJson(
+    val heading: String = "",
+    val content: String = "",
+    val paragraphs: List<String> = emptyList(),
+    val bullets: List<String> = emptyList(),
+    val numberedPoints: List<String> = emptyList(),
+    val subsections: List<ChatSubsectionJson> = emptyList(),
+    val table: ChatTableJson? = null,
+    val figures: List<ChatFigureJson> = emptyList(),
+    val references: List<ChatReferenceJson> = emptyList()
+)
+
+data class ChatSubsectionJson(val heading: String = "", val content: String = "", val paragraphs: List<String> = emptyList())
+
+data class ChatTableJson(
+    val tableNumber: String = "",
+    val title: String = "",
+    val headers: List<String> = emptyList(),
+    val rows: List<List<String>> = emptyList(),
+    val footnote: String = ""
+)
+
+data class ChatFigureJson(
+    val figureNumber: String = "",
+    val title: String = "",
+    val caption: String = "",
+    val imageSearchQuery: String = ""
+)
+
+data class ChatChartJson(
+    val chartId: String = "",
+    val title: String = "",
+    val type: String = "",          // bar | line | pie | column | doughnut
+    val labels: List<String> = emptyList(),
+    val values: List<Double> = emptyList(),
+    val data: List<ChatChartPointJson> = emptyList()
+)
+
+data class ChatChartPointJson(val label: String = "", val value: Double = 0.0)
+
+data class ChatAbbreviationJson(val short: String = "", val full: String = "")
+
+data class ChatReferenceJson(
+    val citation: String = "",
+    val referenceText: String = "",
+    val pmid: String = "",
+    val doi: String = ""
+)
+
+/** An attached file (image OCR'd, PDF parsed, or text read) whose contents the AI answers from. */
+
+
+/** Context loaded from a user-uploaded PDF for Chat-with-PDF. */
+private data class PdfChatContext(
+    val fileName: String,
+    val variables: List<Variable>,
+    val textPreview: String
+) {
+    fun contextPrompt(): String {
+        if (variables.isEmpty()) return ""
+        val sb = StringBuilder()
+        sb.append("You have access to a user-uploaded thesis PDF (\"").append(fileName).append("\"). Use the extracted variables below when answering.\n")
+        val important = variables.filter { it.value.isNotBlank() }
+        important.take(60).forEach { v ->
+            val value = v.value.replace(Regex("\\s+"), " ").trim()
+            sb.append("- ").append(v.name).append(": ").append(value.take(1200)).append("\n")
+        }
+        return sb.toString().trim()
+    }
+}
+
+private const val AI_CHAT_SYSTEM_PROMPT =
+    "You are Medigyaan AI, a friendly medical exam assistant helping NEET PG aspirants. " +
+            "Answer clearly and concisely in plain text (no markdown tables). Use short paragraphs or " +
+            "bullets when helpful. If the question is outside medicine, still answer briefly and helpfully. " +
+            "Users often type quickly on mobile, so silently understand typos, misspellings, and phonetic " +
+            "medical terms (e.g. 'glucoma' means glaucoma, 'tyfoid' means typhoid) — never correct them " +
+            "out loud, just answer the intended question.\n\n" +
+            "BUILT-IN FEATURES: The app has these special features that are handled automatically when " +
+            "the user phrases them correctly — you don't need to explain or activate them:\n" +
+            "• Poster generation: user says 'generate a poster' + pastes an abstract\n" +
+            "• Chapter writing: user says 'write the discussion chapter' (requires uploaded PDF)\n" +
+            "• Thesis topic search: user says 'search thesis topics on <subject>'\n" +
+            "• Citation validation: user pastes a reference list and says 'validate these references'\n" +
+            "• NEET PG college predictor / counseling: user says 'predict colleges / counseling' and " +
+            "mentions their rank plus course/category/state, e.g. 'rank 12000 GEN, want MD Medicine in " +
+            "Karnataka' — the college-option card appears automatically\n" +
+            "If the user seems to want one of these but the app didn't trigger it (maybe due to typos), " +
+            "gently suggest the exact phrasing, e.g. 'Try typing: search thesis topics on glaucoma'.\n\n" +
+            "SEARCH MARKER RULES: When the user asks a genuine medical or academic question (about a disease, " +
+            "drug, procedure, anatomy, exam topic, etc.), append [SEARCH: keyword] as the LAST line of " +
+            "your reply (e.g. [SEARCH: typhoid fever], [SEARCH: vitamin b12 deficiency]). The app uses it " +
+            "to attach related question-bank MCQs and community posts for that topic, so repeat it on " +
+            "every eligible reply — do not skip it even if the topic is simple or you mentioned it " +
+            "recently. Do NOT add it for greetings, thanks, casual chat, or off-topic messages. The " +
+            "keyword must be a 2-4 word medical search phrase. Do not include the marker anywhere else " +
+            "in your reply. Never say you 'can't search' or 'don't have access to search' — instead, " +
+            "just answer the question and use the [SEARCH:] marker so the app's internal search bank " +
+            "displays the results."
+
+private val SEARCH_STOP_WORDS = setOf(
+    "a", "an", "the", "of", "for", "with", "what", "why", "how", "is", "are", "was", "were",
+    "me", "my", "this", "that", "these", "those", "please", "explain", "about", "tell", "give",
+    "question", "questions", "and", "or", "in", "on", "to", "from", "can", "could", "would",
+    "should", "does", "do", "did", "it", "its", "i", "you", "your", "he", "she", "they", "help",
+    "me", "some", "any", "related", "disease", "condition", "diagnosis", "treatment", "treatments",
+    "symptoms", "symptom", "therapy", "therapies", "management", "medicine", "medicines", "drug",
+    "drugs", "clinical", "feature", "features", "patient", "patients", "cause", "causes", "effect",
+    "effects", "describe", "definition", "define", "meaning", "differential", "findings", "find", "get"
+)
+
+// ---------------------------------------------------------------- Poster generation (abstract -> poster image)
+
+/** Only free text models are used for the poster analysis step. */
+private val FALLBACK_FREE_OR_MODELS = listOf(
+    "z-ai/glm-5.2:free",
+    "minimax/minimax-m3:free",
+    "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "google/gemma-4-31b-it:free",
+    "thinkingmachines/inkling:free",
+    "openrouter/free",
+    "meta-llama/llama-3-8b-instruct:free",
+    "mistralai/mistral-7b-instruct:free"
+)
+
+private val GROQ_FREE_MODELS = listOf("llama-3.3-70b-versatile", "llama-3.1-8b-instant")
+
+/** Cheapest OpenRouter image model (~₹3 per 1024x1024 poster). */
+private const val POSTER_IMAGE_MODEL = "google/gemini-3.1-flash-lite-image"
+private const val POSTER_IMAGE_SIZE = "1024x1024"
+private const val POSTER_FREE_LIMIT = 5
+
+private const val POSTER_ANALYSIS_SYSTEM =
+    "You are an expert medical conference poster designer. From the given abstract, build the COMPLETE poster content as a single JSON object. " +
+            "Rules: use ONLY information present in the abstract (never invent numbers, results or citations; if a section has no abstract data write \"Not stated in the abstract\"). " +
+            "Return ONLY valid JSON, no markdown fences, exactly this structure: " +
+            "{\"title\":\"<concise poster title>\",\"subtitle\":\"<1 short line, e.g. authors/institution or focus>\",\"sections\":[{\"heading\":\"<heading>\",\"body\":\"<poster-ready concise text>\"}]}. " +
+            "Create 6-9 sections chosen from: Background/Introduction, Aim & Objectives, Methods/Materials, Results/Key Findings, Conclusion, Take-home Points, Clinical Significance, References. " +
+            "Keep every body under 500 characters, poster-ready and concise. Escape quotes properly."
+
+private val POSTER_COMMAND_PREFIX = Regex(
+    """(?i)^(please\s+)?(generate|make|create|design|build|prepare|draft|write)\s+(me\s+)?(an?\s+)?(ai\s+|research\s+|medical\s+|conference\s+)?poster\s+(from|for|based\s+on|using|of)\s+(this\s+)?(the\s+)?(following\s+)?(abstract|text|content|information)?\s*[:.\n-]*"""
+)
+
+@Composable
+private fun AiChatScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val listState = rememberLazyListState()
+
+    var turns by remember { mutableStateOf(listOf<ChatTurn>()) }
+    var input by remember { mutableStateOf("") }
+    var busy by remember { mutableStateOf(false) }
+    var streamingText by remember { mutableStateOf<String?>(null) }
+
+    // Generation control: the in-flight AI job so Stop can cancel it, plus which user
+    // turn is being edited / regenerated (truncates the conversation on next send).
+    var activeGeneration by remember { mutableStateOf<Job?>(null) }
+    var editingIndex by remember { mutableStateOf<Int?>(null) }
+
+    // AI model mode (Fast / Balanced / Reasoning) — persisted; picks the provider pool.
+    var modelMode by remember { mutableStateOf(loadAiModelMode(context)) }
+
+    // Attachments: picked file -> OCR'd / parsed text used as AI context for replies.
+    var attachment by remember { mutableStateOf<AttachmentContext?>(null) }
+    var attachmentBusy by remember { mutableStateOf(false) }
+    var attachmentNote by remember { mutableStateOf("") }
+
+    // Conversation management (drawer): rename dialog state.
+    var renameTarget by remember { mutableStateOf<SessionMeta?>(null) }
+    var renameText by remember { mutableStateOf("") }
+
+    // Chat-with-PDF: uploaded document context + extraction state
+    var pdfContext by remember { mutableStateOf<PdfChatContext?>(null) }
+    var pdfExtracting by remember { mutableStateOf(false) }
+    var pdfExtractNote by remember { mutableStateOf("") }
+    // Downloaded PubMed abstracts for the uploaded PDF (shown in chat, fed to the next reply).
+    var pdfAbstracts by remember { mutableStateOf<PdfAbstractsState?>(null) }
+
+    // Thesis topics module state
+    var thesisSearch by remember { mutableStateOf<ThesisSearchState?>(null) }
+
+    // NEET PG AI counselor module state
+    var counselSearch by remember { mutableStateOf<CounselState?>(null) }
+
+    // Related-question search state (only shown after the assistant turn that produced it)
+    var searchPhase by remember { mutableStateOf(0) } // 0 idle, 1 searching, 2 done, 3 none
+    var questionSet by remember { mutableStateOf<QuestionSet?>(null) }
+    var suggestionOwner by remember { mutableStateOf(-1) } // index of assistant turn owning suggestions
+    var enriching by remember { mutableStateOf(false) }
+    var enrichmentNote by remember { mutableStateOf("") }
+
+    // Community posts search (post photos + captions) attached to the same assistant turn.
+    var postsResult by remember { mutableStateOf<PostSet?>(null) }
+
+    // PubMed citation validation state (assistant-turn owned)
+    var validation by remember { mutableStateOf<CitationValidationState?>(null) }
+
+    // Evidence discovery / similar articles state
+    var similarArticlesState by remember { mutableStateOf<SimilarArticlesState?>(null) }
+
+    // Tracks generated chapters to suggest the remaining ones as followup chips.
+    var generatedChapters by remember { mutableStateOf(setOf<String>()) }
+
+    // Poster generation: flow state + the 5-per-user free quota
+    var posterGen by remember { mutableStateOf<PosterGenState?>(null) }
+    var posterRemaining by remember { mutableStateOf<Int?>(null) }
+
+    // Chapter generation from an uploaded PDF (thesis analyzer-style schemas, figures, charts, tables)
+    var chapterGen by remember { mutableStateOf<ChapterGenState?>(null) }
+
+    // Thinking/typing state
+    var isThinking by remember { mutableStateOf(false) }
+    var showCompleted by remember { mutableStateOf(false) }
+
+    // Tool chips pre-fill the input box and focus it so the feature visibly activates.
+    val focusRequester = remember { FocusRequester() }
+    var showPosterLimitDialog by remember { mutableStateOf(false) }
+    var showPurchaseDialog by remember { mutableStateOf(false) }
+
+    // Persistent chat sessions (auto-save + history drawer + auto-resume last session).
+    var sessionId by remember { mutableStateOf<String?>(null) }
+    var sessionCreatedAt by remember { mutableStateOf(0L) }
+    var sessionTitleOverride by remember { mutableStateOf<String?>(null) }
+    var savedSessions by remember { mutableStateOf<List<SessionMeta>>(emptyList()) }
+    // Posters that belong to chat turns (persisted with the session so the image card
+    // with its download button survives rotation / reopen / session reload).
+    var sessionPosters by remember { mutableStateOf<List<SavedPoster>>(emptyList()) }
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+
+    // PDF picker (Chat-with-PDF)
+    val pdfPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            pdfExtracting = true
+            pdfExtractNote = "Reading PDF…"
+            scope.launch {
+                val result = runCatching {
+                    withContext(Dispatchers.IO) {
+                        val resolver = context.contentResolver
+                        val name = queryPdfDisplayName(resolver, uri) ?: "thesis.pdf"
+                        val text = resolver.openInputStream(uri)?.use { stream ->
+                            PdfTextExtractor.extractText(context, stream)
+                        }.orEmpty()
+                        name to text
+                    }
+                }.getOrNull()
+                if (result == null || result.second.isBlank()) {
+                    pdfExtracting = false
+                    pdfExtractNote = "Could not read that PDF. Try another file."
+                    return@launch
+                }
+                val (fileName, pdfText) = result
+                pdfExtractNote = "Extracting variables…"
+                val variables = withContext(Dispatchers.IO) {
+                    extractPdfVariables(pdfText, onChunk = { note -> pdfExtractNote = note })
+                }
+                pdfContext = PdfChatContext(
+                    fileName = fileName,
+                    variables = variables,
+                    textPreview = pdfText.take(4000)
+                )
+                pdfExtracting = false
+                pdfExtractNote = if (variables.isNotEmpty()) "${variables.size} variables extracted from $fileName"
+                else "PDF read, but no variables were extracted."
+                // Background pass: validate extracted Vancouver/PubMed references, download
+                // their abstracts, show them in the chat, and add them as variables so the
+                // next AI reply is grounded in the real abstracts.
+                if (variables.isNotEmpty()) {
+                    pdfAbstracts = PdfAbstractsState(running = true, note = "Scanning extracted variables for PubMed references…")
+                    scope.launch {
+                        val extra = enrichPdfVariablesWithAbstracts(
+                            variables = variables,
+                            onState = { pdfAbstracts = it }
+                        )
+                        val ctx = pdfContext
+                        if (ctx != null && extra.isNotEmpty()) {
+                            pdfContext = ctx.copy(variables = ctx.variables + extra)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Export to PDF / Word / PowerPoint: the CreateDocument sheet lets the user pick
+    // the destination, then the queued request (text reply or chapter) is written.
+    var exportBusy by remember { mutableStateOf(false) }
+    var pendingExport by remember { mutableStateOf<AiExportRequest?>(null) }
+    val runPendingExport: (Uri) -> Unit = runExport@ { uri ->
+        val req = pendingExport ?: return@runExport
+        scope.launch {
+            exportBusy = true
+            val result = runCatching {
+                if (req.chapter != null) {
+                    AiChatExporter.exportChapter(context, uri, req.format, req.chapter, req.theme)
+                } else {
+                    AiChatExporter.exportText(context, uri, req.format, req.title, req.text, req.theme)
+                }
+            }
+            exportBusy = false
+            Toast.makeText(
+                context,
+                if (result.isSuccess) "${req.format.label} exported"
+                else "Export failed: ${result.exceptionOrNull()?.message ?: "unknown error"}",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+    val pdfExportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument(AiExportFormat.PDF.mime)
+    ) { uri -> uri?.let(runPendingExport) }
+    val docxExportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument(AiExportFormat.DOCX.mime)
+    ) { uri -> uri?.let(runPendingExport) }
+    val pptxExportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument(AiExportFormat.PPTX.mime)
+    ) { uri -> uri?.let(runPendingExport) }
+
+    fun requestExport(format: AiExportFormat, title: String, text: String = "", chapter: ChatChapterJson? = null) {
+        // A fresh random theme on every download click — the exported PDF/PPTX visibly
+        // changes layout (accent colors, header band, rules) each time.
+        val theme = ThesisArtBridge.randomThemeStyle()
+        pendingExport = AiExportRequest(format = format, title = title, text = text, chapter = chapter, theme = theme)
+        val fileName = "${sanitizeExportFileName(title).ifBlank { "AI_Export" }}_${System.currentTimeMillis()}.${format.extension}"
+        when (format) {
+            AiExportFormat.PDF -> pdfExportLauncher.launch(fileName)
+            AiExportFormat.DOCX -> docxExportLauncher.launch(fileName)
+            AiExportFormat.PPTX -> pptxExportLauncher.launch(fileName)
+        }
+    }
+
+    val attachPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            attachmentBusy = true
+            attachmentNote = "Reading attachment…"
+            scope.launch {
+                val result = runCatching {
+                    withContext(Dispatchers.IO) { parseAttachment(context, uri) }
+                }.getOrNull()
+                attachmentBusy = false
+                if (result == null || result.text.isBlank()) {
+                    attachmentNote = "Couldn't read that file. Try an image, PDF or text file."
+                    return@launch
+                }
+                attachment = result
+                attachmentNote = when (result.kind) {
+                    "image" -> "🖼 OCR'd ${result.text.length} characters from ${result.name}"
+                    "pdf" -> "📄 Parsed ${result.text.length} characters from ${result.name}"
+                    else -> "📎 Loaded ${result.text.length} characters from ${result.name}"
+                }
+                appendChatLog(
+                    context,
+                    JSONObject()
+                        .put("type", "attachment")
+                        .put("name", result.name)
+                        .put("kind", result.kind)
+                        .put("chars", result.text.length)
+                )
+            }
+        }
+    }
+
+    val canSend = input.isNotBlank() && !busy
+
+    fun send() {
+        val text = AiAutoCorrect.correct(input).trim()
+        if (text.isEmpty() || busy) return
+        input = ""
+        // Edit & resend / regenerate: truncate the conversation back to the edited user
+        // turn so the new reply replaces everything after it.
+        val editFrom = editingIndex
+        editingIndex = null
+        if (editFrom != null && editFrom in turns.indices) {
+            turns = turns.subList(0, editFrom)
+            sessionPosters = sessionPosters.filter { it.ownerTurn <= editFrom }
+            thesisSearch = null
+            counselSearch = null
+        }
+        questionSet = null
+        searchPhase = 0
+        suggestionOwner = -1
+        enriching = false
+        enrichmentNote = ""
+        postsResult = null
+        validation = null
+        posterGen = null
+        chapterGen = null
+
+        val updated = turns + ChatTurn("user", text)
+        turns = updated
+        busy = true
+        val userTurnIndex = updated.lastIndex
+
+        // JSON session log: every user input is recorded for debugging.
+        appendChatLog(context, JSONObject().put("type", "user").put("text", text))
+
+        scope.launch {
+            val skill = routeToSkill(text, pdfContext)
+            when (skill) {
+                "SIMILAR_ARTICLES" -> {
+                    similarArticlesState = SimilarArticlesState(running = true, phase = 1, note = "Phase 1: Finding similar articles…")
+                    val ctx = pdfContext
+                    val seedPmids = ctx?.variables?.flatMap { v ->
+                        PubMedCitationValidator.extractCitationEntries(v.value).map { PubMedCitationValidator.extractPmid(it.text) }
+                    }?.filter { it.isNotBlank() }?.distinct()?.take(5) ?: emptyList()
+
+                    val foundPmids = mutableSetOf<String>()
+                    if (seedPmids.isNotEmpty()) {
+                        seedPmids.forEach { foundPmids.addAll(ThesisArtBridge.fetchSimilarPmids(it)) }
+                    } else {
+                        val query = ctx?.variables?.firstOrNull { it.name == "Title" }?.value ?: text
+                        foundPmids.addAll(ThesisArtBridge.searchSimilarArticles(query))
+                    }
+                    val pmidsToFetch = foundPmids.filter { it.isNotBlank() }.take(8).distinct()
+
+                    if (pmidsToFetch.isEmpty()) {
+                        similarArticlesState = SimilarArticlesState(running = false, phase = 0, note = "No similar articles found.")
+                        turns = turns + ChatTurn("assistant", "I couldn't find any similar articles on PubMed for this topic.")
+                        busy = false
+                        return@launch
+                    }
+
+                    similarArticlesState = similarArticlesState?.copy(phase = 2, note = "Phase 2: Downloading abstracts…")
+                    val abstracts = pmidsToFetch.mapNotNull { pmid ->
+                        val abs = ThesisArtBridge.fetchAbstract(pmid)
+                        if (abs != null) PdfAbstractEntry(pmid = pmid, title = "PubMed Article", text = abs) else null
+                    }
+
+                    similarArticlesState = similarArticlesState?.copy(phase = 3, note = "Phase 3: Merging evidence…", entries = abstracts)
+                    val newVars = ThesisArtBridge.abstractsToVariables(abstracts.associate { it.pmid to it.text })
+                    if (ctx != null) pdfContext = ctx.copy(variables = ctx.variables + newVars)
+
+                    similarArticlesState = similarArticlesState?.copy(phase = 4, running = false, note = "Phase 4: Ready! ${abstracts.size} articles merged.")
+                    turns = turns + ChatTurn("assistant", "✅ **Evidence Discovery Complete**\n\nI've found and merged ${abstracts.size} similar article abstracts into your project context. You can now ask deeper questions based on this new evidence.")
+                    busy = false
+                    listState.animateScrollToItem(turns.lastIndex)
+                    return@launch
+                }
+                "POSTER" -> {
+                    val posterSource = detectPosterAbstract(text, pdfContext)
+                    if (posterSource != null) {
+                        val quota = withContext(Dispatchers.IO) { fetchPosterQuota(context) }
+                        if (quota != null && quota <= 0) {
+                            posterRemaining = 0
+                            showPosterLimitDialog = true
+                            busy = false
+                            return@launch
+                        }
+                        posterRemaining = quota
+                        posterGen = PosterGenState(ownerTurn = userTurnIndex, source = posterSource, phase = 1, note = "🧠 Analyzing abstract & building poster data…")
+                        val finalState = runPosterGeneration(posterSource) { update -> posterGen = update }
+                        posterGen = finalState
+                        if (finalState.phase == 3) {
+                            val newRemaining = withContext(Dispatchers.IO) { consumePosterQuota(context) }
+                            if (newRemaining != null) posterRemaining = newRemaining
+                            val meta = persistCompletedPoster(context, userTurnIndex, finalState)
+                            if (meta != null) sessionPosters = upsertSessionPoster(sessionPosters, meta)
+                        }
+                        turns = turns + ChatTurn("assistant", if (finalState.phase == 3) "🎨 **Poster generated** from your abstract." else "⚠ Poster generation failed.")
+                        busy = false
+                        listState.animateScrollToItem(turns.lastIndex)
+                        return@launch
+                    }
+                }
+                "CHAPTER" -> {
+                    val chapterIntent = detectChapterRequest(text, pdfContext)
+                    if (chapterIntent != null) {
+                        chapterGen = ChapterGenState(ownerTurn = userTurnIndex, chapterName = chapterIntent, phase = 1, note = "📚 Generating the $chapterIntent chapter…")
+                        val finalState = runChapterGeneration(userTurnIndex, chapterIntent, text, pdfContext!!, context) { update -> chapterGen = update }
+                        chapterGen = finalState
+                        generatedChapters = generatedChapters + chapterIntent
+                        turns = turns + ChatTurn("assistant", if (finalState.phase == 2) "📚 **${finalState.chapterName.uppercase()}** chapter generated from your PDF." else "⚠ Chapter generation failed.")
+                        busy = false
+                        listState.animateScrollToItem(turns.lastIndex)
+                        return@launch
+                    }
+                }
+                "THESIS_SEARCH" -> {
+                    val thesisIntent = detectThesisTopicSearch(text)
+                    if (thesisIntent != null) {
+                        thesisSearch = ThesisSearchState(ownerTurn = userTurnIndex, query = thesisIntent, running = true, note = "Searching thesis topics…")
+                        val results = withContext(Dispatchers.IO) { fetchThesisTopics(context, thesisIntent) }
+                        thesisSearch = thesisSearch?.copy(running = false, results = results, note = "${results.size} topics found.")
+                        busy = false
+                        return@launch
+                    }
+                }
+                "COUNSELOR" -> {
+                    val counselIntent = detectCounselQuery(text)
+                    if (counselIntent != null) {
+                        counselSearch = CounselState(ownerTurn = userTurnIndex, query = counselIntent, running = true, note = "💭 Asking the AI counselor…")
+                        val outcome = withContext(Dispatchers.IO) { fetchCounselorAdvice(context, counselIntent) }
+                        counselSearch = counselSearch?.copy(running = false, summary = outcome.summary, results = outcome.results, error = outcome.error)
+                        busy = false
+                        return@launch
+                    }
+                }
+                "PUBMED_VALIDATE" -> {
+                    val citationIntent = detectCitationList(text, text)
+                    if (citationIntent != null) {
+                        validation = CitationValidationState(ownerTurn = userTurnIndex, detected = citationIntent.entries, intentRequested = false, running = true, total = citationIntent.entries.size)
+                        runCitationValidation(validation!!) { updated -> validation = updated }
+                        busy = false
+                        return@launch
+                    }
+                }
+            }
+
+            // Normal chat fallback
+            activeGeneration = scope.launch {
+                isThinking = true
+                val startTime = System.currentTimeMillis()
+             val raw = try {
+                 withContext(Dispatchers.IO) { requestAiChat(updated, pdfContext, modelMode.provider, attachment) }
+            } catch (e: Throwable) {
+                if (e is CancellationException) {
+                    // User pressed Stop — abandon quietly; state was already reset.
+                    busy = false
+                    throw e
+                }
+                appendChatLog(
+                    context,
+                    JSONObject()
+                        .put("type", "assistant_error")
+                        .put("user_text", text)
+                        .put("error", e.message ?: "AI request failed")
+                )
+                "I apologize, but I'm having trouble connecting to my knowledge base right now. Please try your question again in a moment."
+            }
+
+            val cleaned = raw.substringBefore("[SEARCH:").trimEnd()
+            // Prefer the model's [SEARCH: …] marker; fall back to an explicit "search questions on X"
+            // request in the user's own text so the 280k-bank module still runs when the AI
+            // forgets to append the marker.
+            // Detection order: the AI's [SEARCH:] marker wins; then an explicit request
+            // ("questions on X", "posts on X"); finally, if the user's own text mentions a
+            // recognized medical condition, run the bank search on it so the modules fire
+            // even when the AI replies in plain text.
+            val keyword = parseSearchKeyword(raw) ?: explicitQuestionTopic(text) ?: findMedicalCondition(text)
+            // Same fallback for the community-posts card: when the AI omits its [SEARCH:]
+            // marker entirely, an explicit "posts about X" request in the user's own text
+            // still runs the posts search on its own.
+            val postsOnlyKeyword = if (keyword == null) explicitPostsTopic(text) else null
+
+            val fullText = cleaned.ifBlank {
+                if (raw.contains("[SEARCH:")) raw else "⚠ AI gave an empty reply. Try again."
+            }
+
+            // JSON session log: every AI reply is recorded for debugging.
+            appendChatLog(
+                context,
+                JSONObject()
+                    .put("type", "assistant")
+                    .put("user_text", text)
+                    .put("keyword", keyword ?: "")
+                    .put("text", fullText)
+            )
+
+            // ChatGPT-style reveal
+            val reveal = suspend {
+                val step = (fullText.length / 160).coerceIn(1, 6)
+                var i = 0
+                while (i < fullText.length) {
+                    i = (i + step).coerceAtMost(fullText.length)
+                    streamingText = fullText.substring(0, i)
+                    delay(11)
+                }
+                streamingText = null
+            }
+             reveal()
+             showCompleted = true
+             delay(1200)
+             showCompleted = false
+
+             turns = turns + ChatTurn("assistant", fullText, responseTimeMs = System.currentTimeMillis() - startTime)
+            val ownerIndex = turns.lastIndex
+
+            if (keyword != null) {
+                suggestionOwner = ownerIndex
+                searchPhase = 1
+                val found = withContext(Dispatchers.IO) { findRelatedQuestions(context, keyword, text) }
+                if (found != null && found.questions.isNotEmpty()) {
+                    questionSet = found
+                    searchPhase = 2
+                } else {
+                    searchPhase = 3
+                }
+                val postsKeyword = bestPostsKeyword(keyword, text)
+                if (postsKeyword != null) {
+                    val posts = withContext(Dispatchers.IO) { searchCommunityPosts(context, postsKeyword) }
+                    if (posts.isNotEmpty()) {
+                        postsResult = PostSet(keyword = postsKeyword, posts = posts.take(6))
+                    }
+                }
+            } else if (postsOnlyKeyword != null) {
+                // User explicitly asked for community posts but the AI omitted its marker —
+                // run just the posts search so the card still appears. The card only shows
+                // when real matches are found, so casual text stays silent.
+                suggestionOwner = ownerIndex
+                val postsKeyword = bestPostsKeyword(postsOnlyKeyword, "")
+                if (postsKeyword != null) {
+                    val posts = withContext(Dispatchers.IO) { searchCommunityPosts(context, postsKeyword) }
+                    if (posts.isNotEmpty()) {
+                        postsResult = PostSet(keyword = postsKeyword, posts = posts.take(6))
+                    }
+                }
+            }
+             busy = false
+             isThinking = false
+             activeGeneration = null
+            if (turns.isNotEmpty()) {
+                listState.animateScrollToItem(turns.lastIndex)
+            }
+
+            // Background data-quality pass on the shown questions: fix (a) topics that are
+            // missing/placeholder (e.g. "PG 2020") and (b) explanations that are missing or
+            // shorter than 100 chars — ask the AI, then persist the result into the DB.
+            val qSet = questionSet
+            val toFix = qSet?.questions?.filter { needsAiTopic(it) || needsAiExplanation(it) }?.take(4).orEmpty()
+            if (toFix.isNotEmpty()) {
+                enriching = true
+                scope.launch {
+                    var tagCount = 0
+                    var explainCount = 0
+                    for (q in toFix) {
+                        // --- Topic: AI picks a topic/subject when blank or placeholder ---
+                        if (needsAiTopic(q)) {
+                            val label = runCatching { withContext(Dispatchers.IO) { requestTopicLabel(q.text) } }.getOrNull()
+                            if (label != null && label.first.isNotBlank()) {
+                                val newSubject = if (isPaperLikeSubject(q.subject)) label.second else q.subject
+                                val ok = withContext(Dispatchers.IO) { postTopicAssignment(q.id, label.first, newSubject) }
+                                if (ok) {
+                                    tagCount++
+                                    questionSet = questionSet?.let { s ->
+                                        if (s.questions.none { it.id == q.id }) s
+                                        else s.copy(questions = s.questions.map {
+                                            if (it.id == q.id) it.copy(topic = label.first, subject = newSubject.ifBlank { it.subject }) else it
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                        // --- Explanation: AI writes a brief one when missing or < 100 chars ---
+                        if (needsAiExplanation(q)) {
+                            val explanation = runCatching {
+                                withContext(Dispatchers.IO) { requestExplanation(q.text, q.explanation) }
+                            }.getOrNull()
+                            if (!explanation.isNullOrBlank()) {
+                                val ok = withContext(Dispatchers.IO) { postExplanation(q.id, explanation) }
+                                if (ok) {
+                                    explainCount++
+                                    questionSet = questionSet?.let { s ->
+                                        if (s.questions.none { it.id == q.id }) s
+                                        else s.copy(questions = s.questions.map {
+                                            if (it.id == q.id) it.copy(explanation = explanation) else it
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    enrichmentNote = buildString {
+                        if (tagCount > 0) append("🧠 AI tagged $tagCount question${if (tagCount == 1) "" else "s"} with a topic")
+                        if (tagCount > 0 && explainCount > 0) append(" and ")
+                        if (explainCount > 0) append("✍️ rewrote $explainCount short explanation${if (explainCount == 1) "" else "s"}")
+                    }
+                    enriching = false
+                }
+            }
+            }
+        }
+    }
+
+    // Stops the in-flight AI generation (typing effect + request) immediately.
+    fun stopGeneration() {
+        activeGeneration?.cancel()
+        activeGeneration = null
+        busy = false
+        streamingText = null
+    }
+
+    // Regenerates the reply for the assistant turn at [ownerIndex]: truncates back to the
+    // owning user message and re-runs the whole send flow with that text.
+    fun regenerate(ownerIndex: Int) {
+        if (busy) return
+        val userIdx = (0..ownerIndex).lastOrNull { i -> turns.getOrNull(i)?.role == "user" } ?: return
+        input = turns[userIdx].content
+        editingIndex = userIdx
+        send()
+    }
+
+    // Edit & resend: load the user message back into the input and mark it for replacement.
+    fun startEdit(userIndex: Int) {
+        if (busy) return
+        val t = turns.getOrNull(userIndex)?.takeIf { it.role == "user" } ?: return
+        editingIndex = userIndex
+        input = t.content
+        focusRequester.requestFocus()
+    }
+
+    // Thumbs up / down on an assistant reply (toggle off on re-tap).
+    val toggleLike: (Int) -> Unit = { index ->
+        if (index in turns.indices) {
+            turns = turns.mapIndexed { i, t -> if (i == index) t.copy(feedback = if (t.feedback == 1) 0 else 1) else t }
+        }
+    }
+    val toggleDislike: (Int) -> Unit = { index ->
+        if (index in turns.indices) {
+            turns = turns.mapIndexed { i, t -> if (i == index) t.copy(feedback = if (t.feedback == -1) 0 else -1) else t }
+        }
+    }
+
+    LaunchedEffect(turns.size, streamingText) {
+        val target = if (streamingText != null) turns.size else (turns.size - 1).coerceAtLeast(0)
+        if (target >= 0) listState.animateScrollToItem(target)
+    }
+
+    // Auto-resume the most recent chat session when the screen opens (persistent chat).
+    // Local first, then merged with the cloud copy so nothing is ever lost.
+    LaunchedEffect(Unit) {
+        val local = withContext(Dispatchers.IO) { listSavedSessions(context) }
+        val remote = withContext(Dispatchers.IO) { chatSyncFetchList(context) }
+        val sessions = mergeSessionMetas(local, remote)
+        savedSessions = sessions
+        val last = sessions.firstOrNull()
+        if (last != null && turns.isEmpty()) {
+            val s = withContext(Dispatchers.IO) {
+                loadSavedSession(context, last.id) ?: chatSyncDownload(context, last.id)?.also { saveChatSessionToDisk(context, it) }
+            }
+            if (s != null && s.turns.isNotEmpty()) {
+                sessionId = s.id
+                sessionCreatedAt = s.createdAt
+                sessionTitleOverride = s.title
+                turns = s.turns
+                sessionPosters = s.posters
+                if (s.pdfVariables.isNotEmpty()) {
+                    pdfContext = PdfChatContext(s.pdfName.ifBlank { s.title }, s.pdfVariables, s.pdfPreview)
+                }
+                questionSet = s.savedQuestionSet
+                postsResult = s.savedPostSet
+                thesisSearch = s.savedThesisSearch
+                counselSearch = s.savedCounselSearch
+            }
+        }
+    }
+
+    // Persist the conversation automatically after every change (new turn, PDF upload, load).
+    // Saved locally AND pushed to the server so the chat lasts forever.
+    LaunchedEffect(turns, pdfContext, sessionPosters, questionSet, postsResult, thesisSearch, counselSearch) {
+        if (turns.isEmpty()) return@LaunchedEffect
+        val id = sessionId ?: ("chat_" + System.currentTimeMillis()).also {
+            sessionId = it
+            if (sessionCreatedAt == 0L) sessionCreatedAt = System.currentTimeMillis()
+        }
+        val created = if (sessionCreatedAt == 0L) System.currentTimeMillis() else sessionCreatedAt
+        val session = SavedChatSession(
+            id = id,
+            title = sessionTitleOverride ?: sessionTitleFrom(turns),
+            createdAt = created,
+            updatedAt = System.currentTimeMillis(),
+            turns = turns,
+            pdfName = pdfContext?.fileName.orEmpty(),
+            pdfVariables = pdfContext?.variables.orEmpty(),
+            pdfPreview = pdfContext?.textPreview.orEmpty(),
+            posters = sessionPosters,
+            pinned = savedSessions.firstOrNull { it.id == id }?.pinned ?: false,
+            savedQuestionSet = questionSet,
+            savedPostSet = postsResult,
+            savedThesisSearch = thesisSearch,
+            savedCounselSearch = counselSearch
+        )
+        withContext(Dispatchers.IO) {
+            saveChatSessionToDisk(context, session)
+            listSavedSessions(context)
+        }.let { savedSessions = it }
+        chatSyncUpload(context, session)   // fire-and-forget cloud backup
+    }
+
+    // New-chat helper (clears everything and starts a fresh unsaved session).
+    val startNewChat: () -> Unit = {
+        turns = emptyList()
+        sessionId = null
+        sessionCreatedAt = 0L
+        sessionTitleOverride = null
+        pdfContext = null
+        pdfExtractNote = ""
+        attachment = null
+        attachmentNote = ""
+        thesisSearch = null
+        questionSet = null
+        searchPhase = 0
+        suggestionOwner = -1
+        postsResult = null
+        validation = null
+        posterGen = null
+        chapterGen = null
+        sessionPosters = emptyList()
+        streamingText = null
+        input = ""
+    }
+
+    // Chat-history drawer actions.
+    val closeHistoryDrawer: () -> Unit = { scope.launch { drawerState.close() } }
+    val refreshHistoryList: () -> Unit = {
+        scope.launch {
+            val local = withContext(Dispatchers.IO) { listSavedSessions(context) }
+            val remote = withContext(Dispatchers.IO) { chatSyncFetchList(context) }
+            savedSessions = mergeSessionMetas(local, remote)
+        }
+    }
+    val loadHistorySession: (SessionMeta) -> Unit = { meta ->
+        scope.launch {
+            val s = withContext(Dispatchers.IO) {
+                loadSavedSession(context, meta.id)
+                    ?: chatSyncDownload(context, meta.id)?.also { saveChatSessionToDisk(context, it) }
+            }
+            if (s != null) {
+                sessionId = s.id
+                sessionCreatedAt = s.createdAt
+                sessionTitleOverride = s.title
+                turns = s.turns
+                sessionPosters = s.posters
+                pdfContext = null
+                pdfExtractNote = ""
+                if (s.pdfVariables.isNotEmpty()) {
+                    pdfContext = PdfChatContext(s.pdfName.ifBlank { s.title }, s.pdfVariables, s.pdfPreview)
+                }
+                thesisSearch = null
+                questionSet = null
+                searchPhase = 0
+                suggestionOwner = -1
+                postsResult = null
+                validation = null
+                posterGen = null
+                chapterGen = null
+                streamingText = null
+            }
+            closeHistoryDrawer()
+        }
+    }
+    val deleteHistorySession: (SessionMeta) -> Unit = { meta ->
+        scope.launch {
+            withContext(Dispatchers.IO) { deleteSavedSession(context, meta.id) }
+            chatSyncDelete(context, meta.id)
+            if (meta.id == sessionId) {
+                sessionId = null
+                sessionCreatedAt = 0L
+                sessionTitleOverride = null
+            }
+            refreshHistoryList()
+        }
+    }
+
+    val togglePinSession: (SessionMeta) -> Unit = { meta ->
+        scope.launch {
+            val s = withContext(Dispatchers.IO) {
+                loadSavedSession(context, meta.id) ?: chatSyncDownload(context, meta.id)
+            } ?: return@launch
+            val updated = s.copy(pinned = !s.pinned, updatedAt = System.currentTimeMillis())
+            withContext(Dispatchers.IO) { saveChatSessionToDisk(context, updated) }
+            chatSyncUpload(context, updated)
+            refreshHistoryList()
+        }
+    }
+
+    val renameSession: (SessionMeta, String) -> Unit = { meta, newTitle ->
+        val t = newTitle.trim()
+        if (t.isNotEmpty()) {
+            scope.launch {
+                val s = withContext(Dispatchers.IO) {
+                    loadSavedSession(context, meta.id) ?: chatSyncDownload(context, meta.id)
+                } ?: return@launch
+                val updated = s.copy(title = t, updatedAt = System.currentTimeMillis())
+                withContext(Dispatchers.IO) { saveChatSessionToDisk(context, updated) }
+                chatSyncUpload(context, updated)
+                if (meta.id == sessionId) sessionTitleOverride = t
+                refreshHistoryList()
+            }
+        }
+    }
+
+    val shareSession: (SessionMeta) -> Unit = { meta ->
+        scope.launch {
+            val s = withContext(Dispatchers.IO) {
+                loadSavedSession(context, meta.id) ?: chatSyncDownload(context, meta.id)
+            }
+            if (s != null) {
+                val send = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_SUBJECT, s.title)
+                    putExtra(Intent.EXTRA_TEXT, buildTranscript(s.turns).replace("**", ""))
+                }
+                runCatching { context.startActivity(Intent.createChooser(send, "Share chat")) }
+            }
+        }
+    }
+
+    val exportSession: (SessionMeta) -> Unit = { meta ->
+        scope.launch {
+            val s = withContext(Dispatchers.IO) {
+                loadSavedSession(context, meta.id) ?: chatSyncDownload(context, meta.id)
+            }
+            if (s != null) {
+                requestExport(AiExportFormat.DOCX, s.title, text = buildTranscript(s.turns))
+            }
+        }
+    }
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        gesturesEnabled = true,
+        drawerContent = {
+            ModalDrawerSheet(
+                modifier = Modifier.widthIn(max = 360.dp),
+                drawerContainerColor = MaterialTheme.colorScheme.surface
+            ) {
+                SessionHistoryDrawerContent(
+                    sessions = savedSessions,
+                    currentId = sessionId,
+                    onNewChat = {
+                        startNewChat()
+                        closeHistoryDrawer()
+                    },
+                    onLoad = loadHistorySession,
+                    onDelete = deleteHistorySession,
+                    onTogglePin = togglePinSession,
+                    onRename = { meta ->
+                        renameTarget = meta
+                        renameText = meta.title
+                    },
+                    onShare = shareSession,
+                    onExport = exportSession
+                )
+            }
+        }
+    ) {
+        Surface(modifier = modifier.fillMaxSize()) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    val onChatPdf: () -> Unit = { pdfPicker.launch("application/pdf") }
+                    val onPubMed: () -> Unit = {
+                        input = "Validate these references with PubMed:\n"
+                        focusRequester.requestFocus()
+                    }
+                    val onThesisTopics: () -> Unit = {
+                        input = "Search thesis topics on: "
+                        focusRequester.requestFocus()
+                    }
+                    val onCounselor: () -> Unit = {
+                        input = "🎯 Predict my NEET PG colleges: my rank is 12000 in GEN category, want MD Medicine in Karnataka"
+                        focusRequester.requestFocus()
+                    }
+                    val onPoster: () -> Unit = {
+                        input = "Generate a poster from this abstract:\n"
+                        focusRequester.requestFocus()
+                    }
+                    val onChapter: () -> Unit = {
+                        if (pdfContext == null) {
+                            Toast.makeText(context, "First upload a PDF via 📄 Chat with PDF", Toast.LENGTH_SHORT).show()
+                        } else {
+                            input = "Generate the Methodology chapter from my uploaded PDF with a figure, table and chart"
+                            focusRequester.requestFocus()
+                        }
+                    }
+                    val onHistory: () -> Unit = {
+                        scope.launch {
+                            val local = withContext(Dispatchers.IO) { listSavedSessions(context) }
+                            val remote = withContext(Dispatchers.IO) { chatSyncFetchList(context) }
+                            savedSessions = mergeSessionMetas(local, remote)
+                            drawerState.open()
+                        }
+                    }
+                    val onCycleModelMode: () -> Unit = {
+                        modelMode = modelMode.next()
+                        saveAiModelMode(context, modelMode)
+                        Toast.makeText(context, "Model mode: ${modelMode.label}", Toast.LENGTH_SHORT).show()
+                    }
+                    ChatHeader(
+                        onBack = onBack,
+                        onChatPdf = onChatPdf,
+                        onPubMed = onPubMed,
+                        onThesisTopics = onThesisTopics,
+                        onCounselor = onCounselor,
+                        onPoster = onPoster,
+                        onChapter = onChapter,
+                        onHistory = onHistory,
+                        modelModeLabel = modelMode.label,
+                        onCycleModelMode = onCycleModelMode,
+                        pdfContext = pdfContext,
+                        attachment = attachment
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        ToolChip("📄 Chat PDF", onChatPdf)
+                        ToolChip("🔬 PubMed", onPubMed)
+                        ToolChip("🎓 Thesis", onThesisTopics)
+                        ToolChip("🎯 Counselor", onCounselor)
+                        ToolChip("🖼️ Poster", onPoster)
+                        ToolChip("📚 Chapter", onChapter)
+                    }
+
+                    Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                        if (turns.isEmpty() && streamingText == null) {
+                            ChatWelcomeHint(onSuggestion = { input = it })
+                        }
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            turns.forEachIndexed { index, turn ->
+                                item(key = "turn-$index") {
+                                    ChatBubble(
+                                        turn = turn,
+                                        onCopy = { copyAiText(context, turn.content) },
+                                        onExport = { fmt -> requestExport(fmt, aiReplyTitle(turn.content), text = turn.content) },
+                                        onLike = { toggleLike(index) },
+                                        onDislike = { toggleDislike(index) },
+                                        onRegenerate = { regenerate(index) },
+                                        onEdit = { startEdit(index) }
+                                    )
+                                }
+                                // Module cards attach to the turn that produced them, never all at once.
+                                thesisSearch?.takeIf { it.ownerTurn == index }?.let { tState ->
+                                    item(key = "thesis-$index") { ThesisTopicsCard(state = tState, context = context) }
+                                }
+                                counselSearch?.takeIf { it.ownerTurn == index }?.let { cState ->
+                                    item(key = "counsel-$index") { AiCounselorCard(state = cState) }
+                                }
+                                validation?.takeIf { it.ownerTurn == index }?.let { vState ->
+                                    item(key = "pubmed-$index") { CitationValidationCard(state = vState) }
+                                }
+                                // Poster card: a live in-progress/completed generation, or a saved
+                                // poster rehydrated from the persisted session (image + download button).
+                                val livePoster = posterGen?.takeIf { it.ownerTurn == index }
+                                val savedPosterMeta =
+                                    if (livePoster == null) sessionPosters.firstOrNull { it.ownerTurn == index } else null
+                                val savedPosterState = savedPosterMeta?.let { m ->
+                                    val pf = File(chatPostersDir(context), m.file)
+                                    if (pf.exists()) {
+                                        PosterGenState(
+                                            ownerTurn = m.ownerTurn,
+                                            phase = 3,
+                                            note = "",
+                                            data = null,
+                                            imageFile = pf,
+                                            imageUrl = null,
+                                            source = ""
+                                        )
+                                    } else null
+                                }
+                                val posterState = livePoster ?: savedPosterState
+                                posterState?.let { pState ->
+                                    val isSaved = savedPosterMeta != null
+                                    item(key = "poster-$index") {
+                                        PosterGenCard(
+                                            state = pState,
+                                            remaining = if (isSaved) null else posterRemaining,
+                                            onSave = {
+                                                scope.launch {
+                                                    downloadAndSavePoster(
+                                                        context,
+                                                        pState.imageUrl,
+                                                        pState.imageFile,
+                                                        pState.data?.title ?: savedPosterMeta?.title.orEmpty()
+                                                    )
+                                                }
+                                            },
+                                            onRetry = if (isSaved) null else {
+                                                {
+                                                    if (pState.source.isNotBlank()) {
+                                                        posterGen = PosterGenState(ownerTurn = index, source = pState.source, phase = 1, note = "🧠 Retrying poster generation…")
+                                                        scope.launch {
+                                                            posterGen = runPosterGeneration(pState.source) { u -> posterGen = u }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                                chapterGen?.takeIf { it.ownerTurn == index }?.let { cState ->
+                                    item(key = "chapter-$index") {
+                                        ChapterGenCard(
+                                            state = cState,
+                                            onExport = { fmt ->
+                                                val chapter = cState.json
+                                                if (chapter != null) {
+                                                    requestExport(fmt, chapter.chapterName.ifBlank { cState.chapterName }, chapter = chapter)
+                                                } else {
+                                                    Toast.makeText(context, "Chapter data not ready yet", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                            streamingText?.let { partial ->
+                                item(key = "streaming") { StreamingBubble(partial) }
+                            }
+                            if (isThinking) {
+                                item(key = "thinking") { ThinkingBubble() }
+                            }
+                            if (showCompleted) {
+                                item(key = "completed") { CompletedBubble() }
+                            }
+                            if (searchPhase == 1) {
+                                item(key = "searching") { SearchingRow() }
+                            }
+                            val qs = questionSet
+                            if (searchPhase == 2 && qs != null && suggestionOwner == turns.lastIndex) {
+                                item(key = "questions") { QuestionSuggestionBlock(context, qs) }
+                            } else if (searchPhase == 3 && suggestionOwner == turns.lastIndex) {
+                                item(key = "noquestions") { NoQuestionsRow() }
+                            }
+                            val ps = postsResult
+                            if (ps != null && suggestionOwner == turns.lastIndex) {
+                                item(key = "posts") { CommunityPostsCard(context, ps) }
+                            }
+                            val note = enrichmentNote
+                            if (suggestionOwner == turns.lastIndex && (enriching || note.isNotBlank())) {
+                                item(key = "enrichtag") {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
+                                        horizontalArrangement = Arrangement.Start,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        if (enriching) {
+                                            CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp)
+                                            Spacer(modifier = Modifier.size(8.dp))
+                                        }
+                                        Text(
+                                            text = if (note.isNotBlank()) note else "🧠 AI is enriching these questions…",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    PdfStatusChip(
+                        extracting = pdfExtracting,
+                        note = pdfExtractNote,
+                        contextData = pdfContext,
+                        onRemove = { pdfContext = null; pdfExtractNote = ""; pdfAbstracts = null }
+                    )
+
+                    pdfAbstracts?.let { PdfAbstractsCard(state = it) }
+
+                    AttachmentStatusChip(
+                        busy = attachmentBusy,
+                        note = attachmentNote,
+                        attachment = attachment,
+                        onRemove = { attachment = null; attachmentNote = "" }
+                    )
+
+                    if (exportBusy) {
+                        LinearProgressIndicator(
+                            progress = { 0.6f },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    ChatInputBar(
+                        value = input,
+                        onValueChange = { input = it },
+                        enabled = !busy,
+                        canSend = canSend,
+                        onSend = { send() },
+                        canStop = busy,
+                        onStop = { stopGeneration() },
+                        onAttach = {
+                            attachPicker.launch(arrayOf("image/*", "application/pdf", "text/plain", "text/markdown"))
+                        },
+                        focusRequester = focusRequester
+                    )
+                }
+            }
+        }
+    }
+
+    if (showPosterLimitDialog) {
+        AlertDialog(
+            onDismissRequest = { showPosterLimitDialog = false },
+            title = { Text("🎨 Free poster limit reached") },
+            text = {
+                Text(
+                    "You have reached your free poster limit ($POSTER_FREE_LIMIT/$POSTER_FREE_LIMIT).\n\nPurchase credits to generate more posters — every additional poster costs just ₹3 and is billed to your OpenRouter key."
+                )
+            },
+            confirmButton = {
+                Button(onClick = { showPosterLimitDialog = false; showPurchaseDialog = true }) {
+                    Text("Purchase credits")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPosterLimitDialog = false }) { Text("Cancel") }
+            }
+        )
+    }
+
+    if (showPurchaseDialog) {
+        AlertDialog(
+            onDismissRequest = { showPurchaseDialog = false },
+            title = { Text("💳 Poster credits") },
+            text = {
+                Text(
+                    "Credit purchase is coming soon.\n\nFor now, ask the admin to top up your account (poster credits), or contact support to unlock more poster generations."
+                )
+            },
+            confirmButton = {
+                Button(onClick = { showPurchaseDialog = false }) { Text("OK") }
+            }
+        )
+    }
+
+    if (renameTarget != null) {
+        AlertDialog(
+            onDismissRequest = { renameTarget = null },
+            title = { Text("✏️ Rename chat") },
+            text = {
+                OutlinedTextField(
+                    value = renameText,
+                    onValueChange = { renameText = it },
+                    singleLine = true,
+                    label = { Text("Chat title") }
+                )
+            },
+            confirmButton = {
+                Button(onClick = {
+                    renameTarget?.let { renameSession(it, renameText) }
+                    renameTarget = null
+                }) { Text("Save") }
+            },
+            dismissButton = {
+                TextButton(onClick = { renameTarget = null }) { Text("Cancel") }
+            }
+        )
+    }
+}
+
+@Composable
+private fun SessionHistoryDrawerContent(
+    sessions: List<SessionMeta>,
+    currentId: String?,
+    onNewChat: () -> Unit,
+    onLoad: (SessionMeta) -> Unit,
+    onDelete: (SessionMeta) -> Unit,
+    onTogglePin: (SessionMeta) -> Unit,
+    onRename: (SessionMeta) -> Unit,
+    onShare: (SessionMeta) -> Unit,
+    onExport: (SessionMeta) -> Unit
+) {
+    var searchQuery by remember { mutableStateOf("") }
+    var menuFor by remember { mutableStateOf<String?>(null) }
+    Column(modifier = Modifier.fillMaxHeight().fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "💬 Chat History",
+                modifier = Modifier.weight(1f).padding(start = 8.dp),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Button(
+                onClick = onNewChat,
+                modifier = Modifier.padding(end = 8.dp)
+            ) {
+                Text("＋ New chat")
+            }
+        }
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
+            placeholder = { Text("🔍 Search chats…") },
+            singleLine = true,
+            shape = RoundedCornerShape(14.dp)
+        )
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        val filtered = remember(sessions, searchQuery) {
+            if (searchQuery.isBlank()) sessions
+            else sessions.filter { it.title.contains(searchQuery.trim(), ignoreCase = true) }
+        }
+        if (filtered.isEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(40.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "💬", fontSize = 44.sp)
+                Text(
+                    text = if (sessions.isEmpty()) "No previous chats yet" else "No chats match “$searchQuery”",
+                    modifier = Modifier.padding(top = 12.dp),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Your AI Chat conversations are saved automatically so you can come back to them anytime.",
+                    modifier = Modifier.padding(top = 6.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                items(filtered, key = { it.id }) { meta ->
+                    val isCurrent = meta.id == currentId
+                    Surface(
+                        onClick = { onLoad(meta) },
+                        shape = RoundedCornerShape(14.dp),
+                        color = if (isCurrent) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                        else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = (if (meta.pinned) "📌 " else "") + meta.title,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(
+                                    text = runCatching {
+                                        SimpleDateFormat("MMM d, h:mm a", Locale.getDefault()).format(Date(meta.updatedAt))
+                                    }.getOrDefault("") + if (isCurrent) "  •  current" else "",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            IconButton(onClick = { onTogglePin(meta) }) {
+                                Text(
+                                    text = if (meta.pinned) "📍" else "📌",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                            Box {
+                                IconButton(onClick = { menuFor = meta.id }) {
+                                    Icon(
+                                        imageVector = Icons.Default.MoreVert,
+                                        contentDescription = "More",
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = menuFor == meta.id,
+                                    onDismissRequest = { menuFor = null }
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text("✏️ Rename") },
+                                        onClick = { menuFor = null; onRename(meta) }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("📤 Share") },
+                                        onClick = { menuFor = null; onShare(meta) }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("📄 Export as Word") },
+                                        onClick = { menuFor = null; onExport(meta) }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("🗑 Delete") },
+                                        onClick = { menuFor = null; onDelete(meta) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChatHeader(
+    onBack: () -> Unit,
+    onChatPdf: () -> Unit,
+    onPubMed: () -> Unit,
+    onThesisTopics: () -> Unit,
+    onCounselor: () -> Unit,
+    onPoster: () -> Unit,
+    onChapter: () -> Unit,
+    onHistory: () -> Unit,
+    modelModeLabel: String = "",
+    onCycleModelMode: () -> Unit = {},
+    pdfContext: PdfChatContext? = null,
+    attachment: AttachmentContext? = null
+) {
+    var showToolsMenu by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .statusBarsPadding()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            Row(
+                modifier = Modifier.weight(1f).padding(start = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(text = "MG", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    }
+                }
+                Column(modifier = Modifier.padding(start = 12.dp)) {
+                    Text(
+                        text = "Medigyaan AI",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF4CAF50))
+                        )
+                        Text(
+                            text = "  Always Active",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                }
+            }
+
+             if (modelModeLabel.isNotBlank()) {
+                 Surface(
+                     onClick = onCycleModelMode,
+                     shape = RoundedCornerShape(16.dp),
+                     color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                     modifier = Modifier.padding(horizontal = 4.dp)
+                 ) {
+                     Text(
+                         text = modelModeLabel,
+                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                         style = MaterialTheme.typography.labelSmall,
+                         color = MaterialTheme.colorScheme.onPrimaryContainer
+                     )
+                 }
+             }
+
+             pdfContext?.let { ctx ->
+                 Surface(
+                     shape = RoundedCornerShape(10.dp),
+                     color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                     modifier = Modifier.padding(horizontal = 4.dp)
+                 ) {
+                     Text(
+                         text = "📄 ${ctx.fileName}",
+                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                         style = MaterialTheme.typography.labelSmall,
+                         color = MaterialTheme.colorScheme.onPrimaryContainer,
+                         maxLines = 1,
+                         overflow = TextOverflow.Ellipsis
+                     )
+                 }
+             }
+
+             attachment?.let { att ->
+                 Surface(
+                     shape = RoundedCornerShape(10.dp),
+                     color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f),
+                     modifier = Modifier.padding(horizontal = 4.dp)
+                 ) {
+                     Text(
+                         text = "📎 ${att.name}",
+                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                         style = MaterialTheme.typography.labelSmall,
+                         color = MaterialTheme.colorScheme.onTertiaryContainer,
+                         maxLines = 1,
+                         overflow = TextOverflow.Ellipsis
+                     )
+                 }
+             }
+
+            IconButton(onClick = onHistory) {
+                Icon(imageVector = Icons.Default.History, contentDescription = "History")
+            }
+
+            Box {
+                IconButton(onClick = { showToolsMenu = true }) {
+                    Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Tools")
+                }
+                DropdownMenu(
+                    expanded = showToolsMenu,
+                    onDismissRequest = { showToolsMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("📄 Chat with PDF") },
+                        onClick = { showToolsMenu = false; onChatPdf() },
+                        leadingIcon = { Icon(Icons.Default.PictureAsPdf, null, Modifier.size(18.dp)) }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("🔬 PubMed Validator") },
+                        onClick = { showToolsMenu = false; onPubMed() },
+                        leadingIcon = { Icon(Icons.Default.Science, null, Modifier.size(18.dp)) }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("🎓 Thesis Topics") },
+                        onClick = { showToolsMenu = false; onThesisTopics() },
+                        leadingIcon = { Icon(Icons.Default.Menu, null, Modifier.size(18.dp)) }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("🎯 AI College Predictor") },
+                        onClick = { showToolsMenu = false; onCounselor() },
+                        leadingIcon = { Icon(Icons.Default.AutoAwesome, null, Modifier.size(18.dp)) }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("🖼️ AI Poster Gen") },
+                        onClick = { showToolsMenu = false; onPoster() },
+                        leadingIcon = { Icon(Icons.Default.Psychology, null, Modifier.size(18.dp)) }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("📚 Chapter Draft") },
+                        onClick = { showToolsMenu = false; onChapter() },
+                        leadingIcon = { Icon(Icons.Default.Menu, null, Modifier.size(18.dp)) }
+                    )
+                }
+            }
+        }
+
+        HorizontalDivider(modifier = Modifier.padding(top = 8.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+    }
+}
+
+@Composable
+private fun ToolChip(label: String, onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f)
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun ChatWelcomeHint(onSuggestion: (String) -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 36.dp, start = 20.dp, end = 20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(text = "🧠", fontSize = 40.sp)
+        Text(
+            text = "How can I help you today?",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            text = "Ask about NEET PG, diseases, drugs — or use the tools above.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        val suggestions = listOf(
+            "Explain typhoid fever presentation and treatment" to "🦠",
+            "Give me 3 PubMed references for dengue fever" to "🔬",
+            "Search thesis topics on diabetes mellitus" to "🎓",
+            "Predict NEET PG colleges: rank 12000, GEN, want MD Medicine in Karnataka" to "🎯",
+            "Generate a poster from this abstract" to "🖼️",
+            "Generate the Discussion chapter from my PDF" to "📚",
+            "Validate these references:" to "✅"
+        )
+        suggestions.chunked(2).forEach { rowItems ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                rowItems.forEach { (text, emoji) ->
+                    SuggestionCard(
+                        text = text,
+                        emoji = emoji,
+                        onClick = { onSuggestion(text) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                if (rowItems.size == 1) Spacer(modifier = Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@Composable
+private fun SuggestionCard(
+    text: String,
+    emoji: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        modifier = modifier.height(92.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(10.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(text = emoji, fontSize = 18.sp)
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun ChatBubble(
+    turn: ChatTurn,
+    onCopy: () -> Unit = {},
+    onExport: (AiExportFormat) -> Unit = {},
+    onLike: () -> Unit = {},
+    onDislike: () -> Unit = {},
+    onRegenerate: () -> Unit = {},
+    onEdit: () -> Unit = {}
+) {
+    val isUser = turn.role == "user"
+    if (isUser) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.End
+        ) {
+            Surface(
+                shape = RoundedCornerShape(18.dp, 18.dp, 2.dp, 18.dp),
+                color = MaterialTheme.colorScheme.primary,
+                tonalElevation = 2.dp,
+                modifier = Modifier.widthIn(max = 300.dp)
+            ) {
+                Text(
+                    text = turn.content,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp)
+                )
+            }
+            Row(
+                modifier = Modifier.padding(top = 4.dp, end = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    text = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date()),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                ReplyActionChip("✏️ Edit", onEdit)
+            }
+        }
+    } else {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                modifier = Modifier.size(32.dp).padding(top = 2.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(text = "AI", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+                }
+            }
+            Surface(
+                shape = RoundedCornerShape(2.dp, 18.dp, 18.dp, 18.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant),
+                modifier = Modifier.weight(1f).widthIn(max = 340.dp)
+            ) {
+                Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
+                    AiRichText(
+                        text = turn.content,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodyMedium,
+                        lineHeight = 22.sp
+                    )
+                    // Every normal AI reply gets copy / export / feedback / regenerate actions.
+                    ReplyActionRow(
+                        feedback = turn.feedback,
+                        onCopy = onCopy,
+                        onExport = onExport,
+                        onLike = onLike,
+                        onDislike = onDislike,
+                        onRegenerate = onRegenerate,
+                        modifier = Modifier.padding(top = 6.dp)
+                    )
+                    if (turn.responseTimeMs > 0) {
+                        Text(
+                            text = "⚡ ${turn.responseTimeMs}ms",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** Compact action chips under every assistant reply: feedback, regenerate, copy, exports. */
+@Composable
+private fun ReplyActionRow(
+    feedback: Int,
+    onCopy: () -> Unit,
+    onExport: (AiExportFormat) -> Unit,
+    onLike: () -> Unit,
+    onDislike: () -> Unit,
+    onRegenerate: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        ReplyActionChip(if (feedback == 1) "👍 Liked" else "👍", onLike, active = feedback == 1)
+        ReplyActionChip(if (feedback == -1) "👎 Disliked" else "👎", onDislike, active = feedback == -1)
+        ReplyActionChip("🔄 Regenerate", onRegenerate)
+        ReplyActionChip("📋 Copy", onCopy)
+        AiExportFormat.entries.forEach { format ->
+            ReplyActionChip(format.label, { onExport(format) })
+        }
+    }
+}
+
+@Composable
+private fun ReplyActionChip(label: String, onClick: () -> Unit, active: Boolean = false) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(10.dp),
+        color = if (active) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
+        else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+        border = BorderStroke(1.dp, if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+        else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f))
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            style = MaterialTheme.typography.labelSmall,
+            color = if (active) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+/** AI model modes — pick the provider pool used for chat replies (Fast / Balanced / Reasoning). */
+private enum class AiModelMode(val label: String, val provider: String) {
+    FAST("⚡ Fast", "groq"),
+    BALANCED("⚖️ Balanced", "auto"),
+    REASONING("🧠 Reasoning", "deepseek");
+
+    fun next(): AiModelMode = entries[(ordinal + 1) % entries.size]
+}
+
+private const val AI_MODEL_MODE_KEY = "ai_model_mode"
+
+private fun loadAiModelMode(context: Context): AiModelMode =
+    runCatching {
+        AiModelMode.valueOf(
+            context.getSharedPreferences("MY_APP", Context.MODE_PRIVATE)
+                .getString(AI_MODEL_MODE_KEY, "") ?: ""
+        )
+    }.getOrDefault(AiModelMode.BALANCED)
+
+private fun saveAiModelMode(context: Context, mode: AiModelMode) {
+    context.getSharedPreferences("MY_APP", Context.MODE_PRIVATE)
+        .edit().putString(AI_MODEL_MODE_KEY, mode.name).apply()
+}
+
+/** Plain-text transcript of a conversation (used for share / export). */
+private fun buildTranscript(turns: List<ChatTurn>): String = buildString {
+    turns.forEach { t ->
+        if (t.role == "user") append("**You:** ").append(t.content)
+        else append("\n\n**Medigyaan AI:** ").append(t.content)
+        append("\n\n")
+    }
+}
+
+/** Copies an AI reply to the system clipboard. */
+private fun copyAiText(context: Context, text: String) {
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    clipboard.setPrimaryClip(ClipData.newPlainText("AI reply", text))
+    Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+}
+
+/** Short title for an exported reply: first meaningful line, markdown markers stripped. */
+private fun aiReplyTitle(text: String): String {
+    val firstLine = text.lines().firstOrNull { it.isNotBlank() }?.trim()?.replace("**", "") ?: return "AI Reply"
+    val cleaned = firstLine.removePrefix("•").removePrefix("- ").trim().take(60)
+    return cleaned.ifBlank { "AI Reply" }
+}
+
+/** Sanitizes a title into a safe filename segment for the export sheet. */
+private fun sanitizeExportFileName(title: String): String {
+    return title
+        .replace(Regex("[^A-Za-z0-9 _-]"), "")
+        .trim()
+        .replace(Regex("\\s+"), "_")
+        .take(48)
+        .trim('_')
+}
+
+@Composable
+private fun FeatureCard(
+    title: String,
+    icon: ImageVector,
+    initiallyExpanded: Boolean = true,
+    content: @Composable () -> Unit
+) {
+    var expanded by remember { mutableStateOf(initiallyExpanded) }
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.7f)),
+        tonalElevation = 1.dp,
+        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
+    ) {
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = !expanded }
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+                    }
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = if (expanded) "Collapse" else "Expand",
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            AnimatedVisibility(visible = expanded) {
+                Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+                    content()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StreamingBubble(partial: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Surface(
+            shape = RoundedCornerShape(50),
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            modifier = Modifier.size(26.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Text(text = "AI", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+            }
+        }
+        Column(modifier = Modifier.weight(1f).padding(top = 2.dp)) {
+            AiRichText(
+                text = partial + "▌",
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.bodyMedium,
+                lineHeight = 21.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun ThinkingBubble() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Surface(
+            shape = RoundedCornerShape(50),
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            modifier = Modifier.size(26.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Text(text = "AI", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSecondaryContainer)
+            }
+        }
+        Column(modifier = Modifier.padding(top = 4.dp)) {
+            Text(
+                text = "Thinking",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text("●", fontSize = 6.sp, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(start = 4.dp))
+                Text("●", fontSize = 6.sp, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(start = 2.dp))
+                Text("●", fontSize = 6.sp, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(start = 2.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun CompletedBubble() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Surface(
+            shape = RoundedCornerShape(50),
+            color = MaterialTheme.colorScheme.primaryContainer,
+            modifier = Modifier.size(26.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Text(text = "✓", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
+            }
+        }
+        Column(modifier = Modifier.padding(top = 4.dp)) {
+            Text(
+                text = "Completed",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
+private fun SearchingRow() {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+        Spacer(modifier = Modifier.size(8.dp))
+        Text(
+            text = "🔎 Searching the 280k question bank…",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun NoQuestionsRow() {
+    Text(
+        text = "No closely related questions found in the bank for that search.",
+        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
+
+@Composable
+private fun QuestionSuggestionBlock(context: Context, set: QuestionSet) {
+    FeatureCard(
+        title = "Related Questions",
+        icon = Icons.Default.AutoAwesome
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+                text = "Based on “${set.keyword}”",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            set.questions.take(4).forEach { q ->
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            context.startActivity(
+                                Intent(context, MCQActivity::class.java).apply {
+                                    putExtra("question_id", q.id)
+                                    putExtra("SELECTED_SUBJECT", q.subject.ifBlank { set.primarySubject })
+                                }
+                            )
+                        }
+                ) {
+                    Column(modifier = Modifier.padding(10.dp)) {
+                        val labelParts = listOfNotNull(
+                            q.subject.ifBlank { set.primarySubject }.takeIf { it.isNotBlank() },
+                            q.topic.takeIf { it.isNotBlank() }
+                        )
+                        Text(
+                            text = labelParts.joinToString(" · "),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = q.text,
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+
+            Button(
+                onClick = {
+                    context.startActivity(
+                        Intent(context, MCQActivity::class.java).apply {
+                            putIntegerArrayListExtra("QUESTION_ID_LIST", ArrayList(set.testIds))
+                            putExtra("SELECTED_SUBJECT", set.primarySubject)
+                        }
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("▶ Take a practice test (${set.testIds.size} questions)")
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChatInputBar(
+    value: String,
+    onValueChange: (String) -> Unit,
+    enabled: Boolean,
+    canSend: Boolean,
+    onSend: () -> Unit,
+    canStop: Boolean = false,
+    onStop: () -> Unit = {},
+    onAttach: () -> Unit = {},
+    focusRequester: FocusRequester
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .imePadding()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+        Surface(
+            shape = RoundedCornerShape(26.dp),
+            color = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier.padding(start = 14.dp, end = 6.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                IconButton(
+                    onClick = onAttach,
+                    modifier = Modifier.padding(bottom = 4.dp, end = 2.dp)
+                ) {
+                    Text(text = "📎", fontSize = 20.sp)
+                }
+                OutlinedTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    modifier = Modifier.weight(1f).focusRequester(focusRequester),
+                    placeholder = { Text("Ask anything…", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                    maxLines = 4,
+                    enabled = enabled,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                    keyboardActions = KeyboardActions(onSend = { if (canSend) onSend() }),
+                    shape = RoundedCornerShape(26.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Transparent,
+                        unfocusedBorderColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        cursorColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+                if (canStop) {
+                    FilledIconButton(
+                        onClick = onStop,
+                        modifier = Modifier.padding(bottom = 6.dp)
+                    ) {
+                        Text(
+                            text = "■",
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                } else {
+                    FilledIconButton(
+                        onClick = onSend,
+                        enabled = canSend,
+                        modifier = Modifier.padding(bottom = 6.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Send,
+                            contentDescription = "Send"
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CitationValidationCard(state: CitationValidationState) {
+    val total = state.detected.size
+
+    FeatureCard(
+        title = "PubMed Verification",
+        icon = Icons.Default.Science
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            when {
+                state.running && state.results == null -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(
+                                text = state.note.ifBlank { "Checking reference 0/$total" },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    if (total > 0) {
+                        LinearProgressIndicator(
+                            progress = { (state.current.toFloat() / total).coerceIn(0f, 1f) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+
+                state.results != null -> {
+                    val verifiedCount = state.results.count { it.found }
+                    val failedCount = state.results.size - verifiedCount
+                    Text(
+                        text = if (verifiedCount == state.results.size) {
+                            "✅ All $verifiedCount references verified"
+                        } else {
+                            "Verification finished: $verifiedCount verified, $failedCount not found"
+                        },
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    state.results.forEachIndexed { index, r ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 1.dp),
+                            verticalAlignment = Alignment.Top,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            if (r.found) {
+                                Icon(
+                                    imageVector = Icons.Filled.Verified,
+                                    contentDescription = "Verified",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp).padding(top = 1.dp)
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Filled.Warning,
+                                    contentDescription = "Not found",
+                                    tint = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.size(16.dp).padding(top = 1.dp)
+                                )
+                            }
+                            Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                                val preview = r.originalText.lineSequence()
+                                    .map { it.trim().replace(Regex("""^\[?\d+]?\s*[.)-]?\s*"""), "") }
+                                    .filter { it.isNotBlank() }
+                                    .joinToString(" ")
+                                    .let { if (it.length > 90) it.take(90) + "…" else it }
+                                Text(
+                                    text = "${index + 1}. $preview",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = if (r.found) {
+                                        val pmidPart = "PMID: ${r.pmid}"
+                                        "✅ Found · $pmidPart"
+                                    } else {
+                                        "❌ Not found — check details"
+                                    },
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = if (r.found) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.error
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ThesisTopicsCard(state: ThesisSearchState, context: Context) {
+    val results = state.results
+    FeatureCard(
+        title = "Thesis Topics",
+        icon = Icons.Default.Menu // or another relevant icon
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (results == null) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                    Text(
+                        text = state.note,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else if (results.isEmpty()) {
+                Text(
+                    text = "📭 ${state.note}\nNo thesis topics or papers found in the catalog for this topic yet.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
+                results.forEach { result ->
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(10.dp)) {
+                            Text(
+                                text = result.displayTitle,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            if (result.studyType.isNotBlank() || result.difficulty.isNotBlank()) {
+                                Text(
+                                    text = listOfNotNull(
+                                        result.studyType.takeIf { it.isNotBlank() },
+                                        result.difficulty.takeIf { it.isNotBlank() }
+                                    ).joinToString(" · "),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            if (result.snippet.isNotBlank()) {
+                                Text(
+                                    text = result.snippet,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    maxLines = 3,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            if (result.pdfUrl.isNotBlank()) {
+                                OutlinedButton(
+                                    onClick = {
+                                        context.startActivity(
+                                            Intent(Intent.ACTION_VIEW, Uri.parse(result.pdfUrl))
+                                        )
+                                    },
+                                    modifier = Modifier.padding(top = 4.dp),
+                                    shape = RoundedCornerShape(10.dp)
+                                ) {
+                                    Text("📄 Open Paper PDF")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AiCounselorCard(state: CounselState) {
+    Log.i(AI_COUNSEL_TAG, "composing card running=${state.running} results=${state.results?.size ?: -1} err='${state.error.take(80)}'")
+    FeatureCard(title = "NEET PG AI Counselor", icon = Icons.Default.AutoAwesome) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            val results = state.results
+            when {
+                state.running || (results == null && state.error.isBlank()) -> {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                        Text(
+                            text = state.note,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                state.error.isNotBlank() -> {
+                    Text(
+                        text = "⚠ ${state.error}\nTry rephrasing with your rank, category and course, e.g. \"rank 12000 GEN, want MD Medicine in Karnataka\".",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                results.isNullOrEmpty() -> {
+                    Text(
+                        text = "📭 ${state.note}\nNo NEET PG college options found for that query.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                else -> {
+                    if (state.summary.isNotBlank()) {
+                        AiRichText(
+                            text = state.summary,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = 4.dp),
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                        )
+                    }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 420.dp)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        results.forEach { college -> CounselCollegeRow(college = college) }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CounselCollegeRow(college: CounselCollege) {
+    val (badgeColor, badgeText) = when (college.chance.lowercase()) {
+        "dream" -> Color(0xFFC2410C) to Color.White
+        "target" -> Color(0xFF1D4ED8) to Color.White
+        else -> Color(0xFF15803D) to Color.White
+    }
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(10.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = college.course.ifBlank { college.institute },
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f)
+                )
+                if (college.chance.isNotBlank()) {
+                    Surface(shape = RoundedCornerShape(10.dp), color = badgeColor) {
+                        Text(
+                            text = college.chance.uppercase(),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = badgeText
+                        )
+                    }
+                }
+            }
+            if (college.institute.isNotBlank() && college.institute != college.course) {
+                Text(
+                    text = college.institute,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            val meta = listOfNotNull(
+                college.state.takeIf { it.isNotBlank() },
+                college.quota.takeIf { it.isNotBlank() && !it.equals("All India", ignoreCase = true) },
+                college.category.takeIf { it.isNotBlank() },
+                college.year.takeIf { it.isNotBlank() }?.let { y ->
+                    if (college.round.isNotBlank()) "$y round ${college.round}" else y
+                }
+            )
+            if (meta.isNotEmpty()) {
+                Text(
+                    text = meta.joinToString(" · "),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            if (college.closingRank.isNotBlank()) {
+                Text(
+                    text = "Closing Rank: ${college.closingRank}",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            val money = listOfNotNull(
+                college.feePerYear.takeIf { it.isNotBlank() && it != "0" }?.let { "Fee/yr ₹$it" },
+                college.totalFee.takeIf { it.isNotBlank() && it != "0" }?.let { "Total ₹$it" },
+                college.stipendYear1.takeIf { it.isNotBlank() && it != "0" }?.let { "Stipend ₹$it" },
+                college.bondYears.takeIf { it.isNotBlank() && it != "0" }?.let { "Bond $it yr" }
+            )
+            if (money.isNotEmpty()) {
+                Text(
+                    text = money.joinToString(" · "),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PosterGenCard(
+    state: PosterGenState,
+    remaining: Int?,
+    onSave: () -> Unit,
+    onRetry: (() -> Unit)?
+) {
+    FeatureCard(
+        title = "AI Research Poster",
+        icon = Icons.Default.Psychology
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            when {
+                state.phase == 1 || state.phase == 2 -> {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(
+                                text = state.note,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                    LinearProgressIndicator(
+                        progress = { if (state.phase == 1) 0.45f else 0.85f },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                state.phase == 3 -> {
+                    val imageModel: Any? = state.imageUrl?.takeIf { it.isNotBlank() }
+                        ?: state.imageFile?.takeIf { it.exists() }
+
+                    if (imageModel != null) {
+                        AsyncImage(
+                            model = imageModel,
+                            contentDescription = "AI generated poster",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 400.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                        )
+                    }
+                    val d = state.data
+                    if (d != null && (d.title.isNotBlank() || d.sections.isNotEmpty())) {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .padding(10.dp)
+                                    .heightIn(max = 280.dp)
+                                    .verticalScroll(rememberScrollState()),
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                if (d.title.isNotBlank()) {
+                                    Text(
+                                        text = d.title,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                                d.sections.forEach { s ->
+                                    Text(
+                                        text = s.heading,
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    AiRichText(
+                                        text = s.body,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        lineHeight = 17.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(onClick = onSave, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp)) {
+                            Text("💾 Save Poster")
+                        }
+                        if (onRetry != null) {
+                            OutlinedButton(onClick = onRetry, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp)) {
+                                Text("🔄 Regenerate")
+                            }
+                        }
+                    }
+                }
+
+                else -> {
+                    Text(
+                        text = "⚠ ${state.note.ifBlank { "Generation failed" }}",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    if (onRetry != null) {
+                        Button(onClick = onRetry, modifier = Modifier.padding(top = 2.dp), shape = RoundedCornerShape(12.dp)) {
+                            Text("🔄 Try Again")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChapterGenCard(state: ChapterGenState, onExport: (AiExportFormat) -> Unit = {}) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            when {
+                state.phase == 1 -> {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(
+                                text = state.note,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "Using the thesis chapter schema — sections, tables, figures and charts parsed from the JSON reply",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    LinearProgressIndicator(progress = { 0.45f }, modifier = Modifier.fillMaxWidth())
+                }
+
+                state.phase == 2 -> {
+                    val json = state.json
+                    if (json != null) {
+                        Text(
+                            text = "📚 ${json.chapterName.ifBlank { state.chapterName.uppercase() }}",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        json.sections.forEach { section -> ChapterSectionBlock(section) }
+                        json.tables.forEach { table -> ChapterTableBlock(table) }
+                        json.figures.forEach { figure -> ChapterFigureBlock(figure) }
+                        json.charts.forEach { chart -> ChapterChartBlock(chart) }
+                        if (json.abbreviations.isNotEmpty()) {
+                            ChapterMiniBlock(title = "Abbreviations") {
+                                json.abbreviations.forEach { ab ->
+                                    Text(
+                                        text = "${ab.short} = ${ab.full}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                            }
+                        }
+                        if (json.references.isNotEmpty()) {
+                            ChapterMiniBlock(title = "References (${json.references.size})") {
+                                json.references.forEachIndexed { i, r ->
+                                    Text(
+                                        text = "${i + 1}. ${r.referenceText.take(220)}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
+                        if (json.sections.isEmpty() && json.tables.isEmpty() && json.figures.isEmpty() && json.charts.isEmpty()) {
+                            Text(
+                                text = "The chapter was generated but contained no parseable sections. Try asking again with a clearer chapter name.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        // Export the generated chapter: PDF / Word / PowerPoint.
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            AiExportFormat.entries.forEach { format ->
+                                ReplyActionChip(format.label, { onExport(format) })
+                            }
+                        }
+                    } else {
+                        Text(
+                            text = "Chapter ready but no data to show.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                else -> {
+                    Text(
+                        text = "⚠ ${state.note.ifBlank { "Chapter generation failed" }}",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    if (state.error.isNotBlank()) {
+                        Text(
+                            text = state.error.take(300),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChapterSectionBlock(section: ChatSectionJson) {
+    if (section.heading.isBlank() && section.paragraphs.isEmpty() && section.bullets.isEmpty() &&
+        section.numberedPoints.isEmpty() && section.subsections.isEmpty()
+    ) return
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        if (section.heading.isNotBlank()) {
+            Text(
+                text = section.heading,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+        if (section.content.isNotBlank()) {
+            AiRichText(
+                text = section.content,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+                lineHeight = 17.sp
+            )
+        }
+        section.paragraphs.forEach { p ->
+            AiRichText(
+                text = p,
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.bodyMedium,
+                lineHeight = 19.sp
+            )
+        }
+        section.bullets.forEach { b ->
+            AiRichText(
+                text = "• $b",
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.bodySmall,
+                lineHeight = 17.sp
+            )
+        }
+        section.numberedPoints.forEachIndexed { i, p ->
+            AiRichText(
+                text = "${i + 1}. $p",
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.bodySmall,
+                lineHeight = 17.sp
+            )
+        }
+        section.subsections.forEach { sub ->
+            if (sub.heading.isNotBlank()) {
+                Text(
+                    text = sub.heading,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            sub.paragraphs.forEach { p ->
+                AiRichText(
+                    text = p,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 17.sp
+                )
+            }
+        }
+        section.table?.let { ChapterTableBlock(it) }
+        section.figures.forEach { ChapterFigureBlock(it) }
+        if (section.references.isNotEmpty()) {
+            Text(
+                text = "Refs: " + section.references.take(8).joinToString("; ") { it.citation.ifBlank { it.referenceText.take(60) } },
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun ChapterTableBlock(table: ChatTableJson) {
+    if (table.headers.isEmpty() && table.rows.isEmpty()) return
+    Surface(
+        shape = RoundedCornerShape(10.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+        modifier = Modifier.fillMaxWidth().padding(top = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                text = "${table.tableNumber.ifBlank { "Table" }}${if (table.title.isNotBlank()) ": ${table.title}" else ""}",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            if (table.headers.isNotEmpty()) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    table.headers.forEachIndexed { i, h ->
+                        Text(
+                            text = h,
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
+            table.rows.take(30).forEach { row ->
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    val cells = if (row.size >= table.headers.size) row else row + List(table.headers.size - row.size) { "" }
+                    cells.forEach { c ->
+                        Text(
+                            text = c,
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
+            if (table.footnote.isNotBlank()) {
+                Text(
+                    text = table.footnote,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChapterFigureBlock(figure: ChatFigureJson) {
+    if (figure.title.isBlank() && figure.caption.isBlank() && figure.imageSearchQuery.isBlank()) return
+    Surface(
+        shape = RoundedCornerShape(10.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f),
+        modifier = Modifier.fillMaxWidth().padding(top = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(
+                text = "🖼️ Figure ${figure.figureNumber.ifBlank { "" }}${if (figure.title.isNotBlank()) ": ${figure.title}" else ""}",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            if (figure.caption.isNotBlank()) {
+                Text(
+                    text = figure.caption,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            if (figure.imageSearchQuery.isNotBlank()) {
+                Text(
+                    text = "🔎 image: ${figure.imageSearchQuery}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChapterChartBlock(chart: ChatChartJson) {
+    val labels = chart.data.map { it.label }.ifEmpty { chart.labels }
+    val values = chart.data.map { it.value }.ifEmpty { chart.values }
+    if (values.isEmpty() || values.none { !it.isNaN() }) return
+    Surface(
+        shape = RoundedCornerShape(10.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f),
+        modifier = Modifier.fillMaxWidth().padding(top = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                text = "📊 ${chart.title.ifBlank { "Chart" }}",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            MiniChart(type = chart.type, labels = labels, values = values)
+        }
+    }
+}
+
+@Composable
+private fun MiniChart(type: String, labels: List<String>, values: List<Double>) {
+    val nums = values.filter { !it.isNaN() }
+    if (nums.isEmpty()) return
+    val maxV = (nums.maxOrNull() ?: 1.0).coerceAtLeast(0.0001)
+    val total = nums.sum().takeIf { it > 0 } ?: 1.0
+    val t = type.lowercase()
+    val colors = listOf(
+        MaterialTheme.colorScheme.primary,
+        MaterialTheme.colorScheme.tertiary,
+        MaterialTheme.colorScheme.secondary,
+        MaterialTheme.colorScheme.error,
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
+        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.6f)
+    )
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Canvas(modifier = Modifier.fillMaxWidth().height(110.dp)) {
+            val n = nums.size
+            when {
+                t.contains("pie") || t.contains("doughnut") -> {
+                    var start = -90f
+                    nums.forEachIndexed { i, v ->
+                        val sweep = (v / total * 360f).toFloat()
+                        drawArc(color = colors[i % colors.size], startAngle = start, sweepAngle = sweep, useCenter = true)
+                        start += sweep
+                    }
+                }
+                t.contains("line") || t.contains("area") -> {
+                    val stepX = size.width / (n - 1).coerceAtLeast(1)
+                    val pts = nums.mapIndexed { i, v ->
+                        Offset(stepX * i, size.height - (v / maxV * size.height * 0.88f).toFloat())
+                    }
+                    pts.zipWithNext().forEach { (a, b) ->
+                        drawLine(color = colors[0], start = a, end = b, strokeWidth = 4f)
+                    }
+                    pts.forEach { p -> drawCircle(color = colors[1], radius = 5f, center = p) }
+                }
+                else -> {
+                    val barW = size.width / n
+                    nums.forEachIndexed { i, v ->
+                        val h = (v / maxV * size.height * 0.88f).toFloat()
+                        drawRect(
+                            color = colors[i % colors.size],
+                            topLeft = Offset(barW * i + barW * 0.18f, size.height - h),
+                            size = Size(barW * 0.64f, h)
+                        )
+                    }
+                }
+            }
+        }
+        if (labels.isNotEmpty()) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                labels.take(8).forEach { label ->
+                    Text(
+                        text = label,
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChapterMiniBlock(title: String, content: @Composable () -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(10.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f),
+        modifier = Modifier.fillMaxWidth().padding(top = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(8.dp)
+                .heightIn(max = 180.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(3.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            content()
+        }
+    }
+}
+
+@Composable
+private fun PdfStatusChip(
+    extracting: Boolean,
+    note: String,
+    contextData: PdfChatContext?,
+    onRemove: () -> Unit
+) {
+    if (!extracting && contextData == null && note.isBlank()) return
+    Surface(
+        shape = RoundedCornerShape(14.dp),
+        color = if (extracting) MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
+        else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if (extracting) {
+                CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp)
+                Text(
+                    text = note.ifBlank { "Reading PDF…" },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else if (contextData != null) {
+                Text(text = "📄", fontSize = 14.sp)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = contextData.fileName,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = if (contextData.variables.isNotEmpty())
+                            "${contextData.variables.size} variables extracted — AI uses them for answers"
+                        else "PDF loaded — ask a question about it",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                IconButton(
+                    onClick = onRemove,
+                    modifier = Modifier.size(26.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = "Remove PDF",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }            } else {
+                Text(
+                    text = note,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+    }
+}
+
+/** Shows the current attachment (OCR'd image / parsed PDF / text) with a remove button. */
+@Composable
+private fun AttachmentStatusChip(
+    busy: Boolean,
+    note: String,
+    attachment: AttachmentContext?,
+    onRemove: () -> Unit
+) {
+    if (!busy && attachment == null && note.isBlank()) return
+    Surface(
+        shape = RoundedCornerShape(14.dp),
+        color = if (busy) MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
+        else MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.4f),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if (busy) {
+                CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp)
+                Text(
+                    text = note.ifBlank { "Reading attachment…" },
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else if (attachment != null) {
+                Text(text = if (attachment.kind == "image") "🖼" else if (attachment.kind == "pdf") "📄" else "📎", fontSize = 14.sp)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = attachment.name,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = when (attachment.kind) {
+                            "image" -> "🖼 OCR'd — AI will answer from the extracted text"
+                            "pdf" -> "📄 Parsed — AI will answer from the document"
+                            else -> "📎 Loaded — AI will answer from this text"
+                        },
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                IconButton(
+                    onClick = onRemove,
+                    modifier = Modifier.size(26.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = "Remove attachment",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            } else {
+                Text(
+                    text = note,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+    }
+}
+
+
+// ---------------------------------------------------------------- Thesis topics module
+
+/** Detects a "search thesis topics/papers on <topic>" request and returns the topic. */
+private fun detectThesisTopicSearch(text: String): String? {
+    val t = text.trim()
+    if (t.isBlank() || t.length < 6) return null
+    val lower = t.lowercase()
+    val thesisSignal = Regex(
+        """\b(thesis|theses|synopsis|dissertation|paper|papers|research paper|research papers|publication|review paper)\b""",
+        RegexOption.IGNORE_CASE
+    ).containsMatchIn(lower)
+    val searchSignal = Regex(
+        """\b(search|find|look|get|need|show|fetch|list|give)\b""",
+        RegexOption.IGNORE_CASE
+    ).containsMatchIn(lower)
+    val topicMarker = Regex(
+        """\b(on|about|for|regarding|related to|topic|topics|paper on|papers on)\b""",
+        RegexOption.IGNORE_CASE
+    ).containsMatchIn(lower)
+    if (!thesisSignal || !searchSignal || !topicMarker) return null
+
+    // Pull out the topic: "search thesis topics on X" -> X
+    val cleaned = t
+        .replace(Regex("""(?i)\b(search|find|look|get|need|show|fetch|list|give)\b"""), " ")
+        .replace(Regex("""(?i)\b(thesis|theses|synopsis|dissertation|paper|papers|research paper|research papers|publication|review paper|topics?|pdfs?|with pdfs?)\b"""), " ")
+        .replace(Regex("""(?i)\b(on|about|for|regarding|related to|with)\b"""), " ")
+        // "Search thesis topics on: cataract" leaves a colon behind once "on" is removed —
+        // strip it (and other punctuation) or the server gets q=": cataract" -> 0 rows.
+        .replace(Regex("""[?,.!:;]"""), " ")
+        .replace(Regex("""\s+"""), " ")
+        .trim()
+    val topic = cleaned.trim()
+        .let { if (it.length > 2) it else t.replace(Regex("""(?i)\b(search|thesis|topics|papers|pdf|on|about|for)\b"""), " ").replace(Regex("""\s+"""), " ").trim() }
+        .replace(":", " ")
+        .replace(Regex("""\s+"""), " ")
+        .trim(' ', ':', ';', ',', '.', '?', '!', '-', '_')
+    return topic.takeIf { it.length >= 2 }?.take(120)
+}
+
+/** Fetches thesis topics + PDFs from the thesis catalog endpoint. */
+private fun fetchThesisTopics(context: Context, query: String): List<ThesisTopicResult> {
+    val userId = context.getSharedPreferences("MY_APP", Context.MODE_PRIVATE).getInt("user_id", 0)
+    val url = "https://medigyaan.xyz/Neurons/thesis_topics_search.php?q=${URLEncoder.encode(query, "UTF-8")}&limit=15&user_id=$userId"
+    val request = Request.Builder()
+        .url(url)
+        .addHeader("X-App-Signature", "EduLabsRTM_Secure_v1_2026")
+        .addHeader("Accept", "application/json")
+        .get()
+        .build()
+    return try {
+        httpClient.newCall(request).execute().use { response ->
+            val body = response.body?.string().orEmpty()
+            if (!response.isSuccessful) {
+                Log.e(POSTER_LOG_TAG, "thesis topics search HTTP ${response.code}: ${body.take(200)}")
+                return emptyList()
+            }
+            val root = JSONObject(body)
+            if (!root.optBoolean("success", false)) {
+                Log.e(POSTER_LOG_TAG, "thesis topics search failed: ${body.take(200)}")
+                return emptyList()
+            }
+            Log.i(POSTER_LOG_TAG, "thesis topics search '$query' -> ${root.optInt("count", 0)} results")
+            val arr = root.optJSONArray("data") ?: return emptyList()
+            val out = mutableListOf<ThesisTopicResult>()
+            for (i in 0 until arr.length()) {
+                val obj = arr.optJSONObject(i) ?: continue
+                out += ThesisTopicResult(
+                    thesisId = obj.optInt("thesis_id", 0),
+                    subject = obj.optString("subject", ""),
+                    snippet = obj.optString("snippet", ""),
+                    pdfUrl = obj.optString("pdf_url", ""),
+                    studyType = obj.optString("study_type", ""),
+                    difficulty = obj.optString("difficulty", "")
+                )
+            }
+            out
+        }
+    } catch (e: Exception) {
+        emptyList()
+    }
+}
+
+// ---------------------------------------------------------------- NEET PG AI Counselor module
+
+/**
+ * Detects a NEET PG college-counseling request ("predict colleges / counseling at rank X") and
+ * returns the full user text so the server can extract the rank/category/course filters.
+ */
+private fun detectCounselQuery(text: String): String? {
+    val t = text.trim()
+    if (t.isBlank() || t.length < 8) return null
+    val lower = t.lowercase()
+    // Explicit tool trigger (tool chip / suggestion card) always fires.
+    if (t.startsWith("🎯") || lower.startsWith("ai predictor")) return t.take(600)
+    // The user must mention a rank/air number for a meaningful counseling search.
+    val rankSignal = Regex("""\b(rank|air)\b\s*[:#]?\s*\d{1,7}""", RegexOption.IGNORE_CASE).containsMatchIn(lower) ||
+        Regex("""\b\d{3,7}\s+(rank|air)\b""", RegexOption.IGNORE_CASE).containsMatchIn(lower)
+    if (!rankSignal) return null
+    val intentSignal = Regex(
+        """\b(college|colleges|seat|seats|allotment|counsell?ing|counsell?or|predict|predictor|options?|admission|branch|cutoff|md|ms|dnb|mds|diploma)\b""",
+        RegexOption.IGNORE_CASE
+    ).containsMatchIn(lower)
+    return t.take(600).takeIf { intentSignal }
+}
+
+/** Calls the server's NEET PG AI counselor (ai_predictor.php) with the user's natural-language query. */
+private fun fetchCounselorAdvice(context: Context, message: String): CounselorOutcome {
+    Log.i(AI_COUNSEL_TAG, "fetching advice for query (${message.length} chars)")
+    val request = Request.Builder()
+        .url("https://medigyaan.xyz/Neurons/ai_predictor.php")
+        .addHeader("X-App-Signature", "EduLabsRTM_Secure_v1_2026")
+        .addHeader("Content-Type", "application/json")
+        .addHeader("Accept", "application/json")
+        .post(JSONObject().put("message", message).toString().toRequestBody("application/json".toMediaType()))
+        .build()
+    return try {
+        httpClient.newCall(request).execute().use { response ->
+            val respBody = response.body?.string().orEmpty()
+            if (!response.isSuccessful) return CounselorOutcome(error = "Server error (HTTP ${response.code})")
+            val root = JSONObject(respBody)
+            if (!root.optBoolean("success", false)) {
+                return CounselorOutcome(error = root.optString("error", "AI could not understand the query"))
+            }
+            val summary = root.optString("summary", "")
+            val arr = root.optJSONArray("results") ?: JSONArray()
+            val results = mutableListOf<CounselCollege>()
+            for (i in 0 until arr.length()) {
+                val o = arr.optJSONObject(i) ?: continue
+                results += CounselCollege(
+                    institute = o.optString("institute", ""),
+                    course = o.optString("course", ""),
+                    closingRank = o.optString("candidate_rank", ""),
+                    category = o.optString("candidate_category", ""),
+                    quota = o.optString("quota", ""),
+                    state = o.optString("state", ""),
+                    year = o.optString("year", ""),
+                    round = o.optString("round", ""),
+                    feePerYear = o.optString("fee_per_year", ""),
+                    totalFee = o.optString("total_fee", ""),
+                    stipendYear1 = o.optString("stipend_year1", ""),
+                    bondYears = o.optString("bond_years", ""),
+                    chance = o.optString("chance", "")
+                )
+            }
+            if (results.isEmpty()) {
+                return CounselorOutcome(error = "No college options matched. Try adding your rank, category and course.")
+            }
+            CounselorOutcome(summary = summary, results = results)
+        }
+    } catch (e: Exception) {
+        CounselorOutcome(error = e.message ?: "Network error")
+    }
+}
+
+// ---------------------------------------------------------------- Chat-with-PDF module
+
+/** Extracts structured variables from PDF text using the same approach as the Thesis Analyzer. */
+private suspend fun extractPdfVariables(
+    pdfText: String,
+    onChunk: (String) -> Unit = {}
+): List<Variable> {
+    if (pdfText.isBlank()) return emptyList()
+    val chunks = TextChunker.chunkText(pdfText, 8000)
+    val merged = linkedMapOf<String, Variable>()
+    for ((idx, chunk) in chunks.withIndex()) {
+        onChunk("Extracting variables (chunk ${idx + 1}/${chunks.size})…")
+        try {
+            val raw = withContext(Dispatchers.IO) {
+                rotateAiRequest(
+                    messages = listOf(Message("system", PDF_VARIABLE_EXTRACTION_SYSTEM), Message("user", chunk)),
+                    maxTokens = 3500,
+                    source = "ai_chat_pdf_extract"
+                )
+            }
+            parseExtractedVariables(raw).forEach { v ->
+                if (v.name.isNotBlank() && v.value.isNotBlank()) {
+                    val existing = merged[v.name]
+                    merged[v.name] = if (existing == null) v
+                    else existing.copy(value = (existing.value + "\n" + v.value).trim())
+                }
+            }
+        } catch (_: Throwable) {
+        }
+    }
+    return merged.values.toList()
+}
+
+private const val PDF_VARIABLE_EXTRACTION_SYSTEM =
+    "You are an expert medical thesis extractor. From the given thesis text, extract ALL the following variables " +
+            "and provide the complete content (do not truncate or summarise). Preserve headings, numbering, bullets and paragraph breaks. " +
+            "Return ONLY valid JSON in this exact structure: " +
+            "{\"variables\":[{\"variable_name\":\"Title\",\"variable_value\":\"...\"},{\"variable_name\":\"Disease_or_Condition\",\"variable_value\":\"...\"}, " +
+            "{\"variable_name\":\"Study_Design\",\"variable_value\":\"...\"},{\"variable_name\":\"Study_Setting\",\"variable_value\":\"...\"}, " +
+            "{\"variable_name\":\"Study_Population\",\"variable_value\":\"...\"},{\"variable_name\":\"Sample_Size\",\"variable_value\":\"...\"}, " +
+            "{\"variable_name\":\"Inclusion_Criteria\",\"variable_value\":\"...\"},{\"variable_name\":\"Exclusion_Criteria\",\"variable_value\":\"...\"}, " +
+            "{\"variable_name\":\"Objectives_primary\",\"variable_value\":\"...\"},{\"variable_name\":\"Hypothesis_null\",\"variable_value\":\"...\"}, " +
+            "{\"variable_name\":\"Hypothesis_alternate\",\"variable_value\":\"...\"},{\"variable_name\":\"Data_Collection\",\"variable_value\":\"...\"}, " +
+            "{\"variable_name\":\"Statistical_Analysis\",\"variable_value\":\"...\"},{\"variable_name\":\"Results_text\",\"variable_value\":\"...\"}, " +
+            "{\"variable_name\":\"Discussion_text\",\"variable_value\":\"...\"},{\"variable_name\":\"Limitations\",\"variable_value\":\"...\"}, " +
+            "{\"variable_name\":\"Conclusion_text\",\"variable_value\":\"...\"},{\"variable_name\":\"References_Vancouver\",\"variable_value\":\"numbered Vancouver references exactly as present; preserve PMID and DOI if shown\"}, " +
+            "{\"variable_name\":\"Abstract_structured\",\"variable_value\":\"Background:...\\nAim:...\\nMethods:...\\nResults:...\\nConclusion:...\"}]}. " +
+            "If a variable is not present, omit it (never set empty). Keep variable_name exactly as written. Do not invent PMIDs or DOIs."
+
+private fun parseExtractedVariables(raw: String): List<Variable> {
+    return try {
+        val trimmed = raw.trim()
+            .removePrefix("```json").removePrefix("```").removeSuffix("```")
+            .trim()
+        val first = trimmed.indexOf('{')
+        if (first < 0) return emptyList()
+        val slice = trimmed.substring(first)
+        val obj = JSONObject(slice)
+        val arr = obj.optJSONArray("variables") ?: return emptyList()
+        val out = mutableListOf<Variable>()
+        for (i in 0 until arr.length()) {
+            val item = arr.optJSONObject(i) ?: continue
+            val name = item.optString("variable_name", "").trim()
+            val value = item.optString("variable_value", "").trim()
+            if (name.isNotBlank() && value.isNotBlank()) out += Variable(name, value)
+        }
+        out
+    } catch (e: Exception) {
+        emptyList()
+    }
+}
+
+/** Resolves a display name for the picked PDF. */
+private fun queryPdfDisplayName(resolver: android.content.ContentResolver, uri: Uri): String? {
+    return runCatching {
+        resolver.query(uri, null, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val idx = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                if (idx >= 0) cursor.getString(idx) else null
+            } else null
+        }
+    }.getOrNull()
+}
+
+// ---------------------------------------------------------------- Chat-with-PDF: PubMed abstracts for the extracted references
+
+/** One downloaded PubMed abstract for the uploaded PDF (shown in the chat). */
+private data class PdfAbstractEntry(
+    val pmid: String = "",
+    val title: String = "",
+    val text: String = ""
+)
+
+/** Live state of the Chat-with-PDF reference → abstract enrichment pass. */
+private data class PdfAbstractsState(
+    val running: Boolean = false,
+    val note: String = "",
+    val entries: List<PdfAbstractEntry> = emptyList()
+)
+
+/** Evidence discovery state: find similar articles, download abstracts, merge into context. */
+private data class SimilarArticlesState(
+    val running: Boolean = false,
+    val phase: Int = 0, // 1 finding, 2 downloading, 3 merging, 4 ready
+    val note: String = "",
+    val entries: List<PdfAbstractEntry> = emptyList()
+)
+
+/**
+ * After Chat-with-PDF variable extraction: pulls the extracted reference block, validates the
+ * Vancouver/PubMed citations with the same validator the chat uses, downloads abstracts for every
+ * verified PMID (NCBI efetch), and returns them as extra variables so the next AI reply is grounded
+ * in the real abstracts. Progress is reported through [onState] and shown in the chat.
+ */
+private suspend fun enrichPdfVariablesWithAbstracts(
+    variables: List<Variable>,
+    onState: (PdfAbstractsState) -> Unit
+): List<Variable> {
+    val refsText = variables
+        .filter { v ->
+            val n = v.name.lowercase()
+            n.contains("reference") || n.contains("citation") || n.contains("vancouver") || n.contains("bibliography")
+        }
+        .joinToString("\n") { it.value }
+        .trim()
+    val entries = PubMedCitationValidator.extractCitationEntries(refsText)
+    if (entries.size < 2) {
+        onState(PdfAbstractsState(running = false, note = "No reference list found in the extracted variables."))
+        return emptyList()
+    }
+    onState(PdfAbstractsState(running = true, note = "Verifying ${entries.size} extracted references against PubMed…"))
+    val results = PubMedCitationValidator.validate(entries) { progress ->
+        onState(PdfAbstractsState(running = true, note = progress.status))
+    }
+    val verified = results.filter { it.found && it.pmid.isNotBlank() }
+    if (verified.isEmpty()) {
+        onState(PdfAbstractsState(running = false, note = "None of the extracted references could be verified on PubMed."))
+        return emptyList()
+    }
+    val abstracts = linkedMapOf<String, String>()
+    verified.forEachIndexed { i, r ->
+        onState(PdfAbstractsState(running = true, note = "Downloading abstract ${i + 1}/${verified.size} (PMID ${r.pmid})…"))
+        ThesisArtBridge.fetchAbstract(r.pmid)?.let { abstracts[r.pmid] = it }
+    }
+    val entriesUi = abstracts.map { (pmid, text) ->
+        PdfAbstractEntry(
+            pmid = pmid,
+            title = verified.firstOrNull { it.pmid == pmid }?.articleTitle.orEmpty(),
+            text = text
+        )
+    }
+    onState(
+        PdfAbstractsState(
+            running = false,
+            note = "${entriesUi.size} PubMed abstracts downloaded — added to the PDF context",
+            entries = entriesUi
+        )
+    )
+    return ThesisArtBridge.abstractsToVariables(abstracts)
+}
+
+/** Card that shows the downloaded PubMed abstracts for the uploaded PDF. */
+@Composable
+private fun PdfAbstractsCard(state: PdfAbstractsState, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = "📄 PubMed abstracts",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold
+            )
+            when {
+                state.running -> Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp)
+                    Text(state.note, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                state.entries.isNotEmpty() -> {
+                    Text(state.note, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    state.entries.take(5).forEach { entry ->
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(
+                                    text = "PMID ${entry.pmid}",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                if (entry.title.isNotBlank()) {
+                                    Text(
+                                        entry.title,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontWeight = FontWeight.Medium,
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                                Text(
+                                    text = entry.text.replace(Regex("\\s+"), " ").trim().take(220) + if (entry.text.length > 220) "…" else "",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 4,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                    }
+                    if (state.entries.size > 5) {
+                        Text(
+                            "+ ${state.entries.size - 5} more abstracts",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Text(
+                        text = "These abstracts were added as variables — the next AI reply will use them.",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                else -> Text(
+                    state.note.ifBlank { "No PubMed abstracts downloaded." },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------- PubMed citation validation helpers
+
+/**
+ * Decides whether a PubMed validation run should happen for a finished exchange.
+ *
+ * Triggered when:
+ *  1. the user pasted a citation list AND asked to validate/check/verify it — the pasted list
+ *     itself is validated (no need for the AI to echo it), or
+ *  2. the AI reply contains a numbered reference/citation list AND the user's message asked for
+ *     references/citations/sources (e.g. "give me PubMed references for typhoid fever"), or
+ *  3. the user pasted a list with an explicit validation ask but the AI reply is where a
+ *     canonical list would live (defensive — validates whichever copy looks real).
+ */
+private fun detectCitationList(userText: String, assistantReply: String): DetectedReferences? {
+    // "validate/check these references"
+    val userWantsValidation = Regex(
+        """(?:validate|check|verify|confirm|look\s*up|are\s*these|are\s*the|is\s*this|is\s*that)\b[^\n]{0,90}\b(?:reference|citation|source|pubmed|pmid|doi)\b""",
+        RegexOption.IGNORE_CASE
+    ).containsMatchIn(userText)
+    // "give me / list / provide references..."
+    val userAskingForReferences = Regex(
+        """\b(?:list|give|provide|need|write|format|find|share|suggest|include)\b[^\n]{0,50}\b(?:references|citations|sources|pubmed)\b""",
+        RegexOption.IGNORE_CASE
+    ).containsMatchIn(userText)
+    val userAskedForCitationWork = userWantsValidation || userAskingForReferences
+
+    val userEntries = PubMedCitationValidator.extractCitationEntries(userText)
+    val userHasRealList = PubMedCitationValidator.looksLikeReferenceBlock(userText) && userEntries.size >= 2
+
+    // 1) User pasted a citation list and is asking anything citation-related → validate the pasted list.
+    if (userHasRealList && userAskedForCitationWork) {
+        return DetectedReferences(userEntries, explicitIntent = userWantsValidation)
+    }
+
+    // 2) Explicit ask that did not paste a list → the AI reply is where the list lives.
+    val replyListBlock = referenceListSlice(assistantReply)
+    if (userAskedForCitationWork && PubMedCitationValidator.looksLikeReferenceBlock(replyListBlock)) {
+        val aiEntries = PubMedCitationValidator.extractCitationEntries(replyListBlock)
+        if (aiEntries.size >= 2) return DetectedReferences(aiEntries, explicitIntent = userWantsValidation)
+    }
+    return null
+}
+
+/** Slices a reply down to its numbered reference block (skips intro/outro prose). */
+private fun referenceListSlice(reply: String): String {
+    if (reply.isBlank()) return reply
+    val lines = reply.replace("\r\n", "\n").split("\n")
+    var startIdx = -1
+    for ((index, line) in lines.withIndex()) {
+        val t = line.trim()
+        if (t.equals("References", ignoreCase = true) || t.equals("References:", ignoreCase = true) ||
+            t.equals("REFERENCES", ignoreCase = true) || t.equals("Citations", ignoreCase = true) ||
+            t.equals("Citations:", ignoreCase = true)
+        ) {
+            startIdx = index + 1
+            break
+        }
+        if (Regex("""^\s*\[?\d+]?\s*[.)]\s*[A-ZÀ-Ž]""").containsMatchIn(t)) {
+            startIdx = index
+            break
+        }
+    }
+    if (startIdx < 0) return reply
+    return lines.subList(startIdx, lines.size).joinToString("\n")
+}
+
+/**
+ * Runs the validator for the given detected references.
+ * @param emit invoked on the main thread with the updated immutable state (Compose-safe).
+ */
+private suspend fun runCitationValidation(
+    state: CitationValidationState,
+    emit: (CitationValidationState) -> Unit
+) {
+    try {
+        val results = PubMedCitationValidator.validate(state.detected) { progress ->
+            emit(
+                state.copy(
+                    note = progress.status,
+                    current = progress.current,
+                    total = progress.total
+                )
+            )
+        }
+        emit(
+            state.copy(
+                running = false,
+                note = "PubMed validation complete ${results.count { it.found }}/${results.size}",
+                current = state.detected.size,
+                total = state.detected.size,
+                results = results
+            )
+        )
+    } catch (e: Throwable) {
+        emit(
+            state.copy(
+                running = false,
+                note = "PubMed validation failed: ${e.message ?: "network error"}",
+                results = emptyList()
+            )
+        )
+    }
+}
+
+// ---------------------------------------------------------------- AI + backend
+
+/** Sends the whole conversation (plus uploaded-PDF context) to the AI providers. */
+// ---------------------------------------------------------------- Chapter generation backend
+
+private const val CHAPTER_LOG_TAG = "ChapterGen"
+private const val CHAT_LOG_TAG = "ChatLog"
+
+/**
+ * Appends one JSON line to files/chat_logs/chat_log.jsonl — every user input and
+ * every AI reply (plus full chapter-generation requests/replies) so the exchange
+ * can be pulled with: adb exec-out run-as com.corp.medigyaan cat files/chat_logs/chat_log.jsonl
+ * Mirrors the same JSON to logcat under the "ChatLog" tag.
+ */
+private val chatLogLock = Any()
+
+private fun appendChatLog(context: Context, entry: JSONObject) {
+    try {
+        entry.put("ts", System.currentTimeMillis())
+        synchronized(chatLogLock) {
+            val dir = File(context.filesDir, "chat_logs")
+            if (!dir.exists()) dir.mkdirs()
+            File(dir, "chat_log.jsonl").appendText(entry.toString() + "\n")
+        }
+        Log.i(CHAT_LOG_TAG, entry.toString())
+    } catch (e: Throwable) {
+        Log.e(CHAT_LOG_TAG, "log write failed: ${e.message}")
+    }
+}
+
+// ---------------------------------------------------------------- Persistent chat sessions
+
+
+
+/** A chat session persisted to files/chat_sessions/{id}.json (survives restart / rotation / nav). */
+private data class SavedChatSession(
+    val id: String,
+    val title: String,
+    val createdAt: Long,
+    val updatedAt: Long,
+    val turns: List<ChatTurn>,
+    val pdfName: String = "",
+    val pdfVariables: List<Variable> = emptyList(),
+    val pdfPreview: String = "",
+    val posters: List<SavedPoster> = emptyList(),
+    val pinned: Boolean = false,
+    val savedQuestionSet: QuestionSet? = null,
+    val savedPostSet: PostSet? = null,
+    val savedThesisSearch: ThesisSearchState? = null,
+    val savedCounselSearch: CounselState? = null
+)
+
+private data class SessionMeta(val id: String, val title: String, val updatedAt: Long, val pinned: Boolean = false)
+
+private fun chatSessionsDir(context: Context): File =
+    File(context.filesDir, "chat_sessions").apply { if (!exists()) mkdirs() }
+
+private fun chatPostersDir(context: Context): File =
+    File(context.filesDir, "chat_posters").apply { if (!exists()) mkdirs() }
+
+/** Sniffs PNG/JPEG magic bytes so images are named (and saved) with the right extension/mime. */
+private fun sniffImageExt(bytes: ByteArray): String =
+    if (bytes.size >= 3 && bytes[0] == 0xFF.toByte() && bytes[1] == 0xD8.toByte() && bytes[2] == 0xFF.toByte()) "jpg"
+    else "png"
+
+/** Replaces (or appends) the saved poster entry for a given chat turn. */
+private fun upsertSessionPoster(current: List<SavedPoster>, meta: SavedPoster): List<SavedPoster> =
+    current.filterNot { it.ownerTurn == meta.ownerTurn } + meta
+
+private fun sessionTitleFrom(turns: List<ChatTurn>): String {
+    val first = turns.firstOrNull { it.role == "user" }?.content?.trim().orEmpty()
+    return first.replace(Regex("\\s+"), " ").take(48).ifBlank { "AI Chat" }
+}
+
+private fun saveChatSessionToDisk(context: Context, session: SavedChatSession) {
+    runCatching {
+        val turnsArr = JSONArray()
+        session.turns.forEach { t ->
+            turnsArr.put(JSONObject().put("role", t.role).put("content", t.content).put("feedback", t.feedback))
+        }
+        val varsArr = JSONArray()
+        session.pdfVariables.forEach { v -> varsArr.put(JSONObject().put("name", v.name).put("value", v.value)) }
+        val postersArr = JSONArray()
+        session.posters.forEach { p ->
+            postersArr.put(JSONObject().put("ownerTurn", p.ownerTurn).put("title", p.title).put("file", p.file))
+        }
+        val obj = JSONObject()
+            .put("id", session.id)
+            .put("title", session.title)
+            .put("createdAt", session.createdAt)
+            .put("updatedAt", session.updatedAt)
+            .put("turns", turnsArr)
+            .put("pdfName", session.pdfName)
+            .put("pdfVariables", varsArr)
+            .put("pdfPreview", session.pdfPreview)
+            .put("posters", postersArr)
+            .put("pinned", session.pinned)
+            .put("savedQuestionSet", session.savedQuestionSet?.let { q ->
+                val questionsArr = JSONArray()
+                q.questions.forEach { r ->
+                    questionsArr.put(JSONObject().put("id", r.id).put("text", r.text).put("explanation", r.explanation).put("topic", r.topic).put("subject", r.subject))
+                }
+                val testIdsArr = JSONArray()
+                q.testIds.forEach { testIdsArr.put(it) }
+                JSONObject()
+                    .put("keyword", q.keyword)
+                    .put("questions", questionsArr)
+                    .put("testIds", testIdsArr)
+                    .put("primarySubject", q.primarySubject)
+            })
+            .put("savedPostSet", session.savedPostSet?.let { p ->
+                val postsArr = JSONArray()
+                p.posts.forEach { post ->
+                    val imagesArr = JSONArray()
+                    post.images.forEach { imagesArr.put(it) }
+                    postsArr.put(JSONObject().put("postId", post.postId).put("author", post.author).put("authorPhoto", post.authorPhoto)
+                        .put("caption", post.caption).put("images", imagesArr)
+                        .put("likes", post.likes).put("uploadDate", post.uploadDate))
+                }
+                JSONObject()
+                    .put("keyword", p.keyword)
+                    .put("posts", postsArr)
+            })
+            .put("savedThesisSearch", session.savedThesisSearch?.let { t ->
+                val resultsArr = t.results?.let { results ->
+                    val arr = JSONArray()
+                    results.forEach { r ->
+                        arr.put(JSONObject().put("thesisId", r.thesisId).put("subject", r.subject).put("snippet", r.snippet)
+                            .put("pdfUrl", r.pdfUrl).put("studyType", r.studyType).put("difficulty", r.difficulty))
+                    }
+                    arr
+                }
+                JSONObject()
+                    .put("ownerTurn", t.ownerTurn)
+                    .put("query", t.query)
+                    .put("note", t.note)
+                    .put("results", resultsArr)
+            })
+            .put("savedCounselSearch", session.savedCounselSearch?.let { c ->
+                val resultsArr = c.results?.let { results ->
+                    val arr = JSONArray()
+                    results.forEach { r ->
+                        arr.put(JSONObject().put("institute", r.institute).put("course", r.course).put("closingRank", r.closingRank)
+                            .put("category", r.category).put("quota", r.quota).put("state", r.state).put("year", r.year)
+                            .put("round", r.round).put("feePerYear", r.feePerYear).put("totalFee", r.totalFee)
+                            .put("stipendYear1", r.stipendYear1).put("bondYears", r.bondYears).put("chance", r.chance))
+                    }
+                    arr
+                }
+                JSONObject()
+                    .put("ownerTurn", c.ownerTurn)
+                    .put("query", c.query)
+                    .put("note", c.note)
+                    .put("summary", c.summary)
+                    .put("results", resultsArr)
+            })
+        File(chatSessionsDir(context), "${session.id}.json").writeText(obj.toString())
+    }
+}
+
+private fun listSavedSessions(context: Context): List<SessionMeta> {
+    val dir = chatSessionsDir(context)
+    return dir.listFiles { f -> f.name.endsWith(".json") }?.mapNotNull { f ->
+        runCatching {
+            val obj = JSONObject(f.readText())
+            SessionMeta(
+                obj.optString("id", f.name.removeSuffix(".json")),
+                obj.optString("title", "AI Chat"),
+                obj.optLong("updatedAt", f.lastModified()),
+                obj.optBoolean("pinned", false)
+            )
+        }.getOrNull()
+    }?.sortedByDescending { it.updatedAt } ?: emptyList()
+}
+
+private fun loadSavedSession(context: Context, id: String): SavedChatSession? = runCatching {
+    val f = File(chatSessionsDir(context), "$id.json")
+    if (!f.exists()) return null
+    val obj = JSONObject(f.readText())
+    val turns = obj.optJSONArray("turns")?.let { arr ->
+        (0 until arr.length()).mapNotNull { i ->
+            val t = arr.optJSONObject(i) ?: return@mapNotNull null
+            ChatTurn(t.optString("role", "user"), t.optString("content", ""), t.optInt("feedback", 0))
+        }
+    } ?: emptyList()
+    val vars = obj.optJSONArray("pdfVariables")?.let { arr ->
+        (0 until arr.length()).mapNotNull { i ->
+            val v = arr.optJSONObject(i) ?: return@mapNotNull null
+            Variable(v.optString("name"), v.optString("value"))
+        }
+    } ?: emptyList()
+    val posters = obj.optJSONArray("posters")?.let { arr ->
+        (0 until arr.length()).mapNotNull { i ->
+            val p = arr.optJSONObject(i) ?: return@mapNotNull null
+            SavedPoster(p.optInt("ownerTurn", -1), p.optString("title", ""), p.optString("file", ""))
+                .takeIf { it.ownerTurn >= 0 && it.file.isNotBlank() }
+        }
+    } ?: emptyList()
+    val savedQuestionSet = obj.optJSONObject("savedQuestionSet")?.let { q ->
+        val questions = q.optJSONArray("questions")?.let { arr ->
+            (0 until arr.length()).mapNotNull { i ->
+                val r = arr.optJSONObject(i) ?: return@mapNotNull null
+                RelatedQuestion(
+                    id = r.optInt("id", 0),
+                    text = r.optString("text", ""),
+                    subject = r.optString("subject", ""),
+                    topic = r.optString("topic", ""),
+                    explanation = r.optString("explanation", "")
+                )
+            }
+        } ?: emptyList()
+        val testIds = q.optJSONArray("testIds")?.let { arr ->
+            (0 until arr.length()).mapNotNull { i -> arr.optInt(i) }
+        } ?: emptyList()
+        QuestionSet(
+            keyword = q.optString("keyword", ""),
+            questions = questions,
+            testIds = testIds,
+            primarySubject = q.optString("primarySubject", "")
+        )
+    }
+    val savedPostSet = obj.optJSONObject("savedPostSet")?.let { p ->
+        val posts = p.optJSONArray("posts")?.let { arr ->
+            (0 until arr.length()).mapNotNull { i ->
+                val post = arr.optJSONObject(i) ?: return@mapNotNull null
+                val images = post.optJSONArray("images")?.let { imgArr ->
+                    (0 until imgArr.length()).mapNotNull { j -> imgArr.optString(j) }
+                } ?: emptyList()
+                CommunityPost(
+                    postId = post.optInt("postId", 0),
+                    author = post.optString("author", ""),
+                    authorPhoto = post.optString("authorPhoto", ""),
+                    caption = post.optString("caption", ""),
+                    images = images,
+                    likes = post.optInt("likes", 0),
+                    uploadDate = post.optString("uploadDate", "")
+                )
+            }
+        } ?: emptyList()
+        PostSet(keyword = p.optString("keyword", ""), posts = posts)
+    }
+    val savedThesisSearch = obj.optJSONObject("savedThesisSearch")?.let { t ->
+        val results = t.optJSONArray("results")?.let { arr ->
+            (0 until arr.length()).mapNotNull { i ->
+                val r = arr.optJSONObject(i) ?: return@mapNotNull null
+                ThesisTopicResult(
+                    thesisId = r.optInt("thesisId", 0),
+                    subject = r.optString("subject", ""),
+                    snippet = r.optString("snippet", ""),
+                    pdfUrl = r.optString("pdfUrl", ""),
+                    studyType = r.optString("studyType", ""),
+                    difficulty = r.optString("difficulty", "")
+                )
+            }
+        }
+        ThesisSearchState(
+            ownerTurn = t.optInt("ownerTurn", 0),
+            query = t.optString("query", ""),
+            note = t.optString("note", ""),
+            results = results
+        )
+    }
+    val savedCounselSearch = obj.optJSONObject("savedCounselSearch")?.let { c ->
+        val results = c.optJSONArray("results")?.let { arr ->
+            (0 until arr.length()).mapNotNull { i ->
+                val r = arr.optJSONObject(i) ?: return@mapNotNull null
+                CounselCollege(
+                    institute = r.optString("institute", ""),
+                    course = r.optString("course", ""),
+                    closingRank = r.optString("closingRank", ""),
+                    category = r.optString("category", ""),
+                    quota = r.optString("quota", ""),
+                    state = r.optString("state", ""),
+                    year = r.optString("year", ""),
+                    round = r.optString("round", ""),
+                    feePerYear = r.optString("feePerYear", ""),
+                    totalFee = r.optString("totalFee", ""),
+                    stipendYear1 = r.optString("stipendYear1", ""),
+                    bondYears = r.optString("bondYears", ""),
+                    chance = r.optString("chance", "")
+                )
+            }
+        }
+        CounselState(
+            ownerTurn = c.optInt("ownerTurn", 0),
+            query = c.optString("query", ""),
+            note = c.optString("note", ""),
+            summary = c.optString("summary", ""),
+            results = results
+        )
+    }
+    SavedChatSession(
+        id = obj.optString("id", id),
+        title = obj.optString("title", "AI Chat"),
+        createdAt = obj.optLong("createdAt"),
+        updatedAt = obj.optLong("updatedAt"),
+        turns = turns.filter { it.content.isNotBlank() },
+        pdfName = obj.optString("pdfName", ""),
+        pdfVariables = vars.filter { it.name.isNotBlank() },
+        pdfPreview = obj.optString("pdfPreview", ""),
+        posters = posters,
+        pinned = obj.optBoolean("pinned", false),
+        savedQuestionSet = savedQuestionSet,
+        savedPostSet = savedPostSet,
+        savedThesisSearch = savedThesisSearch,
+        savedCounselSearch = savedCounselSearch
+    )
+}.getOrNull()
+
+private fun deleteSavedSession(context: Context, id: String) {
+    runCatching { File(chatSessionsDir(context), "$id.json").delete() }
+}
+
+// ------------------------- Cloud backup of chat sessions (persist for all time) -------------------------
+
+private const val CHAT_HISTORY_URL = "https://medigyaan.xyz/Neurons/chat_history.php"
+private val chatSyncMedia = "application/json; charset=utf-8".toMediaType()
+private val chatSyncClient = OkHttpClient.Builder()
+    .connectTimeout(12, TimeUnit.SECONDS)
+    .readTimeout(12, TimeUnit.SECONDS)
+    .writeTimeout(12, TimeUnit.SECONDS)
+    .build()
+private val chatSyncExecutor = java.util.concurrent.Executors.newSingleThreadExecutor { r ->
+    Thread(r, "chat-history-sync").apply { isDaemon = true }
+}
+
+private fun chatUserId(context: Context): Int =
+    context.getSharedPreferences("MY_APP", Context.MODE_PRIVATE).getInt("user_id", 0)
+
+private fun mergeSessionMetas(local: List<SessionMeta>, remote: List<SessionMeta>): List<SessionMeta> {
+    val byId = linkedMapOf<String, SessionMeta>()
+    (local + remote).forEach { meta ->
+        val prev = byId[meta.id]
+        byId[meta.id] = if (prev == null) meta
+        else if (meta.updatedAt > prev.updatedAt) meta.copy(pinned = meta.pinned || prev.pinned)
+        else prev.copy(pinned = prev.pinned || meta.pinned)
+    }
+    return byId.values.sortedWith(compareByDescending<SessionMeta> { it.pinned }.thenByDescending { it.updatedAt })
+}
+
+/** Fire-and-forget upload of the full session to the server (keeps chat forever). */
+private fun chatSyncUpload(context: Context, session: SavedChatSession) {
+    val userId = chatUserId(context)
+    if (userId <= 0) return
+    chatSyncExecutor.execute {
+        try {
+            val turnsArr = JSONArray()
+            session.turns.forEach { t -> turnsArr.put(JSONObject().put("role", t.role).put("content", t.content).put("feedback", t.feedback)) }
+            val varsArr = JSONArray()
+            session.pdfVariables.forEach { v -> varsArr.put(JSONObject().put("name", v.name).put("value", v.value)) }
+            val payload = JSONObject()
+                .put("action", "save")
+                .put("user_id", userId)
+                .put("session_id", session.id)
+                .put("title", session.title)
+                .put("created_at", session.createdAt)
+                .put("updated_at", session.updatedAt)
+                .put("turns", turnsArr)
+                .put("pdf_name", session.pdfName)
+                .put("pdf_variables", varsArr)
+                .put("pdf_preview", session.pdfPreview)
+                .put("pinned", session.pinned)
+            val request = Request.Builder()
+                .url(CHAT_HISTORY_URL)
+                .addHeader("X-App-Signature", "EduLabsRTM_Secure_v1_2026")
+                .post(payload.toString().toRequestBody(chatSyncMedia))
+                .build()
+            runCatching { chatSyncClient.newCall(request).execute().use { it.body?.string() } }
+        } catch (e: Throwable) {
+            Log.d(CHAT_LOG_TAG, "chat sync upload dropped: ${e.message}")
+        }
+    }
+}
+
+/** Blocking fetch of the remote session list (call on Dispatchers.IO). */
+private fun chatSyncFetchList(context: Context): List<SessionMeta> {
+    val userId = chatUserId(context)
+    if (userId <= 0) return emptyList()
+    return runCatching {
+        val url = "$CHAT_HISTORY_URL?action=list&user_id=$userId"
+        val request = Request.Builder().url(url).get().build()
+        chatSyncClient.newCall(request).execute().use { resp ->
+            val obj = JSONObject(resp.body?.string().orEmpty())
+            obj.optJSONArray("sessions")?.let { arr ->
+                (0 until arr.length()).mapNotNull { i ->
+                    val s = arr.optJSONObject(i) ?: return@mapNotNull null
+                    SessionMeta(s.optString("session_id"), s.optString("title", "AI Chat"), s.optLong("updated_at"), s.optBoolean("pinned", false))
+                }
+            } ?: emptyList()
+        }
+    }.getOrElse { emptyList() }
+}
+
+/** Blocking fetch of one full remote session (call on Dispatchers.IO). */
+private fun chatSyncDownload(context: Context, sessionId: String): SavedChatSession? {
+    val userId = chatUserId(context)
+    if (userId <= 0) return null
+    return runCatching {
+        val url = "$CHAT_HISTORY_URL?action=load&user_id=$userId&session_id=${URLEncoder.encode(sessionId, "UTF-8")}"
+        val request = Request.Builder().url(url).get().build()
+        chatSyncClient.newCall(request).execute().use { resp ->
+            val obj = JSONObject(resp.body?.string().orEmpty())
+            if (!obj.optBoolean("success", false)) return@use null
+            val s = obj.optJSONObject("session") ?: return@use null
+            val turns = s.optJSONArray("turns")?.let { arr ->
+                (0 until arr.length()).mapNotNull { i ->
+                    val t = arr.optJSONObject(i) ?: return@mapNotNull null
+                    ChatTurn(t.optString("role", "user"), t.optString("content", ""), t.optInt("feedback", 0))
+                }
+            } ?: emptyList()
+            val vars = s.optJSONArray("pdf_variables")?.let { arr ->
+                (0 until arr.length()).mapNotNull { i ->
+                    val v = arr.optJSONObject(i) ?: return@mapNotNull null
+                    Variable(v.optString("name"), v.optString("value"))
+                }
+            } ?: emptyList()
+            SavedChatSession(
+                id = s.optString("session_id", sessionId),
+                title = s.optString("title", "AI Chat"),
+                createdAt = s.optLong("created_at"),
+                updatedAt = s.optLong("updated_at"),
+                turns = turns.filter { it.content.isNotBlank() },
+                pdfName = s.optString("pdf_name", ""),
+                pdfVariables = vars.filter { it.name.isNotBlank() },
+                pdfPreview = s.optString("pdf_preview", ""),
+                pinned = s.optBoolean("pinned", false)
+            )
+        }
+    }.getOrNull()
+}
+
+/** Fire-and-forget remote delete. */
+private fun chatSyncDelete(context: Context, sessionId: String) {
+    val userId = chatUserId(context)
+    if (userId <= 0) return
+    chatSyncExecutor.execute {
+        runCatching {
+            val url = "$CHAT_HISTORY_URL?action=delete&user_id=$userId&session_id=${URLEncoder.encode(sessionId, "UTF-8")}"
+            chatSyncClient.newCall(Request.Builder().url(url).get().build()).execute().use { it.body?.string() }
+        }
+    }
+}
+
+/**
+ * Chapter catalog: name -> (chapter type, section headings, guidance).
+ * Mirrors the thesis analyzer's default chapter headings so interpretation matches the analyzer.
+ */
+private val CHAT_CHAPTERS: Map<String, Triple<String, List<String>, String>> = mapOf(
+    "introduction" to Triple("CHAPTER_1", listOf("Background", "Problem Statement", "Need for the Study", "Aim", "Objectives", "Scope"),
+        "Build the chapter from broad clinical context to the specific problem. Use a formal thesis tone and avoid filler text."),
+    "background" to Triple("CHAPTER_1", listOf("Epidemiology", "Clinical Relevance", "Current Evidence", "Knowledge Gap"),
+        "Write a clinically grounded background with a clear evidence trail and a polished academic flow."),
+    "disease burden" to Triple("CHAPTER_1", listOf("Global Burden", "National Burden", "Local/Regional Burden", "Clinical Burden", "Public Health Impact", "Disability Adjusted Life Years (DALYs)", "Economic Burden", "Burden Relevance to Thesis"),
+        "Cover magnitude, prevalence, incidence, clinical/public-health burden, disability/mortality, economic burden and local relevance. Never invent statistics; if a statistic is absent from the PDF, describe the burden qualitatively."),
+    "epidemiology" to Triple("CHAPTER_1", listOf("Prevalence", "Incidence", "Age Distribution", "Sex Distribution", "Geographic Distribution", "Risk Groups", "Time Trends", "Epidemiological Determinants", "Local Epidemiological Data"),
+        "Cover prevalence, incidence, age/sex distribution, risk groups, geography, trends and determinants. Cite every factual sentence. Include an epidemiology figure and an epidemiological summary table."),
+    "pathophysiology" to Triple("CHAPTER_1", listOf("Disease Mechanism Overview", "Cellular and Molecular Basis", "Organ System Involvement", "Disease Progression", "Compensatory Mechanisms", "Pathophysiological Basis of Symptoms", "Clinical-Pathological Correlation"),
+        "Explain the disease mechanism from molecular to clinical level. Include a disease mechanism figure with a detailed caption and a mechanism-summary reference table."),
+    "current treatment" to Triple("CHAPTER_1", listOf("Medical Management", "Pharmacological Therapy", "Surgical/Interventional Options", "Treatment Guidelines", "Treatment Algorithms", "Novel/Experimental Therapies", "Treatment Outcomes and Prognosis"),
+        "Cover medical, pharmacological, surgical/interventional options, guidelines, algorithms, novel therapies and outcomes. Include a treatment algorithm figure and a treatment-regimen-outcome table."),
+    "research gap" to Triple("CHAPTER_1", listOf("Existing Evidence", "Identified Gaps", "Unanswered Questions", "Why This Study"), "Write the research gap chapter using only the PDF data."),
+    "need for study" to Triple("CHAPTER_1", listOf("Rationale", "Significance", "Justification", "Potential Impact"), "Write the need-for-study chapter using only the PDF data."),
+    "literature review" to Triple("CHAPTER_2", listOf("Epidemiology", "Risk Factors", "Pathophysiology", "Investigations", "Current Evidence", "Knowledge Gap"),
+        "Review the literature with verified evidence. Add separate figures for epidemiology, risk factors, pathophysiology and investigations with concrete image_search_query values, plus a summary table."),
+    "aim of study" to Triple("CHAPTER_2", listOf("Primary Aim", "Secondary Aims"), "State the aim(s) concisely from the PDF data."),
+    "objectives" to Triple("CHAPTER_2", listOf("Primary Objectives", "Secondary Objectives"), "State the objectives clearly from the PDF data."),
+    "hypothesis" to Triple("CHAPTER_2", listOf("Null Hypothesis", "Alternative Hypothesis"), "State the hypotheses from the PDF data."),
+    "materials and methods" to Triple("CHAPTER_3", listOf("Study Design", "Study Setting", "Study Duration", "Study Population", "Inclusion Criteria", "Exclusion Criteria", "Sample Size", "Sampling Technique", "Data Collection", "Variables Collected", "Investigations", "Study Procedure", "Outcome Measures", "Statistical Analysis"),
+        "Describe the methodology in detail. Include a study design flowchart figure and a variables/measurements table."),
+    "methodology" to Triple("CHAPTER_3", listOf("Study Design", "Study Setting", "Study Duration", "Study Population", "Inclusion Criteria", "Exclusion Criteria", "Sample Size", "Sampling Technique", "Data Collection", "Variables Collected", "Investigations", "Study Procedure", "Outcome Measures", "Statistical Analysis"),
+        "Describe the methodology in detail. Include a study design flowchart figure and a variables/measurements table."),
+    "study design" to Triple("CHAPTER_3", listOf("Type of Study", "Design Rationale", "Comparison Groups"), "Describe the study design from the PDF data. Include a study design flowchart figure."),
+    "study setting" to Triple("CHAPTER_3", listOf("Place of Study", "Duration", "Facilities"), "Describe the study setting from the PDF data."),
+    "study duration" to Triple("CHAPTER_3", listOf("Duration", "Timeline"), "Describe the study duration from the PDF data."),
+    "study population" to Triple("CHAPTER_3", listOf("Source Population", "Target Population"), "Describe the study population from the PDF data."),
+    "inclusion criteria" to Triple("CHAPTER_3", listOf("Inclusion Criteria"), "List the inclusion criteria from the PDF data."),
+    "exclusion criteria" to Triple("CHAPTER_3", listOf("Exclusion Criteria"), "List the exclusion criteria from the PDF data."),
+    "sample size" to Triple("CHAPTER_3", listOf("Sample Size Calculation", "Assumptions", "Final Sample Size"), "Explain the sample size calculation from the PDF data."),
+    "sampling technique" to Triple("CHAPTER_3", listOf("Sampling Method", "Technique Rationale"), "Describe the sampling technique from the PDF data."),
+    "data collection" to Triple("CHAPTER_3", listOf("Data Sources", "Collection Procedure", "Instruments"), "Describe the data collection from the PDF data."),
+    "variables collected" to Triple("CHAPTER_3", listOf("Independent Variables", "Dependent Variables", "Operational Definitions"), "List the variables from the PDF data. Include a variables table."),
+    "investigations" to Triple("CHAPTER_3", listOf("Diagnostic Tests", "Laboratory Investigations", "Imaging", "Interpretation"),
+        "Cover the investigations. Include a diagnostic workflow figure and an investigation-purpose-interpretation table."),
+    "study procedure" to Triple("CHAPTER_3", listOf("Stepwise Procedure", "Flow of Participants"), "Describe the study procedure. Include a procedure flowchart figure."),
+    "outcome measures" to Triple("CHAPTER_3", listOf("Primary Outcomes", "Secondary Outcomes", "Measurement Methods"), "Describe the outcome measures from the PDF data."),
+    "statistical analysis" to Triple("CHAPTER_3", listOf("Statistical Tests", "Software", "Significance Level"), "Describe the statistical analysis from the PDF data."),
+    "ethical considerations" to Triple("CHAPTER_3", listOf("Ethical Approval", "Informed Consent", "Confidentiality", "Declaration of Helsinki"), "Describe the ethical considerations from the PDF data."),
+    "results" to Triple("CHAPTER_4", listOf("Demographic Profile", "Primary Outcome Results", "Secondary Outcome Results", "Subgroup Analysis", "Summary of Findings"),
+        "Present the results with tables and charts for the key numeric findings. Every numeric claim must match the PDF data exactly."),
+    "observations" to Triple("CHAPTER_4", listOf("Observations", "Findings"), "Present the observations with tables and charts from the PDF data."),
+    "discussion" to Triple("CHAPTER_5", listOf("Summary of Findings", "Comparison with Literature", "Mechanisms", "Strengths", "Limitations", "Clinical Implications"),
+        "Discuss the findings against the literature. Include a comparison table when the data supports one."),
+    "conclusion" to Triple("CHAPTER_5", listOf("Conclusion", "Take-home Message"), "Conclude concisely from the PDF data."),
+    "summary" to Triple("CHAPTER_5", listOf("Summary"), "Summarize the chapter content from the PDF data."),
+    "recommendations" to Triple("CHAPTER_5", listOf("Recommendations"), "Give actionable recommendations from the PDF data."),
+    "limitations" to Triple("CHAPTER_5", listOf("Limitations"), "List the limitations from the PDF data."),
+    "future scope" to Triple("CHAPTER_5", listOf("Future Research Directions"), "Describe the future scope from the PDF data."),
+    "abstract" to Triple("CHAPTER_0", listOf("Background", "Aim", "Methods", "Results", "Conclusion", "Keywords"), "Write a structured abstract (max 250 words) with keywords."),
+    "keywords" to Triple("CHAPTER_0", listOf("Keywords"), "List 4-8 keywords.")
+)
+
+/** Builds the JSON schema for a chapter using the same structure as the thesis analyzer's professionalTextSchema. */
+private fun chatChapterSchema(chapterName: String): String {
+    val entry = CHAT_CHAPTERS[chapterName.lowercase().trim()]
+        ?: Triple("CHAPTER_1", listOf("Background", "Aim", "Objectives", "Materials and Methods", "Results", "Discussion", "Conclusion"), "Write the chapter in formal thesis style using only the PDF data.")
+    val (chapterType, sections, guidance) = entry
+    val sectionObjects = sections.joinToString(",\n") { section ->
+        """{"heading":"$section","content":"short section summary [1]","paragraphs":["Paragraph 1 with inline citation [1]","Paragraph 2 with inline citation [2]"],"bullets":["... [1]"],"numbered_points":["... [1]"],"subsections":[{"heading":"...","content":"... [1]"}],"table":{"table_number":"T1","title":"...","headers":["..."],"rows":[["... [1]"]]},"figures":[{"figure_number":"1","title":"...","caption":"...","image_search_query":"..."}],"references":[{"citation":"[1]","reference_text":"Author AA, Author BB. Complete article title. Journal Name. 2020;12(3):123-130. PMID: 12345678. DOI: 10.xxxx/xxxxx","pmid":"12345678","doi":"10.xxxx/xxxxx"}]}"""
+    }
+    return """
+    {
+      "chapter_name": "${chapterName.uppercase()}",
+      "chapter_type": "$chapterType",
+      "sections": [
+$sectionObjects
+      ],
+      "tables": [{"table_number":"T1","title":"...","headers":["..."],"rows":[["..."]],"footnote":"..."}],
+      "figures": [{"figure_number":"1","title":"...","caption":"...","image_search_query":"..."}],
+      "charts": [{"chart_id":"chart_1","title":"...","type":"bar","labels":["..."],"values":[1],"data":[{"label":"...","value":1}]}],
+      "abbreviations": [{"short":"BMI","full":"Body Mass Index"}],
+      "chapter_references": [{"citation":"[1]","reference_text":"Author AA, Author BB. Complete article title. Journal Name. 2020;12(3):123-130. PMID: 12345678. DOI: 10.xxxx/xxxxx","pmid":"12345678","doi":"10.xxxx/xxxxx"}]
+    }
+    """.trimIndent()
+}
+
+/**
+ * Detects a chapter-generation request. Only fires when the user explicitly asks for a chapter
+ * (the word "chapter" or "thesis" plus a chapter name / generation verb), never for plain chat.
+ */
+private fun detectChapterRequest(text: String, pdfContext: PdfChatContext?): String? {
+    if (pdfContext == null || pdfContext.variables.isEmpty()) return null
+    val lower = text.lowercase()
+    val hasChapterWord = Regex("\\bchapter\\b").containsMatchIn(lower)
+    val hasThesisWord = Regex("\\bthesis\\b").containsMatchIn(lower)
+    if (!hasChapterWord && !hasThesisWord) return null
+
+    // 1) "<name> chapter" / "the <name> chapter" — the name sits right before 'chapter'.
+    //    The greedy group can absorb leading words ("generate the discussion"), which
+    //    normalizeChapterName resolves back to the catalog name ("discussion").
+    Regex("([a-z][a-z ]{2,40})\\s+chapter(?=$|[^a-z])").find(lower)?.let { m ->
+        val name = normalizeChapterName(m.groupValues[1].trim())
+        if (name != null && name in CHAT_CHAPTERS) return name
+    }
+    // 2) "chapter: <name>" / "chapter <name>" — catalog names only (avoids junk like
+    //    "chapter from my pdf" being treated as a chapter name).
+    Regex("chapter\\s*:?\\s+([a-z][a-z ]{2,40})(?=$|[.!?])").find(lower)?.let { m ->
+        val name = normalizeChapterName(m.groupValues[1].trim())
+        if (name != null && name in CHAT_CHAPTERS) return name
+    }
+    // 3) "write/generate ... <name>" (needs chapter/thesis word, checked above)
+    for (name in CHAT_CHAPTERS.keys) {
+        val escaped = Regex.escape(name)
+        if (Regex("(?:generate|write|create|draft|make|prepare|produce).{0,30}$escaped").containsMatchIn(lower)) {
+            return name
+        }
+    }
+    return null
+}
+
+private fun normalizeChapterName(raw: String): String? {
+    val t = raw.trim().replace(Regex("\\s+"), " ").removeSuffix("chapter").trim()
+    if (t.isEmpty()) return null
+    // Catalog match (substring-tolerant, so "generate the discussion" -> "discussion").
+    return CHAT_CHAPTERS.keys.firstOrNull { name -> t == name || t.contains(name) || name.contains(t) }
+}
+
+private fun optStringList(o: JSONObject, key: String): List<String> =
+    o.optJSONArray(key)?.let { a -> (0 until a.length()).mapNotNull { i -> a.optString(i).takeIf { it.isNotBlank() } } } ?: emptyList()
+
+private fun parseChatTable(t: JSONObject): ChatTableJson = ChatTableJson(
+    tableNumber = t.optString("table_number"),
+    title = t.optString("title"),
+    headers = optStringList(t, "headers"),
+    rows = t.optJSONArray("rows")?.let { ra ->
+        (0 until ra.length()).mapNotNull { i ->
+            val row = ra.optJSONArray(i) ?: return@mapNotNull null
+            (0 until row.length()).map { j -> row.optString(j) }
+        }
+    } ?: emptyList(),
+    footnote = t.optString("footnote")
+)
+
+private fun parseChatFigures(arr: JSONArray?): List<ChatFigureJson> = arr?.let { a ->
+    (0 until a.length()).mapNotNull { i ->
+        val f = a.optJSONObject(i) ?: return@mapNotNull null
+        ChatFigureJson(f.optString("figure_number"), f.optString("title"), f.optString("caption"), f.optString("image_search_query"))
+    }
+} ?: emptyList()
+
+private fun parseChatReferences(arr: JSONArray?): List<ChatReferenceJson> = arr?.let { a ->
+    (0 until a.length()).mapNotNull { i ->
+        val r = a.optJSONObject(i) ?: return@mapNotNull null
+        ChatReferenceJson(r.optString("citation"), r.optString("reference_text"), r.optString("pmid"), r.optString("doi"))
+    }
+} ?: emptyList()
+
+/** Parses the LLM's JSON reply into a ChatChapterJson using the same keys as the thesis analyzer schemas. */
+private fun parseChatChapter(raw: String): ChatChapterJson {
+    var cleaned = raw.trim()
+    cleaned = cleaned.removePrefix("```json").removePrefix("```").trim()
+    cleaned = cleaned.removeSuffix("```").trim()
+    val obj = JSONObject(cleaned)
+    val sections = obj.optJSONArray("sections")?.let { arr ->
+        (0 until arr.length()).mapNotNull { i ->
+            val s = arr.optJSONObject(i) ?: return@mapNotNull null
+            ChatSectionJson(
+                heading = s.optString("heading"),
+                content = s.optString("content"),
+                paragraphs = optStringList(s, "paragraphs"),
+                bullets = optStringList(s, "bullets"),
+                numberedPoints = optStringList(s, "numbered_points"),
+                subsections = s.optJSONArray("subsections")?.let { sa ->
+                    (0 until sa.length()).mapNotNull { j ->
+                        val sub = sa.optJSONObject(j) ?: return@mapNotNull null
+                        ChatSubsectionJson(sub.optString("heading"), sub.optString("content"), optStringList(sub, "paragraphs"))
+                    }
+                } ?: emptyList(),
+                table = s.optJSONObject("table")?.let { parseChatTable(it) },
+                figures = parseChatFigures(s.optJSONArray("figures")),
+                references = parseChatReferences(s.optJSONArray("references"))
+            )
+        }
+    } ?: emptyList()
+    return ChatChapterJson(
+        chapterName = obj.optString("chapter_name"),
+        chapterType = obj.optString("chapter_type"),
+        sections = sections,
+        tables = obj.optJSONArray("tables")?.let { arr -> (0 until arr.length()).mapNotNull { i -> arr.optJSONObject(i)?.let { parseChatTable(it) } } } ?: emptyList(),
+        figures = parseChatFigures(obj.optJSONArray("figures")),
+        charts = obj.optJSONArray("charts")?.let { arr ->
+            (0 until arr.length()).mapNotNull { i ->
+                val c = arr.optJSONObject(i) ?: return@mapNotNull null
+                ChatChartJson(
+                    chartId = c.optString("chart_id"),
+                    title = c.optString("title"),
+                    type = c.optString("type"),
+                    labels = optStringList(c, "labels"),
+                    values = c.optJSONArray("values")?.let { va ->
+                        (0 until va.length()).mapNotNull { k -> va.optDouble(k).takeIf { !va.isNull(k) } }
+                    } ?: emptyList(),
+                    data = c.optJSONArray("data")?.let { da ->
+                        (0 until da.length()).mapNotNull { k ->
+                            val p = da.optJSONObject(k) ?: return@mapNotNull null
+                            ChatChartPointJson(p.optString("label"), p.optDouble("value"))
+                        }
+                    } ?: emptyList()
+                )
+            }
+        } ?: emptyList(),
+        abbreviations = obj.optJSONArray("abbreviations")?.let { arr ->
+            (0 until arr.length()).mapNotNull { i ->
+                val a = arr.optJSONObject(i) ?: return@mapNotNull null
+                ChatAbbreviationJson(a.optString("short"), a.optString("full"))
+            }
+        } ?: emptyList(),
+        references = parseChatReferences(obj.optJSONArray("chapter_references"))
+    )
+}
+
+private fun chapterWantsFigure(name: String): Boolean = when (name.lowercase().trim()) {
+    "introduction", "background", "disease burden", "epidemiology", "pathophysiology", "current treatment",
+    "literature review", "materials and methods", "methodology", "study design", "investigations",
+    "study procedure", "results", "observations", "discussion" -> true
+    else -> false
+}
+
+private fun chapterWantsTable(name: String): Boolean = when (name.lowercase().trim()) {
+    "literature review", "materials and methods", "methodology", "variables collected", "investigations",
+    "epidemiology", "results", "observations", "discussion", "disease burden", "pathophysiology",
+    "current treatment" -> true
+    else -> false
+}
+
+private fun chapterWantsChart(name: String): Boolean = when (name.lowercase().trim()) {
+    "results", "observations", "epidemiology", "discussion", "disease burden" -> true
+    else -> false
+}
+
+/**
+ * One-shot repair: if the model omitted figures/tables/charts that were requested or that the
+ * chapter type requires, ask it to return the COMPLETE JSON with the missing elements added.
+ */
+private suspend fun repairMissingChapterElements(
+    chapterName: String,
+    userRequest: String,
+    pdfContext: PdfChatContext,
+    schema: String,
+    rawReply: String,
+    parsed: ChatChapterJson,
+    context: Context
+): ChatChapterJson {
+    val lower = userRequest.lowercase()
+    val askedFigure = Regex("\\bfigure\\b|\\bimage\\b|\\bpicture\\b|\\bdiagram\\b").containsMatchIn(lower)
+    val askedTable = Regex("\\btable\\b|\\btabular\\b").containsMatchIn(lower)
+    val askedChart = Regex("\\bchart\\b|\\bgraph\\b|\\bplot\\b|\\bpie\\b|\\bbar\\b").containsMatchIn(lower)
+    val missing = mutableListOf<String>()
+    if (parsed.tables.isEmpty() && (askedTable || chapterWantsTable(chapterName))) missing += "table"
+    if (parsed.charts.isEmpty() && (askedChart || chapterWantsChart(chapterName))) missing += "chart"
+    if (parsed.figures.isEmpty() && (askedFigure || chapterWantsFigure(chapterName))) missing += "figure"
+    if (missing.isEmpty()) return parsed
+    Log.i(CHAPTER_LOG_TAG, "$chapterName missing ${missing.joinToString(", ")} — repair pass")
+
+    val wanted = missing.joinToString(", ") { "at least one $it" }
+    val repairPrompt = buildString {
+        appendLine("You previously generated the \"$chapterName\" thesis chapter as JSON. Your reply is missing: $wanted.")
+        appendLine("Return ONLY the COMPLETE corrected chapter JSON following the same schema (repeated below).")
+        appendLine("Keep ALL existing content identical — including figures/tables/charts/abbreviations/references you already included — and simply ADD the missing element(s). Do not remove anything.")
+        appendLine("- table: {\"table_number\":\"T1\",\"title\":\"...\",\"headers\":[\"...\"],\"rows\":[[\"...\"]],\"footnote\":\"...\"} at top level in `tables` or inside the most relevant section.")
+        appendLine("- figure: {\"figure_number\":\"1\",\"title\":\"...\",\"caption\":\"...\",\"image_search_query\":\"...\"} at top level in `figures` or inside the most relevant section, with 3-5 explanation points in nearby text.")
+        appendLine("- chart: {\"chart_id\":\"chart_1\",\"title\":\"...\",\"type\":\"bar\",\"labels\":[\"...\"],\"values\":[1],\"data\":[{\"label\":\"...\",\"value\":1}]} at top level in `charts`. Type must be bar/line/pie.")
+        appendLine("For numeric values, use the PDF variables when present; otherwise use simple representative values consistent with the chapter text and mark the table/chart title or footnote as illustrative.")
+        appendLine()
+        appendLine("The schema:")
+        appendLine(schema)
+        appendLine()
+        appendLine("Your previous reply (fix it):")
+        appendLine(rawReply.take(40000))
+    }
+    val messages = buildList {
+        pdfContext.contextPrompt().takeIf { it.isNotBlank() }?.let { add(Message("system", it)) }
+        add(Message("user", repairPrompt))
+    }
+    val repairedRaw = try {
+        rotateAiRequest(messages, maxTokens = 8000, source = "ai_chat_chapter_repair")
+    } catch (e: Throwable) {
+        Log.e(CHAPTER_LOG_TAG, "repair pass failed: ${e.message}")
+        appendChatLog(
+            context,
+            JSONObject()
+                .put("type", "chapter_repair_error")
+                .put("chapter_name", chapterName)
+                .put("missing", missing.joinToString(","))
+                .put("error", e.message ?: "repair failed")
+        )
+        return parsed
+    }
+    appendChatLog(
+        context,
+        JSONObject()
+            .put("type", "chapter_repair")
+            .put("chapter_name", chapterName)
+            .put("missing", missing.joinToString(","))
+            .put("repair_prompt", repairPrompt)
+            .put("raw_reply", repairedRaw)
+    )
+    return try {
+        val repaired = parseChatChapter(repairedRaw)
+        // Merge: the model may drop elements it already had while adding the missing ones.
+        // Restore any element type the original had that the repaired reply lost.
+        repaired.copy(
+            tables = repaired.tables.ifEmpty { parsed.tables },
+            charts = repaired.charts.ifEmpty { parsed.charts },
+            figures = repaired.figures.ifEmpty { parsed.figures },
+            abbreviations = repaired.abbreviations.ifEmpty { parsed.abbreviations },
+            references = repaired.references.ifEmpty { parsed.references },
+            sections = repaired.sections.ifEmpty { parsed.sections }
+        )
+    } catch (e: Throwable) {
+        Log.e(CHAPTER_LOG_TAG, "repair parse failed, keeping original: ${e.message}")
+        parsed
+    }
+}
+
+/** Generates a thesis chapter from the uploaded PDF using the matching chapter schema. */
+private suspend fun runChapterGeneration(
+    ownerTurn: Int,
+    chapterName: String,
+    userRequest: String,
+    pdfContext: PdfChatContext,
+    context: Context,
+    onUpdate: (ChapterGenState) -> Unit
+): ChapterGenState {
+    var state = ChapterGenState(ownerTurn = ownerTurn, chapterName = chapterName, phase = 1, note = "📚 Generating the $chapterName chapter from your PDF…")
+    onUpdate(state)
+    return try {
+        val schema = chatChapterSchema(chapterName)
+        val guidance = CHAT_CHAPTERS[chapterName.lowercase().trim()]?.third ?: "Write the chapter in formal thesis style using only the PDF data."
+        val prompt = buildString {
+            appendLine("The user uploaded a thesis PDF and asked you to generate the \"$chapterName\" chapter as a medical thesis chapter.")
+            appendLine("The user's exact request was: \"${userRequest.take(300)}\" — honor any specific elements they asked for (figure, chart, table, section names).")
+            appendLine("Chapter guidance: $guidance")
+            appendLine()
+            appendLine("Return ONLY valid JSON. Do not put markdown fences or prose outside the JSON.")
+            appendLine("Follow this JSON schema exactly:")
+            appendLine(schema)
+            appendLine()
+            appendLine("Rules:")
+            appendLine("- Use only information present in the PDF variables above. Never invent data, statistics, or references.")
+            appendLine("- Write formal thesis-style narrative. Put complete body text in each section's `paragraphs` array; use `content` only as a short summary.")
+            appendLine("- For every factual claim, add inline Vancouver citation labels like [1] in the text.")
+            appendLine("- Add a `figure` whenever a figure naturally supports this chapter (pathology diagram, study design flowchart, treatment algorithm, etc.) with a concrete `image_search_query` that could retrieve the image, and add 3-5 explanatory points about the figure in the nearby text.")
+            appendLine("- Always include at least one `table` whenever tabular data (demographics, investigations, comparisons, results) is present in the PDF.")
+            appendLine("- Always include at least one `chart` (type bar/line/pie) with `labels` and `values` whenever the PDF contains numeric data that can be plotted (age groups, IOP readings, outcome values, percentages).")
+            appendLine("- Include at least 3 entries in `chapter_references` matching the inline citation labels. If you cannot provide a real PMID/DOI, still include the reference with complete `reference_text` and leave `pmid`/`doi` empty rather than inventing them.")
+            appendLine("- Keep section headings exactly as given in the schema. Do not invent extra top-level keys.")
+        }
+        val messages = buildList {
+            pdfContext.contextPrompt().takeIf { it.isNotBlank() }?.let { add(Message("system", it)) }
+            add(Message("user", prompt))
+        }
+        val raw = rotateAiRequest(messages, maxTokens = 8000, source = "ai_chat_chapter")
+        Log.i(CHAPTER_LOG_TAG, "raw chapter reply (${raw.length} chars) for $chapterName")
+        // JSON session log: full chapter request (prompt + schema) and the raw LLM reply.
+        appendChatLog(
+            context,
+            JSONObject()
+                .put("type", "chapter_request")
+                .put("chapter_name", chapterName)
+                .put("pdf", pdfContext.fileName)
+                .put("schema", schema)
+                .put("prompt", prompt)
+                .put("raw_reply", raw)
+        )
+        val json = parseChatChapter(raw)
+        // Repair pass: if the user asked for figures/tables/charts (or the chapter type requires
+        // them) but the model omitted them, ask once to add them to the complete JSON.
+        val finalJson = repairMissingChapterElements(
+            chapterName = chapterName,
+            userRequest = userRequest,
+            pdfContext = pdfContext,
+            schema = schema,
+            rawReply = raw,
+            parsed = json,
+            context = context
+        )
+        state = state.copy(phase = 2, json = finalJson, note = "")
+        onUpdate(state)
+        state
+    } catch (e: Throwable) {
+        Log.e(CHAPTER_LOG_TAG, "chapter generation failed: ${e.message}", e)
+        appendChatLog(
+            context,
+            JSONObject()
+                .put("type", "chapter_error")
+                .put("chapter_name", chapterName)
+                .put("error", e.message ?: "Chapter generation failed")
+                .put("stack", e.stackTraceToString().take(2000))
+        )
+        state = state.copy(phase = 3, error = e.message ?: "Chapter generation failed")
+        onUpdate(state)
+        state
+    }
+}
+
+/**
+ * Skill Router: calls the AI to decide if a specialized skill should be triggered
+ * for the user's input before falling back to normal chat.
+ */
+private suspend fun routeToSkill(text: String, pdfContext: PdfChatContext?): String {
+    val system = """
+        You are an intent router for MediGyaan AI. 
+        Categorize the user's request into exactly one of these categories:
+        - SIMILAR_ARTICLES: asking for more research, similar studies, evidence discovery, or finding more abstracts based on the PDF.
+        - CHAPTER: asking to generate a specific thesis chapter (e.g. introduction, methodology, discussion, epidemiology).
+        - POSTER: asking to generate a scientific poster from an abstract.
+        - THESIS_SEARCH: searching for new thesis topics, project ideas, or research titles.
+        - COUNSELOR: asking about NEET PG ranks, colleges, bonds, or counseling advice.
+        - PUBMED_VALIDATE: asking to check if references/PMIDs mentioned are real.
+        - NONE: a normal chat conversation, general medical question, or follow-up.
+
+        Reply with ONLY the category name.
+    """.trimIndent()
+    val user = "User Input: \"$text\"\nPDF Uploaded: ${pdfContext != null}"
+    return try {
+        rotateAiRequest(
+            listOf(Message("system", system), Message("user", user)),
+            maxTokens = 20,
+            source = "skill_router"
+        ).uppercase().trim().removePrefix("- ").removePrefix("* ")
+    } catch (e: Exception) {
+        "NONE"
+    }
+}
+
+private suspend fun requestAiChat(
+    history: List<ChatTurn>,
+    pdfContext: PdfChatContext?,
+    providerPool: String = "auto",
+    attachmentContext: AttachmentContext? = null
+): String {
+    val messages = buildList {
+        pdfContext?.contextPrompt()?.takeIf { it.isNotBlank() }?.let { prompt ->
+            add(Message("system", prompt))
+        }
+        attachmentContext?.let { att ->
+            add(Message("system", "The user attached ${att.name} (${att.kind}). Its contents:\n${att.text.take(40000)}"))
+        }
+        add(Message("system", AI_CHAT_SYSTEM_PROMPT))
+        history.forEach { add(Message(it.role, it.content)) }
+    }
+    return rotateAiRequest(messages, maxTokens = 2000, source = "ai_chat", providerPool = providerPool)
+}
+
+/** Reads an attachment: images via ML Kit OCR, PDFs via PdfTextExtractor, text via stream. */
+private suspend fun parseAttachment(context: Context, uri: Uri): AttachmentContext? = runCatching {
+    val resolver = context.contentResolver
+    val mime = resolver.getType(uri).orEmpty().lowercase()
+    val name = queryPdfDisplayName(resolver, uri) ?: "attachment"
+    when {
+        mime.startsWith("image/") -> {
+            val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+            try {
+                val result = Tasks.await(recognizer.process(InputImage.fromFilePath(context, uri)))
+                AttachmentContext(name, "image", result.text.trim().take(40000))
+            } finally {
+                recognizer.close()
+            }
+        }
+        mime == "application/pdf" || name.endsWith(".pdf", ignoreCase = true) -> {
+            val text = resolver.openInputStream(uri)?.use { stream ->
+                PdfTextExtractor.extractText(context, stream)
+            }.orEmpty()
+            AttachmentContext(name, "pdf", text.trim().take(40000))
+        }
+        mime.startsWith("text/") -> {
+            val text = resolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) }.orEmpty()
+            AttachmentContext(name, "text", text.trim().take(40000))
+        }
+        else -> null
+    }
+}.getOrNull()
+
+/** Short classification call: returns (topic, subject) guessed for a question. */
+private suspend fun requestTopicLabel(questionText: String): Pair<String, String> {
+    val system = "You classify NEET PG medical MCQs into a concise topic and a medical subject discipline."
+    val user = "Question:\n$questionText\n\nReply with exactly two lines:\nTOPIC: <2-4 word topic, e.g. Glaucoma>\nSUBJECT: <medical discipline, e.g. Ophthalmology>"
+    val raw = rotateAiRequest(
+        listOf(Message("system", system), Message("user", user)),
+        maxTokens = 60,
+        source = "ai_chat_topic_label"
+    )
+    val topic = Regex("""TOPIC:\s*(.+)""", RegexOption.IGNORE_CASE).find(raw)
+        ?.groupValues?.get(1)?.trim().orEmpty()
+    val subject = Regex("""SUBJECT:\s*(.+)""", RegexOption.IGNORE_CASE).find(raw)
+        ?.groupValues?.get(1)?.trim().orEmpty()
+    return topic to subject
+}
+
+/** Shared provider rotation used by chat + topic tagging. */
+private suspend fun rotateAiRequest(
+    messages: List<Message>,
+    maxTokens: Int,
+    source: String = "ai_chat",
+    providerPool: String = "auto"
+): String {
+    val errors = mutableListOf<String>()
+    val triedProviders = mutableSetOf<String>()
+
+    // Runs one candidate; records failures and (for permanent auth errors) cools the
+    // provider down so a dead API key stops blocking every request.
+    suspend fun tryCandidate(candidate: ModelCandidate): String? {
+        val apiKey = when (candidate.provider) {
+            "groq" -> ApiKeys.GROQ_API_KEY
+            "openrouter" -> ApiKeys.OPENROUTER_API_KEY
+            "deepseek" -> ApiKeys.DEEPSEEK_API_KEY
+            "mistral" -> ApiKeys.MISTRAL_API_KEY
+            "cerebras" -> ApiKeys.CEREBRAS_API_KEY
+            else -> ""
+        }.trim()
+        if (apiKey.isBlank()) return null
+        triedProviders += candidate.provider
+
+        val startedAt = System.currentTimeMillis()
+        try {
+            val request = ChatRequest(
+                model = candidate.model,
+                messages = messages,
+                temperature = 0.3,
+                maxTokens = maxTokens
+            )
+            val response = when (candidate.provider) {
+                "groq" -> ApiClient.groqApi.chatCompletion("openai/v1/chat/completions", "Bearer $apiKey", request)
+                "openrouter" -> ApiClient.openRouterApi.chatCompletion("api/v1/chat/completions", "Bearer $apiKey", request)
+                "deepseek" -> ApiClient.deepSeekApi.chatCompletion("chat/completions", "Bearer $apiKey", request)
+                "mistral" -> ApiClient.mistralApi.chatCompletion("v1/chat/completions", "Bearer $apiKey", request)
+                "cerebras" -> ApiClient.cerebrasApi.chatCompletion("v1/chat/completions", "Bearer $apiKey", request)
+                else -> error("Unsupported provider")
+            }
+            val content = response.choices.firstOrNull()?.message?.content?.trim().orEmpty()
+            if (content.isNotBlank()) {
+                // Save the exchange for model training.
+                AiTrainingLogger.log(
+                    source = source,
+                    provider = candidate.provider,
+                    model = candidate.model,
+                    prompt = messages.joinToString("\n\n") { "[${it.role}] ${it.content}" },
+                    response = content,
+                    status = "completed",
+                    durationMs = System.currentTimeMillis() - startedAt
+                )
+                return content
+            }
+            errors += "${candidate.provider}/${candidate.model}: empty response"
+        } catch (e: Throwable) {
+            // Never swallow cancellation (user pressed Stop) — let it propagate.
+            if (e is CancellationException) throw e
+            val msg = e.message ?: "unknown error"
+            errors += "${candidate.provider}/${candidate.model}: $msg"
+            ModelRotator.clearLastSuccessfulIfMatches(candidate.provider, candidate.model)
+            ModelRotator.markFailure(candidate.provider, candidate.model, msg)
+            // Permanent auth failures (invalid/revoked key) should cool the provider down
+            // so it stops being tried first on every request.
+            val lower = msg.lowercase()
+            if (msg.contains("401") || "authentication" in lower || "invalid api key" in lower || "auth failed" in lower) {
+                ModelRotator.markProviderFailure(candidate.provider, "invalid api key")
+            }
+        }
+        return null
+    }
+
+    // 1) Normal rotation (respects last-successful model + provider cooldowns).
+    for (candidate in ModelRotator.buildPool(providerPool)) {
+        if (candidate.provider !in setOf("groq", "openrouter", "deepseek", "mistral", "cerebras")) continue
+        tryCandidate(candidate)?.let { return it }
+    }
+
+    // 2) Emergency fallback — try every remaining provider regardless of cooldown, so a
+    //    single invalid key or cooled-down provider can never produce the generic
+    //    "trouble connecting to my knowledge base" failure reply.
+    val emergencyPool = listOf(
+        ModelCandidate("openrouter", "google/gemini-2.5-flash"),
+        ModelCandidate("groq", "llama-3.3-70b-versatile"),
+        ModelCandidate("cerebras", "llama3.1-70b"),
+        ModelCandidate("mistral", "mistral-large-latest"),
+        ModelCandidate("deepseek", "deepseek-chat")
+    ).filter { it.provider !in triedProviders }
+
+    for (candidate in emergencyPool) {
+        tryCandidate(candidate)?.let { return it }
+    }
+
+    error(errors.joinToString(" | ").ifBlank { "No usable AI provider" })
+}
+
+// ---------------------------------------------------------------- Poster generation backend
+
+/**
+ * Text LLM call restricted to FREE models only (OpenRouter :free pool + Groq free tier).
+ * Used for the poster analysis step — never charges the user.
+ */
+private suspend fun rotateFreeAiRequest(messages: List<Message>, maxTokens: Int, source: String = "ai_chat_poster"): String {
+    val errors = mutableListOf<String>()
+    for (candidate in freeTextCandidates()) {
+        val apiKey = when (candidate.provider) {
+            "openrouter" -> ApiKeys.OPENROUTER_API_KEY
+            "groq" -> ApiKeys.GROQ_API_KEY
+            else -> ""
+        }.trim()
+        if (apiKey.isBlank()) continue
+        val startedAt = System.currentTimeMillis()
+        try {
+            val request = ChatRequest(
+                model = candidate.model,
+                messages = messages,
+                temperature = 0.3,
+                maxTokens = maxTokens
+            )
+            val response = when (candidate.provider) {
+                "openrouter" -> ApiClient.openRouterApi.chatCompletion("api/v1/chat/completions", "Bearer $apiKey", request)
+                "groq" -> ApiClient.groqApi.chatCompletion("openai/v1/chat/completions", "Bearer $apiKey", request)
+                else -> error("Unsupported provider")
+            }
+            val content = response.choices.firstOrNull()?.message?.content?.trim().orEmpty()
+            if (content.isNotBlank()) {
+                AiTrainingLogger.log(
+                    source = source,
+                    provider = candidate.provider,
+                    model = candidate.model,
+                    prompt = messages.joinToString("\n\n") { "[${it.role}] ${it.content}" },
+                    response = content,
+                    status = "completed",
+                    durationMs = System.currentTimeMillis() - startedAt
+                )
+                return content
+            }
+            errors += "${candidate.provider}/${candidate.model}: empty response"
+        } catch (e: Throwable) {
+            errors += "${candidate.provider}/${candidate.model}: ${e.message}"
+        }
+    }
+    error(errors.joinToString(" | ").ifBlank { "No free AI provider available" })
+}
+
+/** Free-only candidate pool: OpenRouter dynamic list filtered to :free + fallbacks, then Groq free tier. */
+private fun freeTextCandidates(): List<ModelCandidate> {
+    val dynamic = ModelRotator.buildPool("openrouter").map { it.model }
+    val orModels = (dynamic + FALLBACK_FREE_OR_MODELS).distinct()
+        .filter { it.contains(":free") || it == "openrouter/free" }
+    val out = mutableListOf<ModelCandidate>()
+    orModels.forEach { out += ModelCandidate("openrouter", it) }
+    GROQ_FREE_MODELS.forEach { out += ModelCandidate("groq", it) }
+    return out
+}
+
+/**
+ * Runs the two-phase poster pipeline: (1) free text LLM builds the complete poster data
+ * from the abstract, (2) the OpenRouter image model renders it as a poster image.
+ * @param emit called on the main thread with the updated immutable state (Compose-safe).
+ */
+private suspend fun runPosterGeneration(
+    abstractSource: String,
+    emit: (PosterGenState) -> Unit
+): PosterGenState {
+    var current = PosterGenState(ownerTurn = -1, source = abstractSource, phase = 1, note = "🧠 Analyzing abstract & building poster data…")
+    emit(current)
+    Log.i(POSTER_LOG_TAG, "phase 1: analyzing abstract (${abstractSource.length} chars)")
+
+    val data = try {
+        val raw = rotateFreeAiRequest(
+            listOf(Message("system", POSTER_ANALYSIS_SYSTEM), Message("user", abstractSource)),
+            maxTokens = 2600,
+            source = "ai_chat_poster_analysis"
+        )
+        Log.i(POSTER_LOG_TAG, "phase 1 done, raw length=${raw.length}")
+        parsePosterAnalysisData(raw)
+    } catch (e: Throwable) {
+        Log.e(POSTER_LOG_TAG, "phase 1 failed", e)
+        current = current.copy(phase = 4, note = "Poster analysis failed", error = e.message ?: "unknown error")
+        emit(current)
+        return current
+    }
+
+    if (data.title.isBlank() && data.sections.isEmpty()) {
+        current = current.copy(phase = 4, note = "Poster analysis failed", error = "The AI returned no usable poster data.")
+        emit(current)
+        return current
+    }
+
+    current = current.copy(phase = 2, note = "🎨 Generating poster image with AI…", data = data)
+    emit(current)
+    Log.i(POSTER_LOG_TAG, "phase 2: generating image (sections=${data.sections.size})")
+
+    val image = try {
+        // generatePosterImage is a blocking OkHttp call — must run off the main thread.
+        withContext(Dispatchers.IO) { generatePosterImage(buildPosterImagePrompt(data)) }
+    } catch (e: Throwable) {
+        Log.e(POSTER_LOG_TAG, "phase 2 failed: ${e.message}", e)
+        current = current.copy(phase = 4, note = "Poster image generation failed", error = e.message ?: "image error", data = data)
+        emit(current)
+        return current
+    }
+
+    current = current.copy(phase = 3, note = "Poster ready", data = data, imageUrl = image.first, imageFile = image.second)
+    emit(current)
+    Log.i(POSTER_LOG_TAG, "phase 3 done: url=${image.first?.take(80)} file=${image.second?.name} exists=${image.second?.exists()}")
+    return current
+}
+
+private const val AI_COUNSEL_TAG = "AiCounselor"
+private const val POSTER_LOG_TAG = "PosterGen"
+
+/** A question's topic needs AI assignment when it is blank or a placeholder like "PG 2020". */
+private fun needsAiTopic(q: RelatedQuestion): Boolean {
+    val t = q.topic.trim()
+    if (t.isEmpty()) return true
+    return Regex("[0-9]{4}|^PG|^Neet|^pg$", RegexOption.IGNORE_CASE).containsMatchIn(t)
+}
+
+/** Old bulk imports used exam names ("NEET PG", "Neet pg 2020") in the subject column. */
+private fun isPaperLikeSubject(subject: String): Boolean {
+    val s = subject.trim().lowercase()
+    return s.isEmpty() || s.contains("neet pg") || Regex("\\d").containsMatchIn(s)
+}
+
+/** Persists an AI-chosen topic (+ optional subject) via update_question_topic.php. */
+private fun postTopicAssignment(questionId: Int, topic: String, subject: String): Boolean = runCatching {
+    val form = okhttp3.FormBody.Builder()
+        .add("question_id", questionId.toString())
+        .add("topic", topic)
+        .add("subject", subject)
+        .build()
+    val request = Request.Builder()
+        .url("https://medigyaan.xyz/Neurons/api/update_question_topic.php")
+        .post(form)
+        .build()
+    httpClient.newCall(request).execute().use { response ->
+        val body = response.body?.string().orEmpty()
+        response.isSuccessful && JSONObject(body).optBoolean("success", false)
+    }
+}.getOrDefault(false)
+
+/** A question needs an AI-written explanation when it is missing or very short (< 100 chars). */
+private fun needsAiExplanation(q: RelatedQuestion): Boolean {
+    val e = q.explanation.trim()
+    return e.isEmpty() || e.length < 100
+}
+
+/**
+ * Short AI call: given the full question and its current (possibly weak/missing)
+ * explanation, returns a brief but complete explanation that teaches the concept.
+ */
+private suspend fun requestExplanation(questionText: String, currentExplanation: String): String {
+    val system = "You are a concise medical teacher. Given an exam MCQ and its current (possibly weak or missing) explanation, write a brief but complete explanation that teaches the concept being tested."
+    val user = buildString {
+        appendLine("Question:")
+        appendLine(questionText)
+        appendLine()
+        append("Current explanation: ")
+        appendLine(currentExplanation.ifBlank { "(none)" })
+        appendLine()
+        append("Write a brief, correct explanation — 1 or 2 clear sentences. Reply with the explanation text only: no labels, no prefixes like 'Explanation:', no extra commentary.")
+    }
+    return rotateAiRequest(
+        listOf(Message("system", system), Message("user", user)),
+        maxTokens = 220,
+        source = "ai_chat_explanation"
+    ).trim()
+}
+
+/** Persists an AI-written explanation via update_question_explanation.php (server keeps existing good ones). */
+private fun postExplanation(questionId: Int, explanation: String): Boolean = runCatching {
+    val form = okhttp3.FormBody.Builder()
+        .add("question_id", questionId.toString())
+        .add("explanation", explanation)
+        .build()
+    val request = Request.Builder()
+        .url("https://medigyaan.xyz/Neurons/api/update_question_explanation.php")
+        .post(form)
+        .build()
+    httpClient.newCall(request).execute().use { response ->
+        val body = response.body?.string().orEmpty()
+        response.isSuccessful && JSONObject(body).optBoolean("success", false)
+    }
+}.getOrDefault(false)
+
+/** Pulls the [SEARCH: keyword] marker the model was asked to append. */
+private fun parseSearchKeyword(raw: String): String? {
+    val regex = Regex("""\[SEARCH:\s*([^\]]{2,80})\]""", RegexOption.IGNORE_CASE)
+    val m = regex.find(raw) ?: return null
+    return m.groupValues[1].trim().trimEnd('.', ',', '!', '?').ifBlank { null }
+}
+
+/**
+ * If the AI forgot its [SEARCH:] marker but the user explicitly asked for question-bank content on a
+ * topic ("search questions on hypertension", "practice mcqs on diabetes", "give me questions about
+ * heart failure"), extract the topic so the 280k-bank search still runs and shows the practice module.
+ */
+private fun explicitQuestionTopic(text: String): String? {
+    val lower = text.lowercase()
+    val hasQuestionWord = Regex(
+        """\b(questions?|mcqs?|quiz|quizzes|pyqs?|question bank|practice test|mock test|test series)\b"""
+    ).containsMatchIn(lower)
+    val hasVerb = Regex(
+        """\b(search|find|give|get|show|fetch|practice|practise|provide|recommend|suggest|need|want|list|ask|pull|send|generate|solve|attempt|take|start|open|repeat|again|another|more|some|any|difficult|tough|hard|easy|previous|recent|latest|new)\b"""
+    ).containsMatchIn(lower)
+    val hasTopicMarker = Regex("""\b(on|about|for|regarding|related to|of|in)\b""").containsMatchIn(lower)
+    val hasCompoundPhrase = Regex(
+        """\b(questions?\s+(on|about|from)|mcqs?\s+(on|about|from)|(practice|pyq|previous year|mock)\s+(questions?|mcqs?))\b"""
+    ).containsMatchIn(lower)
+    if (!hasQuestionWord || !(hasVerb || hasCompoundPhrase) || !hasTopicMarker) return null
+
+    val topic = text
+        .replace(Regex("""(?i)\b(please|can you|could you|i want|i need|want|need|give me|give|get|find|fetch|list|show|search|practice|test|ask|provide|recommend|suggest|some|any|for me|me|question|questions|mcq|mcqs|quiz|quizzes|bank)\b"""), " ")
+        .replace(Regex("""(?i)\b(on|about|for|regarding|related to|of|in)\b"""), " ")
+        .replace(Regex("""[?.,!:"'()]"""), " ")
+        .replace(Regex("""\s+"""), " ")
+        .trim()
+    return topic.takeIf { it.length >= 2 }?.take(120)
+}
+
+/**
+ * Detects an explicit community-posts request in the user's own text ("show posts about
+ * diabetes", "community posts on hypertension") and extracts the topic, so the posts card
+ * still appears when the AI omits its [SEARCH:] marker entirely. Returns null when the
+ * text isn't a posts request or no meaningful topic remains.
+ */
+private fun explicitPostsTopic(text: String): String? {
+    val lower = text.lowercase()
+    val hasPostWord = Regex("""\\b(post|posts|feed)\\b""").containsMatchIn(lower)
+    val hasVerb = Regex("""\\b(search|find|show|fetch|get|see|look|browse|list|display|any|read)\\b""").containsMatchIn(lower)
+    val hasTopicMarker = Regex("""\\b(on|about|for|regarding|related to|of|in)\\b""").containsMatchIn(lower)
+    if (!hasPostWord || !(hasVerb || hasTopicMarker)) return null
+
+    val topic = text
+        .replace(Regex("""(?i)\\b(please|can you|could you|i want|i need|want|need|give me|give|get|find|fetch|list|show|display|browse|see|look|search|read|for me|me|community|post|posts|feed|how|do|does|did|what|where|which)\\b"""), " ")
+        .replace(Regex("""(?i)\\b(on|about|for|regarding|related to|of|in)\\b"""), " ")
+        .replace(Regex("""[?.,!:"'()]"""), " ")
+        .replace(Regex("""\\s+"""), " ")
+        .trim()
+    return topic.takeIf { it.length >= 2 }?.take(120)
+}
+
+/**
+ * A compact medical condition dictionary (NEET PG-weighted) used as a last-resort trigger:
+ * when the AI forgets its [SEARCH:] marker and the user's message names one of these
+ * conditions, the question-bank and community-posts modules fire on that condition.
+ * Multi-word entries collapse common misspellings to a stem (e.g. "typhoid/tifoid/typoid").
+ */
+private val MEDICAL_CONDITIONS: Map<String, List<String>> = mapOf(
+    // ── Cardiovascular ──
+    "myocardial infarction" to listOf("heart attack", "mi", "stemi", "st elevation"),
+    "hypertension" to listOf("high bp", "high blood pressure", "htn", "bp", "b.p"),
+    "heart failure" to listOf("chf", "chd", "congestive cardiac failure", "ccf"),
+    "atrial fibrillation" to listOf("af", "a fib", "afib", "irregular heartbeat"),
+    "rheumatic fever" to listOf("rhd", "rheumatic heart disease"),
+    "infective endocarditis" to listOf("endocarditis"),
+    "pericarditis" to listOf("pericardial effusion"),
+    "angina" to listOf("stable angina", "unstable angina", "coronary artery disease", "cad"),
+    "cardiomyopathy" to listOf("dcm", "hcm", "dilated cardiomyopathy"),
+    "ventricular septal defect" to listOf("vsd"),
+    "atrial septal defect" to listOf("asd"),
+    "tetralogy of fallot" to listOf("tof"),
+    "aortic stenosis" to listOf("as", "aortic regurgitation", "ar", "mitral stenosis", "ms", "mitral regurgitation", "mr"),
+    "deep vein thrombosis" to listOf("dvt"),
+    "pulmonary embolism" to listOf("pe", "embolism"),
+    "varicose veins" to listOf("varicose"),
+    "shock" to listOf("cardiogenic shock", "septic shock", "hypovolemic shock"),
+    "syncope" to listOf("fainting"),
+    // ── Respiratory ──
+    "asthma" to listOf("bronchial asthma", "status asthmaticus"),
+    "copd" to listOf("chronic bronchitis", "emphysema", "chronic obstructive pulmonary"),
+    "pneumonia" to listOf("lobar pneumonia", "bronchopneumonia", "atypical pneumonia"),
+    "tuberculosis" to listOf("tb", "kochs", "koch's", "miliary tb", "pleural effusion"),
+    "lung cancer" to listOf("bronchogenic carcinoma"),
+    "pleural effusion" to listOf("pleurisy", "pleuritis"),
+    "pneumothorax" to listOf("tension pneumothorax"),
+    "bronchiectasis" to listOf("bronchiectatic"),
+    "sarcoidosis" to listOf("sarcoid"),
+    "cystic fibrosis" to listOf("cf"),
+    "respiratory failure" to listOf("ARDS".lowercase(), "acute respiratory distress"),
+    "obstructive sleep apnea" to listOf("osa", "sleep apnoea", "sleep apnea"),
+    "asbestosis" to listOf("pneumoconiosis", "silicosis", "byssinosis", "coal workers"),
+    // ── Gastrointestinal / Hepatic ──
+    "appendicitis" to listOf("appendix"),
+    "cholecystitis" to listOf("gallbladder", "gall bladder", "gallstones", "gall stones", "cholelithiasis"),
+    "pancreatitis" to listOf("pancreas"),
+    "peptic ulcer" to listOf("gastric ulcer", "duodenal ulcer", "h pylori", "helicobacter"),
+    "GERD".lowercase() to listOf("gord", "reflux", "heartburn", "acidity"),
+    "hepatitis" to listOf("hepatitis a", "hepatitis b", "hepatitis c", "jaundice", "hbsag"),
+    "cirrhosis" to listOf("liver cirrhosis"),
+    "hepatocellular carcinoma" to listOf("hcc", "liver cancer"),
+    "crohn disease" to listOf("crohns", "crohn's", "crohn"),
+    "ulcerative colitis" to listOf("uc", "ibd", "inflammatory bowel"),
+    "intestinal obstruction" to listOf("bowel obstruction", "ileus"),
+    "mesenteric ischemia" to listOf("ischemic bowel", "mesenteric ischaemia"),
+    "hemorrhoids" to listOf("piles", "haemorrhoids"),
+    "inguinal hernia" to listOf("hernia", "femoral hernia", "umbilical hernia"),
+    "achalasia" to listOf("achalasia cardia"),
+    "malabsorption" to listOf("celiac", "coeliac", "tropical sprue", "whipple disease"),
+    "colorectal cancer" to listOf("colon cancer", "rectal cancer"),
+    "acute gastroenteritis" to listOf("gastroenteritis", "diarrhea", "diarrhoea", "dysentery", "loose motions"),
+    // ── Renal / Urinary ──
+    "nephrotic syndrome" to listOf("nephrosis"),
+    "nephritic syndrome" to listOf("nephritis", "glomerulonephritis", "agn", "rpgn"),
+    "acute kidney injury" to listOf("aki", "arF".lowercase(), "renal failure", "kidney failure", "ckd", "chronic kidney disease"),
+    "urinary tract infection" to listOf("uti", "cystitis", "pyelonephritis"),
+    "kidney stones" to listOf("renal stone", "nephrolithiasis", "urolithiasis", "renal calculi"),
+    "polycystic kidney" to listOf("pkd", "polycystic kidney disease"),
+    "benign prostatic hyperplasia" to listOf("bph", "prostate enlargement"),
+    "prostate cancer" to listOf("prostatic carcinoma"),
+    "renal cell carcinoma" to listOf("rcc", "hypernephroma"),
+    "uremia" to listOf("uraemia"),
+    // ── Neurology ──
+    "stroke" to listOf("cva", "cerebrovascular accident", "brain stroke", "t ia".replace(" ", ""), "transient ischemic attack"),
+    "epilepsy" to listOf("seizure", "seizures", "fits", "convulsions", "grand mal", "petit mal", "status epilepticus"),
+    "meningitis" to listOf("meningitis"),
+    "encephalitis" to listOf("encephalopathy"),
+    "parkinson disease" to listOf("parkinsons", "parkinson's", "parkinsonism", "pd"),
+    "alzheimer" to listOf("alzheimers", "alzheimer's", "dementia"),
+    "migraine" to listOf("migraine headache"),
+    "cluster headache" to listOf("headache"),
+    "trigeminal neuralgia" to listOf("tic douloureux"),
+    "bell palsy" to listOf("bells palsy", "bell's palsy", "facial palsy", "facial nerve palsy"),
+    "guillain barre" to listOf("gbs", "guillain barre syndrome", "guillain-barre"),
+    "myasthenia gravis" to listOf("mg", "oculopharyngeal"),
+    "multiple sclerosis" to listOf("ms", "demyelinating"),
+    "ALS".lowercase() to listOf("motor neuron disease", "mnd", "lou gehrig"),
+    "huntington disease" to listOf("huntingtons", "huntington's", "chorea"),
+    "subarachnoid hemorrhage" to listOf("sah", "subarachnoid bleed", "intracranial hemorrhage"),
+    "spinal cord injury" to listOf("paraplegia", "quadriplegia", "hemiplegia"),
+    "peripheral neuropathy" to listOf("neuropathy", "gbs", "polyneuropathy"),
+    "brain tumor" to listOf("glioma", "meningioma", "medulloblastoma", "brain tumour"),
+    "vertigo" to listOf("meniere", "menieres", "meniere's", "bppv", "labyrinthitis"),
+    // ── Endocrine / Metabolic ──
+    "diabetes mellitus" to listOf("diabetes", "sugar disease", "dm", "t1dm", "t2dm", "hyperglycemia", "sugar ki bimari"),
+    "diabetic ketoacidosis" to listOf("dka"),
+    "hypothyroidism" to listOf("low thyroid", "myxedema", "hashimoto", "hashimotos", "hashimoto's", "thyroiditis"),
+    "hyperthyroidism" to listOf("thyrotoxicosis", "graves disease", "graves", "graves'", "high thyroid"),
+    "cushing syndrome" to listOf("cushings", "cushing's", "cushing disease"),
+    "addison disease" to listOf("addisons", "addison's", "adrenal insufficiency"),
+    "acromegaly" to listOf("gigantism", "prolactinoma", "pituitary adenoma"),
+    "pheochromocytoma" to listOf("pheo"),
+    "metabolic syndrome" to listOf("insulin resistance"),
+    "obesity" to listOf("morbid obesity"),
+    "dyslipidemia" to listOf("hyperlipidemia", "high cholesterol", "hypercholesterolemia"),
+    "gout" to listOf("hyperuricemia", "gouty arthritis"),
+    "osteomalacia" to listOf("rickets", "vitamin d deficiency", "vit d deficiency"),
+    "porphyria" to listOf("acute intermittent porphyria"),
+    "phe".let { it } to listOf(), // placeholder removed below
+    // ── Hematology / Oncology ──
+    "anemia" to listOf("anaemia", "low hemoglobin", "low hb", "iron deficiency", "IDA".lowercase(), "megaloblastic"),
+    "sickle cell anemia" to listOf("sickle cell", "sickle cell disease", "scd"),
+    "thalassemia" to listOf("thalassaemia", "beta thalassemia", "cooleys anemia", "cooley's"),
+    "hemophilia" to listOf("haemophilia", "bleeding disorder", "von willebrand", "vwd"),
+    "itp" to listOf("idiopathic thrombocytopenic", "immune thrombocytopenia", "low platelets", "thrombocytopenia"),
+    "leukemia" to listOf("leukaemia", "all", "aml", "cml", "cll", "blood cancer"),
+    "lymphoma" to listOf("hodgkin", "hodgkins", "hodgkin's", "non hodgkin", "burkitt"),
+    "multiple myeloma" to listOf("myeloma", "plasma cell"),
+    "polycythemia" to listOf("polycythaemia", "polycythemia vera"),
+    "disseminated intravascular coagulation" to listOf("dic"),
+    "hereditary spherocytosis" to listOf("spherocytosis"),
+    "g6pd deficiency" to listOf("favism"),
+    "hodgkin lymphoma" to listOf("hodgkins lymphoma"),
+    "breast cancer" to listOf("breast carcinoma", "breast lump"),
+    "cervical cancer" to listOf("cin", "pap smear"),
+    "ovarian cancer" to listOf("ovarian carcinoma"),
+    "oral cancer" to listOf("oral squamous cell", "oscc"),
+    "thyroid cancer" to listOf("papillary carcinoma", "follicular carcinoma", "medullary carcinoma"),
+    // ── Infectious / Tropical ──
+    "malaria" to listOf("falciparum", "vivax", "blackwater fever"),
+    "dengue" to listOf("dengue fever", "dengue", "break bone fever", "dengu"),
+    "chikungunya" to listOf("chickungunya", "chikungunia"),
+    "typhoid" to listOf("typhoid fever", "enteric fever", "tifoid", "typoid", "salmonella typhi"),
+    "leptospirosis" to listOf("weil disease", "weils disease", "rat fever"),
+    "rabies" to listOf("hydrophobia", "dog bite"),
+    "tetanus" to listOf("lockjaw"),
+    "measles" to listOf("rubeola", "morbilli"),
+    "rubella" to listOf("german measles"),
+    "mumps" to listOf("parotitis"),
+    "chickenpox" to listOf("chicken pox", "varicella"),
+    "herpes zoster" to listOf("shingles", "zoster", "herpes"),
+    "influenza" to listOf("flu", "h1n1", "swine flu", "bird flu", "avian flu"),
+    "covid" to listOf("covid19", "covid-19", "corona", "sars cov 2", "sars-cov-2", "long covid"),
+    "hiv" to listOf("aids", "hiv aids", "retrovirus"),
+    "amoebiasis" to listOf("amoebic", "amebiasis", "entamoeba", "amoebic liver abscess"),
+    "giardiasis" to listOf("giardia", "gardia"),
+    "ascariasis" to listOf("roundworm", "helminth", "helminthic", "hookworm", "pinworm", "threadworm", "filaria", "filariasis", "elephantiasis"),
+    "hydatid disease" to listOf("hydatid cyst", "echinococcus"),
+    "leishmaniasis" to listOf("kala azar", "kalazar", "visceral leishmaniasis", "post kala azar"),
+    "trypanosomiasis" to listOf("sleeping sickness", "chagas"),
+    "yellow fever" to listOf("yellow fever"),
+    "japanese encephalitis" to listOf("je encephalitis"),
+    "syphilis" to listOf("syphillis", "lues", "chancre", "vdrl"),
+    "gonorrhea" to listOf("gonorrhoea", "clap", "neisseria"),
+    "chlamydia" to listOf("chlamydial"),
+    "candidiasis" to listOf("candida", "thrush", "moniliasis"),
+    "aspergillosis" to listOf("aspergillus", "mucormycosis", "black fungus", "zygomycosis"),
+    "cryptococcosis" to listOf("cryptococcus"),
+    "sepsis" to listOf("septicemia", "septicaemia", "blood infection", "bacteremia"),
+    // ── Rheumatology / Orthopedics / Dermatology ──
+    "rheumatoid arthritis" to listOf("ra", "rheumatoid"),
+    "osteoarthritis" to listOf("oa", "degenerative joint disease", "knee pain"),
+    "ankylosing spondylitis" to listOf("as spine", "bamboo spine"),
+    "psoriasis" to listOf("psoriatic", "psoriasiform"),
+    "eczema" to listOf("atopic dermatitis", "dermatitis", "contact dermatitis"),
+    "urticaria" to listOf("hives", "wheals", "angioedema"),
+    "systemic lupus" to listOf("lupus", "sle", "lupus erythematosus"),
+    "scleroderma" to listOf("systemic sclerosis", "crest syndrome"),
+    "sjogren" to listOf("sjogrens", "sjogren's", "sicca syndrome"),
+    "giant cell arteritis" to listOf("temporal arteritis", "takayasu", "vasculitis", "pANCA", "polyarteritis nodosa", "wegener", "granulomatosis"),
+    "osteoporosis" to listOf("osteopenia", "bone loss"),
+    "osteomyelitis" to listOf("bone infection"),
+    "septic arthritis" to listOf("infected joint"),
+    "gout" to listOf("gouty", "tophi"),
+    "ankylosing" to listOf("spondyloarthropathy", "spondyloarthritis"),
+    "frozen shoulder" to listOf("adhesive capsulitis"),
+    "tennis elbow" to listOf("lateral epicondylitis", "golfer elbow"),
+    "carpal tunnel" to listOf("cts", "median nerve compression"),
+    "clubfoot" to listOf("ctev", "talipes equinovarus"),
+    "ddh" to listOf("developmental dysplasia", "congenital hip dislocation"),
+    "perthes disease" to listOf("legg calve perthes"),
+    "slipped capital femoral epiphysis" to listOf("scfe", "slipped femoral epiphysis"),
+    "dupuytren contracture" to listOf("dupuytrens", "dupuytren's"),
+    "acne" to listOf("acne vulgaris", "pimples"),
+    "lichen planus" to listOf("lichenoid"),
+    "pemphigus" to listOf("pemphigoid", "bullous disease"),
+    "melasma" to listOf("chloasma", "hyperpigmentation"),
+    "vitiligo" to listOf("leucoderma", "leukoderma", "white patches"),
+    "alopecia" to listOf("hair loss", "baldness"),
+    "cellulitis" to listOf("erysipelas"),
+    "necrotizing fasciitis" to listOf("flesh eating"),
+    "burn" to listOf("burns", "scald"),
+    // ── Psychiatry ──
+    "depression" to listOf("depressive", "mdd", "low mood", "clinical depression"),
+    "bipolar disorder" to listOf("bipolar", "mania", "manic", "manic depressive"),
+    "schizophrenia" to listOf("schizophrenic", "psychosis", "psychotic", "delusions"),
+    "anxiety disorder" to listOf("anxiety", "panic attack", "panic disorder", "gad", "phobia"),
+    "OCD".lowercase() to listOf("obsessive compulsive"),
+    "ptsd" to listOf("post traumatic stress", "post-traumatic stress"),
+    "anorexia nervosa" to listOf("bulimia", "eating disorder"),
+    "alcohol withdrawal" to listOf("delirium tremens", "dt", "alcoholism", "alcohol dependence"),
+    "insomnia" to listOf("sleep disorder", "cant sleep"),
+    "dementia" to listOf("vascular dementia", "frontotemporal dementia", "lew body"),
+    "autism" to listOf("autism spectrum", "asd child", "asperger"),
+    "adhd" to listOf("attention deficit", "hyperactivity"),
+    // ── Obstetrics / Gynecology ──
+    "eclampsia" to listOf("preeclampsia", "pre eclampsia", "pre-eclampsia", "toxemia of pregnancy", "pet"),
+    "ectopic pregnancy" to listOf("ectopic"),
+    "placenta previa" to listOf("placenta praevia", "previa"),
+    "abruptio placentae" to listOf("abruption", "placental abruption"),
+    "gestational diabetes" to listOf("gdm", "pregnancy diabetes"),
+    " abortion" to listOf("miscarriage", "missed abortion", "threatened abortion"),
+    "hyperemesis gravidarum" to listOf("hyperemesis", "pregnancy vomiting"),
+    "polyhydramnios" to listOf("oligohydramnios", "hydramnios"),
+    "IUGR".lowercase() to listOf("fetal growth restriction", "iugr", "small for gestational"),
+    "rh incompatibility" to listOf("erythroblastosis fetalis", "rh negative pregnancy", "anti d"),
+    "prolonged labor" to listOf(" obstructed labour", "dystocia", "cpd"),
+    "pph" to listOf("postpartum hemorrhage", "post partum hemorrhage", "atonic uterus"),
+    "pcod" to listOf("pcos", "polycystic ovary", "polycystic ovarian"),
+    "endometriosis" to listOf("endometriotic", "chocolate cyst"),
+    "fibroid uterus" to listOf("fibroid", "leiomyoma", "myoma"),
+    "pcmb".let { it } to listOf(), // placeholder removed below
+    "amenorrhea" to listOf("amenorrhoea", "no periods", "missed periods"),
+    "dysmenorrhea" to listOf("dysmenorrhoea", "painful periods", "menstrual pain"),
+    "menorrhagia" to listOf("heavy periods", "heavy menstrual bleeding"),
+    "infertility" to listOf("infertile", "subfertility", "ivf"),
+    "carcinoma cervix" to listOf("cervical intraepithelial"),
+    "prolapse uterus" to listOf("uterine prolapse", "vault prolapse"),
+    "mastitis" to listOf("breast abscess"),
+    // ── Pediatrics ──
+    "neonatal jaundice" to listOf("physiological jaundice", "nnj", "kernicterus"),
+    "neonatal sepsis" to listOf("neonatal infection"),
+    "nec" to listOf("necrotizing enterocolitis"),
+    "rds" to listOf("respiratory distress syndrome", "surfactant deficiency", "hyaline membrane"),
+    "croup" to listOf("laryngotracheobronchitis", "barking cough"),
+    "epiglottitis" to listOf("acute epiglottitis"),
+    "bronchiolitis" to listOf("rsv bronchiolitis"),
+    "kawasaki disease" to listOf("kawasakis", "kawasaki's", "mucocutaneous lymph node"),
+    "down syndrome" to listOf("trisomy 21", "downs syndrome", "down's syndrome"),
+    "turner syndrome" to listOf("turners syndrome", "turner's syndrome", "monosomy x"),
+    "klinefelter syndrome" to listOf("klinefelters", "klinefelter's", "xxY".lowercase()),
+    "marfan syndrome" to listOf("marfans", "marfan's"),
+    "ehlers danlos" to listOf("ehlers-danlos", "eds"),
+    "cystic kidney" to listOf("infantile polycystic"),
+    "wilms tumor" to listOf("nephroblastoma", "wilms tumour"),
+    "retinoblastoma" to listOf("rb eye tumor"),
+    "congenital diaphragmatic hernia" to listOf("cdh"),
+    "tracheoesophageal fistula" to listOf("tea fistula", "tef"),
+    "hirschsprung" to listOf("hirschsprungs", "hirschsprung's", "aganglionosis"),
+    "intussusception" to listOf("red currant stool"),
+    "cretinism" to listOf("congenital hypothyroid"),
+    "kwashiorkor" to listOf("marasmus", "protein energy malnutrition", "pem", "malnutrition"),
+    "rickets" to listOf("rachitic"),
+    "vitamin deficiency" to listOf("beriberi", "pellagra", "scurvy", "pyridoxine deficiency", "b12 deficiency"),
+    // ── Eyes / ENT / Skinmisc ──
+    "glaucoma" to listOf("glucoma", "glaucoma suspect", "closed angle", "open angle"),
+    "cataract" to listOf("cataracts", "lens opacity"),
+    "conjunctivitis" to listOf("red eye", "pink eye", "apc"),
+    "uveitis" to listOf("iritis", "iridocyclitis", "choroiditis"),
+    "retinal detachment" to listOf("rd eye", "retinal tear"),
+    "diabetic retinopathy" to listOf("retinopathy"),
+    "strabismus" to listOf("squint", "cross eye"),
+    "otitis media" to listOf("com", "asom", "csom", "middle ear infection", "ear discharge"),
+    "otitis externa" to listOf("swimmers ear", "swimmer ear"),
+    "meniere disease" to listOf("endolymphatic hydrops"),
+    "sinusitis" to listOf("sinus infection", "sinus"),
+    "tonsillitis" to listOf("tonsil", "quinsy", "tonsillectomy"),
+    "epistaxis" to listOf("nose bleed", "nosebleed"),
+    "laryngitis" to listOf("hoarseness", "voice loss"),
+    "hearing loss" to listOf("deafness", "conductive deafness", "sensorineural deafness"),
+    "cleft lip" to listOf("cleft palate", "harelip")
+)
+
+/**
+ * Collapsed multi-word condition patterns: commonly misspelled multi-word conditions whose
+ * variants share a stem, matched with tolerant word boundaries.
+ */
+private val COLLAPSED_CONDITION_PATTERNS: List<Pair<String, Regex>> = listOf(
+    "typhoid fever" to Regex("""\btyph\w*\s+fever\b"""),
+    "dengue fever" to Regex("""\bdengu?\w*\s+fever\b"""),
+    "heart failure" to Regex("""\bheart\s+failure\b"""),
+    "kidney failure" to Regex("""\b(kidney|renal)\s+failure\b"""),
+    "liver failure" to Regex("""\b(liver|hepatic)\s+failure\b"""),
+    "heavy periods" to Regex("""\bheav\w*\s+periods?\b"""),
+    "missed periods" to Regex("""\bmiss\w*\s+periods?\b"""),
+    "painful periods" to Regex("""\bpain\w*\s+periods?\b"""),
+    "nose bleed" to Regex("""\bnose\s*bleed\w*\b"""),
+    "dog bite" to Regex("""\bdog\s+bite\w*\b"""),
+    "snake bite" to Regex("""\bsnake\s+bite\w*\b"""),
+    "chest pain" to Regex("""\bchest\s+pain\w*\b"""),
+    "sore throat" to Regex("""\bsore\s+throat\b"""),
+    "blood pressure" to Regex("""\bblood\s+pressure\b"""),
+    "blood cancer" to Regex("""\bblood\s+cancer\b"""),
+    "thyroid problems" to Regex("""\bthyroid\s+(problem\w*|disorder\w*)\b"""),
+    "stomach ulcer" to Regex("""\bstomach\s+ulcer\w*\b"""),
+    "kidney stones" to Regex("""\b(kidney|renal)\s+stone\w*\b"""),
+    "gall stones" to Regex("""\bgall\s*stone\w*\b"""),
+    "brain tumor" to Regex("""\bbrain\s+tumo\w*\b"""),
+    "sleep apnea" to Regex("""\bsleep\s+apn\w*\b"""),
+    "panic attack" to Regex("""\bpanic\s+attack\w*\b"""),
+    "white discharge" to Regex("""\bwhite\s+discharge\b"""),
+    "irregular periods" to Regex("""\birregular\s+periods?\b"""),
+    "iron deficiency" to Regex("""\biron\s+deficien\w*\b"""),
+    "vitamin b12 deficiency" to Regex("""\b(b12|b 12)\s+deficien\w*\b"""),
+    "vitamin d deficiency" to Regex("""\b(vitamin\s*)?d\s+deficien\w*\b"""),
+    "high cholesterol" to Regex("""\bcholesterol\b"""),
+    "high blood sugar" to Regex("""\b(hyperglyc\w*|high\s+blood\s+sugar|high\s+sugar)\b"""),
+    "low blood sugar" to Regex("""\b(hypoglyc\w*|low\s+blood\s+sugar|low\s+sugar)\b"""),
+    "pregnancy complications" to Regex("""\bpregnancy\s+(complication\w*)\b""")
+)
+
+/** Words that may precede a condition without blocking a dictionary match. */
+private val CONDITION_CONTEXT_WORDS = setOf(
+    "about", "on", "in", "of", "for", "regarding", "related", "the", "a", "an", "my", "his", "her",
+    "their", "what", "whats", "what's", "tell", "explain", "know", "learn", "study", "read", "revise",
+    "understand", "share", "give", "get", "need", "want", "help", "symptoms", "signs", "causes",
+    "treatment", "management", "diagnosis", "workup", "investigations", "pathophysiology", "drugs",
+    "medicine", "medicines", "complications", "prognosis", "epidemiology", "notes", "note", "summary",
+    "overview", "mcq", "mcqs", "questions", "question", "quiz", "case", "cases", "scenario", "patient"
+)
+
+/**
+ * Looks up a medical condition from the MEDICAL_CONDITIONS dictionary in the user's text
+ * (typo-tolerant via the collapsed patterns). Returns the canonical condition name, or null
+ * when no known condition is mentioned.
+ */
+private fun findMedicalCondition(text: String): String? {
+    val lower = text.lowercase()
+    // Exact and short-form variants first (longest names win so "heart failure" beats "mi").
+    val matches = mutableListOf<Pair<String, Int>>()
+    for ((canonical, variants) in MEDICAL_CONDITIONS) {
+        if (variants.any { v ->
+                val re = Regex("""\b""" + Regex.escape(v) + """\b""")
+                re.containsMatchIn(lower)
+            } || Regex("""\b""" + Regex.escape(canonical) + """\b""").containsMatchIn(lower)
+        ) {
+            matches.add(canonical to canonical.length)
+        }
+    }
+    if (matches.isNotEmpty()) {
+        return matches.maxByOrNull { it.second }?.first
+    }
+    // Tolerant collapsed patterns for commonly misspelled multi-word conditions.
+    for ((canonical, re) in COLLAPSED_CONDITION_PATTERNS) {
+        if (re.containsMatchIn(lower)) return canonical
+    }
+    // Last chance: a single token that is a known condition word.
+    return lower.split(Regex("""[^a-z]+""")).firstOrNull { it.length > 3 && it in MEDICAL_CONDITIONS }
+}
+
+/** Client-side keyword tokens from the user text, used if the model forgot its [SEARCH:] marker. */
+private fun fallbackKeywords(userText: String): List<String> {
+    return userText
+        .lowercase()
+        .replace(Regex("[^a-z0-9 ]"), " ")
+        .split(" ")
+        .filter { it.isNotBlank() && it.length > 2 && it !in SEARCH_STOP_WORDS }
+        .distinct()
+}
+
+/**
+ * Generic medical words that must never drive a community-posts search on their own
+ * ("causes", "treatment"…) — they match tons of unrelated captions.
+ */
+private val POSTS_STOP_WORDS = setOf(
+    "causes", "cause", "treatment", "treatments", "therapy", "therapies", "symptoms", "symptom",
+    "diagnosis", "diagnoses", "diagnostic", "management", "medicine", "medicines", "drug", "drugs",
+    "disease", "diseases", "condition", "conditions", "patient", "patients", "clinical", "features",
+    "feature", "findings", "finding", "explain", "describe", "definition", "meaning", "effects",
+    "effect", "differential", "presentation", "presentations", "complications", "complication",
+    "investigations", "investigation", "management", "prognosis", "mortality", "prevalence", "incidence",
+    "epidemiology", "pathophysiology", "etiology", "aetiology", "risk", "risks", "factors", "factor",
+    "overview", "summary", "types", "type", "signs", "sign", "role", "roles"
+)
+
+/**
+ * Builds the best keyword for the community-posts search: meaningful topic tokens from the
+ * AI's [SEARCH:] phrase (and the user's words) with generic medical words removed, so a
+ * phrase like "glaucoma causes treatment" becomes "glaucoma" instead of matching unrelated
+ * posts about "causes" or "treatment". Returns null when nothing meaningful remains.
+ */
+private fun bestPostsKeyword(aiKeyword: String?, userText: String): String? {
+    val allTokens = (aiKeyword?.split(Regex("\\s+")).orEmpty() + fallbackKeywords(userText))
+        .map { it.trim().lowercase() }
+        .filter { it.length > 2 && it !in SEARCH_STOP_WORDS && it !in POSTS_STOP_WORDS }
+        .distinct()
+    return allTokens.take(3).joinToString(" ").ifBlank { null }
+}
+
+private val httpClient = OkHttpClient.Builder()
+    .connectTimeout(25, TimeUnit.SECONDS)
+    .readTimeout(25, TimeUnit.SECONDS)
+    .build()
+
+/** Image generation can take 30-90s — use a generous client. */
+private val imageHttpClient = OkHttpClient.Builder()
+    .connectTimeout(60, TimeUnit.SECONDS)
+    .readTimeout(180, TimeUnit.SECONDS)
+    .writeTimeout(60, TimeUnit.SECONDS)
+    .build()
+
+/** Parses the poster JSON returned by the free analysis model. */
+private fun parsePosterAnalysisData(raw: String): PosterAnalysisData {
+    var trimmed = raw.trim()
+        .removePrefix("```json").removePrefix("```").removeSuffix("```")
+        .trim()
+    val first = trimmed.indexOf('{')
+    val last = trimmed.lastIndexOf('}')
+    if (first < 0 || last <= first) return PosterAnalysisData("", "")
+    trimmed = trimmed.substring(first, last + 1)
+    val obj = JSONObject(trimmed)
+    val title = obj.optString("title", "").trim()
+    val subtitle = obj.optString("subtitle", "").trim()
+    val sections = mutableListOf<PosterSectionData>()
+    val arr = obj.optJSONArray("sections") ?: JSONArray()
+    for (i in 0 until arr.length()) {
+        val s = arr.optJSONObject(i) ?: continue
+        val h = s.optString("heading", "").trim()
+        val b = s.optString("body", "").trim()
+        if (h.isNotBlank() && b.isNotBlank()) sections += PosterSectionData(h, b)
+    }
+    return PosterAnalysisData(title, subtitle, sections)
+}
+
+/** Turns the structured poster data into a detailed image-generation prompt. */
+private fun buildPosterImagePrompt(data: PosterAnalysisData): String {
+    val sb = StringBuilder()
+    sb.append("Create a professional medical research conference poster as a single clean, readable image. ")
+    sb.append("Portrait layout. Use a modern academic design: a bold colored header band across the top with the title, ")
+    sb.append("a subtitle line under it, then the content organized in clear columns/boxes with section headings. ")
+    sb.append("Use a calm medical color palette (deep blue/teal with white and soft accents). Avoid generic clipart; ")
+    sb.append("use subtle medical line icons or a clean geometric motif. Make all text legible and correctly spelled. ")
+    sb.append("POSTER TITLE: \"").append(data.title.ifBlank { "Medical Research Poster" }).append("\". ")
+    if (data.subtitle.isNotBlank()) sb.append("SUBTITLE: \"").append(data.subtitle).append("\". ")
+    sb.append("SECTIONS:\n")
+    data.sections.forEachIndexed { i, s ->
+        sb.append(i + 1).append(". \"").append(s.heading).append("\": ")
+            .append(s.body.replace("\"", "'")).append("\n")
+    }
+    return sb.toString().trim()
+}
+
+/**
+ * Calls the OpenRouter images/generations endpoint with the cheapest image model.
+ * Returns (url, file) — b64_json responses are decoded into a temp file.
+ */
+private fun generatePosterImage(prompt: String): Pair<String?, File> {
+    val json = JSONObject()
+        .put("model", POSTER_IMAGE_MODEL)
+        .put("prompt", prompt)
+        .put("n", 1)
+        .put("size", POSTER_IMAGE_SIZE)
+    val request = Request.Builder()
+        .url("https://openrouter.ai/api/v1/images/generations")
+        .addHeader("Authorization", "Bearer ${ApiKeys.OPENROUTER_API_KEY}")
+        .addHeader("X-Title", "MediGyaan AI")
+        .addHeader("Accept", "application/json")
+        .post(json.toString().toRequestBody("application/json".toMediaType()))
+        .build()
+    Log.i(POSTER_LOG_TAG, "POST images/generations model=$POSTER_IMAGE_MODEL promptChars=${prompt.length}")
+    val startedAt = System.currentTimeMillis()
+    imageHttpClient.newCall(request).execute().use { response ->
+        val raw = response.body?.string().orEmpty()
+        Log.i(POSTER_LOG_TAG, "images/generations -> HTTP ${response.code} in ${System.currentTimeMillis() - startedAt}ms bodyLen=${raw.length}")
+        if (!response.isSuccessful) error("Image API HTTP ${response.code}: ${raw.take(300)}")
+        val root = JSONObject(raw)
+        val arr = root.optJSONArray("data") ?: error("Image API returned no data: ${raw.take(300)}")
+        val item = arr.optJSONObject(0) ?: error("Image API returned empty data")
+        val url = item.optString("url", "").takeIf { it.isNotBlank() }
+        val b64 = item.optString("b64_json", "").takeIf { it.isNotBlank() }
+        if (url != null) return url to File("")
+        if (b64 != null) {
+            val bytes = try {
+                android.util.Base64.decode(b64, android.util.Base64.DEFAULT)
+            } catch (e: Throwable) {
+                Log.e(POSTER_LOG_TAG, "base64 decode failed: ${e.message}")
+                throw e
+            }
+            Log.i(POSTER_LOG_TAG, "decoded b64 -> ${bytes.size} bytes")
+            val f = File.createTempFile("medigyaan_poster_", "." + sniffImageExt(bytes))
+            f.writeBytes(bytes)
+            return null to f
+        }
+        error("Image API returned neither url nor b64_json")
+    }
+}
+
+/**
+ * Detects a poster request and returns the abstract source text, or null.
+ * Priority: pasted abstract in the message > abstract mentioned > uploaded PDF context.
+ */
+private fun detectPosterAbstract(userText: String, pdfContext: PdfChatContext?): String? {
+    val trimmed = userText.trim()
+    val lower = trimmed.lowercase()
+    if (!Regex("""\b(poster|posters)\b""").containsMatchIn(lower)) return null
+    val stripped = POSTER_COMMAND_PREFIX.replace(trimmed, "").trim()
+    val mentionsAbstract = Regex("""\babstract\b""").containsMatchIn(lower)
+    if (stripped.length >= 250) return stripped.take(8000)
+    if (stripped.length >= 60 && mentionsAbstract) return stripped.take(8000)
+    if (pdfContext != null) return buildPosterAbstractFromPdf(pdfContext)
+    return null
+}
+
+/** Builds an abstract source from the uploaded PDF chat context. */
+private fun buildPosterAbstractFromPdf(pdf: PdfChatContext): String {
+    val sb = StringBuilder()
+    pdf.variables.firstOrNull { it.name.equals("Title", ignoreCase = true) }?.value
+        ?.takeIf { it.isNotBlank() }?.let { sb.append("Title: ").append(it).append("\n\n") }
+    pdf.variables.firstOrNull { it.name.contains("Abstract", ignoreCase = true) }?.value
+        ?.takeIf { it.isNotBlank() }?.let { sb.append(it).append("\n\n") }
+    sb.append(pdf.textPreview)
+    return sb.toString().trim().take(8000)
+}
+
+/** Reads the server-side poster quota for this user (5 free posters). Null = quota unknown (allow). */
+private fun fetchPosterQuota(context: Context): Int? = runCatching {
+    val userId = context.getSharedPreferences("MY_APP", Context.MODE_PRIVATE).getInt("user_id", 0)
+    val url = "https://medigyaan.xyz/Neurons/api/poster_credits.php?action=check&user_id=$userId"
+    val request = Request.Builder()
+        .url(url)
+        .addHeader("X-App-Signature", "EduLabsRTM_Secure_v1_2026")
+        .addHeader("Accept", "application/json")
+        .get()
+        .build()
+    httpClient.newCall(request).execute().use { response ->
+        val body = response.body?.string().orEmpty()
+        if (!response.isSuccessful) return null
+        val root = JSONObject(body)
+        if (!root.optBoolean("success", false)) return null
+        root.optInt("remaining", -1).takeIf { it >= 0 }
+    }
+}.getOrNull()
+
+/** Decrements the server-side quota after a successful poster generation. Returns new remaining. */
+private fun consumePosterQuota(context: Context): Int? = runCatching {
+    val userId = context.getSharedPreferences("MY_APP", Context.MODE_PRIVATE).getInt("user_id", 0)
+    val form = okhttp3.FormBody.Builder()
+        .add("user_id", userId.toString())
+        .build()
+    val request = Request.Builder()
+        .url("https://medigyaan.xyz/Neurons/api/poster_credits.php?action=consume")
+        .addHeader("X-App-Signature", "EduLabsRTM_Secure_v1_2026")
+        .addHeader("Accept", "application/json")
+        .post(form)
+        .build()
+    httpClient.newCall(request).execute().use { response ->
+        val body = response.body?.string().orEmpty()
+        if (!response.isSuccessful) return null
+        val root = JSONObject(body)
+        if (!root.optBoolean("success", false)) return null
+        root.optInt("remaining", -1).takeIf { it >= 0 }
+    }
+}.getOrNull()
+
+/**
+ * Copies a completed poster (temp file or downloaded URL) into files/chat_posters/ and
+ * returns the metadata to attach to the chat session, or null on failure.
+ */
+private suspend fun persistCompletedPoster(context: Context, ownerTurn: Int, state: PosterGenState): SavedPoster? {
+    val fileRef = state.imageFile?.takeIf { it.exists() }
+    val urlRef = state.imageUrl?.takeIf { it.isNotBlank() }
+    val bytes: ByteArray? = try {
+        withContext(Dispatchers.IO) {
+            when {
+                fileRef != null -> fileRef.readBytes()
+                urlRef != null -> imageHttpClient.newCall(
+                    Request.Builder().url(urlRef).get().build()
+                ).execute().use { it.body?.bytes() }
+                else -> null
+            }
+        }
+    } catch (e: Throwable) {
+        null
+    }
+    if (bytes == null || bytes.isEmpty()) return null
+    return try {
+        val b = bytes
+        withContext(Dispatchers.IO) {
+            val fileName = "poster_${System.currentTimeMillis()}_${ownerTurn}.${sniffImageExt(b)}"
+            File(chatPostersDir(context), fileName).writeBytes(b)
+            SavedPoster(ownerTurn = ownerTurn, title = state.data?.title.orEmpty(), file = fileName)
+        }
+    } catch (e: Throwable) {
+        null
+    }
+}
+
+/** Downloads the poster image (or uses the temp file) and saves it to Pictures/MediGyaan. */
+private suspend fun downloadAndSavePoster(context: Context, url: String?, file: File?, title: String) {
+    val bytes: ByteArray? = try {
+        withContext(Dispatchers.IO) {
+            when {
+                file != null && file.exists() -> file.readBytes()
+                !url.isNullOrBlank() -> imageHttpClient.newCall(Request.Builder().url(url).get().build()).execute().use { it.body?.bytes() }
+                else -> null
+            }
+        }
+    } catch (e: Throwable) {
+        null
+    }
+    if (bytes == null || bytes.isEmpty()) {
+        Toast.makeText(context, "Could not download the poster image", Toast.LENGTH_SHORT).show()
+        return
+    }
+    try {
+        val ext = sniffImageExt(bytes)
+        val displayName = "poster_${System.currentTimeMillis()}.$ext"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val values = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, displayName)
+                put(MediaStore.Images.Media.MIME_TYPE, if (ext == "jpg") "image/jpeg" else "image/png")
+                put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/MediGyaan")
+            }
+            val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            if (uri != null) {
+                context.contentResolver.openOutputStream(uri)?.use { it.write(bytes) }
+                Toast.makeText(context, "Poster saved to Pictures/MediGyaan", Toast.LENGTH_SHORT).show()
+                return
+            }
+        }
+        Toast.makeText(context, "Saving needs Android 10+. Poster is shown above — take a screenshot.", Toast.LENGTH_LONG).show()
+    } catch (e: Throwable) {
+        Toast.makeText(context, "Could not save poster: ${e.message?.take(60)}", Toast.LENGTH_SHORT).show()
+    }
+}
+
+/**
+ * Searches the 280k question bank for related questions.
+ * The AI keyword sometimes arrives as a phrase the full-text matcher can't hit
+ * (e.g. "glaucoma causes treatment"), so we also try each meaningful single word
+ * and the tokens of the user's question, merging results across candidates.
+ */
+private fun findRelatedQuestions(context: Context, aiKeyword: String?, userText: String): QuestionSet? {
+    val candidates = linkedSetOf<String>()
+    aiKeyword?.takeIf { it.length >= 2 }?.let { candidates.add(it) }
+    aiKeyword?.split(" ")?.forEach { token ->
+        val t = token.trim().lowercase()
+        if (t.length > 2 && t !in SEARCH_STOP_WORDS) candidates.add(t)
+    }
+    fallbackKeywords(userText).forEach { candidates.add(it) }
+
+    val merged = LinkedHashMap<Int, RelatedQuestion>()
+    var successLabel = ""
+    for (candidate in candidates) {
+        val results = searchQuestionsForKeyword(context, candidate) ?: emptyList()
+        if (results.isNotEmpty() && successLabel.isBlank()) successLabel = candidate
+        results.forEach { q -> if (!merged.containsKey(q.id)) merged[q.id] = q }
+        // Stop once we have enough coverage so a bad tail candidate doesn't slow things down
+        if (merged.size >= 12) break
+    }
+    if (merged.isEmpty()) return null
+    val ordered = merged.values.toList()
+    return QuestionSet(
+        keyword = successLabel,
+        questions = ordered,
+        testIds = ordered.map { it.id }.take(15),
+        primarySubject = ordered.firstOrNull { it.subject.isNotBlank() }?.subject ?: "NEET PG"
+    )
+}
+
+/** Full-text search of the 280k question bank via Neurons searchv2 for a single keyword. */
+private fun searchQuestionsForKeyword(context: Context, keyword: String): List<RelatedQuestion>? {
+    val userId = context.getSharedPreferences("MY_APP", Context.MODE_PRIVATE).getInt("user_id", 0)
+    val url = "https://medigyaan.xyz/Neurons/api/searchv2.php?keyword=${URLEncoder.encode(keyword, "UTF-8")}&type=json&user_id=$userId"
+    val request = Request.Builder()
+        .url(url)
+        .addHeader("X-App-Signature", "EduLabsRTM_Secure_v1_2026")
+        .addHeader("Accept", "application/json")
+        .get()
+        .build()
+    return try {
+        httpClient.newCall(request).execute().use { response ->
+            val body = response.body?.string().orEmpty()
+            if (!response.isSuccessful) return null
+            val root = JSONObject(body)
+            if (root.optString("status") != "success") return null
+
+            val questions = mutableListOf<RelatedQuestion>()
+            val qArray: JSONArray = root.optJSONObject("results")
+                ?.optJSONArray("questions")
+                ?: JSONArray()
+            for (i in 0 until qArray.length()) {
+                val q = qArray.optJSONObject(i) ?: continue
+                val id = q.optInt("question_id", 0)
+                if (id <= 0) continue
+                val text = q.optString("question", "").trim()
+                if (text.isBlank()) continue
+                questions.add(
+                    RelatedQuestion(
+                        id = id,
+                        text = text,
+                        subject = q.optString("subject", "").trim(),
+                        topic = q.optString("topic", "").trim(),
+                        explanation = q.optString("explanation", "").trim()
+                    )
+                )
+            }
+            questions
+        }
+    } catch (e: Exception) {
+        null
+    }
+}
+
+/**
+ * Searches the community posts module (user_posts captions) for the topic keyword.
+ * Returns matching posts with their photos (full URLs), author and caption text.
+ */
+private fun searchCommunityPosts(context: Context, keyword: String): List<CommunityPost> {
+    val userId = context.getSharedPreferences("MY_APP", Context.MODE_PRIVATE).getInt("user_id", 0)
+    val url = "https://medigyaan.xyz/Neurons/api/posts_search.php?q=${URLEncoder.encode(keyword, "UTF-8")}&user_id=$userId"
+    val request = Request.Builder()
+        .url(url)
+        .addHeader("X-App-Signature", "EduLabsRTM_Secure_v1_2026")
+        .addHeader("Accept", "application/json")
+        .get()
+        .build()
+    return try {
+        httpClient.newCall(request).execute().use { response ->
+            val body = response.body?.string().orEmpty()
+            if (!response.isSuccessful) return emptyList()
+            val root = JSONObject(body)
+            if (root.optString("status") != "success") return emptyList()
+
+            val posts = mutableListOf<CommunityPost>()
+            val arr = root.optJSONArray("posts") ?: return emptyList()
+            for (i in 0 until arr.length()) {
+                val p = arr.optJSONObject(i) ?: continue
+                val id = p.optInt("post_id", 0)
+                if (id <= 0) continue
+                val caption = p.optString("caption", "").trim()
+                if (caption.isBlank()) continue
+                val images = mutableListOf<String>()
+                val imgArr = p.optJSONArray("images") ?: JSONArray()
+                for (j in 0 until imgArr.length()) {
+                    val u = imgArr.optString(j, "").trim()
+                    if (u.startsWith("http")) images.add(u)
+                }
+                posts.add(
+                    CommunityPost(
+                        postId = id,
+                        author = p.optString("author", "MediGyaan user").trim(),
+                        authorPhoto = p.optString("author_photo", "").trim(),
+                        caption = caption,
+                        images = images,
+                        likes = p.optInt("likes", 0),
+                        uploadDate = p.optString("upload_date", "").trim()
+                    )
+                )
+            }
+            posts
+        }
+    } catch (e: Exception) {
+        emptyList()
+    }
+}
+
+/** Renders community posts (photo + caption) as tappable cards inside the AI reply. */
+@Composable
+private fun CommunityPostsCard(context: Context, set: PostSet) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "📸 Community posts · “${set.keyword}”",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            set.posts.forEach { post ->
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            // Show the tapped post in-app: open the community feed with
+                            // this post pinned at the top (image + caption + like/share).
+                            runCatching {
+                                val focusJson = JSONObject()
+                                    .put("post_id", post.postId)
+                                    .put("name", post.author)
+                                    .put("photo", post.authorPhoto)
+                                    .put("caption", post.caption)
+                                    .put("file_paths", JSONArray(post.images))
+                                    .put("likes", post.likes)
+                                context.startActivity(
+                                    Intent(context, NewsFeedActivity::class.java)
+                                        .putExtra(NewsFeedActivity.EXTRA_FOCUS_POST_ID, post.postId)
+                                        .putExtra(NewsFeedActivity.EXTRA_FOCUS_POST_JSON, focusJson.toString())
+                                )
+                            }
+                        }
+                ) {
+                    Column {
+                        post.images.firstOrNull()?.let { imageUrl ->
+                            AsyncImage(
+                                model = imageUrl,
+                                contentDescription = "Post image",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(170.dp)
+                            )
+                        }
+                        Column(modifier = Modifier.padding(10.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // Author avatar (or an initial chip when there's no photo).
+                                if (post.authorPhoto.startsWith("http")) {
+                                    AsyncImage(
+                                        model = post.authorPhoto,
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .size(22.dp)
+                                            .clip(CircleShape)
+                                    )
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(22.dp)
+                                            .clip(CircleShape)
+                                            .background(MaterialTheme.colorScheme.primaryContainer),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = post.author.firstOrNull()?.uppercase() ?: "?",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.size(6.dp))
+                                Text(
+                                    text = post.author,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Text(
+                                    text = "❤️ ${post.likes}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = post.caption,
+                                style = MaterialTheme.typography.bodySmall,
+                                maxLines = 6,
+                                overflow = TextOverflow.Ellipsis,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+

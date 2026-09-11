@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- PRIMARY -->
+    <color name="primary">#5C6BC0</color>
+    <color name="primary_variant">#3949AB</color>
+    <color name="primary_dark">#3949AB</color>
+    <color name="primary_light">#E8EAF6</color>
+
+    <!-- SECONDARY -->
+    <color name="secondary">#FFD54F</color>
+    <color name="secondary_variant">#FFA000</color>
+    <color name="secondary_dark">#FFA000</color>
+
+    <!-- BACKGROUND -->
+    <color name="background">#F6F8FC</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="card_bg">#FFFFFF</color>
+
+    <!-- TEXT -->
+    <color name="text_primary">#1A1C2E</color>
+    <color name="text_secondary">#5F6368</color>
+
+    <!-- ON COLORS -->
+    <color name="on_primary">#FFFFFF</color>
+    <color name="on_secondary">#212121</color>
+    <color name="on_background">#1A1C2E</color>
+    <color name="on_surface">#1A1C2E</color>
+
+    <!-- MATERIAL COLORS -->
+    <color name="colorPrimary">#5C6BC0</color>
+    <color name="colorPrimaryVariant">#3949AB</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
+
+    <color name="colorPrimaryContainer">#E8EAF6</color>
+    <color name="colorOnPrimaryContainer">#1A237E</color>
+
+    <color name="colorSecondary">#FFD54F</color>
+    <color name="colorSecondaryVariant">#FFA000</color>
+    <color name="colorOnSecondary">#212121</color>
+
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorOnSurface">#1A1C2E</color>
+
+    <color name="colorBackground">#F6F8FC</color>
+    <color name="colorOnBackground">#1A1C2E</color>
+
+    <color name="purple_500">#5C6BC0</color>
+    <color name="colorOutline">#D0D7E2</color>
+
+    <!-- STATUS -->
+    <color name="success">#43A047</color>
+    <color name="accent_purple">#7B1FFF</color>
+    <color name="error">#E53935</color>
+    <color name="accent_cyan">#00E5FF</color>
+    <color name="warning">#FB8C00</color>
+
+    <!-- GRADIENT ACCENTS -->
+    <color name="gradient_start">#5C6BC0</color>
+    <color name="gradient_end">#3949AB</color>
+    <color name="accent_glow">#337986CB</color>
+
+    <!-- EXTRA -->
+    <color name="divider">#1F000000</color>
+    <color name="toolbar_bg">#FFFFFF</color>
+    <color name="bottom_nav_bg">#FFFFFF</color>
+    <color name="bottom_nav_ripple">#335C6BC0</color>
+
+    <!-- BASE -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="gray">#808080</color>
+    <color name="transparent">#00000000</color>
+
+    <!-- WHATSAPP PROTOCOL THEME -->
+    <color name="whatsapp_chat_bg">#E5DDD5</color>
+    <color name="whatsapp_bubble_sent">#D9FDD3</color>
+    <color name="whatsapp_bubble_received">#FFFFFF</color>
+    <color name="whatsapp_bubble_sent_text">#111B21</color>
+    <color name="whatsapp_bubble_received_text">#111B21</color>
+    <color name="message_input_bg">#F1F3F5</color>
+    <color name="whatsapp_chat_bg_end">#D4C9C0</color>
+    <color name="option_card_bg_default">#FFFFFF</color>
+    <color name="option_card_stroke_default">#E0E0E0</color>
+    <color name="option_card_bg_selected">#E3F2FD</color>
+    <color name="option_card_stroke_selected">#2196F3</color>
+</resources>

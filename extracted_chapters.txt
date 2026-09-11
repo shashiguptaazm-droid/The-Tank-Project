@@ -1,0 +1,502 @@
+            [
+                'name' => 'TITLE',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Title', 'paragraphs' => []],
+                    ['heading' => 'Subtitle', 'paragraphs' => []],
+                    ['heading' => 'Author', 'paragraphs' => []],
+                    ['heading' => 'Guide', 'paragraphs' => []],
+                    ['heading' => 'Institution Details', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'CERTIFICATE',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Certificate Body', 'paragraphs' => []],
+                    ['heading' => 'Guide Signature', 'paragraphs' => []],
+                    ['heading' => 'HOD Signature', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'DECLARATION',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Declaration Statement', 'paragraphs' => []],
+                    ['heading' => 'Student Details', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'ACKNOWLEDGEMENTS',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Acknowledgements', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'TABLE OF CONTENTS',
+                'status' => 'synced',
+                'sections' => [
+
+                ]
+            ],
+            [
+                'name' => 'LIST OF TABLES',
+                'status' => 'synced',
+                'sections' => [
+
+                ]
+            ],
+            [
+                'name' => 'LIST OF FIGURES',
+                'status' => 'synced',
+                'sections' => [
+
+                ]
+            ],
+            [
+                'name' => 'LIST OF ABBREVIATIONS',
+                'status' => 'synced',
+                'sections' => [
+
+                ]
+            ],
+            [
+                'name' => 'ABSTRACT',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Background', 'paragraphs' => []],
+                    ['heading' => 'Aim', 'paragraphs' => []],
+                    ['heading' => 'Methods', 'paragraphs' => []],
+                    ['heading' => 'Results', 'paragraphs' => []],
+                    ['heading' => 'Conclusion', 'paragraphs' => []],
+                    ['heading' => 'Keywords', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'KEYWORDS',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Keywords List', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'INTRODUCTION',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Background', 'paragraphs' => []],
+                    ['heading' => 'Problem Statement', 'paragraphs' => []],
+                    ['heading' => 'Need for the Study', 'paragraphs' => []],
+                    ['heading' => 'Aim', 'paragraphs' => []],
+                    ['heading' => 'Objectives', 'paragraphs' => []],
+                    ['heading' => 'Scope', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'BACKGROUND',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Epidemiology', 'paragraphs' => []],
+                    ['heading' => 'Clinical Relevance', 'paragraphs' => []],
+                    ['heading' => 'Current Evidence', 'paragraphs' => []],
+                    ['heading' => 'Knowledge Gap', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'DISEASE BURDEN',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Global Burden', 'paragraphs' => []],
+                    ['heading' => 'National Burden', 'paragraphs' => []],
+                    ['heading' => 'Local/Regional Burden', 'paragraphs' => []],
+                    ['heading' => 'Clinical Burden', 'paragraphs' => []],
+                    ['heading' => 'Public Health Impact', 'paragraphs' => []],
+                    ['heading' => 'Disability Adjusted Life Years (DALYs)', 'paragraphs' => []],
+                    ['heading' => 'Economic Burden', 'paragraphs' => []],
+                    ['heading' => 'Burden Relevance to Thesis', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'EPIDEMIOLOGY',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Prevalence', 'paragraphs' => []],
+                    ['heading' => 'Incidence', 'paragraphs' => []],
+                    ['heading' => 'Age Distribution', 'paragraphs' => []],
+                    ['heading' => 'Sex Distribution', 'paragraphs' => []],
+                    ['heading' => 'Geographic Distribution', 'paragraphs' => []],
+                    ['heading' => 'Risk Groups', 'paragraphs' => []],
+                    ['heading' => 'Time Trends', 'paragraphs' => []],
+                    ['heading' => 'Epidemiological Determinants', 'paragraphs' => []],
+                    ['heading' => 'Local Epidemiological Data', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'PATHOPHYSIOLOGY',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Disease Mechanism Overview', 'paragraphs' => []],
+                    ['heading' => 'Cellular and Molecular Basis', 'paragraphs' => []],
+                    ['heading' => 'Organ System Involvement', 'paragraphs' => []],
+                    ['heading' => 'Disease Progression', 'paragraphs' => []],
+                    ['heading' => 'Compensatory Mechanisms', 'paragraphs' => []],
+                    ['heading' => 'Pathophysiological Basis of Symptoms', 'paragraphs' => []],
+                    ['heading' => 'Clinical-Pathological Correlation', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'CURRENT TREATMENT',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Medical Management', 'paragraphs' => []],
+                    ['heading' => 'Pharmacological Therapy', 'paragraphs' => []],
+                    ['heading' => 'Surgical/Interventional Options', 'paragraphs' => []],
+                    ['heading' => 'Treatment Guidelines', 'paragraphs' => []],
+                    ['heading' => 'Treatment Algorithms', 'paragraphs' => []],
+                    ['heading' => 'Novel/Experimental Therapies', 'paragraphs' => []],
+                    ['heading' => 'Treatment Outcomes and Prognosis', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'LITERATURE REVIEW',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Disease Definition', 'paragraphs' => []],
+                    ['heading' => 'Epidemiology', 'paragraphs' => []],
+                    ['heading' => 'Risk Factors', 'paragraphs' => []],
+                    ['heading' => 'Pathophysiology', 'paragraphs' => []],
+                    ['heading' => 'Types and Classification', 'paragraphs' => []],
+                    ['heading' => 'Investigations in Literature', 'paragraphs' => []],
+                    ['heading' => 'Relation of Investigations with Disease', 'paragraphs' => []],
+                    ['heading' => 'Key Study Summary and Research Gap', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'RESEARCH GAP',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'What is known', 'paragraphs' => []],
+                    ['heading' => 'What is missing', 'paragraphs' => []],
+                    ['heading' => 'Why this study is needed', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'NEED FOR STUDY',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Evidence Gap', 'paragraphs' => []],
+                    ['heading' => 'Clinical Relevance', 'paragraphs' => []],
+                    ['heading' => 'Public Health Significance', 'paragraphs' => []],
+                    ['heading' => 'Unanswered Questions', 'paragraphs' => []],
+                    ['heading' => 'Potential Impact of the Study', 'paragraphs' => []],
+                    ['heading' => 'Justification for the Current Research', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'AIM OF STUDY',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Aim', 'paragraphs' => []],
+                    ['heading' => 'Clinical Rationale', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'OBJECTIVES',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Primary Objective', 'paragraphs' => []],
+                    ['heading' => 'Secondary Objectives', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'HYPOTHESIS',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Null Hypothesis', 'paragraphs' => []],
+                    ['heading' => 'Alternate Hypothesis', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'MATERIALS AND METHODS',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Study Design', 'paragraphs' => []],
+                    ['heading' => 'Study Setting', 'paragraphs' => []],
+                    ['heading' => 'Inclusion Criteria', 'paragraphs' => []],
+                    ['heading' => 'Exclusion Criteria', 'paragraphs' => []],
+                    ['heading' => 'Sample Size', 'paragraphs' => []],
+                    ['heading' => 'Sampling Technique', 'paragraphs' => []],
+                    ['heading' => 'Data Collection', 'paragraphs' => []],
+                    ['heading' => 'Variables Collected', 'paragraphs' => []],
+                    ['heading' => 'Investigations', 'paragraphs' => []],
+                    ['heading' => 'Study Procedure', 'paragraphs' => []],
+                    ['heading' => 'Outcome Measures', 'paragraphs' => []],
+                    ['heading' => 'Statistical Analysis', 'paragraphs' => []],
+                    ['heading' => 'Ethical Considerations', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'STUDY DESIGN',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Design Overview', 'paragraphs' => []],
+                    ['heading' => 'Design Rationale', 'paragraphs' => []],
+                    ['heading' => 'Study Flow', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'STUDY SETTING',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Institution', 'paragraphs' => []],
+                    ['heading' => 'Department', 'paragraphs' => []],
+                    ['heading' => 'Setting Description', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'STUDY DURATION',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Start Date', 'paragraphs' => []],
+                    ['heading' => 'End Date', 'paragraphs' => []],
+                    ['heading' => 'Total Duration', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'STUDY POPULATION',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Target Population', 'paragraphs' => []],
+                    ['heading' => 'Source Population', 'paragraphs' => []],
+                    ['heading' => 'Eligibility Overview', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'INCLUSION CRITERIA',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Inclusion Criteria', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'EXCLUSION CRITERIA',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Exclusion Criteria', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'SAMPLE SIZE',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Sample Size Calculation', 'paragraphs' => []],
+                    ['heading' => 'Assumptions', 'paragraphs' => []],
+                    ['heading' => 'Final Sample Size', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'SAMPLING TECHNIQUE',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Sampling Method', 'paragraphs' => []],
+                    ['heading' => 'Selection Process', 'paragraphs' => []],
+                    ['heading' => 'Rationale', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'DATA COLLECTION',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Data Sources', 'paragraphs' => []],
+                    ['heading' => 'Data Collection Procedure', 'paragraphs' => []],
+                    ['heading' => 'Quality Control', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'VARIABLES COLLECTED',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Independent Variables', 'paragraphs' => []],
+                    ['heading' => 'Dependent Variables', 'paragraphs' => []],
+                    ['heading' => 'Confounders', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'INVESTIGATIONS',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Brief Overview', 'paragraphs' => []],
+                    ['heading' => 'Clinical Examination and Bedside Assessment', 'paragraphs' => []],
+                    ['heading' => 'Laboratory Investigations', 'paragraphs' => []],
+                    ['heading' => 'Imaging Investigations', 'paragraphs' => []],
+                    ['heading' => 'Device-Based and Special Investigations', 'paragraphs' => []],
+                    ['heading' => 'Diagnostic Workflow', 'paragraphs' => []],
+                    ['heading' => 'Relation of Investigations with Disease', 'paragraphs' => []],
+                    ['heading' => 'Evidence from Literature', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'STUDY PROCEDURE',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Screening', 'paragraphs' => []],
+                    ['heading' => 'Enrollment', 'paragraphs' => []],
+                    ['heading' => 'Intervention/Observation', 'paragraphs' => []],
+                    ['heading' => 'Follow-up', 'paragraphs' => []],
+                    ['heading' => 'Data Recording', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'OUTCOME MEASURES',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Primary Outcome', 'paragraphs' => []],
+                    ['heading' => 'Secondary Outcomes', 'paragraphs' => []],
+                    ['heading' => 'Measurement Time Points', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'STATISTICAL ANALYSIS',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Software', 'paragraphs' => []],
+                    ['heading' => 'Descriptive Statistics', 'paragraphs' => []],
+                    ['heading' => 'Inferential Tests', 'paragraphs' => []],
+                    ['heading' => 'Significance Threshold', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'ETHICAL CONSIDERATIONS',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Ethics Approval', 'paragraphs' => []],
+                    ['heading' => 'Informed Consent', 'paragraphs' => []],
+                    ['heading' => 'Confidentiality', 'paragraphs' => []],
+                    ['heading' => 'Risk/Benefit Statement', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'RESULTS',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Demographics', 'paragraphs' => []],
+                    ['heading' => 'Primary Outcomes', 'paragraphs' => []],
+                    ['heading' => 'Secondary Outcomes', 'paragraphs' => []],
+                    ['heading' => 'Other Observations', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'OBSERVATIONS',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Observation Summary', 'paragraphs' => []],
+                    ['heading' => 'Trend Analysis', 'paragraphs' => []],
+                    ['heading' => 'Key Notes', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'DISCUSSION',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Key Findings', 'paragraphs' => []],
+                    ['heading' => 'Comparison with Literature', 'paragraphs' => []],
+                    ['heading' => 'Limitations', 'paragraphs' => []],
+                    ['heading' => 'Clinical Implications', 'paragraphs' => []],
+                    ['heading' => 'Future Directions', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'CONCLUSION',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Key Findings', 'paragraphs' => []],
+                    ['heading' => 'Clinical Relevance', 'paragraphs' => []],
+                    ['heading' => 'Final Conclusion', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'SUMMARY',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Thesis Summary', 'paragraphs' => []],
+                    ['heading' => 'Overall Message', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'RECOMMENDATIONS',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Clinical Recommendations', 'paragraphs' => []],
+                    ['heading' => 'Future Research', 'paragraphs' => []],
+                    ['heading' => 'Practice Implications', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'LIMITATIONS',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Study Limitations', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'FUTURE SCOPE',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Future Research Directions', 'paragraphs' => []],
+                    ['heading' => 'Potential Applications', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'REFERENCES',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Reference List', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'BIBLIOGRAPHY',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Bibliography List', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'APPENDICES',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Appendix Items', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'PROFORMA',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Patient Details', 'paragraphs' => []],
+                    ['heading' => 'History', 'paragraphs' => []],
+                    ['heading' => 'Examination', 'paragraphs' => []],
+                    ['heading' => 'Investigations', 'paragraphs' => []],
+                    ['heading' => 'Diagnosis', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'PATIENT CONSENT FORM (ENGLISH)',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'Introduction', 'paragraphs' => []],
+                    ['heading' => 'Procedure', 'paragraphs' => []],
+                    ['heading' => 'Risks', 'paragraphs' => []],
+                    ['heading' => 'Benefits', 'paragraphs' => []],
+                    ['heading' => 'Confidentiality', 'paragraphs' => []]
+                ]
+            ],
+            [
+                'name' => 'PATIENT CONSENT FORM (HINDI)',
+                'status' => 'synced',
+                'sections' => [
+                    ['heading' => 'परिचय', 'paragraphs' => []],
+                    ['heading' => 'प्रक्रिया', 'paragraphs' => []],
+                    ['heading' => 'जोखिम', 'paragraphs' => []],
+                    ['heading' => 'लाभ', 'paragraphs' => []],
+                    ['heading' => 'गोपनीयता', 'paragraphs' => []]
+                ]
+            ]

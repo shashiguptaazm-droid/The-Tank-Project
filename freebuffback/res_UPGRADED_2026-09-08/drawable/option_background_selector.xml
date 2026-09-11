@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- When the option is selected (Correct/Selected state) -->
+    <item android:state_checked="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#E8F5E9" /> <!-- Light Green for light mode -->
+            <stroke android:width="2dp" android:color="#2E7D32" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+
+    <!-- DEFAULT STATE (The fix for white-on-white) -->
+    <item>
+        <shape android:shape="rectangle">
+            <!-- 🔥 Use colorSurface so it turns dark in Dark Mode -->
+            <solid android:color="?attr/colorSurface" />
+            <stroke android:width="1dp" android:color="#E0E0E0" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+</selector>

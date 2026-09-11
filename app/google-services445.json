@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "103336576343",
+    "firebase_url": "https://edulabsrtm-default-rtdb.firebaseio.com",
+    "project_id": "edulabsrtm",
+    "storage_bucket": "edulabsrtm.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:103336576343:android:16804cf22ad0cd7290aa12",
+        "android_client_info": {
+          "package_name": "com.corp.edulabsrtm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "103336576343-3pm5tm8conuedv1eusdi6aceh5fmn09d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.corp.edulabsrtm",
+            "certificate_hash": "183e35d7aebe140e2119b12d760754bb6dbe65e6"
+          }
+        },
+        {
+          "client_id": "103336576343-hjvfa13v9rq0suk96t7vo9r6qr2aah2f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnX67d-g8OovVLCY50Fysgm8PBFlXq3uk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103336576343-84i5js9hk3tbf7eri60gqte501aods52.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

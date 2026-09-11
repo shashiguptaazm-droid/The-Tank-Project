@@ -1,0 +1,9 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- Semi-transparent red -->
+    <solid android:color="#80C62828"/> <!-- 50% opacity red -->
+    <stroke android:width="2dp" android:color="#B71C1C"/>
+    <corners android:radius="12dp"/>
+    <padding android:left="8dp" android:top="8dp"
+        android:right="8dp" android:bottom="8dp"/>
+</shape>

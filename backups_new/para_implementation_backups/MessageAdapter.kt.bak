@@ -1,0 +1,246 @@
+package com.rankwarz.edulabsrtm
+
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.PopupMenu
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import java.text.SimpleDateFormat
+import java.util.Locale
+
+class MessageAdapter(
+    private val currentUserId: Int,
+    private val onImageClick: (String) -> Unit,
+    private val onFileClick: (String) -> Unit,
+    private val onCallInviteClick: (String) -> Unit,
+    private val onDeleteMessage: (ChatMessage, Int) -> Unit,
+    private val onAskAiAboutDocument: (String, String) -> Unit
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private val messages = mutableListOf<ChatMessage>()
+
+    companion object {
+        private const val TYPE_SENT = 1
+        private const val TYPE_RECEIVED = 2
+    }
+
+    fun addMessage(msg: ChatMessage) {
+        messages.add(msg)
+        notifyItemInserted(messages.size - 1)
+    }
+
+    fun setMessages(newList: List<ChatMessage>) {
+        messages.clear()
+        messages.addAll(newList)
+        notifyDataSetChanged()
+    }
+
+    fun removeMessageAt(position: Int) {
+        if (position >= 0 && position < messages.size) {
+            messages.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (messages[position].senderId == currentUserId) TYPE_SENT else TYPE_RECEIVED
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == TYPE_SENT) {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_message_sent, parent, false)
+            SentViewHolder(view)
+        } else {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_message_received, parent, false)
+            ReceivedViewHolder(view)
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val message = messages[position]
+        if (holder is SentViewHolder) holder.bind(message, position)
+        else if (holder is ReceivedViewHolder) holder.bind(message, position)
+    }
+
+    override fun getItemCount(): Int = messages.size
+
+    inner class SentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val text: TextView = view.findViewById(R.id.messageText)
+        private val time: TextView = view.findViewById(R.id.messageTime)
+        private val image: ImageView = view.findViewById(R.id.messageImage)
+        private val fileBadge: TextView = view.findViewById(R.id.fileBadge)
+        private val status: TextView = view.findViewById(R.id.messageStatus)
+        private val askAiBtn: TextView = view.findViewById(R.id.askAiBtn)
+        private val bubbleLayout: View = view.findViewById(R.id.bubbleLayout)
+
+        fun bind(msg: ChatMessage, position: Int) {
+            bindShared(msg, text, time, image, fileBadge, askAiBtn, bubbleLayout)
+            status.text = if (msg.isRead == 1) " \u2713\u2713" else " \u2713"
+            status.setTextColor(if (msg.isRead == 1) 0xFF34B7F1.toInt() else 0xFF808080.toInt())
+
+            // Long press for copy and delete
+            itemView.setOnLongClickListener {
+                showMessageOptions(itemView, msg, position)
+                true
+            }
+        }
+    }
+
+    inner class ReceivedViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val text: TextView = view.findViewById(R.id.messageText)
+        private val time: TextView = view.findViewById(R.id.messageTime)
+        private val image: ImageView = view.findViewById(R.id.messageImage)
+        private val fileBadge: TextView = view.findViewById(R.id.fileBadge)
+        private val askAiBtn: TextView = view.findViewById(R.id.askAiBtn)
+        private val bubbleLayout: View = view.findViewById(R.id.bubbleLayout)
+
+        fun bind(msg: ChatMessage, position: Int) {
+            bindShared(msg, text, time, image, fileBadge, askAiBtn, bubbleLayout)
+
+            // Long press for copy and delete
+            itemView.setOnLongClickListener {
+                showMessageOptions(itemView, msg, position)
+                true
+            }
+        }
+    }
+
+    private fun bindShared(
+        msg: ChatMessage,
+        textTv: TextView,
+        timeTv: TextView,
+        imageIv: ImageView,
+        fileTv: TextView,
+        askAiBtn: TextView,
+        bubbleLayout: View
+    ) {
+        if (msg.text.startsWith("VIDEO_CALL_INVITE:")) {
+            val room = msg.text.substringAfter("VIDEO_CALL_INVITE:")
+            textTv.text = "\uD83D\uDCA9 Video Call Invite (Tap to join)"
+            textTv.setOnClickListener { onCallInviteClick(room) }
+            fileTv.visibility = View.GONE
+            askAiBtn.visibility = View.GONE
+        } else {
+            textTv.text = msg.text
+            textTv.setOnClickListener(null)
+
+            if (msg.attachment.isNotBlank() && msg.attachment != "null") {
+                val fullUrl = if (msg.attachment.startsWith("http")) msg.attachment else "https://medigyaan.xyz/Neurons/" + msg.attachment.removePrefix("/")
+                val docType = getDocumentType(msg.attachment)
+                val icon = getDocumentIcon(docType)
+                val fileName = msg.attachment.substringAfterLast("/")
+
+                if (isImage(msg.attachment)) {
+                    imageIv.visibility = View.VISIBLE
+                    fileTv.visibility = View.GONE
+                    Glide.with(imageIv.context).load(fullUrl).centerCrop().into(imageIv)
+                    imageIv.setOnClickListener { onImageClick(fullUrl) }
+                    askAiBtn.visibility = View.GONE
+                } else {
+                    imageIv.visibility = View.GONE
+                    fileTv.visibility = View.VISIBLE
+                    fileTv.text = "$icon $fileName"
+                    fileTv.setBackgroundResource(getDocumentBackground(docType))
+                    fileTv.setOnClickListener { openDocumentInVps(it, fullUrl, msg.attachment) }
+                    
+                    // Show "Ask AI" button for documents
+                    askAiBtn.visibility = View.VISIBLE
+                    askAiBtn.setOnClickListener { onAskAiAboutDocument(fullUrl, msg.text) }
+                }
+            } else {
+                imageIv.visibility = View.GONE
+                fileTv.visibility = View.GONE
+                askAiBtn.visibility = View.GONE
+            }
+        }
+        textTv.visibility = if (msg.text.isNotEmpty()) View.VISIBLE else View.GONE
+        timeTv.text = formatTime(msg.sentAt)
+    }
+
+    private fun getDocumentType(path: String): String {
+        val ext = path.substringAfterLast(".").lowercase()
+        return when {
+            ext in listOf("pdf") -> "pdf"
+            ext in listOf("doc", "docx") -> "word"
+            ext in listOf("ppt", "pptx") -> "ppt"
+            ext in listOf("xls", "xlsx") -> "excel"
+            ext in listOf("txt") -> "txt"
+            else -> "file"
+        }
+    }
+
+    private fun getDocumentIcon(docType: String): String {
+        return when (docType) {
+            "pdf" -> "\uD83D\uDCC4"
+            "word" -> "\uD83D\uDCDD"
+            "ppt" -> "\uD83D\uDCCA"
+            "excel" -> "\uD83D\uDCC8"
+            "txt" -> "\uD83D\uDCC3"
+            else -> "\uD83D\uDCCE"
+        }
+    }
+
+    private fun getDocumentBackground(docType: String): Int {
+        return when (docType) {
+            "pdf" -> R.drawable.bg_file_pdf
+            "word" -> R.drawable.bg_file_word
+            "ppt" -> R.drawable.bg_file_ppt
+            "excel" -> R.drawable.bg_file_excel
+            else -> R.drawable.bg_file_generic
+        }
+    }
+
+    private fun openDocumentInVps(view: View, url: String, originalPath: String) {
+        val viewerUrl = "https://docs.google.com/viewer?embedded=true&url=$url"
+        val intent = Intent(view.context, WebViewActivity::class.java).putExtra("url", viewerUrl)
+        intent.putExtra("title", originalPath.substringAfterLast("/"))
+        view.context.startActivity(intent)
+    }
+
+    private fun showMessageOptions(view: View, msg: ChatMessage, position: Int) {
+        val popup = PopupMenu(view.context, view)
+        popup.menuInflater.inflate(R.menu.message_long_press_menu, popup.menu)
+        
+        // Only show delete for own messages
+        if (msg.senderId != currentUserId) {
+            popup.menu.findItem(R.id.action_delete).isVisible = false
+        }
+        
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_copy -> {
+                    val clipboard = view.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = android.content.ClipData.newPlainText("Message", msg.text)
+                    clipboard.setPrimaryClip(clip)
+                    Toast.makeText(view.context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.action_delete -> {
+                    onDeleteMessage(msg, position)
+                    true
+                }
+                else -> false
+            }
+        }
+        popup.show()
+    }
+
+    private fun isImage(path: String) = listOf("jpg", "jpeg", "png", "gif", "webp").any { path.lowercase().endsWith(it) }
+
+    private fun formatTime(sentAt: String): String {
+        return try {
+            val sdfSource = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val date = sdfSource.parse(sentAt) ?: return sentAt
+            SimpleDateFormat("hh:mm a", Locale.getDefault()).format(date)
+        } catch (e: Exception) { sentAt }
+    }
+}

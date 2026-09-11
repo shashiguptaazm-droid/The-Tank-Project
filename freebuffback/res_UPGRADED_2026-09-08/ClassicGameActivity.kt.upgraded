@@ -1,0 +1,1801 @@
+package com.rankwarz.edulabsrtm
+
+import QuestionModel
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
+import android.content.Context
+import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.Typeface
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.util.Log
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
+import android.view.animation.TranslateAnimation
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.android.volley.DefaultRetryPolicy
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.bumptech.glide.Glide
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.database.*
+import org.json.JSONArray
+import org.json.JSONObject
+import java.util.Collections
+import kotlin.math.sin
+import kotlin.random.Random
+
+class ClassicGameActivity : AppCompatActivity() {
+
+    // ─── Companion ───────────────────────────────────────────────────────────
+
+    companion object {
+
+        @JvmStatic
+        fun start(
+            context: Context,
+            challengeId: String,
+            uniqueId: Int = 1,
+            subject: String? = null,
+            topic: String? = null,
+            isHost: Boolean = true,
+            isChallenge: Boolean = true,
+            realMultiplayer: Boolean = true
+        ) {
+            val intent = Intent(context, ClassicGameActivity::class.java).apply {
+                putExtra("CHALLENGE_ID",   challengeId)
+                putExtra("UNIQUE_ID",      uniqueId)
+                putExtra("IS_HOST",        isHost)
+                putExtra("IS_CHALLENGE",   isChallenge)
+                putExtra("REAL_MULTIPLAYER", realMultiplayer)
+                subject?.let { putExtra("SUBJECT", it) }
+                topic?.let   { putExtra("TOPIC",   it) }
+            }
+            context.startActivity(intent)
+        }
+
+        @JvmStatic
+        fun start(
+            context: Context,
+            challengeId: Int,
+            uniqueId: Int = 1,
+            subject: String? = null,
+            topic: String? = null,
+            isHost: Boolean = true,
+            isChallenge: Boolean = true
+        ) {
+            start(
+                context         = context,
+                challengeId     = challengeId.toString(),
+                uniqueId        = uniqueId,
+                subject         = subject,
+                topic           = topic,
+                isHost          = isHost,
+                isChallenge     = isChallenge,
+                realMultiplayer = false
+            )
+        }
+
+        val BOT_NAME_POOL = listOf(
+            "Aarav","Vihaan","Aditya","Arjun","Reyansh","Sai","Krish","Ishaan","Vivaan","Atharv",
+            "Parth","Kabir","Om","Rahul","Rohan","Ayaan","Aryan","Kunal","Naman","Samar",
+            "Tanish","Yash","Aman","Dev","Mihir","Ritvik","Rudra","Shaurya","Ved","Vansh",
+            "Abhay","Abhinav","Adeel","Akhil","Alok","Aniket","Ansh","Arin","Arnav","Ashwin",
+            "Bharat","Chirag","Darsh","Deepak","Dhruv","Dinesh","Eshan","Gaurav","Harsh","Hemant",
+            "Imran","Ishan","Jatin","Karan","Kartik","Laksh","Manav","Mohit","Nikhil","Nitish",
+            "Piyush","Pranav","Puneet","Raj","Rakesh","Rishabh","Sahil","Sandeep","Sanjay","Shivam",
+            "Siddharth","Soham","Sumit","Tarun","Uday","Utkarsh","Varun","Veer","Vikas","Vivek",
+            "Zain","Zorawar","Aanya","Anika","Anvi","Diya","Ira","Jiya","Kavya","Meera",
+            "Myra","Naina","Palak","Riya","Sanya","Sara","Sia","Tanya","Trisha","Vanya",
+            "Yukti","Zara","Aditi","Bhavna","Chhavi","Esha","Gita","Hina","Ishita","Jhanvi",
+            "Khushi","Lavanya","Madhuri","Neha","Oviya","Pallavi","Rashi","Shreya","Tanvi","Uma",
+            "Aesha","Bhoomi","Chetna","Damini","Ekta","Farah","Geet","Hansika","Indira","Jasmine",
+            "Kalpana","Lata","Mansi","Nandini","Ojasvi","Prerna","Radhika","Sakshi","Tejaswi","Urvi"
+        )
+
+        enum class BotPersonality {
+            STEADY, STREAKY, CLUTCH, TILTING, CATCH_UP
+        }
+    }
+
+    // ─── Firebase refs ───────────────────────────────────────────────────────
+
+    private val TAG = "CLASSIC_GAME_DEBUG"
+
+    private lateinit var challengeRootRef:    DatabaseReference
+    private lateinit var challengePlayersRef: DatabaseReference
+    private lateinit var questionOrderRef:    DatabaseReference
+
+    private var healthListener:        ValueEventListener? = null
+    private var sharedQuestionListener: ValueEventListener? = null
+    private var challengeMetaListener: ValueEventListener? = null
+
+    // ─── Heartbeat ───────────────────────────────────────────────────────────
+
+    private val HEARTBEAT_INTERVAL_MS = 5_000L
+    private val heartbeatHandler = Handler(Looper.getMainLooper())
+    private val heartbeatRunnable = object : Runnable {
+        override fun run() {
+            if (!isGameOverHandled && isRealMultiplayer && ::challengeRootRef.isInitialized) {
+                challengeRootRef.child("heartbeat/$userId").setValue(System.currentTimeMillis())
+            }
+            heartbeatHandler.postDelayed(this, HEARTBEAT_INTERVAL_MS)
+        }
+    }
+
+    // ─── Game state ──────────────────────────────────────────────────────────
+
+    private var isGameOverHandled = false
+    private var currentHp: Int    = 100
+    private var hpFlashOverlay: View? = null
+
+    private var correctStreak = 0
+    private var totalCorrect  = 0
+    private var totalAnswered = 0
+
+    // ─── Views ───────────────────────────────────────────────────────────────
+
+    private lateinit var rootLayout:           ViewGroup
+    private lateinit var questionText:         TextView
+    private lateinit var timerText:            TextView
+    private lateinit var radioGroup:           RadioGroup
+    private lateinit var optionA:              RadioButton
+    private lateinit var optionB:              RadioButton
+    private lateinit var optionC:              RadioButton
+    private lateinit var optionD:              RadioButton
+    private lateinit var submitBtn:            Button
+    private lateinit var statusText:           TextView
+    private lateinit var questionImageView:    ImageView
+    private lateinit var finalSubmitBtn:       Button
+    private lateinit var explanationLayout:    View
+    private lateinit var explanationText:      TextView
+    private lateinit var battleCard:           View
+    private lateinit var challengeBattleHeader: LinearLayout
+    private lateinit var tvBattleStatusTitle:   TextView
+    private lateinit var btnBattleToggle:      ImageButton
+    private lateinit var btnAdrenaline:        ImageButton
+    private lateinit var btnShield:            ImageButton
+    private lateinit var btnShock:             ImageButton
+    private lateinit var tvAdrenalineCooldown: TextView
+    private lateinit var tvShieldCooldown:     TextView
+    private lateinit var tvShockCooldown:      TextView
+    private lateinit var btnConfuse:           ImageButton
+    private lateinit var tvConfuseCooldown:    TextView
+    private lateinit var streakLabel:          TextView
+    private lateinit var questionProgressLabel: TextView
+    private lateinit var lowHpWarningView:     View
+    private lateinit var damageNumberPool:     MutableList<TextView>
+
+    // ─── Player maps ─────────────────────────────────────────────────────────
+
+    private val playerBars        = HashMap<String, ProgressBar>()
+    private val playerScoreLabels = HashMap<String, TextView>()
+    private val playerScores      = HashMap<String, Int>()
+    private val playerSkins       = HashMap<String, String>()
+    private val playerNames       = HashMap<String, String>()
+
+    // ─── User / session ──────────────────────────────────────────────────────
+
+    private var userId          = 0
+    private var currentUserName = "Doctor"
+    private var currentQuestion: QuestionModel? = null
+    private var uniqueId        = 0
+    private var challengeId     = ""
+    private var isHost          = true
+
+    // ─── Power-ups ───────────────────────────────────────────────────────────
+
+    private var canHeal            = true
+    private var canShield          = true
+    private var canShock           = true
+    private var canConfuse         = true
+    private var shieldRoundsActive = 0
+    private var isShockCharged     = false
+
+    // ─── Questions ───────────────────────────────────────────────────────────
+
+    private var allQuestionIds = ArrayList<Int>()
+    private var currentIndex   = 0
+    private var testTimer: CountDownTimer? = null
+
+    private val IMAGE_BASE_URL = "https://medigyaan.xyz/Neurons/"
+    private val BASE_URL       = "https://medigyaan.xyz/Neurons/"
+    private val requestQueue by lazy { Volley.newRequestQueue(this) }
+
+    private val uiHandler  = Handler(Looper.getMainLooper())
+    private val reviewJson = JSONArray()
+
+    private var isQuestionGenerationInProgress = false
+    private var sharedQuestionLoaded           = false
+    private var selectedSubject: String?       = null
+    private var currentTopic:    String?       = null
+    private var isChallenge      = false
+    private var gameStarted      = false
+    private var questionToken    = 0
+    private var isRealMultiplayer = false
+    private var isBotMatch        = false
+    private var battleStatusExpanded = true
+
+    // ─── Bot state ───────────────────────────────────────────────────────────
+
+    private data class BotState(
+        val id: String,
+        val name: String,
+        val skin: String,
+        val baseAccuracy: Float,
+        val minDelayMs: Long,
+        val maxDelayMs: Long,
+        val personality: BotPersonality = BotPersonality.STEADY,
+        var hp: Int    = 100,
+        var score: Int = 0,
+        var finished: Boolean = false,
+        var consecutiveCorrect: Int = 0,
+        var consecutiveWrong:   Int = 0,
+        var questionsAnswered:  Int = 0,
+        var confusedThisRound:  Boolean = false
+    ) {
+        fun effectiveAccuracy(playerScore: Int, @Suppress("UNUSED_PARAMETER") playerHp: Int): Float {
+            var acc = baseAccuracy
+            when (personality) {
+                BotPersonality.STREAKY -> {
+                    if (consecutiveCorrect >= 3) acc = (acc + 0.15f).coerceAtMost(0.95f)
+                    if (consecutiveWrong   >= 2) acc = (acc - 0.20f).coerceAtLeast(0.25f)
+                }
+                BotPersonality.CLUTCH -> {
+                    acc = if (hp <= 40) (acc + 0.20f).coerceAtMost(0.95f)
+                    else          (acc - 0.10f).coerceAtLeast(0.30f)
+                }
+                BotPersonality.TILTING -> {
+                    acc = (acc - consecutiveWrong * 0.05f).coerceAtLeast(0.20f)
+                    if (consecutiveCorrect >= 1) acc = baseAccuracy
+                }
+                BotPersonality.CATCH_UP -> {
+                    val delta = score - playerScore
+                    acc = when {
+                        delta >  20 -> (acc - 0.15f).coerceAtLeast(0.35f)
+                        delta < -20 -> (acc + 0.20f).coerceAtMost(0.95f)
+                        else -> acc
+                    }
+                }
+                BotPersonality.STEADY -> Unit
+            }
+            if (confusedThisRound) acc = (acc - 0.40f).coerceAtLeast(0.05f)
+            return acc
+        }
+
+        fun effectiveDelay(rng: Random): Long {
+            val base = minDelayMs + (rng.nextFloat() * (maxDelayMs - minDelayMs)).toLong()
+            return when (personality) {
+                BotPersonality.CLUTCH  -> if (hp <= 40) (base * 0.6f).toLong() else base
+                BotPersonality.TILTING -> base + (consecutiveWrong * 150L)
+                else -> base
+            }
+        }
+    }
+
+    private val botStates = HashMap<String, BotState>()
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // LIFECYCLE
+    // ─────────────────────────────────────────────────────────────────────────
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        logStep("onCreate() started")
+        setContentView(R.layout.activity_test_mode)
+
+        val prefs       = getSharedPreferences("MY_APP", Context.MODE_PRIVATE)
+        userId          = prefs.getInt("user_id", 0)
+        currentUserName = prefs.getString("name", "Doctor") ?: "Doctor"
+
+        selectedSubject = intent.getStringExtra("SUBJECT")?.trim()?.takeIf { it.isNotEmpty() }
+            ?: intent.getStringExtra("SELECTED_SUBJECT")?.trim()?.takeIf { it.isNotEmpty() }
+            ?: prefs.getString("selected_subject_preference", null)
+        currentTopic    = intent.getStringExtra("TOPIC")?.trim()?.takeIf { it.isNotEmpty() }
+        uniqueId        = normalizeUniqueId(intent.getIntExtra("UNIQUE_ID", 1))
+        challengeId     = intent.getStringExtra("CHALLENGE_ID")?.trim().orEmpty()
+        isHost          = intent.getBooleanExtra("IS_HOST", true)
+
+        // FIX 3: isChallenge must always be true in real multiplayer so that
+        // damagePlayer() writes HP to Firebase
+        isChallenge       = intent.getBooleanExtra("IS_CHALLENGE", false) || challengeId.isNotBlank()
+        isRealMultiplayer = intent.getBooleanExtra("REAL_MULTIPLAYER", false)
+
+        // Safety: if we have a challenge ID but flag was not passed, treat as real multiplayer
+        if (challengeId.isNotBlank() && !isRealMultiplayer) {
+            val mode = intent.getStringExtra("MODE") ?: ""
+            if (mode == "CHALLENGE") isRealMultiplayer = true
+        }
+
+        bindViews()
+        setupPowerButtons()
+        setupButtons()
+        setupBottomNavigation()
+        setupLowHealthSystem()
+        animateQuestionCardEntrance()
+
+        if (isRealMultiplayer) {
+            logStep("Real multiplayer mode — challengeId=$challengeId isHost=$isHost")
+            // FIX 3: ensure isChallenge=true so damagePlayer writes to Firebase
+            isChallenge = true
+            startRealMultiplayerGame()
+        } else {
+            showMatchmakingPreviewDialog()
+            initializeBotStates()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        testTimer?.cancel()
+        uiHandler.removeCallbacksAndMessages(null)
+        heartbeatHandler.removeCallbacks(heartbeatRunnable)
+        cleanupListeners()
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // ENTRANCE ANIMATION
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun animateQuestionCardEntrance() {
+        questionText.alpha       = 0f
+        questionText.translationY = 80f
+        questionText.animate()
+            .alpha(1f).translationY(0f)
+            .setDuration(450).setStartDelay(200)
+            .setInterpolator(DecelerateInterpolator(2f)).start()
+
+        listOf(optionA, optionB, optionC, optionD).forEachIndexed { i, btn ->
+            btn.alpha       = 0f
+            btn.translationX = -60f
+            btn.animate()
+                .alpha(1f).translationX(0f)
+                .setDuration(350).setStartDelay((300 + i * 80).toLong())
+                .setInterpolator(DecelerateInterpolator(1.8f)).start()
+        }
+
+        submitBtn.scaleX = 0.8f; submitBtn.scaleY = 0.8f; submitBtn.alpha = 0f
+        submitBtn.animate().scaleX(1f).scaleY(1f).alpha(1f)
+            .setDuration(350).setStartDelay(650)
+            .setInterpolator(OvershootInterpolator(1.5f)).start()
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // REAL MULTIPLAYER ENTRY POINT
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun startRealMultiplayerGame() {
+        if (challengeId.isBlank()) {
+            Toast.makeText(this, "Invalid challenge ID", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+        setupClassicFirebaseSession()
+        registerCurrentUserReal()
+        gameStarted = true
+        startTimer(15 * 60 * 1000L)
+        observeChallengeMetaAndStartQuestions()
+        heartbeatHandler.post(heartbeatRunnable)
+    }
+
+    private fun setupClassicFirebaseSession() {
+        val ref = FirebaseDatabase.getInstance().getReference("challenges").child(challengeId)
+        challengeRootRef    = ref
+        challengePlayersRef = ref.child("players")
+        questionOrderRef    = ref.child("question_ids")
+        isBotMatch = !isRealMultiplayer
+
+        // Only host should overwrite status/timestamp — guest just reads
+        if (isHost) {
+            challengeRootRef.child("status").setValue("started")
+            challengeRootRef.child("created_at").setValue(ServerValue.TIMESTAMP)
+            challengeRootRef.child("isBotMatch").setValue(isBotMatch)
+        }
+
+        challengeMetaListener?.let { challengeRootRef.removeEventListener(it) }
+        challengeMetaListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (selectedSubject.isNullOrBlank())
+                    selectedSubject = snapshot.child("subject").getValue(String::class.java)
+                if (currentTopic.isNullOrBlank())
+                    currentTopic = snapshot.child("topic").getValue(String::class.java)
+                // Re-confirm host status from Firebase in case it changed
+                val hostId = snapshot.child("hostId").getValue(String::class.java)
+                if (hostId != null) isHost = (hostId == userId.toString())
+            }
+            override fun onCancelled(error: DatabaseError) {
+                logError("challengeMetaListener cancelled: ${error.message}")
+            }
+        }
+        challengeRootRef.addValueEventListener(challengeMetaListener!!)
+    }
+
+    private fun observeChallengeMetaAndStartQuestions() {
+        challengeRootRef.get()
+            .addOnSuccessListener { snapshot ->
+                if (selectedSubject.isNullOrBlank())
+                    selectedSubject = snapshot.child("subject").getValue(String::class.java)
+                if (currentTopic.isNullOrBlank())
+                    currentTopic = snapshot.child("topic").getValue(String::class.java)
+                if (selectedSubject.isNullOrBlank()) selectedSubject = "NEET PG"
+
+                if (isHost) ensureQuestionListForChallengeHost()
+                else        waitForSharedQuestionList()
+
+                setupPlayersListener()
+            }
+            .addOnFailureListener { e ->
+                logError("Failed to read challenge meta", e)
+                if (selectedSubject.isNullOrBlank()) selectedSubject = "NEET PG"
+                if (isHost) ensureQuestionListForChallengeHost()
+                else        waitForSharedQuestionList()
+                setupPlayersListener()
+            }
+    }
+
+    private fun registerCurrentUserReal() {
+        if (!::challengePlayersRef.isInitialized) return
+        challengePlayersRef.child(userId.toString()).get().addOnSuccessListener { snapshot ->
+            if (!snapshot.exists()) {
+                challengePlayersRef.child(userId.toString()).setValue(
+                    hashMapOf(
+                        "name" to currentUserName, "hp" to 100, "score" to 0,
+                        "image" to "", "skin" to "warrior",
+                        "isFinished" to false, "isBot" to false
+                    )
+                )
+            }
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // BOT MATCHMAKING (single-player path)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun showMatchmakingPreviewDialog() {
+        preGenerateBots()
+        val subjectText = selectedSubject ?: "NEET PG"
+        
+        val progressDialog = AlertDialog.Builder(this)
+            .setTitle("⚔ Finding Match")
+            .setMessage("Searching for opponents online...\n\nSubject: $subjectText")
+            .setCancelable(false)
+            .show()
+
+        uiHandler.postDelayed({
+            if (isFinishing) return@postDelayed
+            progressDialog.dismiss()
+            
+            val foundDialog = AlertDialog.Builder(this)
+                .setTitle("⚔ Match Found!")
+                .setMessage(buildString {
+                    append("Opponents connected:\n")
+                    append("• YOU (Dr. $currentUserName)\n")
+                    botStates.values.forEach { append("• Dr. ${it.name}\n") }
+                })
+                .setCancelable(false)
+                .show()
+                
+            uiHandler.postDelayed({
+                if (isFinishing) return@postDelayed
+                foundDialog.dismiss()
+                startGameAfterConfirmation()
+            }, 2000)
+            
+        }, 3000)
+    }
+
+    private fun initializeBotStates() {
+        if (botStates.isNotEmpty()) return
+        val personalities = BotPersonality.entries.toList().shuffled()
+
+        // Pick 3 unique names from the pool
+        val randomNames = BOT_NAME_POOL.shuffled().take(3)
+
+        val bots = listOf(
+            BotState("BOT_A", randomNames[0], "mage",     0.65f, 4000, 9000, personalities[0]),
+            BotState("BOT_B", randomNames[1], "assassin", 0.74f, 3500, 8000, personalities[1]),
+            BotState("BOT_C", randomNames[2], "tank",     0.58f, 5000, 12000, personalities[2])
+        )
+
+        bots.forEach { botStates[it.id] = it }
+    }
+
+    private fun preGenerateBots() {
+        // Ensure names are picked before the preview dialog is shown
+        if (botStates.isNotEmpty()) return
+        initializeBotStates()
+    }
+
+    private fun startGameAfterConfirmation() {
+        if (gameStarted) return
+        gameStarted = true
+        startTimer(15 * 60 * 1000L)
+
+        // Initialize Firebase refs for UI tracking even in bot matches
+        if (challengeId.isBlank()) {
+            challengeId = "ARENA_PVP_${userId}_${System.currentTimeMillis()}"
+        }
+        setupClassicFirebaseSession()
+        registerCurrentUser() // This will trigger createHumanAndBots()
+
+        if (!isRealMultiplayer) {
+            if (!selectedSubject.isNullOrBlank()) fetchQuestionsBySubjectSinglePlayer(selectedSubject!!)
+            else fetchQuestionsByUniqueIdSinglePlayer()
+        }
+        observeChallengeMetaAndStartQuestions()
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // VIEW BINDING
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun bindViews() {
+        rootLayout            = findViewById(android.R.id.content)
+        questionText          = findViewById(R.id.questionText)
+        timerText             = findViewById(R.id.timerText)
+        radioGroup            = findViewById(R.id.radioGroup)
+        optionA               = findViewById(R.id.optionA)
+        optionB               = findViewById(R.id.optionB)
+        optionC               = findViewById(R.id.optionC)
+        optionD               = findViewById(R.id.optionD)
+        submitBtn             = findViewById(R.id.submitBtn)
+        statusText            = findViewById(R.id.statusText)
+        questionImageView     = findViewById(R.id.questionImageView)
+        explanationLayout     = findViewById(R.id.explanationLayout)
+        explanationText       = findViewById(R.id.explanationText)
+        battleCard            = findViewById(R.id.battleCard)
+        btnBattleToggle       = findViewById(R.id.btnBattleToggle)
+        tvBattleStatusTitle   = findViewById(R.id.tvBattleStatusTitle)
+        challengeBattleHeader = findViewById(R.id.challengeBattleHeader)
+        finalSubmitBtn        = findViewById(R.id.finalSubmitBtn)
+        btnAdrenaline         = findViewById(R.id.btnAdrenaline)
+        btnShield             = findViewById(R.id.btnShield)
+        btnShock              = findViewById(R.id.btnShock)
+
+        tvAdrenalineCooldown  = tryFindTextView(R.id.tvAdrenalineCooldown)
+        tvShieldCooldown      = tryFindTextView(R.id.tvShieldCooldown)
+        tvShockCooldown       = tryFindTextView(R.id.tvShockCooldown)
+        btnConfuse            = tryFindImageButton(R.id.btnConfuse)
+        tvConfuseCooldown     = tryFindTextView(R.id.tvConfuseCooldown)
+        streakLabel           = tryFindTextView(R.id.tvStreak)
+        questionProgressLabel = tryFindTextView(R.id.tvQuestionProgress)
+
+        finalSubmitBtn.setOnClickListener { finishClassicMatch() }
+        btnBattleToggle.setOnClickListener { toggleBattleStatus() }
+        applyBattleStatusVisibility()
+    }
+
+    private fun tryFindTextView(id: Int): TextView =
+        try { findViewById(id) } catch (_: Exception) { TextView(this) }
+
+    private fun tryFindImageButton(id: Int): ImageButton =
+        try { findViewById(id) } catch (_: Exception) { ImageButton(this) }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // LOW-HP SYSTEM
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun setupLowHealthSystem() {
+        hpFlashOverlay = View(this).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            setBackgroundColor(Color.parseColor("#80FF0000"))
+            alpha = 0f; visibility = View.GONE
+        }
+        rootLayout.addView(hpFlashOverlay)
+
+        lowHpWarningView = TextView(this).apply {
+            text = "LOW HEALTH"
+            setTextColor(Color.RED); textSize = 18f
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            setShadowLayer(4f, 0f, 0f, Color.BLACK)
+            visibility = View.GONE; gravity = Gravity.CENTER
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                Gravity.TOP or Gravity.CENTER_HORIZONTAL
+            ).apply { topMargin = 100 }
+        }
+        rootLayout.addView(lowHpWarningView)
+
+        damageNumberPool = ArrayList()
+        repeat(10) {
+            val tv = TextView(this).apply {
+                textSize = 18f
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+                setShadowLayer(2f, 0f, 0f, Color.BLACK)
+                visibility = View.GONE
+            }
+            rootLayout.addView(tv)
+            damageNumberPool.add(tv)
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // POWER BUTTONS
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun setupPowerButtons() {
+        btnAdrenaline.setOnClickListener {
+            if (!canHeal) return@setOnClickListener
+            val newHp = (currentHp + 15).coerceAtMost(100)
+            currentHp = newHp; canHeal = false
+            animatePowerUsed(btnAdrenaline, tvAdrenalineCooldown, "Used!")
+            if (isChallenge && ::challengePlayersRef.isInitialized)
+                challengePlayersRef.child(userId.toString()).child("hp").setValue(newHp)
+            showFloatingText("+15 HP", Color.GREEN)
+            pulseBarColor(playerBars[userId.toString()], Color.parseColor("#00E676"))
+        }
+
+        btnShield.setOnClickListener {
+            if (!canShield) return@setOnClickListener
+            shieldRoundsActive = 2; canShield = false
+            animatePowerUsed(btnShield, tvShieldCooldown, "Active: 2")
+            showFloatingText("SHIELD UP", Color.CYAN)
+            showShieldEffect()
+        }
+
+        btnShock.setOnClickListener {
+            if (!canShock) return@setOnClickListener
+            isShockCharged = true; canShock = false
+            animatePowerUsed(btnShock, tvShockCooldown, "Charged")
+            showFloatingText("SHOCK CHARGED", Color.YELLOW)
+            showShockEffect()
+        }
+
+        btnConfuse.setOnClickListener {
+            if (!canConfuse) return@setOnClickListener
+            canConfuse = false
+            animatePowerUsed(btnConfuse, tvConfuseCooldown, "Used")
+            val target = botStates.values.filter { !it.finished && it.hp > 0 }.randomOrNull()
+            if (target != null) {
+                target.confusedThisRound = true
+                showFloatingText("${target.name} confused!", Color.MAGENTA)
+            } else {
+                showFloatingText("No target", Color.GRAY)
+            }
+        }
+    }
+
+    private fun animatePowerUsed(btn: ImageButton, label: TextView?, labelText: String) {
+        // press_pop + wiggle combo, then dim/settle
+        val combo = AnimationUtils.loadAnimation(this, R.anim.power_pop)
+        combo.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(a: Animation?) {}
+            override fun onAnimationRepeat(a: Animation?) {}
+            override fun onAnimationEnd(a: Animation?) {
+                btn.animate().alpha(0.35f).setDuration(150).start()
+            }
+        })
+        btn.clearAnimation()
+        btn.startAnimation(combo)
+        btn.isEnabled = false
+        label?.apply { text = labelText; visibility = View.VISIBLE }
+    }
+
+    private fun pulseBarColor(bar: ProgressBar?, glowColor: Int) {
+        bar ?: return
+        val originalTint = bar.progressTintList
+        ValueAnimator.ofArgb(glowColor, Color.TRANSPARENT).apply {
+            duration = 600
+            addUpdateListener { bar.progressTintList = ColorStateList.valueOf(it.animatedValue as Int) }
+            addListener(object : android.animation.AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: android.animation.Animator) {
+                    originalTint?.let { bar.progressTintList = it }
+                }
+            })
+        }.start()
+    }
+
+    private fun showShieldEffect() {
+        val icon = ImageView(this).apply {
+            setImageDrawable(ContextCompat.getDrawable(this@ClassicGameActivity, R.drawable.ic_shield_effect))
+            scaleType   = ImageView.ScaleType.CENTER_INSIDE
+            layoutParams = FrameLayout.LayoutParams(120, 120, Gravity.CENTER)
+        }
+        rootLayout.addView(icon)
+        icon.animate().scaleX(1.5f).scaleY(1.5f).alpha(0f).setDuration(1000)
+            .withEndAction { rootLayout.removeView(icon) }.start()
+    }
+
+    private fun showShockEffect() {
+        val icon = ImageView(this).apply {
+            setImageDrawable(ContextCompat.getDrawable(this@ClassicGameActivity, R.drawable.ic_shock_effect))
+            scaleType   = ImageView.ScaleType.CENTER_INSIDE
+            layoutParams = FrameLayout.LayoutParams(120, 120, Gravity.CENTER)
+        }
+        rootLayout.addView(icon)
+        icon.animate().rotation(360f).scaleX(1.3f).scaleY(1.3f).alpha(0f).setDuration(800)
+            .withEndAction { rootLayout.removeView(icon) }.start()
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // FIREBASE PLAYER LISTENER
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun setupPlayersListener() {
+        if (!::challengePlayersRef.isInitialized) return
+        healthListener?.let { challengePlayersRef.removeEventListener(it) }
+
+        healthListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (isGameOverHandled) return
+                val allowedIds = if (isBotMatch) {
+                    mutableSetOf<String>().apply {
+                        add(userId.toString())
+                        addAll(botStates.keys)
+                    }
+                } else {
+                    null
+                }
+
+                var survivors = 0
+                var lastManId = ""
+
+                // FIX 4: use snapshot.childrenCount for accurate total player count
+                val totalPlayers = snapshot.childrenCount.toInt()
+
+                for (playerSnap in snapshot.children) {
+                    val pId      = playerSnap.key ?: continue
+                    if (allowedIds != null && pId !in allowedIds) continue
+                    val hp       = playerSnap.child("hp").getValue(Int::class.java) ?: 100
+                    val score    = playerSnap.child("score").getValue(Int::class.java) ?: 0
+                    val skin     = playerSnap.child("skin").getValue(String::class.java) ?: "default"
+                    val imageUrl = playerSnap.child("image").getValue(String::class.java) ?: ""
+                    val dbName   = playerSnap.child("name").getValue(String::class.java)
+                    val isBot    = playerSnap.child("isBot").getValue(Boolean::class.java) ?: false
+
+                    val isMe = pId == userId.toString()
+                    val name = when {
+                        pId == userId.toString() -> currentUserName
+                        isBot -> dbName ?: playerNames[pId] ?: "Opponent"
+                        !dbName.isNullOrEmpty() && dbName != pId -> dbName
+                        else -> "Player $pId"
+                    }
+
+                    playerScores[pId] = score
+                    playerNames[pId]  = name
+                    playerSkins[pId]  = skin
+
+                    if (isBot && !botStates.containsKey(pId)) {
+                        val accuracy = when (skin.lowercase()) {
+                            "mage"     -> 0.65f
+                            "assassin" -> 0.74f
+                            "tank"     -> 0.58f
+                            else       -> 0.65f
+                        }
+                        botStates[pId] = BotState(pId, name, skin, accuracy, 700, 1400)
+                    }
+
+                    if (isMe) {
+                        val oldHp = currentHp
+                        currentHp = hp
+                        if (oldHp > hp && hp > 0) {
+                            showDamageNumber(oldHp - hp)
+                            playerBars[pId]?.let { triggerDamageVisuals(it, true, pId) }
+                        }
+                        checkLowHealth(hp)
+                    }
+
+                    botStates[pId]?.let {
+                        it.hp       = hp
+                        it.score    = score
+                        it.finished = playerSnap.child("isFinished").getValue(Boolean::class.java) ?: false
+                    }
+
+                    if (hp > 0) { survivors++; lastManId = pId }
+
+                    updatePlayerHealthUI(pId, name, hp, score, imageUrl, skin)
+
+                    // Check if current user is eliminated
+                    if (pId == userId.toString() && hp <= 0 && !isGameOverHandled) {
+                        showResult(false)
+                        return
+                    }
+                }
+
+                // FIX 4: use totalPlayers from snapshot, not playerBars.size
+                if (survivors == 1 && totalPlayers > 1 && !isGameOverHandled) {
+                    showResult(lastManId == userId.toString())
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                logError("Players listener cancelled: ${error.message}")
+                // Auto-reconnect after 3s
+                uiHandler.postDelayed({ if (!isGameOverHandled) setupPlayersListener() }, 3000)
+            }
+        }
+
+        challengePlayersRef.addValueEventListener(healthListener!!)
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // USER / BOT REGISTRATION
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun registerCurrentUser() {
+        if (!::challengePlayersRef.isInitialized) return
+        challengePlayersRef.child(userId.toString()).setValue(
+            hashMapOf(
+                "name" to currentUserName, "hp" to 100, "score" to 0,
+                "image" to "", "skin" to "warrior",
+                "isFinished" to false, "isBot" to false
+            )
+        ).addOnSuccessListener {
+            if (!isRealMultiplayer) createHumanAndBots()
+        }
+    }
+
+    private fun createHumanAndBots() {
+        if (!::challengePlayersRef.isInitialized) return
+        challengePlayersRef.removeValue().addOnSuccessListener {
+            challengePlayersRef.child(userId.toString()).setValue(
+                hashMapOf(
+                    "name" to currentUserName, "hp" to 100, "score" to 0,
+                    "image" to "", "skin" to "warrior",
+                    "isFinished" to false, "isBot" to false
+                )
+            )
+            botStates.values.forEach { writeBotToFirebase(it) }
+        }
+    }
+
+    private fun writeBotToFirebase(bot: BotState) {
+        challengePlayersRef.child(bot.id).setValue(
+            hashMapOf(
+                "name" to bot.name, "hp" to bot.hp, "score" to bot.score,
+                "image" to "", "skin" to bot.skin,
+                "isFinished" to bot.finished, "isBot" to true
+            )
+        )
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // QUESTION MANAGEMENT
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun ensureQuestionListForChallengeHost() {
+        if (sharedQuestionLoaded || isQuestionGenerationInProgress) return
+        isQuestionGenerationInProgress = true
+
+        fetchQuestionIdsBySubject(selectedSubject ?: "", currentTopic) { ids ->
+            isQuestionGenerationInProgress = false
+            if (ids.isEmpty()) {
+                Toast.makeText(this, "No questions found for this subject", Toast.LENGTH_SHORT).show()
+                return@fetchQuestionIdsBySubject
+            }
+            val finalIds = if (ids.size > 15) ids.shuffled().take(15) else ids.shuffled()
+            questionOrderRef.setValue(finalIds).addOnSuccessListener {
+                sharedQuestionLoaded = true
+                allQuestionIds.clear()
+                allQuestionIds.addAll(finalIds)
+                currentIndex = 0
+                loadQuestion(allQuestionIds[0])
+            }
+        }
+    }
+
+    private fun waitForSharedQuestionList() {
+        if (sharedQuestionLoaded) return
+        sharedQuestionListener?.let { questionOrderRef.removeEventListener(it) }
+
+        sharedQuestionListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.exists()) return
+                val list = ArrayList<Int>()
+                for (child in snapshot.children) {
+                    val value = when (val v = child.value) {
+                        is Long   -> v.toInt()
+                        is Int    -> v
+                        is String -> v.toIntOrNull() ?: -1
+                        else      -> -1
+                    }
+                    if (value > 0) list.add(value)
+                }
+                if (list.isNotEmpty() && !sharedQuestionLoaded) {
+                    sharedQuestionLoaded = true
+                    allQuestionIds.clear()
+                    allQuestionIds.addAll(list)
+                    currentIndex = 0
+                    loadQuestion(allQuestionIds[0])
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+                logError("question listener cancelled", error.toException())
+            }
+        }
+        questionOrderRef.addValueEventListener(sharedQuestionListener!!)
+    }
+
+    private fun fetchQuestionsBySubjectSinglePlayer(subject: String) {
+        fetchQuestionIdsBySubject(subject, currentTopic) { ids ->
+            allQuestionIds.clear()
+            allQuestionIds.addAll(ids)
+            if (allQuestionIds.isEmpty()) { fetchQuestionsByUniqueIdSinglePlayer(); return@fetchQuestionIdsBySubject }
+            Collections.shuffle(allQuestionIds)
+            currentIndex = 0
+            loadQuestion(allQuestionIds[currentIndex])
+        }
+    }
+
+    private fun fetchQuestionsByUniqueIdSinglePlayer() {
+        fetchQuestionIdsLegacyByUniqueId { ids ->
+            allQuestionIds.clear()
+            allQuestionIds.addAll(ids)
+            if (allQuestionIds.isEmpty()) {
+                Toast.makeText(this, "No questions available", Toast.LENGTH_SHORT).show()
+                return@fetchQuestionIdsLegacyByUniqueId
+            }
+            Collections.shuffle(allQuestionIds)
+            currentIndex = 0
+            loadQuestion(allQuestionIds[currentIndex])
+        }
+    }
+
+    private fun fetchQuestionIdsBySubject(subject: String, topic: String?, callback: (ArrayList<Int>) -> Unit) {
+        val url = StringBuilder("${BASE_URL}api/getQuestions.php?")
+            .append("subject=${Uri.encode(subject)}&user_id=$userId")
+            .also { if (!topic.isNullOrEmpty()) it.append("&topic=${Uri.encode(topic)}") }
+            .toString()
+
+        val req = StringRequest(Request.Method.GET, url, { response ->
+            try {
+                val json = JSONObject(response)
+                if (!json.optBoolean("success", false)) { callback(ArrayList()); return@StringRequest }
+                val arr = json.optJSONArray("all_question_ids")
+                val ids = ArrayList<Int>()
+                if (arr != null) for (i in 0 until arr.length()) ids.add(arr.optInt(i))
+                callback(ids)
+            } catch (e: Exception) { logError("Subject question parse error", e); callback(ArrayList()) }
+        }, { error -> logError("Subject question request failed", error); callback(ArrayList()) })
+
+        req.retryPolicy = DefaultRetryPolicy(10000, 2, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+        requestQueue.add(req)
+    }
+
+    private fun fetchQuestionIdsLegacyByUniqueId(callback: (ArrayList<Int>) -> Unit) {
+        val safeId = normalizeUniqueId(uniqueId)
+        val url = "${BASE_URL}api/get_test_structure.php?unique_id=$safeId&subject=${Uri.encode(selectedSubject ?: "NEET PG")}"
+        val req = StringRequest(Request.Method.GET, url, { response ->
+            try {
+                val arr = JSONObject(response).optJSONArray("question_ids")
+                val ids = ArrayList<Int>()
+                if (arr != null) for (i in 0 until arr.length()) {
+                    val q = arr.optInt(i, -1); if (q > 0) ids.add(q)
+                }
+                callback(ids)
+            } catch (e: Exception) { logError("Legacy question parse error", e); callback(ArrayList()) }
+        }, { error -> logError("Legacy question request failed", error); callback(ArrayList()) })
+
+        req.retryPolicy = DefaultRetryPolicy(10000, 2, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+        requestQueue.add(req)
+    }
+
+    private fun loadQuestion(qId: Int) {
+        val url = "${BASE_URL}api/get_single_question.php?question_id=$qId"
+        logStep("Loading questionId=$qId")
+        val req = JsonObjectRequest(Request.Method.GET, url, null, { res ->
+            try {
+                val data = res.getJSONObject("data")
+                currentQuestion = QuestionModel(
+                    qId,
+                    data.getString("question"),
+                    data.getString("option_a"),
+                    data.getString("option_b"),
+                    data.getString("option_c"),
+                    data.getString("option_d"),
+                    data.getString("correct_option"),
+                    data.getString("explanation"),
+                    data.getString("question_image")
+                )
+                currentQuestion?.let { displayQuestion(it) }
+            } catch (e: Exception) { logError("loadQuestion parse error qId=$qId", e) }
+        }, { error -> logError("loadQuestion network error qId=$qId: ${error.message}", error) })
+        requestQueue.add(req)
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // DISPLAY QUESTION
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun displayQuestion(q: QuestionModel) {
+        questionToken++
+        val myToken = questionToken
+
+        questionProgressLabel.text = "Q ${currentIndex + 1} / ${allQuestionIds.size}"
+        updateStreakLabel()
+
+        questionText.translationY = 60f; questionText.alpha = 0f
+        val cleanQuestion = q.question.split(Regex("""(?i)\s*[\(\[]?a[\)\].]"""))[0].trim()
+        questionText.text = cleanQuestion
+        questionText.animate().translationY(0f).alpha(1f)
+            .setDuration(350).setInterpolator(DecelerateInterpolator(2f)).start()
+
+        if (q.a.isNullOrBlank() || q.a == "null") {
+            val match = Regex(
+                """(?i)a[\)\].]\s*(.*?)\s*b[\)\].]\s*(.*?)\s*c[\)\].]\s*(.*?)\s*d[\)\].]\s*(.*)""",
+                RegexOption.DOT_MATCHES_ALL
+            ).find(q.question)
+            if (match != null) {
+                optionA.text = match.groupValues[1].trim(); optionB.text = match.groupValues[2].trim()
+                optionC.text = match.groupValues[3].trim(); optionD.text = match.groupValues[4].trim()
+            } else {
+                optionA.text = q.a ?: ""; optionB.text = q.b ?: ""
+                optionC.text = q.c ?: ""; optionD.text = q.d ?: ""
+            }
+        } else {
+            optionA.text = q.a; optionB.text = q.b; optionC.text = q.c; optionD.text = q.d
+        }
+
+        listOf(optionA, optionB, optionC, optionD).forEachIndexed { i, btn ->
+            btn.alpha = 0f; btn.translationX = -40f
+            btn.animate().alpha(1f).translationX(0f)
+                .setDuration(280).setStartDelay((i * 60).toLong())
+                .setInterpolator(DecelerateInterpolator(1.5f)).start()
+        }
+
+        val imagePath = q.imageUrl
+        if (!imagePath.isNullOrEmpty() && imagePath != "null") {
+            val imgUrl = if (imagePath.startsWith("http")) imagePath else IMAGE_BASE_URL + imagePath
+            questionImageView.visibility = View.VISIBLE
+            Glide.with(this).load(imgUrl.replace(" ", "%20")).into(questionImageView)
+        } else {
+            questionImageView.visibility = View.GONE
+        }
+
+        radioGroup.clearCheck()
+        explanationLayout.visibility = View.GONE
+        submitBtn.isEnabled = true; submitBtn.alpha = 1f
+
+        scheduleBotAnswersForCurrentQuestion(myToken, q)
+    }
+
+    private fun updateStreakLabel() {
+        streakLabel.text = when {
+            correctStreak >= 5 -> "🔥 x$correctStreak STREAK!"
+            correctStreak >= 3 -> "x$correctStreak"
+            correctStreak >= 1 -> "✅ x$correctStreak"
+            else               -> ""
+        }
+        if (correctStreak >= 3) {
+            streakLabel.setTextColor(Color.parseColor("#FF6F00"))
+            streakLabel.animate().scaleX(1.15f).scaleY(1.15f).setDuration(150)
+                .withEndAction { streakLabel.animate().scaleX(1f).scaleY(1f).setDuration(150).start() }.start()
+        } else {
+            streakLabel.setTextColor(Color.parseColor("#4CAF50"))
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // SUBMIT / SCORING
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun setupButtons() {
+        submitBtn.setOnClickListener {
+            val selectedId = radioGroup.checkedRadioButtonId
+            if (selectedId == -1) {
+                Toast.makeText(this, "Please select an answer", Toast.LENGTH_SHORT).show()
+                shakeView(submitBtn)
+                return@setOnClickListener
+            }
+
+            val ans = when (selectedId) {
+                R.id.optionA -> "A"; R.id.optionB -> "B"; R.id.optionC -> "C"; else -> "D"
+            }
+
+            val current   = currentQuestion ?: return@setOnClickListener
+            val isCorrect = ans == current.correctAnswer
+
+            totalAnswered++
+            if (isCorrect) { totalCorrect++; correctStreak++ } else correctStreak = 0
+
+            try {
+                reviewJson.put(JSONObject().apply {
+                    put("question_id",     current.id)
+                    put("question",        current.question)
+                    put("option_a",        current.a ?: "")
+                    put("option_b",        current.b ?: "")
+                    put("option_c",        current.c ?: "")
+                    put("option_d",        current.d ?: "")
+                    put("correct_option",  current.correctAnswer)
+                    put("selected_option", ans)
+                    put("is_correct",      isCorrect)
+                    put("explanation",     current.explanation ?: "")
+                    put("streak_at_answer", correctStreak)
+                    val fullImageUrl = when {
+                        current.imageUrl.isNullOrEmpty() || current.imageUrl == "null" -> ""
+                        current.imageUrl.startsWith("http") -> current.imageUrl
+                        else -> IMAGE_BASE_URL + current.imageUrl
+                    }
+                    put("image_url",  fullImageUrl)
+                    put("bot_answers", JSONArray())
+                })
+            } catch (e: Exception) { logError("Error building review JSON", e) }
+
+            submitBtn.isEnabled = false
+            flashOption(radioGroup.findViewById(selectedId), isCorrect)
+            handleScoringAndDamage(isCorrect)
+            syncWithServer(ans)
+            showInstantFeedback(isCorrect, current.explanation ?: "No explanation available.")
+        }
+    }
+
+    private fun flashOption(btn: RadioButton, correct: Boolean) {
+        val originalDrawable = btn.background
+        val originalTint     = btn.buttonTintList
+        btn.backgroundTintList = ColorStateList.valueOf(
+            if (correct) Color.parseColor("#1B5E20") else Color.parseColor("#B71C1C")
+        )
+        btn.animate().scaleX(1.08f).scaleY(1.08f).setDuration(120).withEndAction {
+            btn.animate().scaleX(1f).scaleY(1f).setDuration(120).start()
+            Handler(Looper.getMainLooper()).postDelayed({
+                btn.background        = originalDrawable
+                btn.backgroundTintList = null
+                btn.buttonTintList    = originalTint
+            }, 350)
+        }.start()
+    }
+
+    private fun shakeView(view: View) {
+        TranslateAnimation(0f, 18f, 0f, 0f).apply {
+            duration = 40; repeatCount = 6; repeatMode = Animation.REVERSE
+        }.also { view.startAnimation(it) }
+    }
+
+    private fun handleScoringAndDamage(isCorrect: Boolean) {
+        val myUid = userId.toString()
+        if (isCorrect) {
+            if (::challengePlayersRef.isInitialized) {
+                val bonus = when { correctStreak >= 5 -> 8; correctStreak >= 3 -> 6; else -> 4 }
+                challengePlayersRef.child(myUid).child("score")
+                    .runTransaction(object : Transaction.Handler {
+                        override fun doTransaction(data: MutableData): Transaction.Result {
+                            data.value = (data.getValue(Int::class.java) ?: 0) + bonus
+                            return Transaction.success(data)
+                        }
+                        override fun onComplete(e: DatabaseError?, b: Boolean, s: DataSnapshot?) {
+                            if (e != null) logError("Score transaction failed: ${e.message}")
+                        }
+                    })
+                if (correctStreak >= 3) showFloatingText("+$bonus STREAK BONUS!", Color.parseColor("#FF6F00"))
+            }
+            val dmg = if (isShockCharged) {
+                isShockCharged = false
+                tvShockCooldown.text = "Used"
+                10
+            } else 5
+            for (pid in playerBars.keys) { if (pid != myUid) damagePlayer(pid, dmg) }
+        } else {
+            damagePlayer(myUid, 3)
+        }
+    }
+
+    // FIX 3: damagePlayer always writes to Firebase when isChallenge=true.
+    // isChallenge is now guaranteed to be true in real multiplayer mode.
+    private fun damagePlayer(pid: String, dmg: Int) {
+        if (pid == userId.toString() && shieldRoundsActive > 0) {
+            shieldRoundsActive--
+            if (shieldRoundsActive > 0) tvShieldCooldown.text = "Active: $shieldRoundsActive"
+            else tvShieldCooldown.text = "Used"
+            showFloatingText("Blocked!", Color.CYAN)
+            return
+        }
+
+        if (pid == userId.toString()) {
+            currentHp = (currentHp - dmg).coerceAtLeast(0)
+            checkLowHealth(currentHp)
+        }
+
+        // FIX 3: this now runs for real multiplayer too since isChallenge=true
+        if (isChallenge && ::challengePlayersRef.isInitialized) {
+            challengePlayersRef.child(pid).child("hp")
+                .runTransaction(object : Transaction.Handler {
+                    override fun doTransaction(data: MutableData): Transaction.Result {
+                        data.value = ((data.getValue(Int::class.java) ?: 100) - dmg).coerceAtLeast(0)
+                        return Transaction.success(data)
+                    }
+                    override fun onComplete(e: DatabaseError?, b: Boolean, s: DataSnapshot?) {
+                        if (e != null) logError("HP transaction failed pid=$pid: ${e.message}")
+                    }
+                })
+        }
+
+        if (pid == userId.toString()) {
+            playerBars[pid]?.let { triggerDamageVisuals(it, true, pid) }
+            showDamageNumber(dmg)
+        }
+    }
+
+    private fun showInstantFeedback(isCorrect: Boolean, explanation: String) {
+        explanationLayout.visibility = View.VISIBLE
+        explanationText.text = aiMarkdownSpannable(if (isCorrect) "CORRECT! ✅$explanation" else "INCORRECT ❌$explanation")
+        explanationText.setTextColor(if (isCorrect) Color.parseColor("#4CAF50") else Color.parseColor("#F44336"))
+
+        val isLast = currentIndex >= allQuestionIds.size - 1
+        uiHandler.postDelayed({
+            explanationLayout.visibility = View.GONE
+            if (isLast) {
+                questionText.text     = "Battle Finished! Calculating results..."
+                radioGroup.visibility = View.GONE
+                submitBtn.visibility  = View.GONE
+                finishClassicMatch()
+            } else {
+                moveNext()
+                submitBtn.isEnabled = true
+                radioGroup.clearCheck()
+            }
+        }, 2000)
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // BOT ANSWER SCHEDULING
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun scheduleBotAnswersForCurrentQuestion(token: Int, question: QuestionModel) {
+        val rng     = Random(System.currentTimeMillis())
+        val myScore = playerScores[userId.toString()] ?: 0
+        val myHp    = currentHp
+
+        for (bot in botStates.values) {
+            if (bot.finished || bot.hp <= 0) continue
+
+            val wasConfused  = bot.confusedThisRound
+            bot.confusedThisRound = false
+            val effectiveAcc = bot.effectiveAccuracy(myScore, myHp)
+            val delay        = bot.effectiveDelay(rng)
+
+            uiHandler.postDelayed({
+                if (token != questionToken || isGameOverHandled || bot.finished || bot.hp <= 0) return@postDelayed
+
+                val correct   = rng.nextFloat() < effectiveAcc
+                val botAnswer = if (correct && !wasConfused) question.correctAnswer ?: "A"
+                else pickWrongAnswer(question.correctAnswer ?: "A")
+                val isBotCorrect = botAnswer == question.correctAnswer
+
+                if (isBotCorrect) { bot.consecutiveCorrect++; bot.consecutiveWrong = 0 }
+                else              { bot.consecutiveWrong++;   bot.consecutiveCorrect = 0 }
+                bot.questionsAnswered++
+
+                logStep("Bot ${bot.name} [${bot.personality}] answered $botAnswer correct=$isBotCorrect")
+
+                // Update review JSON
+                try {
+                    var reviewObj: JSONObject? = null
+                    for (i in 0 until reviewJson.length()) {
+                        val obj = reviewJson.getJSONObject(i)
+                        if (obj.optInt("question_id") == question.id) { reviewObj = obj; break }
+                    }
+                    if (reviewObj == null) {
+                        reviewObj = JSONObject().apply {
+                            put("question_id",    question.id)
+                            put("question",       question.question)
+                            put("correct_option", question.correctAnswer)
+                            put("selected_option", JSONObject.NULL)
+                            put("is_correct",     false)
+                            put("explanation",    question.explanation ?: "")
+                            put("bot_answers",    JSONArray())
+                        }
+                        reviewJson.put(reviewObj)
+                    }
+                    val botArray = reviewObj.optJSONArray("bot_answers") ?: JSONArray().also { reviewObj.put("bot_answers", it) }
+                    var alreadyExists = false
+                    for (j in 0 until botArray.length()) {
+                        if (botArray.getJSONObject(j).optString("bot_id") == bot.id) { alreadyExists = true; break }
+                    }
+                    if (!alreadyExists) {
+                        botArray.put(JSONObject().apply {
+                            put("bot_id",      bot.id)
+                            put("bot_name",    bot.name)
+                            put("personality", bot.personality.name)
+                            put("answer",      botAnswer)
+                            put("is_correct",  isBotCorrect)
+                            put("was_confused", wasConfused)
+                        })
+                    }
+                } catch (e: Exception) { logError("Bot review JSON error", e) }
+
+                val feedbackText = when {
+                    wasConfused && !isBotCorrect           -> "${bot.name} was confused!"
+                    isBotCorrect && bot.consecutiveCorrect >= 3 -> "🔥 ${bot.name} is on fire!"
+                    isBotCorrect                           -> "${bot.name} got it ✅"
+                    else                                   -> "${bot.name} missed ❌"
+                }
+                showFloatingText(feedbackText, if (isBotCorrect) Color.CYAN else Color.parseColor("#FF7043"))
+                applyAnswerEffects(bot.id, isBotCorrect, isBot = true)
+
+            }, delay)
+        }
+    }
+
+    private fun pickWrongAnswer(correct: String): String {
+        val options = arrayOf("A", "B", "C", "D").filter { it != correct }
+        return options[Random.nextInt(options.size)]
+    }
+
+    private fun applyAnswerEffects(playerId: String, isCorrect: Boolean, isBot: Boolean) {
+        if (isCorrect) {
+            for (pid in playerBars.keys) { if (pid != playerId) damagePlayer(pid, 5) }
+            if (::challengePlayersRef.isInitialized) {
+                challengePlayersRef.child(playerId).child("score")
+                    .runTransaction(object : Transaction.Handler {
+                        override fun doTransaction(data: MutableData): Transaction.Result {
+                            data.value = (data.getValue(Int::class.java) ?: 0) + 4
+                            return Transaction.success(data)
+                        }
+                        override fun onComplete(e: DatabaseError?, b: Boolean, s: DataSnapshot?) {
+                            if (e != null) logError("Score transaction failed player=$playerId: ${e.message}")
+                        }
+                    })
+            }
+        } else {
+            damagePlayer(playerId, 3)
+        }
+        if (isBot) {
+            val bot = botStates[playerId]
+            if (bot != null && ::challengePlayersRef.isInitialized) {
+                challengePlayersRef.child(playerId).child("isFinished").setValue(bot.hp <= 0)
+            }
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // NAVIGATION
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun moveNext() {
+        currentIndex++
+        if (currentIndex < allQuestionIds.size) loadQuestion(allQuestionIds[currentIndex])
+        else finishClassicMatch()
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // GAME OVER
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun finishClassicMatch() {
+        testTimer?.cancel(); testTimer = null
+        uiHandler.removeCallbacksAndMessages(null)
+        heartbeatHandler.removeCallbacks(heartbeatRunnable)
+
+        try {
+            if (::challengePlayersRef.isInitialized) {
+                challengePlayersRef.child(userId.toString()).child("isFinished").setValue(true)
+                for (bot in botStates.values) {
+                    challengePlayersRef.child(bot.id).child("isFinished").setValue(true)
+                }
+            }
+        } catch (e: Exception) { logError("Error marking players finished", e) }
+
+        botStates.values.forEach { it.finished = true }
+
+        // Short delay to allow final HP/Score sync from Firebase before showing results
+        uiHandler.postDelayed({
+            if (!isGameOverHandled) determineWinnerByPoints()
+        }, 800)
+    }
+
+    // FIX 1: use playerScores (Firebase data) instead of playerBars (UI map)
+    // playerBars may be empty/incomplete at game-over time in real multiplayer
+    private fun determineWinnerByPoints() {
+        var winnerId  = ""
+        var bestPower = -1
+
+        for ((pid, score) in playerScores) {
+            val hpVal = if (pid == userId.toString()) currentHp else (botStates[pid]?.hp ?: 0)
+            val power = (score * 10) + hpVal
+            if (power > bestPower) { bestPower = power; winnerId = pid }
+        }
+
+        if (winnerId.isEmpty()) {
+            // playerScores empty — fallback, declare loss to unblock UI
+            logError("determineWinnerByPoints: playerScores is empty, defaulting to loss")
+            showResult(false)
+            return
+        }
+
+        showResult(winnerId == userId.toString())
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // SERVER SYNC
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun syncWithServer(ans: String) {
+        val qId = currentQuestion?.id ?: return
+        if (challengeId.isBlank()) return
+        val url = "${BASE_URL}sync_challenge_v16_authenticated.php"
+        val req = object : StringRequest(Request.Method.POST, url, {
+            logStep("Server synced qId=$qId")
+        }, { error ->
+            logError("syncWithServer error: ${error.networkResponse?.statusCode ?: 0}", error)
+        }) {
+            override fun getParams() = hashMapOf(
+                "challenge_id" to challengeId,
+                "user_id"      to userId.toString(),
+                "question_id"  to qId.toString(),
+                "answer"       to ans
+            )
+        }
+        req.retryPolicy = DefaultRetryPolicy(5000, 0, 1f)
+        requestQueue.add(req)
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // TIMER
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun startTimer(ms: Long) {
+        testTimer?.cancel()
+        testTimer = object : CountDownTimer(ms, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val mins = millisUntilFinished / 60000
+                val secs = (millisUntilFinished / 1000) % 60
+                timerText.text = String.format("%02d:%02d", mins, secs)
+                if (millisUntilFinished < 30000) {
+                    timerText.setTextColor(Color.RED)
+                    timerText.alpha = (sin(millisUntilFinished / 500.0) * 0.3 + 0.7).toFloat()
+                }
+            }
+            override fun onFinish() {
+                timerText.text = "00:00"; timerText.alpha = 1f
+                finishClassicMatch()
+            }
+        }.start()
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // FLOATING TEXT / DAMAGE VISUALS
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun showFloatingText(text: String, color: Int) {
+        val tv = TextView(this).apply {
+            this.text = text; setTextColor(color); textSize = 22f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            setShadowLayer(8f, 0f, 0f, Color.BLACK)
+        }
+        rootLayout.addView(tv, FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER
+        ))
+        tv.animate().translationY(-300f).alpha(0f).setDuration(1200)
+            .withEndAction { rootLayout.removeView(tv) }.start()
+    }
+
+    private fun triggerDamageVisuals(bar: ProgressBar, isMe: Boolean, playerId: String) {
+        val skin = playerSkins[playerId] ?: "default"
+        when (skin.lowercase()) {
+            "warrior" -> TranslateAnimation(0f, 25f, 0f, 0f).apply {
+                duration = 40; repeatCount = 6; repeatMode = Animation.REVERSE
+            }.also { bar.startAnimation(it) }
+            "mage"     -> bar.animate().alpha(0.3f).setDuration(100).withEndAction { bar.animate().alpha(1f).start() }
+            "assassin" -> bar.animate().rotationY(360f).setDuration(200).start()
+            "tank"     -> TranslateAnimation(0f, 8f, 0f, 0f).apply {
+                duration = 120; repeatCount = 2; repeatMode = Animation.REVERSE
+            }.also { bar.startAnimation(it) }
+            else       -> TranslateAnimation(0f, 15f, 0f, 0f).apply {
+                duration = 50; repeatCount = 5; repeatMode = Animation.REVERSE
+            }.also { bar.startAnimation(it) }
+        }
+
+        if (isMe) {
+            @Suppress("DEPRECATION")
+            val v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
+            else v.vibrate(100)
+
+            ValueAnimator.ofArgb(Color.argb(80, 255, 0, 0), Color.TRANSPARENT).apply {
+                duration = 300
+                addUpdateListener { rootLayout.setBackgroundColor(it.animatedValue as Int) }
+            }.start()
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // HEALTH UI
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun updatePlayerHealthUI(
+        pId: String, name: String, hp: Int, score: Int, imageUrl: String?, skin: String
+    ) {
+        val isMe = pId == userId.toString()
+        playerScores[pId] = score
+
+
+        if (!playerBars.containsKey(pId)) {
+            val row = LinearLayout(this).apply {
+                tag = pId; orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply { setMargins(0, 15, 0, 15) }
+                alpha = 0f; animate().alpha(1f).setDuration(500).setStartDelay(100).start()
+            }
+            val sizeInPx = (45 * resources.displayMetrics.density).toInt()
+            val avatar   = ImageView(this).apply { layoutParams = LinearLayout.LayoutParams(sizeInPx, sizeInPx) }
+            val infoLayout = LinearLayout(this).apply {
+                orientation  = LinearLayout.VERTICAL
+                layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.2f)
+                setPadding(30, 0, 10, 0)
+            }
+            val nameLabel  = TextView(this).apply {
+                text = if (isMe) currentUserName else name; textSize = 14f
+                setTextColor(ContextCompat.getColor(this@ClassicGameActivity, R.color.text_primary))
+                setTypeface(null, Typeface.BOLD)
+            }
+            val scoreLabel = TextView(this).apply {
+                text = "Score: $score"; textSize = 12f
+                setTextColor(ContextCompat.getColor(this@ClassicGameActivity, R.color.text_secondary))
+            }
+            infoLayout.addView(nameLabel); infoLayout.addView(scoreLabel)
+
+            val bar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+                layoutParams     = LinearLayout.LayoutParams(0, 35, 2.5f)
+                max = 100; progress = hp
+                progressDrawable = ContextCompat.getDrawable(this@ClassicGameActivity, R.drawable.custom_health_bar)
+            }
+            applySkinToBar(bar, skin, isMe)
+            row.addView(avatar); row.addView(infoLayout); row.addView(bar)
+            challengeBattleHeader.addView(row)
+
+            playerBars[pId]        = bar
+            playerScoreLabels[pId] = scoreLabel
+            playerSkins[pId]       = skin
+            applyBattleStatusVisibility()
+
+            val finalUrl = when {
+                !imageUrl.isNullOrBlank() && imageUrl != "null" ->
+                    if (imageUrl.startsWith("http")) imageUrl
+                        else IMAGE_BASE_URL + imageUrl
+                else -> "https://api.dicebear.com/7.x/pixel-art/png?seed=${name.replace(" ", "_")}"
+            }
+            Glide.with(this).load(finalUrl)
+                .placeholder(android.R.drawable.ic_menu_gallery)
+                .error(android.R.drawable.ic_menu_report_image)
+                .circleCrop().into(avatar)
+
+        } else {
+            val bar = playerBars[pId] ?: return
+            playerScoreLabels[pId]?.text = "Score: $score"
+            if (hp < bar.progress) { triggerDamageVisuals(bar, isMe, pId); showDamageNumber(bar.progress - hp) }
+            ObjectAnimator.ofInt(bar, "progress", bar.progress, hp).setDuration(400).start()
+            updateHealthBarColor(bar, hp)
+            if (!battleStatusExpanded) applyBattleStatusVisibility()
+        }
+    }
+
+    private fun toggleBattleStatus() {
+        battleStatusExpanded = !battleStatusExpanded
+        applyBattleStatusVisibility()
+    }
+
+    private fun applyBattleStatusVisibility() {
+        if (!::challengeBattleHeader.isInitialized || !::btnBattleToggle.isInitialized || !::tvBattleStatusTitle.isInitialized) return
+
+        if (!battleStatusExpanded) {
+            val myScore = playerScores[userId.toString()] ?: 0
+            tvBattleStatusTitle.text = "YOUR SCORE: $myScore"
+            for (index in 0 until challengeBattleHeader.childCount) {
+                challengeBattleHeader.getChildAt(index).visibility = View.GONE
+            }
+        } else {
+            tvBattleStatusTitle.text = "BATTLE STATUS"
+            for (index in 0 until challengeBattleHeader.childCount) {
+                challengeBattleHeader.getChildAt(index).visibility = View.VISIBLE
+            }
+        }
+
+        btnBattleToggle.setImageResource(
+            if (battleStatusExpanded) android.R.drawable.arrow_up_float
+            else android.R.drawable.arrow_down_float
+        )
+        btnBattleToggle.contentDescription =
+            if (battleStatusExpanded) "Collapse battle status" else "Expand battle status"
+    }
+
+    private fun updateHealthBarColor(bar: ProgressBar, hp: Int) {
+        val color = when { hp <= 20 -> Color.parseColor("#D32F2F"); hp <= 50 -> Color.parseColor("#FF9800"); else -> Color.parseColor("#4CAF50") }
+        val oldColor = bar.progressTintList?.defaultColor ?: color
+        ValueAnimator.ofArgb(oldColor, color).apply {
+            duration = 300
+            addUpdateListener { bar.progressTintList = ColorStateList.valueOf(it.animatedValue as Int) }
+        }.start()
+    }
+
+    private fun checkLowHealth(hp: Int) {
+        if (hp in 1..30) {
+            if (lowHpWarningView.visibility != View.VISIBLE) {
+                lowHpWarningView.visibility = View.VISIBLE
+                lowHpWarningView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.pulse))
+            }
+            hpFlashOverlay?.let {
+                it.visibility = View.VISIBLE; it.alpha = 0.3f
+                it.animate().alpha(0f).setDuration(500).withEndAction { it.visibility = View.GONE }.start()
+            }
+        } else {
+            lowHpWarningView.visibility = View.GONE
+        }
+    }
+
+    private fun showDamageNumber(damage: Int) {
+        val freeTv = damageNumberPool.find { it.visibility != View.VISIBLE } ?: return
+        freeTv.text = "-$damage"; freeTv.setTextColor(Color.RED)
+        freeTv.alpha = 1f; freeTv.scaleX = 1f; freeTv.scaleY = 1f; freeTv.visibility = View.VISIBLE
+        val userBar = playerBars[userId.toString()]
+        if (userBar != null) {
+            val loc = IntArray(2); userBar.getLocationOnScreen(loc)
+            freeTv.x = loc[0] + userBar.width / 2f - 50f; freeTv.y = loc[1] - 50f
+        } else { freeTv.x = 100f; freeTv.y = 200f }
+        freeTv.animate().translationYBy(-150f).alpha(0f).setDuration(1000)
+            .withEndAction { freeTv.visibility = View.GONE }.start()
+    }
+
+    private fun applySkinToBar(bar: ProgressBar, skin: String, isMe: Boolean) {
+        when (skin.lowercase()) {
+            "warrior"  -> { bar.progressTintList = ColorStateList.valueOf(Color.parseColor("#D32F2F")); bar.scaleY = 1.25f }
+            "mage"     -> { bar.progressTintList = ColorStateList.valueOf(Color.parseColor("#1E88E5")); bar.alpha  = 0.95f }
+            "assassin" -> { bar.progressTintList = ColorStateList.valueOf(Color.parseColor("#212121")); bar.scaleY = 1.1f }
+            "tank"     -> { bar.progressTintList = ColorStateList.valueOf(Color.parseColor("#2E7D32")); bar.scaleY = 1.45f }
+            else       -> bar.progressTintList = ColorStateList.valueOf(
+                if (isMe) Color.parseColor("#4CAF50") else Color.parseColor("#F44336")
+            )
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // RESULT / FINALIZATION
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun showResult(win: Boolean) {
+        if (isGameOverHandled) return
+        isGameOverHandled = true
+        testTimer?.cancel()
+        cleanupListeners()
+
+        if (::challengePlayersRef.isInitialized) {
+            challengePlayersRef.child(userId.toString()).child("hp").setValue(if (win) currentHp else 0)
+        }
+
+        val accuracy   = if (totalAnswered > 0) (totalCorrect * 100 / totalAnswered) else 0
+        val bestStreak = correctStreak
+
+        runOnUiThread {
+            AlertDialog.Builder(this)
+                .setTitle(if (win) "VICTORY! 🏆" else "DEFEAT! 💀")
+                .setMessage(buildString {
+                    append(if (win) "You defeated all opponents!" else "You have been eliminated.")
+                    append("Accuracy: $accuracy%")
+                    append("Best streak: $bestStreak")
+                    append("Score: ${playerScores[userId.toString()] ?: 0}")
+                })
+                .setCancelable(false)
+                .setPositiveButton("View Leaderboard") { _, _ -> finalizeChallenge() }
+                .show()
+        }
+    }
+
+    private fun finalizeChallenge() {
+        cleanupListeners()
+        val totalWrong = totalAnswered - totalCorrect
+        val score = playerScores[userId.toString()] ?: 0
+        val topic = currentTopic ?: selectedSubject ?: ""
+        HistoryManager.saveHistory(
+            context = this,
+            mode = "CHALLENGE",
+            title = if (isRealMultiplayer) "Real Multiplayer Challenge" else "Classic Bot Challenge",
+            topic = topic,
+            score = score,
+            totalQuestions = totalAnswered,
+            correctAnswers = totalCorrect,
+            wrongAnswers = totalWrong,
+            challengeId = challengeId,
+            reviewJson = reviewJson.toString()
+        )
+        val url = "${BASE_URL}sync_challenge_v16_authenticated.php"
+        val req = object : StringRequest(Request.Method.POST, url, {
+            launchResultActivity()
+        }, { launchResultActivity() }) {
+            override fun getParams() = hashMapOf(
+                "challenge_id" to challengeId,
+                "user_id"      to userId.toString(),
+                "finish_test"  to "true"
+            )
+        }
+        req.retryPolicy = DefaultRetryPolicy(10000, 0, 1f)
+        requestQueue.add(req)
+    }
+
+    private fun launchResultActivity() {
+        Log.d(TAG, "launchResultActivity: reviewJson length=${reviewJson.length()}")
+        if (reviewJson.length() == 0) {
+            Log.w(TAG, "No review data, skipping result activity")
+            Toast.makeText(this, "No questions answered", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+        startActivity(Intent(this, ChallengeResultActivity::class.java).apply {
+            putExtra("CHALLENGE_ID",    challengeId)
+            putExtra("USER_ID",         userId)
+            putExtra("REVIEW_JSON_STR", reviewJson.toString())
+            putExtra("GAME_MODE",       if (isRealMultiplayer) "REAL_PVP" else "CLASSIC_BOT")
+            putExtra("TOTAL_CORRECT",   totalCorrect)
+            putExtra("TOTAL_ANSWERED",  totalAnswered)
+        })
+        finish()
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // LISTENER CLEANUP (centralised — called from finishClassicMatch + onDestroy)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun cleanupListeners() {
+        try {
+            if (::challengePlayersRef.isInitialized && healthListener != null) {
+                challengePlayersRef.removeEventListener(healthListener!!); healthListener = null
+            }
+            if (::questionOrderRef.isInitialized && sharedQuestionListener != null) {
+                questionOrderRef.removeEventListener(sharedQuestionListener!!); sharedQuestionListener = null
+            }
+            if (::challengeRootRef.isInitialized && challengeMetaListener != null) {
+                challengeRootRef.removeEventListener(challengeMetaListener!!); challengeMetaListener = null
+            }
+        } catch (e: Exception) { logError("Listener cleanup error", e) }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // HELPERS
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private fun normalizeUniqueId(id: Int): Int {
+        // If ID is in a special subject range (e.g. 701), don't normalize it down to 1-50
+        if (id > 100) return id
+
+        val safe = ((id % 50) + 50) % 50
+        return if (safe == 0) 1 else safe
+    }
+
+    @Deprecated("Use initializeBotStates for pooled random selection",
+        ReplaceWith("BOT_NAME_POOL.shuffled().first()"))
+    private fun pickBotName(index: Int): String {
+        val rng = Random(System.currentTimeMillis() + index)
+        return BOT_NAME_POOL[rng.nextInt(BOT_NAME_POOL.size)]
+    }
+
+    private fun setupBottomNavigation() {
+        val bottomNav: BottomNavigationView = findViewById(R.id.bottomNavigation)
+        setupAppBottomNavigation(bottomNav, R.id.nav_home)
+    }
+
+    private fun logStep(message: String) = Log.d(TAG, message)
+    private fun logError(message: String, tr: Throwable? = null) {
+        if (tr != null) Log.e(TAG, message, tr) else Log.e(TAG, message)
+    }
+}

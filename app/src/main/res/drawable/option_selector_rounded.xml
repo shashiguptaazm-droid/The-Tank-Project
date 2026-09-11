@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Selected/Checked State -->
+    <item android:state_checked="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/primary_variant" />
+            <stroke android:width="2dp" android:color="@color/primary" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+
+    <!-- Default State (The Fix) -->
+    <item>
+        <shape android:shape="rectangle">
+            <!-- 🔥 Use the surface color from your night theme -->
+            <solid android:color="?attr/colorSurface" />
+            <stroke android:width="1dp" android:color="@color/divider" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</selector>

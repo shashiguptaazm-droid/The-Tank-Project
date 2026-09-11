@@ -1,0 +1,54 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 224 >>
+stream
+BT
+/F1 12 Tf
+100 700 Td
+(Test Thesis: A Study of Sample PDFs for AI Processing) Tj
+0 -20 Td
+(Abstract) Tj
+0 -15 Td
+(This is a test thesis PDF for testing the session creation workflow.) Tj
+0 -15 Td
+(Background: This test document simulates a simple medical thesis.) Tj
+0 -15 Td
+(Aim: To test the PDF upload and parsing functionality.) Tj
+0 -15 Td
+(Methods: We used a minimal PDF file with text content.) Tj
+0 -15 Td
+(Results: The PDF parsing should extract this text.) Tj
+0 -15 Td
+(Discussion: This test validates the end-to-end workflow.) Tj
+0 -15 Td
+(Keywords: test, thesis, PDF, parsing, AI) Tj
+0 -15 Td
+(References: 1. Test Author, Test Journal. 2024;10:100-110) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000266 00000 n 
+0000000543 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+594
+%%EOF

@@ -1,0 +1,45 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownsUserDocument(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    match /users/{uid} {
+      allow read, write: if ownsUserDocument(uid);
+
+      match /online_cache/{cacheId} {
+        allow read, write: if ownsUserDocument(uid);
+      }
+
+      match /thesis_reference_caches/{sessionId} {
+        allow read, write: if ownsUserDocument(uid);
+
+        match /references/{documentId} {
+          allow read, write: if ownsUserDocument(uid);
+        }
+
+        match /abstract_sources/{documentId} {
+          allow read, write: if ownsUserDocument(uid);
+        }
+
+        match /pubmed_matches/{documentId} {
+          allow read, write: if ownsUserDocument(uid);
+        }
+
+        match /search_matches/{documentId} {
+          allow read, write: if ownsUserDocument(uid);
+        }
+
+        match /pubmed_figures/{documentId} {
+          allow read, write: if ownsUserDocument(uid);
+        }
+      }
+    }
+  }
+}

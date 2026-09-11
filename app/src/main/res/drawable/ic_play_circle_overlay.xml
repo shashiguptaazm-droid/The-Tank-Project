@@ -1,0 +1,19 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="54dp"
+    android:height="54dp"
+    android:viewportWidth="54"
+    android:viewportHeight="54">
+    <!-- Semi-transparent dark circular backdrop -->
+    <path
+        android:fillColor="#99000000"
+        android:pathData="M27,27m-24,0a24,24 0,1 1,48 0a24,24 0,1 1,-48 0" />
+    <!-- White outer border ring -->
+    <path
+        android:strokeColor="#B3FFFFFF"
+        android:strokeWidth="1.5"
+        android:pathData="M27,27m-23.25,0a23.25,23.25 0,1 1,46.5 0a23.25,23.25 0,1 1,-46.5 0" />
+    <!-- White play triangle centered -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M22,17 L37,27 L22,37 Z" />
+</vector>

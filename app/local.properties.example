@@ -1,0 +1,59 @@
+# =============================================================================
+# local.properties.example
+# =============================================================================
+# Copy this file to `local.properties` and fill in the actual values. The
+# `local.properties` file is gitignored, so your real keys will never be
+# committed to the repository.
+#
+# Every key here is also accepted from the environment. If both are set, the
+# local.properties value wins so CI / build machines can override per-build.
+#
+# Rotate keys at the provider dashboard first, then update the matching line
+# here and rebuild. See ROTATION_CHECKLIST.md for the rotation runbook.
+# =============================================================================
+
+# Groq Cloud — https://console.groq.com/keys
+GROQ_API_KEY=
+
+# Google Gemini — https://aistudio.google.com/apikey
+GEMINI_API_KEY=
+
+# OpenRouter — https://openrouter.ai/keys
+OPENROUTER_API_KEY=
+
+# Mistral AI — https://console.mistral.ai/api-keys/
+MISTRAL_API_KEY=
+
+# Cloudflare Workers AI — https://dash.cloudflare.com/profile/api-tokens
+CLOUDFLARE_WORKER_API_KEY=
+CLOUDFLARE_ACCOUNT_ID=
+
+# Cerebras Inference — https://cloud.cerebras.ai/
+CEREBRAS_API_KEY=
+
+# Cohere — https://dashboard.cohere.com/api-keys
+COHERE_API_KEY=
+
+# Replicate — https://replicate.com/account/api-tokens
+REPLICATE_API_KEY=
+
+# Hugging Face (optional) — https://huggingface.co/settings/tokens
+HUGGINGFACE_API_KEY=
+HUGGINGFACE_MODEL=
+
+# EndpointAI (custom proxy) — internal team only
+ENDPOINT_AI_API_KEY=
+ENDPOINT_AI_BASE_URL=https://endpointai-backend-production.up.railway.app/
+ENDPOINT_AI_MODEL=deepseek-r1:70b
+
+# Thesis session backend (PHP on medigyaan.xyz)
+THESIS_SESSION_BACKEND_URL=https://medigyaan.xyz/Neurons/thesis_session_backend.php
+
+# DeepSeek — https://platform.deepseek.com/api_keys
+DEEPSEEK_API_KEY=
+DEEPSEEK_MODEL=deepseek-v4-flash
+
+# -----------------------------------------------------------------------------
+# Build-only overrides (Android Gradle expects an `sdk.dir` line here as well)
+# -----------------------------------------------------------------------------
+sdk.dir=/absolute/path/to/Android/Sdk

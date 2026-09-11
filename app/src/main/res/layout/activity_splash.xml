@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#050816">
+
+    <!-- Layer 1: TextureView for Smooth Hardware-Accelerated Video Background -->
+    <TextureView
+        android:id="@+id/splashTextureView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Layer 2: Dark translucent scrim overlay for contrast & readability -->
+    <View
+        android:id="@+id/splashVideoScrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_splash_scrim"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Layer 3: Skip Button in top-right corner -->
+    <TextView
+        android:id="@+id/btnSkipVideo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="42dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/bg_skip_button"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:text="Skip ➔"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:elevation="15dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Layer 4: Foreground Branding (Logo + Title + Subtitle) -->
+    <LinearLayout
+        android:id="@+id/splashLogoLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:elevation="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/splashLogo"
+            android:layout_width="144dp"
+            android:layout_height="144dp"
+            android:src="@drawable/medigyaan_logo"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/splashTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/app_name"
+            android:textColor="#FFFFFF"
+            android:textSize="34sp"
+            android:fontFamily="sans-serif-black"
+            android:letterSpacing="0.04"
+            android:shadowColor="#00E5FF"
+            android:shadowDx="0"
+            android:shadowDy="2"
+            android:shadowRadius="6" />
+
+        <TextView
+            android:id="@+id/splashSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Empowering Competitive Learning"
+            android:textColor="#E0E0FF"
+            android:alpha="0.85"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-medium"
+            android:shadowColor="#80000000"
+            android:shadowDx="0"
+            android:shadowDy="1"
+            android:shadowRadius="4" />
+
+    </LinearLayout>
+
+    <!-- Layer 5: Progress Indicator -->
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/splashProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="54dp"
+        android:elevation="10dp"
+        android:indeterminate="true"
+        app:indicatorSize="32dp"
+        app:trackThickness="3dp"
+        app:indicatorColor="#00E5FF"
+        app:trackColor="#33FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,1364 @@
+package com.rankwarz.edulabsrtm
+
+import android.content.Context
+import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.speech.tts.TextToSpeech
+import android.text.Html
+import android.util.Log
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.view.animation.*
+import android.widget.*
+import android.view.LayoutInflater
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
+import androidx.core.view.ViewCompat
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.snackbar.Snackbar
+import org.json.JSONObject
+import java.util.Locale
+import kotlin.random.Random
+import androidx.core.content.ContextCompat
+
+class MCQActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
+
+    private val TAG = "GAMIFIED_MCQ"
+    private val VOLLEY_TAG = "MCQ_REQUESTS"
+    private val BASE_URL = "https://medigyaan.xyz/Neurons/api/"
+    private val IMAGE_BASE_URL = "https://medigyaan.xyz/Neurons/"
+    private val AI_URL = "https://medigyaan.xyz/Neurons/ask_ai2.php"
+    private var chatHistory = StringBuilder()
+    private lateinit var questionCard: MaterialCardView
+    private lateinit var questionText: TextView
+    private lateinit var questionImageView: ImageView
+    private lateinit var optionA: RadioButton
+    private lateinit var optionB: RadioButton
+    private lateinit var optionC: RadioButton
+    private lateinit var optionD: RadioButton
+    private lateinit var radioGroup: RadioGroup
+    private lateinit var submitBtn: MaterialButton
+    private lateinit var reportBtn: MaterialButton
+    private lateinit var askAiBtn: MaterialButton
+    private lateinit var nextBtn: View
+    private lateinit var prevBtn: View
+    private lateinit var explanationCard: CardView
+    private lateinit var explanationText: TextView
+    private lateinit var statusText: TextView
+    private lateinit var topicSpinner: Spinner
+    private lateinit var speakBtn: ImageButton
+    private lateinit var navBtn: ImageButton
+    private lateinit var shareWhatsappBtn: ImageButton
+    private lateinit var addToQuizBtn: ImageButton
+    private lateinit var bottomNav: BottomNavigationView
+    private lateinit var comboText: TextView
+    private lateinit var expText: TextView
+    private lateinit var dailyProgressBar: ProgressBar
+    private lateinit var rootLayout: FrameLayout
+    private lateinit var topicLayout: View
+
+    private var currentSubject: String = ""
+    private var currentTopic: String? = null
+    private var currentQuestionTopic: String = "General"
+    private var userId: Int = 0
+    private var allQuestionIds = ArrayList<Int>()
+    private var currentIndex = 0
+    private var currentQuestionObj: JSONObject? = null
+    private var comboCount = 0
+    private var currentExp = 0
+    private var isFirstLoad = true
+    private var isFixedTest = false
+    private var isNavigating = false
+    private var isAutoNavigating = false
+
+    // Survival & Streak logic (Para 26, 27, 28)
+    private var isSurvivalMode = false
+    private var isKingOfTopic = false
+    private var isTodayChallenge = false
+    private var currentStreak = 0
+    private var maxStreak = 0
+    private var questionStartTime = 0L
+    private var survivalRound = 1
+    private var timeLeftSeconds = 600L // 10 minutes for challenge
+    private val challengeTimerHandler = Handler(Looper.getMainLooper())
+
+    private lateinit var topicAdapter: ArrayAdapter<String>
+    private val topicsList = ArrayList<String>()
+    private val requestQueue by lazy { Volley.newRequestQueue(this) }
+    private val autoAdvanceHandler = Handler(Looper.getMainLooper())
+    private lateinit var vibrator: Vibrator
+    private var tts: TextToSpeech? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_mcq)
+
+        val prefs = getSharedPreferences("MY_APP", MODE_PRIVATE)
+        val rawSubject = intent.getStringExtra("SELECTED_SUBJECT")
+            ?: prefs.getString("selected_subject_preference", "General")
+            ?: "General"
+        currentSubject = rawSubject.replace(Regex("[^\\p{L}\\p{N}\\s]"), "").trim()
+        userId = prefs.getInt("user_id", 0)
+        currentExp = prefs.getInt("user_exp", 0)
+        tts = TextToSpeech(this, this)
+        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
+        val mode = intent.getStringExtra("MODE")
+        if (mode == "SURVIVAL") {
+            isSurvivalMode = true
+            currentSubject = intent.getStringExtra("SELECTED_SUBJECT") ?: "NEET PG"
+            currentTopic = intent.getStringExtra("SELECTED_TOPIC") ?: "Uncategorized"
+        } else if (mode == "KING_OF_TOPIC") {
+            isKingOfTopic = true
+            isSurvivalMode = true // King of topic is a survival mode
+            currentSubject = intent.getStringExtra("SELECTED_SUBJECT") ?: "NEET PG"
+            currentTopic = intent.getStringExtra("SELECTED_TOPIC")
+        } else if (mode == "TODAY_CHALLENGE") {
+            isTodayChallenge = true
+            currentSubject = "NEET PG"
+            currentTopic = "Uncategorized"
+            startChallengeTimer()
+        }
+
+        initViews()
+        setupListeners()
+        setupBottomNav()
+        setupTopicSelection()
+        setupGamingUI()
+
+        val incomingIds = intent.getIntegerArrayListExtra("QUESTION_ID_LIST")
+        if (incomingIds != null && incomingIds.isNotEmpty()) {
+            isFixedTest = true
+            allQuestionIds.addAll(incomingIds)
+            Log.d(TAG, "Loaded fixed test with ${allQuestionIds.size} questions. First ID: ${allQuestionIds.getOrNull(0)}")
+            topicLayout.visibility = View.GONE
+            fetchQuestion(allQuestionIds[currentIndex])
+        } else if (intent.hasExtra("question_id")) {
+            // Support for single question intent override
+            val singleId = readQuestionIdExtra()
+            if (singleId > 0) {
+                Log.d(TAG, "Loading single question ID: $singleId")
+                isFixedTest = true
+                allQuestionIds.add(singleId)
+                topicLayout.visibility = View.GONE
+                fetchQuestion(singleId)
+            } else {
+                Log.w(TAG, "Invalid question_id extra; loading default question flow")
+                isFixedTest = false
+                fetchTopics()
+                fetchQuestion(null)
+            }
+        }else {
+            isFixedTest = false
+            fetchTopics()
+            fetchQuestion(null)
+        }
+    }
+
+    private fun readQuestionIdExtra(): Int {
+        val value = intent.extras?.get("question_id") ?: return 0
+        return when (value) {
+            is Int -> value
+            is Number -> value.toInt()
+            is String -> value.toIntOrNull() ?: 0
+            else -> 0
+        }
+    }
+
+    private fun initViews() {
+        questionCard = findViewById(R.id.questionCard)
+        questionText = findViewById(R.id.questionText)
+        questionImageView = findViewById(R.id.questionImageView)
+        optionA = findViewById(R.id.optionA)
+        optionB = findViewById(R.id.optionB)
+        optionC = findViewById(R.id.optionC)
+        optionD = findViewById(R.id.optionD)
+        radioGroup = findViewById(R.id.radioGroup)
+        submitBtn = findViewById(R.id.submitBtn)
+        reportBtn = findViewById(R.id.reportBtn)
+        askAiBtn = findViewById(R.id.askAiBtn)
+        nextBtn = findViewById(R.id.nextBtn)
+        prevBtn = findViewById(R.id.prevBtn)
+        explanationCard = findViewById(R.id.explanationCard)
+        explanationText = findViewById(R.id.explanationText)
+        statusText = findViewById(R.id.statusText)
+        speakBtn = findViewById(R.id.speakBtn)
+        topicSpinner = findViewById(R.id.topicSpinner)
+        navBtn = findViewById(R.id.navBtn)
+        shareWhatsappBtn = findViewById(R.id.shareWhatsappBtn)
+        addToQuizBtn = findViewById(R.id.addToQuizBtn)
+        bottomNav = findViewById(R.id.bottomNavigation)
+        dailyProgressBar = findViewById(R.id.dailyProgressBar)
+        topicLayout = findViewById(R.id.topicLayout)
+        rootLayout = findViewById(android.R.id.content)
+    }
+
+    private class QuestionPickerAdapter(
+        context: Context,
+        private val questions: List<Int>,
+        private val prefs: android.content.SharedPreferences
+    ) : ArrayAdapter<Int>(context, android.R.layout.simple_list_item_1, questions) {
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val view = super.getView(position, convertView, parent) as TextView
+            val qId = questions[position]
+            val savedAns = prefs.getString("q_$qId", null)
+
+            // Check if correct/incorrect from stored metadata if available,
+            // or just green if attempted.
+            // For simplicity here, we use attempted (green) vs not (red)
+            // and check the "correct" status if we can verify it.
+
+            view.text = "Question ${position + 1}"
+
+if (savedAns != null) {
+                 // Attempted = Green with checkmark
+                 view.setTextColor(Color.parseColor("#4CAF50"))
+                 view.setCompoundDrawablesWithIntrinsicBounds(0, 0, android.R.drawable.checkbox_on_background, 0)
+             } else {
+                 // Not attempted = Red/Gray
+                 view.setTextColor(Color.parseColor("#F44336"))
+                 view.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+             }
+
+            val padding = (16 * context.resources.displayMetrics.density).toInt()
+            view.setPadding(padding, padding, padding, padding)
+
+            return view
+        }
+    }
+
+    private fun setupGamingUI() {
+        comboText = TextView(this).apply {
+            text = "🔥 Combo: 0"
+            setTextColor(Color.parseColor("#FF9800"))
+            textSize = 14f
+            setPadding(12, 6, 12, 6)
+            background = GradientDrawable().apply {
+                setColor(Color.parseColor("#FFF3E0"))
+                cornerRadius = 30f
+            }
+            visibility = View.GONE
+        }
+
+        expText = TextView(this).apply {
+            text = "⭐ $currentExp XP"
+            setTextColor(Color.parseColor("#4CAF50"))
+            textSize = 14f
+            setPadding(12, 6, 12, 6)
+            background = GradientDrawable().apply {
+                setColor(Color.parseColor("#E8F5E9"))
+                cornerRadius = 30f
+            }
+            setOnClickListener {
+                animateButton(it)
+                val intent = Intent(this@MCQActivity, RankActivity::class.java)
+                startActivity(intent)
+            }
+        }
+
+        val expParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply {
+            topMargin = 80
+            rightMargin = 20
+            gravity = android.view.Gravity.TOP or android.view.Gravity.END
+        }
+        rootLayout.addView(expText, expParams)
+
+        val comboParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply {
+            topMargin = 140
+            rightMargin = 20
+            gravity = android.view.Gravity.TOP or android.view.Gravity.END
+        }
+        rootLayout.addView(comboText, comboParams)
+    }
+
+    private fun setupListeners() {
+        reportBtn.setOnClickListener {
+            animateButton(it)
+            showButtonFeedback("Report", it)
+            showReportDialog()
+        }
+
+        askAiBtn.setOnClickListener {
+            animateButton(it)
+            showButtonFeedback("Ask AI", it)
+            openAskAiDialog()
+        }
+
+        shareWhatsappBtn.setOnClickListener {
+            animateButton(it)
+            showButtonFeedback("Share challenge", it)
+            shareToWhatsApp()
+        }
+
+        addToQuizBtn.setOnClickListener {
+            animateButton(it)
+            showButtonFeedback("Add to quiz", it)
+            addQuestionToQuiz()
+        }
+
+        submitBtn.setOnClickListener {
+            animateButton(it)
+            submitAnswer()
+        }
+
+        nextBtn.setOnClickListener {
+            animateButton(it)
+            showButtonFeedback("Next question", it)
+            navigate(1)
+        }
+
+        prevBtn.setOnClickListener {
+            animateButton(it)
+            showButtonFeedback("Previous question", it)
+            navigate(-1)
+        }
+
+        navBtn.setOnClickListener {
+            animateButton(it)
+            showButtonFeedback("Jump to question", it)
+            showQuestionPicker()
+        }
+
+        speakBtn.setOnClickListener {
+            animateButton(it)
+            speakExplanation()
+        }
+
+        listOf(optionA, optionB, optionC, optionD).forEach { rb ->
+            rb.setOnClickListener { animateButton(rb) }
+        }
+    }
+
+    /** Shows the report-a-question dialog and submits the report to question_reports. */
+    private fun showReportDialog() {
+        val qId = currentQuestionObj?.optInt("question_id", 0) ?: 0
+        if (qId <= 0) {
+            Toast.makeText(this, "No question loaded to report", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val reasons = arrayOf("Wrong answer", "Wrong explanation", "Image not loading", "Duplicate question", "Typo / wording", "Other")
+        val input = android.widget.EditText(this).apply {
+            hint = "Optional details…"
+            setSingleLine(false)
+            minLines = 3
+        }
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Report question #$qId")
+            .setItems(reasons) { _, which ->
+                val reason = reasons[which]
+                android.app.AlertDialog.Builder(this)
+                    .setTitle("Add details?")
+                    .setView(input)
+                    .setPositiveButton("Send report") { _, _ ->
+                        submitQuestionReport(qId, reason, input.text.toString().trim())
+                    }
+                    .setNegativeButton("Send without details", null)
+                    .show()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun submitQuestionReport(qId: Int, reason: String, details: String) {
+        val body = org.json.JSONObject().apply {
+            put("user_id", userId)
+            put("question_id", qId)
+            put("reason", reason)
+            put("details", details)
+        }
+        val request = object : com.android.volley.toolbox.JsonObjectRequest(
+            com.android.volley.Request.Method.POST,
+            "https://medigyaan.xyz/Neurons/api/report_question.php", body,
+            { resp ->
+                if (resp.optBoolean("success")) {
+                    Toast.makeText(this, "Report sent — thank you!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, resp.optString("error", "Could not send report"), Toast.LENGTH_LONG).show()
+                }
+            },
+            {
+                Toast.makeText(this, "Network error — report not sent", Toast.LENGTH_SHORT).show()
+            }
+        ) {
+            override fun getHeaders(): MutableMap<String, String> {
+                return hashMapOf(
+                    "Content-Type" to "application/json",
+                    "X-App-Signature" to "EduLabsRTM_Secure_v1_2026"
+                )
+            }
+        }
+        requestQueue.add(request)
+    }
+
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            tts?.language = Locale.US
+        } else {
+            Log.e(TAG, "TTS Initialization failed")
+        }
+    }
+
+    private fun speakExplanation() {
+        val text = explanationText.text.toString()
+        if (text.isNotEmpty()) {
+            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "MCQ_EXP")
+            showButtonFeedback("Speaking...", speakBtn)
+        }
+    }
+
+    private fun animateButton(view: View) {
+        view.animate()
+            .scaleX(0.95f)
+            .scaleY(0.95f)
+            .setDuration(100)
+            .withEndAction {
+                view.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(100)
+                    .start()
+            }
+            .start()
+
+        if (view is Button || view is ImageButton || view is MaterialButton) {
+            ViewCompat.animate(view).setDuration(200).start()
+        }
+    }
+
+    private fun showButtonFeedback(message: String, anchor: View) {
+        Snackbar.make(rootLayout, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(Color.parseColor("#FF9800"))
+            .setTextColor(Color.WHITE)
+            .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
+            .show()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            vibrator.vibrate(50)
+        }
+    }
+
+    private fun openAskAiDialog() {
+        val q = currentQuestionObj?.optString("question", "")?.trim().orEmpty()
+        if (q.isEmpty()) {
+            showButtonFeedback("No question loaded", askAiBtn)
+            return
+        }
+
+        val currentExplanation = explanationText.text?.toString().orEmpty()
+
+        val input = EditText(this).apply {
+            hint = "Ask something like: explain this question"
+            setText("Explain this question in simple exam-focused language.")
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Ask AI")
+            .setMessage(
+                "Current explanation:\n\n${
+                    if (currentExplanation.isNotBlank()) currentExplanation
+                    else "No explanation loaded yet."
+                }\n\nQuestion:\n\n${Html.fromHtml(q, Html.FROM_HTML_MODE_LEGACY)}"
+            )
+            .setView(input)
+            .setPositiveButton("Ask") { _, _ ->
+                val userQuery = input.text.toString().trim()
+                askAiBtn.isEnabled = false
+                fetchAiAnswer(
+                    question = q,
+                    userQuery = userQuery.ifEmpty { "Explain this question clearly" },
+                    baseExplanation = currentExplanation
+                )
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun fetchAiAnswer(question: String, userQuery: String, baseExplanation: String) {
+        val qId = currentQuestionObj?.optInt("question_id", 0) ?: 0
+        if (qId == 0) {
+            askAiBtn.isEnabled = true
+            showButtonFeedback("Invalid question", askAiBtn)
+            return
+        }
+
+        val url = AI_URL
+
+        val request = object : StringRequest(Method.POST, url,
+            { response ->
+                askAiBtn.isEnabled = true
+                try {
+                    val json = JSONObject(response)
+
+                    val aiText = when {
+                        json.optBoolean("success", false) -> {
+                            json.optString("answer", "")
+                                .ifEmpty { json.optString("content", "") }
+                                .ifEmpty { json.optString("message", "") }
+                        }
+                        json.has("choices") -> {
+                            json.getJSONArray("choices")
+                                .getJSONObject(0)
+                                .getJSONObject("message")
+                                .getString("content")
+                        }
+                        else -> json.optString("answer", response)
+                    }
+
+                    showAiResult(
+                        baseExplanation = baseExplanation,
+                        aiText = aiText.ifEmpty { "No AI response received." }
+                    )
+                } catch (e: Exception) {
+                    Log.e(TAG, "AI parse error: ${e.message}")
+                    showButtonFeedback("AI parse error", askAiBtn)
+                }
+            },
+            { error ->
+                askAiBtn.isEnabled = true
+                Log.e(TAG, "AI request error: ${error.message}")
+                showButtonFeedback("AI failed", askAiBtn)
+            }) {
+            override fun getParams(): MutableMap<String, String> {
+                return hashMapOf(
+                    "question_id" to qId.toString(),
+                    "question" to question,
+                    "query" to userQuery,
+                    "subject" to currentSubject,
+                    "topic" to (currentQuestionTopic.ifEmpty { "General" }),
+                    "explanation" to baseExplanation,
+                    "correct_answer" to (currentQuestionObj?.optString("correct_answer", "") ?: ""),
+                    "user_id" to userId.toString(),
+                    "timestamp" to System.currentTimeMillis().toString(),
+                    "random" to (0..999999).random().toString()
+                )
+            }
+
+            override fun getHeaders(): MutableMap<String, String> {
+                return hashMapOf(
+                    "Cache-Control" to "no-cache",
+                    "Pragma" to "no-cache"
+                )
+            }
+        }
+
+        request.setShouldCache(false)
+        requestQueue.add(request)
+    }
+
+    private fun addMessage(parent: LinearLayout, text: String, isUser: Boolean) {
+        val card = MaterialCardView(this).apply {
+            radius = 32f
+            cardElevation = 2f
+            setCardBackgroundColor(
+                if (isUser) getColor(R.color.whatsapp_bubble_sent)
+                else getColor(R.color.whatsapp_bubble_received)
+            )
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply {
+                gravity = if (isUser) Gravity.END else Gravity.START
+                setMargins(if (isUser) 100 else 20, 12, if (isUser) 20 else 100, 12)
+            }
+
+            val tv = TextView(context).apply {
+                this.text = if (isUser) text else aiMarkdownSpannable(text)
+                textSize = 15f
+                setTextColor(
+                    if (isUser) getColor(R.color.whatsapp_bubble_sent_text)
+                    else getColor(R.color.whatsapp_bubble_received_text)
+                )
+                setPadding(35, 20, 35, 20)
+            }
+            addView(tv)
+        }
+        parent.addView(card)
+        // Auto scroll to bottom
+        (card.parent.parent as? ScrollView)?.post {
+            (card.parent.parent as? ScrollView)?.fullScroll(View.FOCUS_DOWN)
+        }
+    }
+
+    private fun showAiResult(baseExplanation: String, aiText: String) {
+        // Initialize chat history with the context of the current question
+        chatHistory.clear()
+        chatHistory.append("System: You are a helpful medical exam tutor. Base your answers on the provided question and explanation.\n")
+        chatHistory.append("Assistant: $aiText\n")
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            setBackgroundResource(R.drawable.bg_chat_wallpaper)
+        }
+
+        val scroll = ScrollView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f)
+        }
+
+        val chatLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(20, 20, 20, 20)
+        }
+        scroll.addView(chatLayout)
+
+        val inputLayout = MaterialCardView(this).apply {
+            radius = 0f
+            cardElevation = 20f
+            setCardBackgroundColor(getColor(R.color.colorSurface))
+            layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        }.let { card ->
+            val inner = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(20, 10, 20, 10)
+                gravity = Gravity.CENTER_VERTICAL
+            }
+            card.addView(inner)
+            inner
+        }
+
+        val inputBox = EditText(this).apply {
+            hint = "Ask a follow-up question..."
+            background = null
+            maxLines = 4
+            setTextColor(getColor(R.color.text_primary))
+            setHintTextColor(getColor(R.color.text_secondary))
+            layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+        }
+
+        val sendBtn = ImageButton(this).apply {
+            setImageResource(android.R.drawable.ic_menu_send)
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(getColor(R.color.primary))
+            }
+            setColorFilter(Color.WHITE)
+            setPadding(20, 20, 20, 20)
+            layoutParams = LinearLayout.LayoutParams(110, 110).apply { marginStart = 10 }
+        }
+
+        inputLayout.addView(inputBox)
+        inputLayout.addView(sendBtn)
+
+        container.addView(scroll)
+        container.addView(inputLayout.parent as View)
+
+        // Use standard theme to allow automatic Dark/Light layout support
+        val dialog = AlertDialog.Builder(this, android.R.style.Theme_NoTitleBar_Fullscreen)
+            .setView(container)
+            .create()
+
+        // Add a Header
+        val header = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setBackgroundColor(getColor(R.color.primary))
+            setPadding(40, 40, 40, 40)
+            gravity = Gravity.CENTER_VERTICAL
+
+            val title = TextView(context).apply {
+                text = "AI Medical Tutor"
+                setTextColor(Color.WHITE)
+                textSize = 18f
+                setTypeface(null, android.graphics.Typeface.BOLD)
+                layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+            }
+            val close = ImageButton(context).apply {
+                setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
+                setBackgroundColor(Color.TRANSPARENT)
+                setColorFilter(Color.WHITE)
+                setOnClickListener { dialog.dismiss() }
+            }
+            addView(title)
+            addView(close)
+        }
+        container.addView(header, 0)
+
+        dialog.show()
+
+        addMessage(chatLayout, "📘 $baseExplanation", false)
+        streamMessage(chatLayout, "🤖 $aiText")
+        sendBtn.setOnClickListener {
+            val userText = inputBox.text.toString().trim()
+            if (userText.isEmpty()) return@setOnClickListener
+            addMessage(chatLayout, userText, true)
+            chatHistory.append("User: $userText\n")
+            inputBox.setText("")
+            fetchFollowUpAi(userText, chatLayout)
+        }
+    }
+
+    private fun fetchFollowUpAi(userQuery: String, chatLayout: LinearLayout) {
+        val url = AI_URL
+        val request = object : StringRequest(Method.POST, url,
+            { response ->
+                try {
+                    val json = JSONObject(response)
+                    val reply = json.optString("answer", json.optString("content", "No response"))
+                    chatHistory.append("Assistant: $reply\n")
+                    streamMessage(chatLayout, reply)
+                } catch (e: Exception) {
+                    addMessage(chatLayout, "⚠ Parse error", false)
+                }
+            },
+            { addMessage(chatLayout, "⚠ Network error", false) }) {
+            override fun getParams(): MutableMap<String, String> {
+                val qId = currentQuestionObj?.optInt("question_id", 0) ?: 0
+                val qText = currentQuestionObj?.optString("question", "") ?: ""
+                val baseExp = explanationText.text.toString()
+
+                return hashMapOf(
+                    "question_id" to qId.toString(),
+                    "question" to qText,
+                    "explanation" to baseExp,
+                    "query" to userQuery,
+                    "chat_history" to chatHistory.toString(),
+                    "mode" to "chat",
+                    "user_id" to userId.toString(),
+                    "timestamp" to System.currentTimeMillis().toString(),
+                    "random" to (0..999999).random().toString()
+                )
+            }
+
+            override fun getHeaders(): MutableMap<String, String> {
+                return hashMapOf(
+                    "Cache-Control" to "no-cache",
+                    "Pragma" to "no-cache"
+                )
+            }
+        }
+
+        request.setShouldCache(false)
+        requestQueue.add(request)
+    }
+
+    private fun streamMessage(parent: LinearLayout, fullText: String) {
+        val card = MaterialCardView(this).apply {
+            radius = 32f
+            cardElevation = 2f
+            setCardBackgroundColor(Color.parseColor("#F5F5F5"))
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply {
+                gravity = Gravity.START
+                setMargins(20, 12, 100, 12)
+            }
+        }
+
+        val tv = TextView(this).apply {
+            textSize = 15f
+            setTextColor(Color.BLACK)
+            setPadding(35, 20, 35, 20)
+        }
+        card.addView(tv)
+        parent.addView(card)
+
+        val scrollView = (parent.parent as? ScrollView)
+
+        val handler = Handler(Looper.getMainLooper())
+        var index = 0
+        handler.post(object : Runnable {
+            override fun run() {
+                if (index <= fullText.length) {
+                    // Apply the bold+highlight render once the full reply is streamed
+                    tv.text = if (index >= fullText.length) aiMarkdownSpannable(fullText)
+                    else fullText.substring(0, index)
+                    index++
+                    scrollView?.fullScroll(View.FOCUS_DOWN)
+                    handler.postDelayed(this, 15)
+                }
+            }
+        })
+    }
+
+    private fun fetchQuestion(questionId: Int?) {
+        val isSpecificFetch = questionId != null && questionId > 0
+        Log.d(TAG, "fetchQuestion called with ID: $questionId (Specific: $isSpecificFetch)")
+
+        val url = if (isSpecificFetch) {
+            "${BASE_URL}getQuestions.php?question_id=$questionId&user_id=$userId&t=${System.currentTimeMillis()}"
+        } else {
+            val limitParam = if (isTodayChallenge) "&limit=10" else ""
+            val topicParam = if (!currentTopic.isNullOrEmpty() && currentTopic != "All Topics") "&topic=${Uri.encode(currentTopic)}" else ""
+            val finalUrl = "${BASE_URL}getQuestions.php?subject=${Uri.encode(currentSubject)}&user_id=$userId$topicParam$limitParam&t=${System.currentTimeMillis()}"
+            finalUrl
+        }
+        requestQueue.cancelAll(VOLLEY_TAG)
+        val request = JsonObjectRequest(Request.Method.GET, url, null,
+            { response ->
+                isNavigating = false
+                if (!isFinishing && response.optBoolean("success")) {
+                    if (allQuestionIds.isEmpty() && response.has("all_question_ids")) {
+                         val ids = response.optJSONArray("all_question_ids")
+                         ids?.let {
+                             for (i in 0 until it.length()) allQuestionIds.add(it.getInt(i))
+                             Log.d(TAG, "Populated list with ${allQuestionIds.size} IDs from server")
+                         }
+
+                         if (isKingOfTopic && allQuestionIds.size < 200) {
+                             showNotEnoughQuestionsDialog()
+                         }
+
+                         // Sync answered status from server for the dropdown indicators
+                         val answeredIds = response.optJSONArray("answered_ids")
+                         if (answeredIds != null) {
+                             val ansPrefs = getSharedPreferences("MCQ_ANSWERS", MODE_PRIVATE).edit()
+                             for (i in 0 until answeredIds.length()) {
+                                 val qId = answeredIds.getInt(i)
+                                 // Marker to show as green in dropdown even if we don't have the full result cached
+                                 if (!getSharedPreferences("MCQ_ANSWERS", MODE_PRIVATE).contains("q_$qId")) {
+                                     ansPrefs.putString("q_$qId", "SYNCED")
+                                 }
+                             }
+                             ansPrefs.apply()
+                         }
+
+                         updateDailyProgress()
+                    }
+
+                    response.optJSONObject("data")?.let { data ->
+                        currentQuestionObj = data
+                        currentQuestionTopic = extractQuestionTopic(data)
+                        displayQuestionWithAnimation(data)
+                        Log.d(TAG, "Successfully loaded question_id: ${data.optInt("question_id")}")
+                    }
+                }
+            },
+            { error ->
+                isNavigating = false
+                val errorLabel = networkErrorLabel(error)
+                val body = error.networkResponse?.data?.toString(Charsets.UTF_8).orEmpty()
+                Log.e(TAG, "fetchQuestion Error: $errorLabel | URL: $url | Body=${body.take(500)}", error)
+                showButtonFeedback("Network error: $errorLabel", rootLayout)
+            }
+        )
+
+        // If the specific question fails to load in a sequence,
+        // we can add a retry logic or skip here if we're in a list
+        request.setShouldCache(false)
+        request.setRetryPolicy(com.android.volley.DefaultRetryPolicy(
+            30000, 2, com.android.volley.DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ))
+        request.tag = VOLLEY_TAG
+        requestQueue.add(request)
+    }
+
+    private fun displayQuestionWithAnimation(data: JSONObject) {
+        questionCard.animate().alpha(0f).setDuration(150).withEndAction {
+            displayQuestionData(data)
+            questionCard.animate().alpha(1f).setDuration(300).start()
+        }.start()
+    }
+
+    private fun displayQuestionData(data: JSONObject) {
+        resetUI()
+        val qId = data.optInt("question_id")
+        currentQuestionObj = data
+        currentQuestionTopic = extractQuestionTopic(data)
+
+        val imageUrl = data.optString("question_image")
+        if (!imageUrl.isNullOrEmpty() && imageUrl != "null") {
+            questionImageView.visibility = View.VISIBLE
+            val fullUrl = if (imageUrl.startsWith("http")) imageUrl else IMAGE_BASE_URL + imageUrl
+            Glide.with(this).load(fullUrl).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).into(questionImageView)
+        } else questionImageView.visibility = View.GONE
+
+        val leadingNumberRegex = Regex("^\\d+[.\\s\\-)]+\\s*")
+        val rawQuestion = data.optString("question", "")
+        questionText.text = rawQuestion.replace(leadingNumberRegex, "")
+        optionA.text = data.optString("option_a").replace(leadingNumberRegex, "").trim()
+        optionB.text = data.optString("option_b").replace(leadingNumberRegex, "").trim()
+        optionC.text = data.optString("option_c").replace(leadingNumberRegex, "").trim()
+        optionD.text = data.optString("option_d").replace(leadingNumberRegex, "").trim()
+
+        questionText.setTextColor(ContextCompat.getColor(this, R.color.on_surface))
+        statusText.text = if (isSurvivalMode) "Survival Mode - Round $survivalRound" else "Question ${currentIndex + 1} of ${allQuestionIds.size}"
+        questionStartTime = System.currentTimeMillis()
+
+        val correctAnswer = data.optString("correct_answer", data.optString("correct_option", "")).trim()
+        val prefs = getSharedPreferences("MCQ_ANSWERS", Context.MODE_PRIVATE)
+        val localAns = prefs.getString("q_$qId", null)
+        val serverAns = data.optString("user_answer", "").trim()
+        val isAnswered = localAns != null || data.optBoolean("answered", false) || (serverAns.isNotEmpty() && serverAns != "null")
+
+        if (isAnswered) showResult(correctAnswer, localAns ?: serverAns, data.optString("explanation"), fromCache = true)
+    }
+
+    private fun submitAnswer() {
+        val qId = currentQuestionObj?.optInt("question_id", -1) ?: -1
+        if (qId == -1) return
+        val selectedId = radioGroup.checkedRadioButtonId
+        if (selectedId == -1) { showButtonFeedback("Select an answer first!", submitBtn); return }
+
+        val ans = when (selectedId) {
+            R.id.optionA -> "A"; R.id.optionB -> "B"; R.id.optionC -> "C"; R.id.optionD -> "D"; else -> ""
+        }
+        submitBtn.isEnabled = false
+        val url = "${BASE_URL}submitAnswerx1.php?t=${System.currentTimeMillis()}"
+        val request = object : StringRequest(Method.POST, url,
+            { response ->
+                submitBtn.isEnabled = true
+                try {
+                    val json = JSONObject(response)
+                    if (json.optBoolean("success")) {
+                        getSharedPreferences("MCQ_ANSWERS", Context.MODE_PRIVATE).edit().putString("q_$qId", ans).apply()
+                        currentQuestionObj?.put("answered", true); currentQuestionObj?.put("user_answer", ans)
+                        showResult(json.optString("correct_answer", "").trim(), ans, json.optString("explanation", ""), fromCache = false)
+                    }
+                } catch (e: Exception) { Log.e(TAG, "JSON error: ${e.message}") }
+            },
+            { submitBtn.isEnabled = true }) {
+            override fun getParams() = hashMapOf("user_id" to userId.toString(), "question_id" to qId.toString(), "answer" to ans)
+        }
+        requestQueue.add(request)
+    }
+
+    private fun showResult(correct: String, user: String, explanation: String, fromCache: Boolean) {
+        submitBtn.visibility = View.GONE
+        askAiBtn.visibility = View.VISIBLE
+        explanationCard.visibility = View.VISIBLE
+
+        val cleanCorrect = correct.replace(Regex("[^A-Za-z0-9]"), "").trim()
+        val cleanUser = user.replace(Regex("[^A-Za-z0-9]"), "").trim()
+        val isCorrect = cleanUser.equals(cleanCorrect, ignoreCase = true)
+
+        fun finalizeResult(finalExp: String) {
+            explanationText.text = aiMarkdownSpannable(finalExp)
+            if (isCorrect) {
+                comboCount++; updateComboUI(); animateCorrectAnswer()
+                
+                // Streak Logic (Para 27)
+                currentStreak++
+                if (currentStreak > maxStreak) maxStreak = currentStreak
+                
+                var expGain = 10 + (comboCount * 2)
+                
+                // Speed Bonus logic (Para 26)
+                val timeTaken = System.currentTimeMillis() - questionStartTime
+                val speedBonus = when {
+                    timeTaken < 5000 -> 15 // Under 5s
+                    timeTaken < 10000 -> 10 // Under 10s
+                    timeTaken < 15000 -> 5 // Under 15s
+                    else -> 0
+                }
+                expGain += speedBonus
+
+                // Survival Multiplier (Para 26)
+                if (isSurvivalMode) {
+                    val survivalBonus = survivalRound * 5
+                    expGain += survivalBonus
+                    survivalRound++
+                }
+
+                // Streak Milestones (Para 27)
+                when (currentStreak) {
+                    5 -> { expGain += 50; showBadgePopup("🔥 5 Streak Bonus!", "You gained +50 bonus XP") }
+                    10 -> { expGain += 150; showBadgePopup("🔥 10 Streak Super Bonus!", "You gained +150 bonus XP") }
+                    25 -> { expGain += 500; showBadgePopup("🏆 25 Streak Legend!", "Special Badge Unlocked!"); saveBadgeToServer("STREAK_25") }
+                }
+
+                currentExp += expGain; updateExpUI(expGain); 
+                statusText.text = if (isSurvivalMode) "SURVIVED! +$expGain XP (Speed: +$speedBonus)" else "+$expGain XP! 🔥 Combo: $comboCount"
+                statusText.setTextColor(Color.parseColor("#4CAF50")); showFloatingXp(expGain); syncPracticeExp(expGain)
+                DailyStatsManager.recordAnswer(this, currentQuestionTopic, true); AccuracyHistoryManager.recordAnswer(this, true)
+                UserCacheSyncer.sync(this, userId)
+                
+                if (!fromCache && !isAutoNavigating) handleAutoAdvance()
+            } else {
+                comboCount = 0; updateComboUI(); animateWrongAnswer()
+                
+                // Survival End (Para 26)
+                if (isSurvivalMode && !fromCache) {
+                    statusText.text = "SURVIVAL ENDED at Round $survivalRound"
+                    statusText.setTextColor(Color.RED)
+                    showSurvivalEndDialog()
+                } else {
+                    statusText.text = "+0 XP • Wrong answer"
+                    statusText.setTextColor(Color.RED)
+                }
+
+                currentStreak = 0 // Streak resets on wrong (Para 27)
+                DailyStatsManager.recordAnswer(this, currentQuestionTopic, false)
+                AccuracyHistoryManager.recordAnswer(this, false)
+                UserCacheSyncer.sync(this, userId)
+            }
+
+            val review = currentQuestionObj?.let { createReviewJson(it, user, isCorrect) } ?: ""
+            val todayStats = DailyStatsManager.getToday(this)
+            HistoryManager.saveHistory(this, "PRACTICE", "Practice Session", currentQuestionTopic, currentExp, todayStats.first, todayStats.second, todayStats.first - todayStats.second, reviewJson = review)
+            statusText.append("\n${todayStats.second}/${todayStats.first} MCQs • Topic: $currentQuestionTopic")
+
+            for (i in 0 until radioGroup.childCount) {
+                val rb = radioGroup.getChildAt(i) as RadioButton
+                val tag = when (rb.id) { R.id.optionA -> "A"; R.id.optionB -> "B"; R.id.optionC -> "C"; R.id.optionD -> "D"; else -> "" }
+                rb.isEnabled = false
+                if (tag == cleanUser) rb.isChecked = true
+                if (tag == cleanCorrect) {
+                    rb.setTextColor(Color.parseColor("#4CAF50")); rb.buttonTintList = ColorStateList.valueOf(Color.parseColor("#4CAF50"))
+                } else if (tag == cleanUser && !isCorrect) {
+                    rb.setTextColor(Color.RED); rb.buttonTintList = ColorStateList.valueOf(Color.RED)
+                }
+            }
+        }
+
+        if (explanation.trim().length < 100 && !fromCache) {
+            explanationText.text = "Loading enhanced AI explanation..."
+            fetchAiAnswerForAutoExplanation(currentQuestionObj?.optString("question", "") ?: "", "Explain this MCQ in detail.", explanation) { aiExp ->
+                currentQuestionObj?.put("explanation", aiExp)
+                saveEnhancedExplanationToDatabase(currentQuestionObj?.optInt("question_id", 0) ?: 0, aiExp)
+                finalizeResult("🤖 AI Enhanced:\n\n$aiExp")
+            }
+        } else finalizeResult(explanation)
+
+        explanationCard.alpha = 0f; explanationCard.translationY = 50f; explanationCard.animate().alpha(1f).translationY(0f).setDuration(400).start()
+    }
+
+    private fun fetchAiAnswerForAutoExplanation(question: String, userQuery: String, baseExplanation: String, callback: (String) -> Unit) {
+        val url = AI_URL
+        val request = object : StringRequest(Method.POST, url,
+            { response ->
+                try {
+                    val json = JSONObject(response)
+                    val aiText = json.optString("answer", json.optString("content", baseExplanation))
+                    callback(aiText)
+                } catch (e: Exception) { callback(baseExplanation) }
+            },
+            { callback(baseExplanation) }) {
+            override fun getParams() = hashMapOf("question" to question, "query" to userQuery, "explanation" to baseExplanation, "user_id" to userId.toString())
+        }
+        requestQueue.add(request)
+    }
+
+    private fun saveEnhancedExplanationToDatabase(questionId: Int, explanation: String) {
+        if (questionId <= 0 || explanation.isBlank()) return
+        val url = "${BASE_URL}update_question_explanation.php"
+        val request = object : StringRequest(Method.POST, url,
+            { response ->
+                try {
+                    val json = JSONObject(response)
+                    if (json.optString("status") == "success") {
+                        Log.d("MCQ", "Enhanced explanation saved for question $questionId")
+                    }
+                } catch (e: Exception) {
+                    Log.e("MCQ", "Failed to parse save response: ${e.message}")
+                }
+            },
+            { error ->
+                Log.e("MCQ", "Failed to save explanation: ${error.message}")
+            }) {
+            override fun getParams() = hashMapOf(
+                "question_id" to questionId.toString(),
+                "explanation" to explanation,
+                "user_id" to userId.toString()
+            )
+            override fun getHeaders() = hashMapOf(
+                "X-App-Signature" to "EduLabsRTM_Secure_v1_2026",
+                "Accept" to "application/json"
+            )
+        }
+        requestQueue.add(request)
+    }
+
+    private fun createReviewJson(q: JSONObject, selected: String, isCorrect: Boolean): String {
+        return try {
+            val array = org.json.JSONArray()
+            val obj = JSONObject().apply {
+                put("question_id", q.optInt("question_id"))
+                put("question", q.optString("question"))
+                put("option_a", q.optString("option_a"))
+                put("option_b", q.optString("option_b"))
+                put("option_c", q.optString("option_c"))
+                put("option_d", q.optString("option_d"))
+                put("selected_option", selected)
+                val correct = q.optString("correct_answer", q.optString("correct_option", ""))
+                put("correct_option", correct)
+                put("is_correct", if (isCorrect) 1 else 0)
+                put("explanation", q.optString("explanation"))
+                put("image_url", q.optString("question_image"))
+                put("answered_at", System.currentTimeMillis())
+                put("selected_answer_text", q.optString("option_${selected.lowercase()}"))
+                put("correct_answer_text", q.optString("option_${correct.lowercase()}"))
+            }
+            array.put(obj).toString()
+        } catch (e: Exception) { "" }
+    }
+
+    private fun animateCorrectAnswer() {
+        for (i in 0..20) {
+            val particle = View(this).apply { setBackgroundColor(Color.rgb(Random.nextInt(255), Random.nextInt(255), Random.nextInt(255))); layoutParams = ViewGroup.LayoutParams(12, 12) }
+            rootLayout.addView(particle)
+            particle.x = submitBtn.x + submitBtn.width / 2; particle.y = submitBtn.y + submitBtn.height / 2
+            particle.animate().translationX(particle.x + Random.nextInt(-300, 300)).translationY(particle.y - Random.nextInt(200, 500)).alpha(0f).setDuration(800).withEndAction { rootLayout.removeView(particle) }.start()
+        }
+        vibrator.vibrate(80); questionCard.animate().scaleY(1.02f).scaleX(1.02f).setDuration(150).withEndAction { questionCard.animate().scaleY(1f).scaleX(1f).start() }.start()
+    }
+
+    private fun animateWrongAnswer() {
+        questionCard.startAnimation(AnimationUtils.loadAnimation(this, R.anim.shake))
+        vibrator.vibrate(100)
+    }
+
+    private fun showFloatingXp(xp: Int) {
+        val xpPopup = TextView(this).apply { text = "+$xp XP!"; setTextColor(Color.parseColor("#FFD700")); textSize = 18f; setTypeface(null, android.graphics.Typeface.BOLD) }
+        rootLayout.addView(xpPopup); val params = xpPopup.layoutParams as FrameLayout.LayoutParams
+        params.gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL; params.topMargin = 200; xpPopup.layoutParams = params
+        xpPopup.animate().translationY(-200f).alpha(0f).setDuration(1000).withEndAction { rootLayout.removeView(xpPopup) }.start()
+    }
+
+    private fun updateComboUI() {
+        if (comboCount > 0) {
+            comboText.text = "🔥 Combo: $comboCount"; comboText.visibility = View.VISIBLE
+            comboText.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150).withEndAction { comboText.animate().scaleX(1f).scaleY(1f).start() }.start()
+        } else comboText.visibility = View.GONE
+    }
+
+    private fun updateExpUI(addedXp: Int) {
+        expText.text = "⭐ $currentExp XP"; expText.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150).withEndAction { expText.animate().scaleX(1f).scaleY(1f).start() }.start()
+        getSharedPreferences("MY_APP", Context.MODE_PRIVATE).edit().putInt("user_exp", currentExp).apply()
+    }
+
+    private fun syncPracticeExp(xpGain: Int) {
+        val request = object : StringRequest(Method.POST, "${BASE_URL}sync_game_stats.php", {}, {}) {
+            override fun getParams() = hashMapOf("user_id" to userId.toString(), "score" to xpGain.toString(), "total_questions" to "1", "hp" to "0", "is_win" to "false", "challenge_id" to "0")
+        }
+        requestQueue.add(request)
+    }
+
+    private fun updateDailyProgress() {
+        val total = allQuestionIds.size
+        if (total > 0) {
+            val answered = allQuestionIds.count { getSharedPreferences("MCQ_ANSWERS", Context.MODE_PRIVATE).contains("q_$it") }
+            dailyProgressBar.max = total; dailyProgressBar.progress = answered
+        }
+    }
+
+    private fun showNotEnoughQuestionsDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Not Enough Questions")
+            .setMessage("This topic has only ${allQuestionIds.size} questions. King Mode requires at least 200.\n\nMore questions coming soon!")
+            .setCancelable(false)
+            .setPositiveButton("Back") { _, _ -> finish() }
+            .show()
+    }
+
+    private fun startChallengeTimer() {
+        challengeTimerHandler.post(object : Runnable {
+            override fun run() {
+                if (timeLeftSeconds > 0) {
+                    timeLeftSeconds--
+                    val mins = timeLeftSeconds / 60
+                    val secs = timeLeftSeconds % 60
+                    statusText.text = String.format("Challenge Time: %02d:%02d", mins, secs)
+                    challengeTimerHandler.postDelayed(this, 1000)
+                } else {
+                    showChallengeTimeoutDialog()
+                }
+            }
+        })
+    }
+
+    private fun showChallengeTimeoutDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Time's Up!")
+            .setMessage("The 10-minute challenge has ended.")
+            .setCancelable(false)
+            .setPositiveButton("See Results") { _, _ -> finish() }
+            .show()
+    }
+
+    private fun showSurvivalEndDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Survival Ended!")
+            .setMessage("You survived $survivalRound rounds.\nMax Streak: $maxStreak\nTotal XP this session: $currentExp")
+            .setCancelable(false)
+            .setPositiveButton("Review Session") { _, _ -> /* Stay to review */ }
+            .setNegativeButton("Back to Dashboard") { _, _ -> finish() }
+            .show()
+    }
+
+    private fun showBadgePopup(title: String, msg: String) {
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_badge_unlocked, null)
+        view.findViewById<TextView>(R.id.txtBadgeTitle).text = title
+        view.findViewById<TextView>(R.id.txtBadgeDesc).text = msg
+        
+        val dialog = AlertDialog.Builder(this)
+            .setView(view)
+            .create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.show()
+        Handler(Looper.getMainLooper()).postDelayed({ dialog.dismiss() }, 3000)
+    }
+
+    private fun saveBadgeToServer(badgeId: String) {
+        val url = "${BASE_URL}unlock_badge.php"
+        val request = object : StringRequest(Method.POST, url, {}, {}) {
+            override fun getParams() = hashMapOf("user_id" to userId.toString(), "badge_id" to badgeId)
+        }
+        requestQueue.add(request)
+    }
+
+    private fun handleAutoAdvance() {
+        isAutoNavigating = true
+        autoAdvanceHandler.postDelayed({ if (!isFinishing && currentIndex < allQuestionIds.size - 1) navigate(1); isAutoNavigating = false }, 1800)
+    }
+
+    private fun navigate(step: Int) {
+        if (isNavigating || allQuestionIds.isEmpty()) return
+        tts?.stop()
+        val nextIndex = currentIndex + step
+        if (nextIndex in 0 until allQuestionIds.size) {
+            isNavigating = true; currentIndex = nextIndex; fetchQuestion(allQuestionIds[currentIndex])
+        }
+    }
+
+    private fun resetUI() {
+        radioGroup.clearCheck(); explanationCard.visibility = View.GONE; submitBtn.visibility = View.VISIBLE; submitBtn.isEnabled = true; askAiBtn.visibility = View.GONE; statusText.setTextColor(Color.GRAY)
+        for (i in 0 until radioGroup.childCount) {
+            val child = radioGroup.getChildAt(i) as? RadioButton ?: continue
+            child.isEnabled = true; child.setTextColor(Color.BLACK); child.buttonTintList = null
+        }
+    }
+
+    private fun extractQuestionTopic(data: JSONObject): String {
+        val chosen = listOf(data.optString("topic"), data.optString("topic_name"), data.optString("subject")).firstOrNull { it.isNotBlank() && it.lowercase() != "null" } ?: "General"
+        return chosen.replace(Regex("[^A-Za-z0-9 ]"), "").trim()
+    }
+
+    private fun networkErrorLabel(error: com.android.volley.VolleyError): String {
+        val statusCode = error.networkResponse?.statusCode
+        if (statusCode != null) return "HTTP $statusCode"
+        if (error is com.android.volley.TimeoutError) return "timeout"
+        return error.localizedMessage?.takeIf { it.isNotBlank() } ?: "network unavailable"
+    }
+
+    private fun fetchTopics() {
+        val request = JsonObjectRequest(Request.Method.GET, "${BASE_URL}getTopics.php?subject=${Uri.encode(currentSubject)}", null, { response ->
+            if (response.optBoolean("success")) {
+                topicsList.clear(); topicsList.add("All Topics")
+                val data = response.optJSONArray("data")
+                data?.let { for (i in 0 until it.length()) topicsList.add(it.getString(i)) }
+                topicAdapter.notifyDataSetChanged()
+            }
+            isFirstLoad = false
+        }, { error ->
+            isFirstLoad = false
+            Log.e(TAG, "fetchTopics Error: ${networkErrorLabel(error)}", error)
+        })
+        request.setShouldCache(false)
+        request.retryPolicy = com.android.volley.DefaultRetryPolicy(
+            30000, 1, com.android.volley.DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
+        requestQueue.add(request)
+    }
+
+    private fun setupTopicSelection() {
+        topicAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, topicsList); topicAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); topicSpinner.adapter = topicAdapter
+        topicSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, pos: Int, p3: Long) {
+                if (isFirstLoad || isFixedTest) return
+                val selected = if (pos == 0) null else topicsList[pos]
+                if (selected != currentTopic) { currentTopic = selected; allQuestionIds.clear(); currentIndex = 0; fetchQuestion(null) }
+            }
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+        }
+    }
+
+    private fun showQuestionPicker() {
+        val prefs = getSharedPreferences("MCQ_ANSWERS", Context.MODE_PRIVATE)
+        val adapter = QuestionPickerAdapter(this, allQuestionIds, prefs)
+
+        AlertDialog.Builder(this)
+            .setTitle("Jump to Question")
+            .setAdapter(adapter) { _, which ->
+                currentIndex = which
+                fetchQuestion(allQuestionIds[currentIndex])
+            }.show()
+    }
+
+    private fun setupBottomNav() {
+        setupAppBottomNavigation(bottomNav, R.id.nav_home)
+    }
+
+    private fun shareToWhatsApp() {
+        val qId = currentQuestionObj?.optInt("question_id", 0) ?: 0
+        val shareUrl = "https://medigyaan.xyz/Neurons/share.php?question_id=$qId&ref=$userId"
+        val message = "🧠 *MCQ Challenge!*\n👉 *Attempt here:* $shareUrl"
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, message)
+            `package` = "com.whatsapp" // ✅ WhatsApp's real package name
+        }
+        try {
+            startActivity(intent)
+        } catch (_: Exception) {
+            // WhatsApp not installed → share anywhere via the system sheet
+            val fallback = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, message)
+            }
+            startActivity(Intent.createChooser(fallback, "Share via"))
+        }
+    }
+
+    private fun addQuestionToQuiz() {
+        requestQueue.add(JsonObjectRequest(Request.Method.GET, "${BASE_URL}getuserquizzes.php?user_id=$userId", null, { response ->
+            if (response.optBoolean("success")) {
+                val data = response.optJSONArray("data")
+                if (data != null && data.length() > 0) showQuizSelectionDialog(data, currentQuestionObj?.optInt("question_id") ?: -1)
+                else showCreateQuizDialog(currentQuestionObj?.optInt("question_id") ?: -1)
+            }
+        }, {}))
+    }
+
+    private fun showQuizSelectionDialog(quizzes: org.json.JSONArray, qId: Int) {
+        val names = ArrayList<String>(); val ids = ArrayList<Int>()
+        for (i in 0 until quizzes.length()) { val obj = quizzes.getJSONObject(i); names.add(obj.getString("quiz_name")); ids.add(obj.getInt("quiz_id")) }
+        AlertDialog.Builder(this).setTitle("Select Quiz").setItems(names.toTypedArray()) { _, which -> addToQuizApi(ids[which], qId) }.setNegativeButton("Create New") { _, _ -> showCreateQuizDialog(qId) }.show()
+    }
+
+    private fun showCreateQuizDialog(qId: Int) {
+        val input = EditText(this).apply { hint = "Enter Quiz Name" }
+        AlertDialog.Builder(this).setTitle("Create Quiz").setView(input).setPositiveButton("Create") { _, _ -> val name = input.text.toString().trim(); if (name.isNotEmpty()) createQuizApi(name, qId) }.setNegativeButton("Cancel", null).show()
+    }
+
+    private fun createQuizApi(name: String, qId: Int) {
+        requestQueue.add(object : StringRequest(Method.POST, "${BASE_URL}createquiz.php", { response -> try { val json = JSONObject(response); if (json.getBoolean("success")) addToQuizApi(json.getInt("quiz_id"), qId) } catch (_: Exception) {} }, {}) {
+            override fun getParams() = hashMapOf("user_id" to userId.toString(), "quiz_name" to name)
+        })
+    }
+
+    private fun addToQuizApi(quizId: Int, qId: Int) {
+        requestQueue.add(object : StringRequest(Method.POST, "${BASE_URL}addtoquiz.php", { _ -> showButtonFeedback("Added!", addToQuizBtn) }, {}) {
+            override fun getParams() = hashMapOf("quiz_id" to quizId.toString(), "question_id" to qId.toString())
+        })
+    }
+
+    override fun onDestroy() { super.onDestroy(); autoAdvanceHandler.removeCallbacksAndMessages(null); tts?.apply { stop(); shutdown() }; requestQueue.cancelAll(VOLLEY_TAG) }
+}

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <VideoView
+        android:id="@+id/battleVideoBg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:alpha="1"
+        android:keepScreenOn="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/battlePosterBg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:alpha="0.7"
+        android:src="@drawable/bg_battle"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 🔥 LEFT HALF BACKGROUND -->
+    <ImageView
+        android:id="@+id/bgMe"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:alpha="0.35"
+        android:src="@drawable/medigyaan_logo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guidelineCenter"/>
+
+    <!-- 🔥 RIGHT HALF BACKGROUND -->
+    <ImageView
+        android:id="@+id/bgOpp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:alpha="0.35"
+        android:src="@drawable/medigyaan_logo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guidelineCenter"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- 🔥 CENTER GUIDELINE -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineCenter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5"/>
+
+    <!-- 🔥 DARK OVERLAY -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#A0000000"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- 🔥 YOU SIDE -->
+    <LinearLayout
+        android:id="@+id/leftContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guidelineCenter"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:id="@+id/imgMe"
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:background="@drawable/avatar_glow"
+            android:padding="5dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/default_avatar"/>
+
+        <ImageView
+            android:id="@+id/imgMeBadge"
+            android:layout_width="76dp"
+            android:layout_height="76dp"
+            android:layout_marginTop="-18dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="Your rank badge"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_beginner"/>
+
+        <TextView
+            android:id="@+id/txtMe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="YOU"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:id="@+id/txtMeRank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Aspirant"
+            android:textColor="#FFD54F"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:layout_marginTop="3dp"/>
+    </LinearLayout>
+
+    <!-- 🔥 OPPONENT SIDE -->
+    <LinearLayout
+        android:id="@+id/rightContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintStart_toEndOf="@id/guidelineCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:id="@+id/imgOpp"
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:background="@drawable/avatar_glow"
+            android:padding="5dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/default_avatar"/>
+
+        <ImageView
+            android:id="@+id/imgOppBadge"
+            android:layout_width="76dp"
+            android:layout_height="76dp"
+            android:layout_marginTop="-18dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="Opponent rank badge"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_beginner"/>
+
+        <TextView
+            android:id="@+id/txtOpponent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Opponent"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:id="@+id/txtOpponentRank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Aspirant"
+            android:textColor="#FFD54F"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:layout_marginTop="3dp"/>
+    </LinearLayout>
+
+    <!-- 🔥 VS TEXT -->
+    <TextView
+        android:id="@+id/txtVS"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="VS"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        android:textColor="#FF3D00"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guidelineCenter"
+        app:layout_constraintEnd_toEndOf="@id/guidelineCenter"/>
+
+    <!-- 🔥 STATUS -->
+    <TextView
+        android:id="@+id/txtStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Preparing battle..."
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toTopOf="@id/progressBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- 🔥 PROGRESS -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="240dp"
+        android:layout_height="10dp"
+        android:indeterminate="true"
+        android:progressTint="#FF3D00"
+        android:layout_marginBottom="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

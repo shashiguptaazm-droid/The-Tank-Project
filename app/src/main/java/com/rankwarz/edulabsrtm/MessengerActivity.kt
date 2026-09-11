@@ -1,0 +1,1358 @@
+package com.rankwarz.edulabsrtm
+
+import android.annotation.SuppressLint
+import android.widget.GridView
+import org.json.JSONObject
+import android.content.Context
+import android.content.Intent
+import android.speech.RecognizerIntent
+import java.util.Locale
+import android.graphics.Color
+import android.graphics.Paint
+import android.net.Uri
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.provider.OpenableColumns
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ListPopupWindow
+import android.widget.ListView
+import android.widget.ProgressBar
+import android.widget.RelativeLayout
+import android.widget.ScrollView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.DefaultRetryPolicy
+import com.android.volley.Request
+import com.android.volley.Response as VolleyResponse
+import com.android.volley.toolbox.JsonArrayRequest
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.RequestBody
+import okhttp3.Response
+import okio.BufferedSink
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import com.rankwarz.edulabsrtm.util.AiDocumentOcrHelper
+import java.text.SimpleDateFormat
+import java.util.Date
+
+class MessengerActivity : BaseActivity() {
+
+    private lateinit var chatLayout: RelativeLayout
+    private lateinit var messageInput: EditText
+    private lateinit var sendBtn: ImageView
+    private lateinit var attachBtn: ImageView
+    private lateinit var messageRecyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var userListLayout: LinearLayout
+    private lateinit var userRecyclerView: RecyclerView
+    private lateinit var bottomNav: BottomNavigationView
+    private lateinit var emojiBtn: ImageView
+    private lateinit var emojiPanel: LinearLayout
+    private lateinit var emojiGridView: GridView
+    private lateinit var chatUserImage: ImageView
+    private lateinit var searchUsers: EditText
+    private lateinit var uploadOverlay: LinearLayout
+    private lateinit var uploadProgress: ProgressBar
+    private lateinit var uploadFileName: TextView
+    private lateinit var noUsersText: TextView
+    private lateinit var noMessagesText: TextView
+    private lateinit var txtOnlineStatus: TextView
+    private lateinit var btnBlockUser: ImageView
+    private lateinit var btnAudioCall: ImageView
+    private lateinit var btnVideoCall: ImageView
+
+    private lateinit var messageAdapter: MessageAdapter
+    private lateinit var userAdapter: UserAdapter
+    private var allUsers = mutableListOf<ChatUserItem>()
+
+    private var selectedFileUri: Uri? = null
+    private val PICK_FILE = 100
+    private val TAG = "MESSENGER_DEBUG"
+    private val BASE_URL = "https://medigyaan.xyz/Neurons/messenger_api.php"
+    private val IMAGE_BASE_URL = "https://medigyaan.xyz/Neurons/"
+    private val PREF_NAME = "MY_APP"
+    private val KEY_FOLLOW_PREFIX = "follow_status_"
+
+    private var userId: Int = 0
+    private var receiverId: Int = 0
+    private var currentChatUser: ChatUserItem? = null
+    private val MAX_SHARED_HOSTING_FILE_SIZE = 2 * 1024 * 1024 // 2 MB
+    
+    // VPS Upload Configuration - can be overridden from server
+    private var vpsUploadUrl: String = "http://213.199.61.156/api/upload"
+    private var vpsUploadToken: String = "00b0e86a671d6635ca9cbdfc98bc5ff4dc2e"
+    private val MAX_VPS_FILE_SIZE = 100 * 1024 * 1024 // 100 MB
+    private val MAX_RETRIES = 2
+
+    private val refreshHandler = Handler(Looper.getMainLooper())
+    private val refreshRunnable = object : Runnable {
+        override fun run() {
+            if (receiverId != 0) {
+                loadMessages(isPolling = true)
+            }
+            refreshHandler.postDelayed(this, 3000)
+        }
+    }
+
+    @SuppressLint("MissingInflatedId")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_messenger)
+
+        chatLayout = findViewById(R.id.chatLayout)
+        userListLayout = findViewById(R.id.userListLayout)
+        userRecyclerView = findViewById(R.id.userRecyclerView)
+        messageInput = findViewById(R.id.messageInput)
+        sendBtn = findViewById(R.id.sendBtn)
+        attachBtn = findViewById(R.id.attachBtn)
+        progressBar = findViewById(R.id.progressBar)
+        messageRecyclerView = findViewById(R.id.messageRecyclerView)
+        bottomNav = findViewById(R.id.bottomNavigation)
+        emojiBtn = findViewById(R.id.emojiBtn)
+        emojiPanel = findViewById(R.id.emojiPanel)
+        emojiGridView = findViewById(R.id.emojiGridView)
+        chatUserImage = findViewById(R.id.chatUserImage)
+        searchUsers = findViewById(R.id.searchUsers)
+        uploadOverlay = findViewById(R.id.uploadOverlay)
+        uploadProgress = findViewById(R.id.uploadProgress)
+        uploadFileName = findViewById(R.id.uploadFileName)
+        noUsersText = findViewById(R.id.noUsersText)
+        noMessagesText = findViewById(R.id.noMessagesText)
+        txtOnlineStatus = findViewById(R.id.txtOnlineStatus)
+        btnBlockUser = findViewById(R.id.btnBlockUser)
+        btnAudioCall = findViewById(R.id.btnAudioCall)
+        btnVideoCall = findViewById(R.id.btnVideoCall)
+
+        val prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        userId = prefs.getInt("user_id", 0)
+
+        setupAdapters()
+        setupSearch()
+
+        receiverId = intent.getStringExtra("SENDER_ID")?.toIntOrNull()
+            ?: intent.getIntExtra("receiver_id", 0)
+
+        if (userId == 0) {
+            Toast.makeText(this, "Please Login", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        setupBottomNavigation()
+        setupViewMode()
+        setupEmojiSupport()
+        setupEmojiPanel()
+        setupAiMention()
+
+        sendBtn.setOnClickListener {
+            if (messageInput.text.toString().trim().isNotEmpty() || selectedFileUri != null) {
+                uploadAndSendMessage()
+            }
+        }
+
+        attachBtn.setOnClickListener {
+            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                type = "*/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+            }
+            startActivityForResult(intent, PICK_FILE)
+        }
+
+        findViewById<ImageView?>(R.id.voiceBtn)?.setOnClickListener {
+            try {
+                val voiceIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                    putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak your message…")
+                }
+                startActivityForResult(voiceIntent, 1042)
+            } catch (e: Exception) {
+                Toast.makeText(this, "Voice input not available", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        findViewById<ImageView>(R.id.backBtn).setOnClickListener { onBackPressed() }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_FILE && resultCode == RESULT_OK) {
+            selectedFileUri = data?.data
+            Toast.makeText(this, "File attached", Toast.LENGTH_SHORT).show()
+        } else if (requestCode == 1042 && resultCode == RESULT_OK) {
+            val spoken = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
+            if (!spoken.isNullOrBlank()) {
+                val cur = messageInput.text.toString().trim()
+                messageInput.setText(if (cur.isBlank()) spoken else "$cur $spoken")
+                messageInput.setSelection(messageInput.text.length)
+            }
+        }
+    }
+
+    private fun setupEmojiSupport() {
+        messageInput.setOnLongClickListener {
+            showEmojiDialog()
+            true
+        }
+    }
+
+    private fun showEmojiDialog() {
+        val emojis = listOf("😀", "😂", "😍", "🥰", "😁", "😢", "😭", "👍", "🙏", "❤️", "🔥", "🎉", "💯", "😉", "🤝")
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(16, 16, 16, 16)
+        }
+
+        val grid = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+
+        val rows = emojis.chunked(5)
+        for (rowEmojis in rows) {
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER
+            }
+            for (emoji in rowEmojis) {
+                val btn = TextView(this).apply {
+                    text = emoji
+                    textSize = 24f
+                    setPadding(18, 18, 18, 18)
+                    setOnClickListener {
+                        val start = messageInput.selectionStart.coerceAtLeast(0)
+                        messageInput.text?.insert(start, emoji)
+                    }
+                }
+                row.addView(btn)
+            }
+            grid.addView(row)
+        }
+
+        container.addView(grid)
+
+        AlertDialog.Builder(this)
+            .setTitle("Choose emoji")
+            .setView(container)
+            .setPositiveButton("Close", null)
+            .show()
+    }
+
+    private fun setupBottomNavigation() {
+        setupAppBottomNavigation(bottomNav, R.id.nav_messages)
+    }
+
+
+
+    private class ProgressFileRequestBody(
+        private val file: File,
+        private val mediaType: okhttp3.MediaType,
+        private val onProgress: (Int) -> Unit
+    ) : RequestBody() {
+        override fun contentType() = mediaType
+        override fun contentLength() = file.length()
+
+        override fun writeTo(sink: BufferedSink) {
+            val total = contentLength().coerceAtLeast(1L)
+            var uploaded = 0L
+            var lastPercent = -1
+            val buffer = ByteArray(64 * 1024) // 64 KB buffer
+            FileInputStream(file).use { input ->
+                while (true) {
+                    val read = input.read(buffer)
+                    if (read == -1) break
+                    sink.write(buffer, 0, read)
+                    uploaded += read
+                    val percent = ((uploaded * 100) / total).toInt().coerceIn(0, 100)
+                    if (percent != lastPercent) {
+                        lastPercent = percent
+                        onProgress(percent)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupViewMode() {
+        if (receiverId == 0) {
+            currentChatUser = null
+            userListLayout.visibility = View.VISIBLE
+            chatLayout.visibility = View.GONE
+            chatUserImage.visibility = View.GONE
+            txtOnlineStatus.visibility = View.GONE
+            btnBlockUser.visibility = View.GONE
+            btnAudioCall.visibility = View.GONE
+            btnVideoCall.visibility = View.GONE
+            findViewById<TextView>(R.id.toolbarTitle)?.text = "Messages"
+            loadUserList()
+        } else {
+            userListLayout.visibility = View.GONE
+            chatLayout.visibility = View.VISIBLE
+            chatUserImage.visibility = View.VISIBLE
+            txtOnlineStatus.visibility = if (currentChatUser?.isOnline == true) View.VISIBLE else View.GONE
+            btnBlockUser.visibility = View.VISIBLE
+            btnAudioCall.visibility = View.VISIBLE
+            btnVideoCall.visibility = View.VISIBLE
+            findViewById<TextView>(R.id.toolbarTitle)?.text = currentChatUser?.name ?: "Chat"
+            
+            btnBlockUser.setOnClickListener {
+                currentChatUser?.let { confirmBlockUser(it) }
+            }
+
+            btnAudioCall.setOnClickListener {
+                startCall(isVideo = false)
+            }
+
+            btnVideoCall.setOnClickListener {
+                startCall(isVideo = true)
+            }
+            
+            currentChatUser?.image?.let {
+                val fullUrl = if (it.startsWith("http")) it else "https://medigyaan.xyz/Neurons/" + it.removePrefix("/")
+                Glide.with(this).load(fullUrl).apply(RequestOptions.circleCropTransform()).placeholder(R.drawable.ic_user_placeholder).into(chatUserImage)
+            }
+
+            noMessagesText.visibility = View.GONE
+            messageAdapter.setMessages(emptyList())
+            loadMessages(isPolling = false)
+        }
+    }
+
+    private fun startCall(isVideo: Boolean) {
+        if (receiverId == 0) return
+        val peerName = currentChatUser?.name ?: "User $receiverId"
+        val roomName = getCallRoomName(userId, receiverId)
+
+        // Post call invite to chat
+        val invitePrefix = if (isVideo) "VIDEO_CALL_INVITE:" else "AUDIO_CALL_INVITE:"
+        sendMessageToPhpBackend("$invitePrefix$roomName", "")
+
+        LiveKitCallActivity.start(this, roomName, peerName, isVideo)
+    }
+
+    private fun getCallRoomName(u1: Int, u2: Int): String {
+        val low = minOf(u1, u2)
+        val high = maxOf(u1, u2)
+        return "edu_lab_rtm_${low}_${high}"
+    }
+
+    private fun setupAdapters() {
+        messageAdapter = MessageAdapter(
+            currentUserId = userId,
+            onImageClick = { url ->
+                startActivity(Intent(this, FullScreenImageActivity::class.java).putExtra("image_url", url))
+            },
+            onFileClick = { url ->
+                val viewerUrl = "https://docs.google.com/viewer?embedded=true&url=$url"
+                startActivity(Intent(this, WebViewActivity::class.java).putExtra("url", viewerUrl))
+            },
+            onCallInviteClick = { room ->
+                val peerName = currentChatUser?.name ?: "User $receiverId"
+                val isVideo = !room.startsWith("audio_", ignoreCase = true)
+                LiveKitCallActivity.start(this@MessengerActivity, room, peerName, isVideo)
+            },
+            onDeleteMessage = { msg, position ->
+                deleteMessage(msg, position)
+            },
+            onAskAiAboutDocument = { docUrl, context ->
+                askAiAboutDocument(docUrl, context)
+            }
+        )
+        messageRecyclerView.layoutManager = LinearLayoutManager(this)
+        messageRecyclerView.adapter = messageAdapter
+
+        userAdapter = UserAdapter(
+            onUserClick = { user ->
+                receiverId = user.id
+                currentChatUser = user
+                setupViewMode()
+            },
+            onBlockUser = { user ->
+                blockUser(user)
+            }
+        )
+        userRecyclerView.layoutManager = LinearLayoutManager(this)
+        userRecyclerView.adapter = userAdapter
+    }
+
+    private fun setupSearch() {
+        searchUsers.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                filterUsers(s.toString())
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
+    private fun filterUsers(query: String) {
+        if (query.isEmpty()) {
+            userAdapter.setUsers(allUsers)
+            noUsersText.visibility = if (allUsers.isEmpty()) View.VISIBLE else View.GONE
+        } else {
+            val filtered = allUsers.filter { it.name.contains(query, ignoreCase = true) }
+            userAdapter.setUsers(filtered)
+            noUsersText.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun loadUserList() {
+        progressBar.visibility = View.VISIBLE
+
+        // SERVER-DRIVEN CONTACTS: pull the followed-user list from the server once,
+        // refresh the local cache, then rebuild the list below from that cache.
+        if (!serverConnectionsLoaded) {
+            serverConnectionsLoaded = true
+            loadConnectionsFromServer { ok ->
+                if (ok) {
+                    loadUserList()
+                } else {
+                    serverConnectionsLoaded = false
+                    progressBar.visibility = View.GONE
+                    Toast.makeText(this, "Couldn't load connections", Toast.LENGTH_SHORT).show()
+                }
+            }
+            return
+        }
+        serverConnectionsLoaded = false
+
+        val prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+
+        val followIds = prefs.all
+            .filter { it.key.startsWith(KEY_FOLLOW_PREFIX) && it.value == true }
+            .map { it.key.removePrefix(KEY_FOLLOW_PREFIX) }
+            .filter { it != userId.toString() }
+
+        if (followIds.isEmpty()) {
+            progressBar.visibility = View.GONE
+            Toast.makeText(this, "No connections yet — follow players to chat with them", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val queue = Volley.newRequestQueue(this)
+        val userList = mutableListOf<ChatUserItem>()
+        var finishedRequests = 0
+
+        fun checkDone() {
+            if (finishedRequests >= followIds.size) {
+                runOnUiThread {
+                    showUserList(userList)
+                }
+            }
+        }
+
+        for (id in followIds) {
+            val url = "https://medigyaan.xyz/Neurons/get_profilev1.php?user_id=$id&viewer_id=$userId"
+
+            val req = JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
+                { response ->
+                    try {
+                        val obj = response.optJSONObject("data") ?: response
+
+                        val name = obj.optString("name", "User $id")
+
+                        var photo = obj.optString("photo", "")
+                        if (photo.isBlank() || photo.equals("null", true)) {
+                            photo = obj.optString("profile_pic", "")
+                        }
+                        if (photo.isNotBlank() && !photo.startsWith("http")) {
+                            photo = IMAGE_BASE_URL + photo.trimStart('/')
+                        }
+
+                        userList.add(
+                            ChatUserItem(
+                                id = id.toIntOrNull() ?: 0,
+                                name = name,
+                                image = photo
+                            )
+                        )
+                    } catch (e: Exception) {
+                        Log.e(TAG, "parse error: ${e.message}", e)
+                    }
+
+                    finishedRequests++
+                    checkDone()
+                },
+                { error ->
+                    Log.e(TAG, "network error: $id", error)
+                    finishedRequests++
+                    checkDone()
+                }
+            )
+
+            req.retryPolicy = DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+            )
+
+            queue.add(req)
+        }
+    }
+
+    private var serverConnectionsLoaded = false
+
+    private fun loadConnectionsFromServer(onDone: (Boolean) -> Unit) {
+        val url = "$BASE_URL?get_connections&user_id=$userId"
+        val queue = Volley.newRequestQueue(this)
+        val request = JsonArrayRequest(
+            Request.Method.GET,
+            url,
+            null,
+            { response ->
+                try {
+                    val prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                    val editor = prefs.edit()
+                    // Clear any stale cached follow ids first
+                    for ((key, _) in prefs.all) {
+                        if (key.startsWith(KEY_FOLLOW_PREFIX)) editor.remove(key)
+                    }
+                    // Cache the users the server says this account follows
+                    for (i in 0 until response.length()) {
+                        val obj = response.getJSONObject(i)
+                        val id = obj.optInt("user_id", 0)
+                        if (id != 0 && id != userId) {
+                            editor.putBoolean("$KEY_FOLLOW_PREFIX$id", true)
+                        }
+                    }
+                    editor.apply()
+                    onDone(true)
+                } catch (e: Exception) {
+                    Log.e(TAG, "connections parse error: ${e.message}")
+                    onDone(false)
+                }
+            },
+            { error ->
+                Log.e(TAG, "connections network error: ${error.message}")
+                onDone(false)
+            }
+        )
+        queue.add(request)
+    }
+
+    private fun showUserList(list: List<ChatUserItem>) {
+        progressBar.visibility = View.GONE
+
+        if (list.isEmpty()) {
+            noUsersText.visibility = View.VISIBLE
+            userAdapter.setUsers(emptyList())
+            return
+        }
+
+        // Start online status listeners
+        startOnlineStatusListeners(list)
+        
+        userAdapter.setUsers(list)
+        allUsers = list.toMutableList()
+        noUsersText.visibility = View.GONE
+    }
+
+    private fun startOnlineStatusListeners(list: List<ChatUserItem>) {
+        val database = FirebaseDatabase.getInstance().reference
+        for (user in list) {
+            val statusRef = database.child("users/${user.id}/status")
+            statusRef.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val isOnline = snapshot.child("online").getValue(Boolean::class.java) ?: false
+                    val lastSeen = snapshot.child("lastSeen").getValue(Long::class.java) ?: 0L
+                    
+                    // Update user in allUsers list
+                    val index = allUsers.indexOfFirst { it.id == user.id }
+                    if (index >= 0) {
+                        allUsers[index] = allUsers[index].copy(
+                            isOnline = isOnline,
+                            lastSeen = lastSeen
+                        )
+                        
+                        if (receiverId == user.id) {
+                            runOnUiThread {
+                                txtOnlineStatus.visibility = if (isOnline) View.VISIBLE else View.GONE
+                            }
+                        }
+
+                        // Update adapter
+                        val adapterIndex = allUsers.indexOfFirst { it.id == user.id }
+                        if (adapterIndex >= 0) {
+                            userAdapter.notifyItemChanged(adapterIndex)
+                        }
+                    }
+                }
+                override fun onCancelled(error: com.google.firebase.database.DatabaseError) {}
+            })
+        }
+    }
+
+    private fun blockUser(user: ChatUserItem) {
+        val url = "https://medigyaan.xyz/Neurons/block_user.php"
+        val request = object : StringRequest(Request.Method.POST, url,
+            VolleyResponse.Listener<String> { response ->
+                try {
+                    val json = JSONObject(response)
+                    if (json.optBoolean("success")) {
+                        Toast.makeText(this, "${user.name} blocked", Toast.LENGTH_SHORT).show()
+                        if (receiverId == user.id) {
+                            receiverId = 0
+                            setupViewMode()
+                        }
+                        loadUserList()
+                    } else {
+                        Toast.makeText(this, "Failed: ${json.optString("message")}", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            },
+            VolleyResponse.ErrorListener { Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show() }
+        ) {
+            override fun getParams() = hashMapOf(
+                "user_id" to userId.toString(),
+                "blocked_user_id" to user.id.toString()
+            )
+            override fun getHeaders() = hashMapOf("X-App-Signature" to "EduLabsRTM_Secure_v1_2026")
+        }
+        Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun confirmBlockUser(user: ChatUserItem) {
+        AlertDialog.Builder(this)
+            .setTitle("Block User")
+            .setMessage("Are you sure you want to block ${user.name}? You will no longer receive messages from them.")
+            .setPositiveButton("Block") { _, _ ->
+                blockUser(user)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun deleteMessage(msg: ChatMessage, position: Int) {
+        AlertDialog.Builder(this)
+            .setTitle("Delete Message")
+            .setMessage("Are you sure you want to delete this message?")
+            .setPositiveButton("Delete") { _, _ ->
+                val url = "$BASE_URL?delete_message=1&message_id=${msg.sentAt}&user_id=$userId"
+                val request = object : StringRequest(Request.Method.GET, url,
+                    VolleyResponse.Listener<String> { response ->
+                        try {
+                            val json = JSONObject(response)
+                            if (json.optBoolean("success")) {
+                                messageAdapter.removeMessageAt(position)
+                                Toast.makeText(this, "Message deleted", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(this, "Failed to delete", Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    VolleyResponse.ErrorListener { Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show() }
+                ) {
+                    override fun getHeaders(): MutableMap<String, String> = hashMapOf("X-App-Signature" to "EduLabsRTM_Secure_v1_2026")
+                }
+                Volley.newRequestQueue(this).add(request)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun askAiAboutDocument(docUrl: String, docMsgText: String) {
+        val fileName = docUrl.substringAfterLast("/").substringBefore("?").ifBlank { "document" }
+
+        // If the user typed a specific question into the chat input bar, prioritize it!
+        val inputQuestion = messageInput.text.toString().trim()
+        val userPrompt = if (inputQuestion.isNotBlank()) {
+            messageInput.setText("")
+            inputQuestion
+        } else if (docMsgText.isNotBlank()) {
+            docMsgText
+        } else {
+            "Please analyze and explain the key medical findings of this document."
+        }
+
+        // 1. Post user inquiry into the chat stream
+        val currentTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+        val userChatText = "🤖 @medigyaanAI $userPrompt\n📄 $fileName"
+        val userMsg = ChatMessage(
+            senderId = userId,
+            text = userChatText,
+            attachment = "",
+            sentAt = currentTime,
+            isRead = 1
+        )
+        messageAdapter.addMessage(userMsg)
+
+        // 2. Post thinking placeholder into the chat stream
+        val thinkingMsg = ChatMessage(
+            senderId = 0,
+            text = "🤖 MediGyaan AI is analyzing $fileName...",
+            attachment = "",
+            sentAt = currentTime,
+            isRead = 1
+        )
+        val thinkingPos = messageAdapter.itemCount - 1
+        messageAdapter.addMessage(thinkingMsg)
+        val actualThinkingIndex = messageAdapter.itemCount - 1
+        messageRecyclerView.smoothScrollToPosition(actualThinkingIndex)
+
+        // Sync user message to server if in active chat
+        if (receiverId != 0) {
+            sendMessageToPhpBackend(userChatText, "")
+        }
+
+        // 3. Perform OCR text extraction + AI generation in background with animated thinking and ChatGPT streamlined typing
+        CoroutineScope(Dispatchers.Main).launch {
+            // Animated thinking loop while waiting for OCR & AI
+            val thinkingJob = launch {
+                val dots = listOf("analyzing document", "analyzing document .", "analyzing document . .", "analyzing document . . .")
+                var dotIdx = 0
+                while (isActive) {
+                    val label = "🤖 MediGyaan AI is ${dots[dotIdx % dots.size]}"
+                    val current = messageAdapter.getMessageAt(actualThinkingIndex)
+                    if (current != null) {
+                        messageAdapter.updateMessageAt(actualThinkingIndex, current.copy(text = label))
+                    }
+                    dotIdx++
+                    delay(320)
+                }
+            }
+
+            try {
+                val extractedText = withContext(Dispatchers.IO) {
+                    AiDocumentOcrHelper.extractText(this@MessengerActivity, docUrl)
+                }
+
+                val aiResponse = withContext(Dispatchers.IO) {
+                    AiDocumentOcrHelper.queryAiAboutDocument(userPrompt, extractedText, fileName, this@MessengerActivity)
+                }
+
+                // Stop thinking animation
+                thinkingJob.cancel()
+
+                // ChatGPT-style streamlined typing reveal
+                val fullReply = "🤖 MediGyaan AI:\n\n$aiResponse"
+                val step = (fullReply.length / 100).coerceIn(2, 7)
+                var i = 0
+                while (i < fullReply.length) {
+                    i = (i + step).coerceAtMost(fullReply.length)
+                    val partial = fullReply.substring(0, i) + (if (i < fullReply.length) " ▌" else "")
+                    val current = messageAdapter.getMessageAt(actualThinkingIndex)
+                    if (current != null) {
+                        messageAdapter.updateMessageAt(actualThinkingIndex, current.copy(text = partial))
+                        messageRecyclerView.scrollToPosition(actualThinkingIndex)
+                    }
+                    delay(14)
+                }
+
+                val replyTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                val finalAiMsg = ChatMessage(
+                    senderId = 0,
+                    text = fullReply,
+                    attachment = "",
+                    sentAt = replyTime,
+                    isRead = 1
+                )
+
+                // Update placeholder with final complete AI reply
+                messageAdapter.updateMessageAt(actualThinkingIndex, finalAiMsg)
+                messageRecyclerView.smoothScrollToPosition(actualThinkingIndex)
+
+                // Sync AI reply to server so it is persisted in the conversation
+                if (receiverId != 0) {
+                    sendMessageToPhpBackend(fullReply, "")
+                }
+            } catch (e: Exception) {
+                thinkingJob.cancel()
+                Log.e(TAG, "askAiAboutDocument error: ${e.message}", e)
+                val replyTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                val errorMsg = ChatMessage(
+                    senderId = 0,
+                    text = "🤖 MediGyaan AI:\n\nSorry, I couldn't analyze the document at this moment. Please try again.",
+                    attachment = "",
+                    sentAt = replyTime,
+                    isRead = 1
+                )
+                messageAdapter.updateMessageAt(actualThinkingIndex, errorMsg)
+            }
+        }
+    }
+
+    private fun loadMessages(isPolling: Boolean) {
+        if (isPolling && uploadOverlay.visibility == View.VISIBLE) return
+
+        val url = "$BASE_URL?fetch_messages=$receiverId&user_id=$userId"
+
+        val request = JsonArrayRequest(
+            Request.Method.GET,
+            url,
+            null,
+            { response ->
+                if (response.length() != messageAdapter.itemCount) {
+                    val newList = mutableListOf<ChatMessage>()
+                    for (i in 0 until response.length()) {
+                        val msg = response.getJSONObject(i)
+                        newList.add(
+                            ChatMessage(
+                                senderId = msg.optInt("sender_id"),
+                                text = msg.optString("message"),
+                                attachment = msg.optString("attachment"),
+                                sentAt = msg.optString("sent_at", ""),
+                                isRead = msg.optInt("is_read", 0)
+                            )
+                        )
+                    }
+                    messageAdapter.setMessages(newList)
+                    noMessagesText.visibility = if (newList.isEmpty()) View.VISIBLE else View.GONE
+                    messageRecyclerView.post { messageRecyclerView.smoothScrollToPosition((messageAdapter.itemCount - 1).coerceAtLeast(0)) }
+                }
+            },
+            { error ->
+                if (!isPolling)
+                    Log.e(TAG, "Fetch Error: ${error.message}", error)
+            }
+        )
+
+        Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun addUploadProgressBubble(file: File, message: String) {
+        uploadOverlay.visibility = View.VISIBLE
+        uploadFileName.text = "Uploading: ${file.name}"
+        uploadProgress.progress = 0
+    }
+
+    private fun updateUploadProgress(percent: Int, status: String = "Uploading") {
+        runOnUiThread {
+            uploadProgress.progress = percent.coerceIn(0, 100)
+            if (percent >= 100) {
+                uploadOverlay.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun markUploadFailed(message: String) {
+        runOnUiThread {
+            uploadOverlay.visibility = View.GONE
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun clearUploadProgressBubble() {
+        runOnUiThread {
+            uploadOverlay.visibility = View.GONE
+        }
+    }
+
+    private fun uploadAndSendMessage() {
+        val msgText = messageInput.text.toString().trim()
+        
+        if (msgText.startsWith("@medigyaanAI", ignoreCase = true)) {
+            sendAiMessage(msgText)
+            messageInput.setText("")
+            return
+        }
+
+        messageInput.setText("")
+
+        progressBar.visibility = View.VISIBLE
+
+        val fileUri = selectedFileUri
+        if (fileUri != null) {
+            val path = getRealPathFromURI(this, fileUri)
+            if (path != null) {
+                val file = File(path)
+                progressBar.visibility = View.GONE
+                addUploadProgressBubble(file, msgText)
+                
+                // Check file size limits
+                if (file.length() > MAX_VPS_FILE_SIZE) {
+                    runOnUiThread {
+                        markUploadFailed("File too large (max 100MB)")
+                        Toast.makeText(this, "File size exceeds 100MB limit", Toast.LENGTH_SHORT).show()
+                    }
+                    return
+                }
+                
+                if (file.length() > MAX_SHARED_HOSTING_FILE_SIZE) {
+                    uploadToVpsAndSend(file, msgText, 0)
+                } else {
+                    uploadToSharedHostingAndSend(file, msgText)
+                }
+                return
+            }
+        }
+
+        sendMessageToPhpBackend(msgText, "")
+    }
+
+    private fun uploadToVpsAndSend(file: File, msgText: String, retryCount: Int) {
+        val client = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(300, TimeUnit.SECONDS)  // 5 min for large files
+            .readTimeout(300, TimeUnit.SECONDS)
+            .build()
+
+        val url = "$vpsUploadUrl?token=$vpsUploadToken"
+        
+        val request = okhttp3.Request.Builder()
+            .url(url)
+            .header("X-Filename", file.name)
+            .header("X-File-Size", file.length().toString())
+            .header("X-User-Id", userId.toString())
+            .post(
+                ProgressFileRequestBody(file, "application/octet-stream".toMediaType()) { percent ->
+                    updateUploadProgress(percent, "Uploading to VPS")
+                }
+            )
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e(TAG, "VPS upload attempt ${retryCount + 1} failed: ${e.message}")
+                if (retryCount < MAX_RETRIES) {
+                    runOnUiThread {
+                        updateUploadProgress(0, "Retrying... (${retryCount + 1}/${MAX_RETRIES})")
+                    }
+                    // Exponential backoff
+                    Thread.sleep((1000 * (retryCount + 1)).toLong())
+                    uploadToVpsAndSend(file, msgText, retryCount + 1)
+                } else {
+                    runOnUiThread {
+                        progressBar.visibility = View.GONE
+                        markUploadFailed("VPS failed - trying shared hosting")
+                        Toast.makeText(this@MessengerActivity, "VPS upload failed, trying alternative...", Toast.LENGTH_SHORT).show()
+                        // Fallback to shared hosting
+                        uploadToSharedHostingAndSend(file, msgText)
+                    }
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val bodyStr = response.body?.string() ?: ""
+                if (!response.isSuccessful) {
+                    Log.e(TAG, "VPS upload HTTP ${response.code}: ${bodyStr.take(500)}")
+                    if (retryCount < MAX_RETRIES) {
+                        runOnUiThread {
+                            updateUploadProgress(0, "Retrying... (${retryCount + 1}/${MAX_RETRIES})")
+                        }
+                        Thread.sleep((1000 * (retryCount + 1)).toLong())
+                        uploadToVpsAndSend(file, msgText, retryCount + 1)
+                    } else {
+                        runOnUiThread {
+                            progressBar.visibility = View.GONE
+                            markUploadFailed("VPS failed - trying shared hosting")
+                            Toast.makeText(this@MessengerActivity, "VPS upload failed (${response.code}), trying alternative...", Toast.LENGTH_SHORT).show()
+                            uploadToSharedHostingAndSend(file, msgText)
+                        }
+                    }
+                    return
+                }
+
+                try {
+                    val json = org.json.JSONObject(bodyStr)
+                    val fileUrl = json.optString("url")
+                        .ifBlank { json.optString("file_url") }
+                        .ifBlank { json.optString("fileUrl") }
+                        .ifBlank { json.optString("download_url") }
+                    if (fileUrl.isBlank()) {
+                        throw IllegalStateException("VPS upload response missing url: ${bodyStr.take(500)}")
+                    }
+                    runOnUiThread {
+                        selectedFileUri = null
+                        updateUploadProgress(100, "Sending message")
+                        sendMessageToPhpBackend(msgText, fileUrl)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "VPS upload response parse failed. Body=${bodyStr.take(500)}", e)
+                    if (retryCount < MAX_RETRIES) {
+                        runOnUiThread {
+                            updateUploadProgress(0, "Retrying... (${retryCount + 1}/${MAX_RETRIES})")
+                        }
+                        Thread.sleep((1000 * (retryCount + 1)).toLong())
+                        uploadToVpsAndSend(file, msgText, retryCount + 1)
+                    } else {
+                        runOnUiThread {
+                            progressBar.visibility = View.GONE
+                            markUploadFailed("VPS response invalid - trying shared hosting")
+                            Toast.makeText(this@MessengerActivity, "VPS response invalid, trying alternative...", Toast.LENGTH_SHORT).show()
+                            uploadToSharedHostingAndSend(file, msgText)
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    private fun uploadToSharedHostingAndSend(file: File, msgText: String) {
+        val mimeType = contentResolver.getType(selectedFileUri!!) ?: "application/octet-stream"
+
+        val builder = MultipartBody.Builder().setType(MultipartBody.FORM)
+            .addFormDataPart("user_id", userId.toString())
+            .addFormDataPart("receiver_id", receiverId.toString())
+            .addFormDataPart("message", msgText)
+            .addFormDataPart(
+                "attachment",
+                file.name,
+                ProgressFileRequestBody(file, mimeType.toMediaType()) { percent ->
+                    updateUploadProgress(percent, "Uploading")
+                }
+            )
+
+        val client = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .build()
+
+        val request = okhttp3.Request.Builder()
+            .url(BASE_URL)
+            .post(builder.build())
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    markUploadFailed("Upload failed")
+                    Log.e(TAG, "Fail: ${e.message}", e)
+                    Toast.makeText(this@MessengerActivity, "Upload failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    if (response.isSuccessful) {
+                        selectedFileUri = null
+                        updateUploadProgress(100, "Sent")
+                        clearUploadProgressBubble()
+                        loadMessages(false)
+                    } else {
+                        markUploadFailed("Upload failed")
+                        Toast.makeText(this@MessengerActivity, "Upload failed (${response.code})", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
+    }
+
+    private fun sendMessageToPhpBackend(msgText: String, attachmentUrl: String) {
+        val builder = MultipartBody.Builder().setType(MultipartBody.FORM)
+            .addFormDataPart("user_id", userId.toString())
+            .addFormDataPart("receiver_id", receiverId.toString())
+            .addFormDataPart("message", msgText)
+            .addFormDataPart("attachment", attachmentUrl)
+
+        val client = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .build()
+
+        val request = okhttp3.Request.Builder()
+            .url(BASE_URL)
+            .post(builder.build())
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    if (uploadOverlay.visibility == View.VISIBLE) markUploadFailed("Message send failed")
+                    Toast.makeText(this@MessengerActivity, "Send message failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    if (response.isSuccessful) {
+                        clearUploadProgressBubble()
+                        loadMessages(false)
+                    } else {
+                        if (uploadOverlay.visibility == View.VISIBLE) markUploadFailed("Message send failed")
+                        Toast.makeText(this@MessengerActivity, "Send message failed (${response.code})", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
+    }
+
+    private fun setupEmojiPanel() {
+        val emojis = listOf(
+            "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗",
+            "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟",
+            "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶",
+            "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯", "😦", "😧",
+            "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈",
+            "👿", "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃", "😺", "😸", "😹", "😻", "😼", "😽",
+            "🙀", "😿", "😾", "👋", "🤚", "🖐️", "✋", "🖖", "👌", "🤏", "✌️", "🤞", "🤟", "🤘", "🤙", "👈", "👉", "👆",
+            "🖕", "👇", "☝️", "👍", "👎", "✊", "👊", "🤛", "🤜", "👏", "🙌", "👐", "🤲", "🤝", "🙏", "✍️", "💅", "🤳",
+            "💪", "🦾", "🦿", "🦵", "🦶", "👂", "🦻", "👃", "🧠", "🦷", "🦴", "👀", "👁️", "👅", "👄", "💋", "🩸", "❤️",
+            "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❤️‍🔥", "❤️‍🩹", "❣️", "💕", "💞", "💓", "💗", "💖", "💘"
+        )
+
+        val emojiAdapter = object : ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, emojis) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent) as TextView
+                view.text = getItem(position)
+                view.textSize = 26f
+                view.gravity = Gravity.CENTER
+                view.setPadding(0, 0, 0, 0)
+                view.setBackgroundColor(Color.TRANSPARENT)
+                return view
+            }
+        }
+
+        emojiGridView.adapter = emojiAdapter
+
+        emojiGridView.setOnItemClickListener { _, _, position, _ ->
+            val emoji = emojis[position]
+            val start = messageInput.selectionStart.coerceAtLeast(0)
+            messageInput.text?.insert(start, emoji)
+        }
+
+        emojiBtn.setOnClickListener {
+            if (emojiPanel.visibility == View.VISIBLE) {
+                emojiPanel.visibility = View.GONE
+                emojiBtn.setImageResource(R.drawable.ic_emoji_smile)
+                showKeyboard(messageInput)
+            } else {
+                hideKeyboard(messageInput)
+                Handler(Looper.getMainLooper()).postDelayed({
+                    emojiPanel.visibility = View.VISIBLE
+                    emojiBtn.setImageResource(R.drawable.ic_message)
+                }, 100)
+            }
+        }
+
+        messageInput.setOnClickListener {
+            if (emojiPanel.visibility == View.VISIBLE) {
+                emojiPanel.visibility = View.GONE
+                emojiBtn.setImageResource(R.drawable.ic_emoji_smile)
+            }
+        }
+    }
+
+    private fun hideKeyboard(view: View) {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    private fun showKeyboard(view: View) {
+        view.requestFocus()
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+        imm.showSoftInput(view, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    private fun getRealPathFromURI(context: Context, uri: Uri): String? {
+        return try {
+            val returnCursor = context.contentResolver.query(uri, null, null, null, null)
+            val nameIndex = returnCursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME) ?: -1
+            returnCursor?.moveToFirst()
+            val name = if (nameIndex != -1) returnCursor?.getString(nameIndex) else "temp_file"
+            returnCursor?.close()
+
+            val file = File(context.cacheDir, name ?: "temp_file")
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                FileOutputStream(file).use { output ->
+                    val buffer = ByteArray(8 * 1024)
+                    while (true) {
+                        val read = input.read(buffer)
+                        if (read == -1) break
+                        output.write(buffer, 0, read)
+                    }
+                }
+            }
+            file.absolutePath
+        } catch (e: Exception) {
+            Log.e(TAG, "getRealPathFromURI error: ${e.message}", e)
+            null
+        }
+    }
+
+    private fun setupAiMention() {
+        messageInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val text = s.toString()
+                if (text.endsWith("@")) {
+                    showAiSuggestion()
+                }
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
+    private fun showAiSuggestion() {
+        val popup = ListPopupWindow(this)
+        popup.anchorView = messageInput
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, listOf("medigyaanAI"))
+        popup.setAdapter(adapter)
+        popup.setOnItemClickListener { _, _, _, _ ->
+            val text = messageInput.text.toString()
+            if (text.endsWith("@")) {
+                messageInput.setText(text + "medigyaanAI ")
+                messageInput.setSelection(messageInput.text.length)
+            }
+            popup.dismiss()
+        }
+        popup.show()
+    }
+
+    private fun sendAiMessage(prompt: String) {
+        val query = prompt.removePrefix("@medigyaanAI").trim()
+        val currentTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+
+        // 1. Show user message locally
+        val userMsg = ChatMessage(userId, prompt, "", currentTime, 0)
+        messageAdapter.addMessage(userMsg)
+
+        // 2. Add thinking placeholder
+        val thinkingMsg = ChatMessage(0, "🤖 MediGyaan AI is thinking...", "", currentTime, 1)
+        messageAdapter.addMessage(thinkingMsg)
+        val thinkingPos = messageAdapter.itemCount - 1
+        messageRecyclerView.smoothScrollToPosition(thinkingPos)
+
+        if (receiverId != 0) {
+            sendMessageToPhpBackend(prompt, "")
+        }
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val thinkingJob = launch {
+                val dots = listOf("thinking", "thinking .", "thinking . .", "thinking . . .")
+                var dotIdx = 0
+                while (isActive) {
+                    val label = "🤖 MediGyaan AI is ${dots[dotIdx % dots.size]}"
+                    val current = messageAdapter.getMessageAt(thinkingPos)
+                    if (current != null) {
+                        messageAdapter.updateMessageAt(thinkingPos, current.copy(text = label))
+                    }
+                    dotIdx++
+                    delay(320)
+                }
+            }
+
+            try {
+                val reply = withContext(Dispatchers.IO) {
+                    AiDocumentOcrHelper.queryAiAboutDocument(query, "", "Chat Question", this@MessengerActivity)
+                }
+                thinkingJob.cancel()
+
+                val fullReply = "🤖 MediGyaan AI:\n\n$reply"
+                val step = (fullReply.length / 100).coerceIn(2, 7)
+                var i = 0
+                while (i < fullReply.length) {
+                    i = (i + step).coerceAtMost(fullReply.length)
+                    val partial = fullReply.substring(0, i) + (if (i < fullReply.length) " ▌" else "")
+                    val current = messageAdapter.getMessageAt(thinkingPos)
+                    if (current != null) {
+                        messageAdapter.updateMessageAt(thinkingPos, current.copy(text = partial))
+                        messageRecyclerView.scrollToPosition(thinkingPos)
+                    }
+                    delay(14)
+                }
+
+                val replyTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                val finalMsg = ChatMessage(0, fullReply, "", replyTime, 1)
+                messageAdapter.updateMessageAt(thinkingPos, finalMsg)
+                messageRecyclerView.smoothScrollToPosition(thinkingPos)
+
+                if (receiverId != 0) {
+                    sendMessageToPhpBackend(fullReply, "")
+                }
+            } catch (e: Exception) {
+                thinkingJob.cancel()
+                Log.e(TAG, "sendAiMessage error: ${e.message}", e)
+                val replyTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                val errorMsg = ChatMessage(0, "🤖 MediGyaan AI:\n\nSorry, I couldn't process your request right now.", "", replyTime, 1)
+                messageAdapter.updateMessageAt(thinkingPos, errorMsg)
+            }
+        }
+    }
+
+    private fun saveAiReplyToServer(userMsg: String, aiReply: String) {
+        // We need to send both messages to the messenger API
+        // First the user's mention
+        sendMessageToPhpBackend(userMsg, "")
+        // Then the AI's reply (with sender_id = 0 or a special Bot ID)
+        val url = BASE_URL
+        val request = object : StringRequest(Method.POST, url, {}, {}) {
+            override fun getParams() = hashMapOf(
+                "user_id" to "0", // Bot ID
+                "receiver_id" to receiverId.toString(),
+                "message" to aiReply,
+                "attachment" to ""
+            )
+        }
+        Volley.newRequestQueue(this).add(request)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshHandler.post(refreshRunnable)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        refreshHandler.removeCallbacks(refreshRunnable)
+    }
+
+    override fun onBackPressed() {
+        if (receiverId != 0) {
+            receiverId = 0
+            currentChatUser = null
+            setupViewMode()
+        } else {
+            super.onBackPressed()
+        }
+    }
+}
+
+data class ChatUserItem(
+    val id: Int,
+    val name: String,
+    val image: String,
+    val isOnline: Boolean = false,
+    val lastSeen: Long = 0
+)

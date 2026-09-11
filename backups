@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@color/colorBackground">
+
+    <TextView
+        android:id="@+id/txtLobbyTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Waiting for Players..."
+        android:textAlignment="center"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="22sp"
+        android:layout_marginTop="20dp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Battle Lobby"
+        android:textAlignment="center"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="14sp"
+        android:layout_marginBottom="30dp" />
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="2dp"
+        app:cardBackgroundColor="?attr/colorSurface">
+
+        <ListView
+            android:id="@+id/playerList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="8dp"
+            android:padding="10dp" />
+    </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="20dp">
+
+        <Button
+            android:id="@+id/btnReady"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="I'M READY"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="12dp" />
+
+        <Button
+            android:id="@+id/btnStart"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="START BATTLE"
+            android:visibility="gone"
+            android:backgroundTint="#2196F3"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="12dp" />
+        <Button
+            android:id="@+id/btnInvite"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Invite Non-Android Users"
+            android:backgroundTint="#FF9800"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="10dp"
+            app:cornerRadius="12dp"/>
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="?attr/colorSurface"
+            app:elevation="8dp"
+            app:menu="@menu/bottom_nav_menu" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,171 @@
+package com.rankwarz.edulabsrtm
+
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.SwitchCompat
+import androidx.appcompat.widget.Toolbar
+import com.bumptech.glide.Glide
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+
+class SettingsActivity : AppCompatActivity() {
+
+    private lateinit var prefs: SharedPreferences
+    private lateinit var editor: SharedPreferences.Editor
+    private var userId: Int = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_settings_v2)
+
+        prefs = getSharedPreferences("MY_APP", MODE_PRIVATE)
+        editor = prefs.edit()
+        userId = prefs.getInt("user_id", 0)
+
+        setupToolbar()
+        setupProfileHeader()
+        setupSettingsItems()
+        setupBottomNavigation()
+    }
+
+    private fun setupToolbar() {
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { finish() }
+    }
+
+    private fun setupProfileHeader() {
+        val name = prefs.getString("name", "User")
+        val photo = prefs.getString("photo_url", "")
+        
+        findViewById<TextView>(R.id.txtName).text = name
+        val ivProfile = findViewById<ImageView>(R.id.ivProfileImage)
+        
+        if (!photo.isNullOrEmpty()) {
+            val fullUrl = if (photo.startsWith("http")) photo else "https://medigyaan.xyz/Neurons/" + photo.trimStart('/')
+            Glide.with(this).load(fullUrl).circleCrop().placeholder(R.drawable.ic_person).into(ivProfile)
+        }
+        
+        findViewById<View>(R.id.layoutProfile).setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java).apply { putExtra("USER_ID", userId) })
+        }
+    }
+
+    private fun setupSettingsItems() {
+        // Earn Section
+        setupRow(R.id.itemReferral, "Refer & Earn", "Invite friends and earn coins", R.drawable.ic_share) {
+            startActivity(Intent(this, ReferralActivity::class.java))
+        }
+        setupRow(R.id.itemDailyReward, "Daily Reward", "Claim your daily bonus", R.drawable.ic_help) {
+            claimDailyReward()
+        }
+        setupRow(R.id.itemWatchAds, "Watch Ads", "Earn coins by watching videos", R.drawable.ic_reels) {
+            Toast.makeText(this, "Coming soon!", Toast.LENGTH_SHORT).show()
+        }
+
+        // Preferences
+        setupRow(R.id.itemDarkMode, "Dark Mode", "Adjust appearance", R.drawable.ic_dark_mode, isSwitch = true, initialSwitchState = prefs.getBoolean("dark_mode", false)) { isChecked ->
+            applyDarkMode(isChecked)
+            editor.putBoolean("dark_mode", isChecked).apply()
+        }
+        setupRow(R.id.itemNotifications, "Notifications", "Message, group & call tones", R.drawable.ic_notifications, isSwitch = true, initialSwitchState = prefs.getBoolean("notifications_enabled", true)) { isChecked ->
+            editor.putBoolean("notifications_enabled", isChecked).apply()
+            updateNotificationSettings(isChecked)
+        }
+        setupRow(R.id.itemDataSaver, "Data Saver", "Reduce data usage", R.drawable.ic_data_saver, isSwitch = true, initialSwitchState = prefs.getBoolean("data_saver", false)) { isChecked ->
+            editor.putBoolean("data_saver", isChecked).apply()
+        }
+
+        // Account
+        setupRow(R.id.itemEditProfile, "Edit Profile", "Change name, photo, and bio", R.drawable.ic_person) {
+            startActivity(Intent(this, EditProfileActivity::class.java))
+        }
+        setupRow(R.id.itemWidgetSettings, "Widget Settings", "Customize your home screen widget", R.drawable.ic_widgets) {
+            startActivity(Intent(this, WidgetSettingsActivity::class.java))
+        }
+        setupRow(R.id.itemPrivacy, "Privacy", "Block contacts, disappearing messages", R.drawable.ic_lock) {
+            val intent = Intent(this, WebViewActivity::class.java).apply {
+                putExtra("url", "https://medigyaan.xyz/privacy-policy")
+                putExtra("title", "Privacy Policy")
+            }
+            startActivity(intent)
+        }
+
+        // Support
+        setupRow(R.id.itemHelp, "Help Center", "Get support and FAQs", R.drawable.ic_help) {
+            startActivity(Intent(this, HelpActivity::class.java))
+        }
+        setupRow(R.id.itemAbout, "About", "App info and version", R.drawable.ic_help) {
+            showAboutDialog()
+        }
+
+        findViewById<View>(R.id.btnLogout).setOnClickListener { confirmLogout() }
+    }
+
+    private fun setupRow(id: Int, title: String, desc: String, iconRes: Int, isSwitch: Boolean = false, initialSwitchState: Boolean = false, onClick: (Boolean) -> Unit) {
+        val row = findViewById<View>(id)
+        row.findViewById<TextView>(R.id.txtTitle).text = title
+        row.findViewById<TextView>(R.id.txtDescription).text = desc
+        row.findViewById<ImageView>(R.id.ivIcon).setImageResource(iconRes)
+        
+        val sw = row.findViewById<SwitchCompat>(R.id.switchAction)
+        if (isSwitch) {
+            sw.visibility = View.VISIBLE
+            sw.isChecked = initialSwitchState
+            sw.setOnCheckedChangeListener { _, isChecked -> onClick(isChecked) }
+            row.setOnClickListener { sw.toggle() }
+        } else {
+            row.setOnClickListener { onClick(true) }
+        }
+    }
+
+    private fun applyDarkMode(enabled: Boolean) {
+        AppCompatDelegate.setDefaultNightMode(if (enabled) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO)
+        recreate()
+    }
+
+    private fun updateNotificationSettings(enabled: Boolean) {
+        FirebaseDatabase.getInstance().reference.child("users").child(userId.toString()).child("notifications").setValue(enabled)
+    }
+
+    private fun claimDailyReward() {
+        val lastClaim = prefs.getLong("last_daily_claim", 0)
+        val now = System.currentTimeMillis()
+        if (now - lastClaim < 24 * 60 * 60 * 1000L) {
+            Toast.makeText(this, "Daily reward already claimed!", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val reward = (50..150).random()
+        val currentCoins = prefs.getInt("user_coins", 0)
+        editor.putInt("user_coins", currentCoins + reward).putLong("last_daily_claim", now).apply()
+        Toast.makeText(this, "🎉 Claimed $reward coins!", Toast.LENGTH_LONG).show()
+    }
+
+    private fun showAboutDialog() {
+        AlertDialog.Builder(this).setTitle("About MediGyaan").setMessage("MediGyaan - Medical Education Platform\nVersion 1.0.0\n\n© 2024 MediGyaan. All rights reserved.").setPositiveButton("OK", null).show()
+    }
+
+    private fun confirmLogout() {
+        AlertDialog.Builder(this).setTitle("Logout").setMessage("Are you sure?").setPositiveButton("Logout") { _, _ ->
+            FirebaseAuth.getInstance().signOut()
+            editor.clear().apply()
+            startActivity(Intent(this, LoginActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK })
+            finish()
+        }.setNegativeButton("Cancel", null).show()
+    }
+
+    private fun setupBottomNavigation() {
+        setupAppBottomNavigation(findViewById(R.id.bottomNavigation), R.id.nav_home)
+    }
+}
