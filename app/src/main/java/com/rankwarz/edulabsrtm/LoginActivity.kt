@@ -17,8 +17,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -146,20 +148,25 @@ class LoginActivity : AppCompatActivity() {
             val token = task.result
             Log.d(FCM_TAG, "Fetched Token: $token")
 
-            val url = "https://medigyaan.xyz/api/Neurons/update_fcmv2.php"
-            val jsonBody = JSONObject().apply {
-                put("user_id", userId)
-                put("fcm_token", token)
+            val url = "https://medigyaan.xyz/Neurons/api/update_fcmv2.php"
+
+            val request = object : StringRequest(Method.POST, url,
+                { response ->
+                    Log.d(FCM_TAG, "FCM Token synced to MySQL successfully: $response")
+                },
+                { error ->
+                    Log.e(FCM_TAG, "FCM Sync Failed: ${error.message}")
+                }) {
+
+                override fun getParams(): MutableMap<String, String> {
+                    val params = HashMap<String, String>()
+                    params["user_id"] = userId.toString()
+                    params["fcm_token"] = token ?: ""
+                    return params
+                }
             }
 
-            val request = JsonObjectRequest(
-                Request.Method.POST,
-                url,
-                jsonBody,
-                { Log.d(FCM_TAG, "FCM Token synced to MySQL successfully.") },
-                { Log.e(FCM_TAG, "FCM Sync Failed: ${it.message}") }
-            )
-
+            request.retryPolicy = DefaultRetryPolicy(10000, 1, 1.0f)
             Volley.newRequestQueue(this).add(request)
         }
     }

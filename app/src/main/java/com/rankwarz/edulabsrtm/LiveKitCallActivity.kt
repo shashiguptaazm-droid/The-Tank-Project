@@ -1,10 +1,11 @@
-﻿package com.rankwarz.edulabsrtm
+package com.rankwarz.edulabsrtm
 
 import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioManager
+import android.media.ToneGenerator
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -28,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -39,9 +41,10 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 /**
- * LiveKit WebRTC Call Activity.
- * Interoperable with iOS and VPS SFU server (wss://medigyaan.com/rtc).
- * Supports 1-on-1 audio/video calls and ad-hoc conference rooms.
+ * LiveKit WebRTC 1-to-1 Call Activity (WhatsApp / FaceTime style).
+ * Interoperable with VPS SFU server (wss://medigyaan.com/rtc).
+ * Supports strictly 1-on-1 audio & video calls with ringing, timer on connect,
+ * and auto-hangup when peer disconnects.
  */
 class LiveKitCallActivity : AppCompatActivity() {
 
@@ -51,6 +54,7 @@ class LiveKitCallActivity : AppCompatActivity() {
         private const val TOKEN_URL = "https://medigyaan.com/Neurons/livekit_token.php"
         private const val WS_URL = "wss://medigyaan.com/rtc"
         private const val PERMISSION_REQUEST_CODE = 2001
+        private const val CALL_TIMEOUT_MS = 45_000L
 
         const val EXTRA_ROOM_NAME = "room_name"
         const val EXTRA_PEER_NAME = "peer_name"
@@ -94,8 +98,13 @@ class LiveKitCallActivity : AppCompatActivity() {
     private var isCameraOff = false
     private var isSpeakerOn = true
     private var callDurationSeconds = 0
+    private var isCallConnected = false
     private var timerJob: Job? = null
+    private var callTimeoutJob: Job? = null
+    private var toneGenerator: ToneGenerator? = null
     private lateinit var audioManager: AudioManager
+    private var targetPeerName: String = "User"
+    private var isCallEnding = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,10 +117,10 @@ class LiveKitCallActivity : AppCompatActivity() {
             finish()
             return
         }
-        val peerName = intent.getStringExtra(EXTRA_PEER_NAME) ?: "User"
+        targetPeerName = intent.getStringExtra(EXTRA_PEER_NAME)?.takeIf { it.isNotBlank() } ?: "User"
         isVideoCall = intent.getBooleanExtra(EXTRA_IS_VIDEO, true)
 
-        initViews(peerName)
+        initViews(targetPeerName)
         setupControls()
 
         if (checkPermissions()) {
@@ -154,6 +163,7 @@ class LiveKitCallActivity : AppCompatActivity() {
             isSpeakerOn = true
         }
         updateSpeakerUI()
+        updateStatus("Connecting...")
     }
 
     private fun setupControls() {
@@ -227,7 +237,7 @@ class LiveKitCallActivity : AppCompatActivity() {
         val userId = prefs.getInt("user_id", 0)
         val userName = prefs.getString("user_name", "User $userId") ?: "User $userId"
 
-        updateStatus("Connecting to server...")
+        updateStatus("Connecting...")
 
         scope.launch {
             try {
@@ -245,7 +255,6 @@ class LiveKitCallActivity : AppCompatActivity() {
                 }
 
                 // 2. Initialize LiveKit Room
-                updateStatus("Joining room...")
                 val newRoom = LiveKit.create(applicationContext)
                 room = newRoom
 
@@ -266,11 +275,18 @@ class LiveKitCallActivity : AppCompatActivity() {
                     attachLocalVideoTrack()
                 }
 
-                updateStatus("Connected")
-                startCallTimer()
-
                 // 5. Collect room events
                 observeRoomEvents(newRoom)
+
+                // Check if remote peer is already in the room
+                if (newRoom.remoteParticipants.isNotEmpty()) {
+                    onCallAnswered()
+                } else {
+                    // We are caller, waiting for peer to answer
+                    updateStatus("Calling $targetPeerName...")
+                    startRinging()
+                    startCallTimeout()
+                }
 
             } catch (e: Exception) {
                 Log.e(TAG, "Connection error: ${e.message}", e)
@@ -280,6 +296,15 @@ class LiveKitCallActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun onCallAnswered() {
+        if (isCallConnected || isCallEnding) return
+        isCallConnected = true
+        stopRinging()
+        callTimeoutJob?.cancel()
+        updateStatus("Connected (00:00)")
+        startCallTimer()
     }
 
     private fun observeRoomEvents(r: Room) {
@@ -305,26 +330,82 @@ class LiveKitCallActivity : AppCompatActivity() {
                         }
                     }
                     is RoomEvent.ParticipantConnected -> {
-                        updateStatus("Peer joined")
-                    }
-                    is RoomEvent.ParticipantDisconnected -> {
-                        updateStatus("Peer left")
-                        if (r.remoteParticipants.isEmpty()) {
-                            Toast.makeText(this@LiveKitCallActivity, "Call ended", Toast.LENGTH_SHORT).show()
-                            endCall()
+                        // Strictly 1-to-1: if this is our peer joining, mark answered
+                        if (!isCallConnected) {
+                            onCallAnswered()
                         }
                     }
+                    is RoomEvent.ParticipantDisconnected -> {
+                        // In 1-to-1 call, when remote peer leaves, call ends immediately
+                        onPeerDisconnected()
+                    }
                     is RoomEvent.FailedToConnect -> {
+                        stopRinging()
                         updateStatus("Failed to connect")
-                        Toast.makeText(this@LiveKitCallActivity, "Failed to connect to room", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@LiveKitCallActivity, "Failed to connect to call", Toast.LENGTH_SHORT).show()
                         finish()
                     }
                     is RoomEvent.Disconnected -> {
-                        updateStatus("Call ended")
-                        finish()
+                        if (!isCallEnding) {
+                            onPeerDisconnected()
+                        }
                     }
                     else -> {}
                 }
+            }
+        }
+    }
+
+    private fun onPeerDisconnected() {
+        if (isCallEnding) return
+        isCallEnding = true
+        stopRinging()
+        timerJob?.cancel()
+        callTimeoutJob?.cancel()
+        updateStatus("Call ended")
+        Toast.makeText(this@LiveKitCallActivity, "Call ended", Toast.LENGTH_SHORT).show()
+
+        scope.launch {
+            delay(1200)
+            endCall()
+        }
+    }
+
+    private fun startRinging() {
+        try {
+            if (toneGenerator == null) {
+                toneGenerator = ToneGenerator(AudioManager.STREAM_VOICE_CALL, 70)
+            }
+            toneGenerator?.startTone(ToneGenerator.TONE_SUP_RINGTONE)
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to start ringtone: ${e.message}")
+        }
+    }
+
+    private fun stopRinging() {
+        try {
+            toneGenerator?.stopTone()
+            toneGenerator?.release()
+            toneGenerator = null
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to stop ringtone: ${e.message}")
+        }
+    }
+
+    private fun startCallTimeout() {
+        callTimeoutJob?.cancel()
+        callTimeoutJob = scope.launch {
+            delay(CALL_TIMEOUT_MS)
+            if (!isCallConnected && !isCallEnding) {
+                isCallEnding = true
+                stopRinging()
+                updateStatus("No answer")
+                try {
+                    val busyTone = ToneGenerator(AudioManager.STREAM_VOICE_CALL, 70)
+                    busyTone.startTone(ToneGenerator.TONE_SUP_BUSY, 1500)
+                } catch (_: Exception) {}
+                delay(2000)
+                endCall()
             }
         }
     }
@@ -433,7 +514,7 @@ class LiveKitCallActivity : AppCompatActivity() {
         timerJob?.cancel()
         timerJob = scope.launch {
             while (true) {
-                kotlinx.coroutines.delay(1000)
+                delay(1000)
                 callDurationSeconds++
                 val min = callDurationSeconds / 60
                 val sec = callDurationSeconds % 60
@@ -444,7 +525,10 @@ class LiveKitCallActivity : AppCompatActivity() {
     }
 
     private fun endCall() {
+        isCallEnding = true
+        stopRinging()
         timerJob?.cancel()
+        callTimeoutJob?.cancel()
         scope.launch {
             try {
                 room?.disconnect()
@@ -457,7 +541,10 @@ class LiveKitCallActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        isCallEnding = true
+        stopRinging()
         timerJob?.cancel()
+        callTimeoutJob?.cancel()
         restoreAudioRouting()
         scope.launch {
             try {

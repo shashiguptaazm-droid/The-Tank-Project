@@ -1,4 +1,4 @@
-﻿package com.rankwarz.edulabsrtm
+package com.rankwarz.edulabsrtm
 
 import android.content.Context
 import android.os.Bundle
@@ -9,17 +9,22 @@ class VideoCallActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val prefs = getSharedPreferences("MY_APP", Context.MODE_PRIVATE)
-        val userId = prefs.getInt("user_id", 0)
-        val userName = prefs.getString("user_name", "User $userId") ?: "User $userId"
-        val room = "EDULABS_${System.currentTimeMillis()}"
+        val room = intent.getStringExtra(LiveKitCallActivity.EXTRA_ROOM_NAME)
+        val peer = intent.getStringExtra(LiveKitCallActivity.EXTRA_PEER_NAME) ?: "User"
+        val isVideo = intent.getBooleanExtra(LiveKitCallActivity.EXTRA_IS_VIDEO, true)
 
-        LiveKitCallActivity.start(
-            context = this,
-            roomName = room,
-            peerName = "EduLabs Meeting",
-            isVideo = true
-        )
+        if (!room.isNullOrBlank()) {
+            LiveKitCallActivity.start(
+                context = this,
+                roomName = room,
+                peerName = peer,
+                isVideo = isVideo
+            )
+        } else {
+            // If no room is specified, route to Messenger to pick a user to call
+            val intent = android.content.Intent(this, MessengerActivity::class.java)
+            startActivity(intent)
+        }
 
         finish()
     }
