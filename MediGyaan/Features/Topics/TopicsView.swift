@@ -72,7 +72,7 @@ struct TopicsView: View {
 
     @MainActor
     private func load() async {
-        await state.load { [api] in
+        state = await LoadState.result { [api] in
             try await api.study.topics()
         }
     }
@@ -232,7 +232,7 @@ struct QuizListView: View {
     @MainActor
     private func load() async {
         let userId = session.userId
-        await state.load { [api] in
+        state = await LoadState.result { [api] in
             try await api.study.quizzes(topicId: topic.id, userId: userId)
         }
     }

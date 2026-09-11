@@ -119,7 +119,7 @@ struct MessengerView: View {
         let userId = session.userId
         guard userId > 0 else { return }
         let thread = conversationId
-        await state.load { [api] in
+        state = await LoadState.result { [api] in
             try await api.social.messages(conversationId: thread, userId: userId)
         }
     }

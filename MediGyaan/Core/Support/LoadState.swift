@@ -45,3 +45,24 @@ enum LoadState<Value> {
 }
 
 extension LoadState: Equatable where Value: Equatable {}
+
+extension LoadState {
+    /// Non-mutating load, used by SwiftUI views.
+    ///
+    /// A `@State` property is backed by a computed `wrappedValue`, so the
+    /// compiler cannot form a stable `inout` access to it across an `await`
+    /// suspension point — calling the mutating ``load(_:)`` on it fails with
+    /// "cannot call mutating async function on actor-isolated property".
+    /// Views therefore build the next state here and assign it:
+    ///
+    /// ```swift
+    /// state = await LoadState.result { try await api.study.topics() }
+    /// ```
+    static func result(_ operation: () async throws -> Value) async -> LoadState<Value> {
+        do {
+            return .loaded(try await operation())
+        } catch {
+            return .failed(message(for: error))
+        }
+    }
+}

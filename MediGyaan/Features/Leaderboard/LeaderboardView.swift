@@ -115,7 +115,7 @@ struct LeaderboardView: View {
         let userId = session.userId
         guard userId > 0 else { return }
         let selectedScope = scope.rawValue
-        await state.load { [api] in
+        state = await LoadState.result { [api] in
             try await api.study.leaderboard(userId: userId, scope: selectedScope)
         }
     }
@@ -227,7 +227,7 @@ struct HistoryView: View {
     private func load() async {
         let userId = session.userId
         guard userId > 0 else { return }
-        await state.load { [api] in
+        state = await LoadState.result { [api] in
             try await api.study.attempts(userId: userId)
         }
     }

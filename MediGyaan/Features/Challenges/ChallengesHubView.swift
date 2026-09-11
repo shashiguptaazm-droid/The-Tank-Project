@@ -202,7 +202,7 @@ struct TopicChallengePickerView: View {
 
     @MainActor
     private func load() async {
-        await state.load { [api] in
+        state = await LoadState.result { [api] in
             try await api.study.topics()
         }
     }
@@ -279,7 +279,7 @@ struct ChallengeListView: View {
     private func load() async {
         let userId = session.userId
         guard userId > 0 else { return }
-        await state.load { [api] in
+        state = await LoadState.result { [api] in
             try await api.study.challenges(userId: userId)
         }
     }

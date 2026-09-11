@@ -90,7 +90,7 @@ struct ReferenceLibraryView: View {
 
     @MainActor
     private func load() async {
-        await state.load { [api] in
+        state = await LoadState.result { [api] in
             try await api.thesis.references(sessionId: session.id)
         }
     }
@@ -356,7 +356,7 @@ struct ThesisChecklistView: View {
 
     @MainActor
     private func load() async {
-        await state.load { [api] in
+        state = await LoadState.result { [api] in
             try await api.thesis.checklist(sessionId: session.id)
         }
     }

@@ -159,12 +159,12 @@ struct PredictorView: View {
     private func predict() async {
         guard let score = Double(scoreText) else { return }
         let userId = session.userId
-        await predictionState.load { [api] in
+        predictionState = await LoadState.result { [api] in
             try await api.predictor.predictRank(userId: userId, score: score)
         }
 
         if let prediction = predictionState.value {
-            await collegesState.load { [api] in
+            collegesState = await LoadState.result { [api] in
                 try await api.predictor.colleges(rank: prediction.predictedRank)
             }
         }

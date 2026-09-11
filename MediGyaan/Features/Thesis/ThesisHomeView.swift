@@ -134,7 +134,7 @@ struct ThesisHomeView: View {
     private func load() async {
         let userId = session.userId
         guard userId > 0 else { return }
-        await state.load { [api] in
+        state = await LoadState.result { [api] in
             try await api.thesis.session(userId: userId)
         }
     }

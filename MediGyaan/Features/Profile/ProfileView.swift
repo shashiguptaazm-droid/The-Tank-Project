@@ -145,7 +145,7 @@ struct ProfileView: View {
     private func load() async {
         let userId = session.userId
         guard userId > 0 else { return }
-        await profileState.load { [api] in
+        profileState = await LoadState.result { [api] in
             try await api.auth.profile(userId: userId)
         }
         if let refreshed = profileState.value {
