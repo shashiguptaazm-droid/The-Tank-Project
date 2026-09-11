@@ -184,6 +184,19 @@ These are backend deployment problems, not client bugs — `dash_api.php`,
 correctly. The sweep prints this list on every run so the state stays visible
 without failing the build.
 
+Auditing these names against the server's own copy of the codebase found that
+**all eight are absent from the deployment** — and that an unknown path on this
+host is answered by a 503 from its front controller (verified with a
+`definitely_missing_xyz.php` probe), not a 404. So the 503s are missing scripts
+rather than crashing ones, and `APIConfig.Endpoint` still carries eight paths that
+no longer exist. Removing them is a decision about what the app still needs, so
+they are left in place and kept visible.
+
+One consequence for the sweep: a 404 is *not* a reliable "wrong path" signal on
+this host, and CI has been served a 404 for `share.php` while that script answers
+200 from two independent networks. The sweep therefore treats 404 as degraded
+(printed) rather than fatal, and treats only a transport failure as unroutable.
+
 ## Testing
 
 ```bash
