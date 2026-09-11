@@ -2,7 +2,9 @@ name: iOS Build & Test
 
 on:
   push:
-    branches: [main, master]
+    # Any branch: this project also lives on a side branch of a shared repo, so a
+    # trimmed branch filter would silently skip the build.
+    branches: ['**']
   pull_request:
   workflow_dispatch:
 
