@@ -66,10 +66,13 @@
 	<string>MediGyaan needs microphone access for live challenge and video calls.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Used to keep your study analytics accurate across devices.</string>
+	<!-- `audio` keeps an active call alive when the app is backgrounded or the
+	     screen locks; required by LiveKit's audio session handling. -->
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
 		<string>remote-notification</string>
+		<string>audio</string>
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>

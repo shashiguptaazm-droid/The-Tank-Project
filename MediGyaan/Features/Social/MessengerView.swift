@@ -15,6 +15,11 @@ import SwiftUI
 ///
 /// This view does not own a `NavigationStack` — it is both a tab root (wrapped
 /// by `AppTabView`) and a push destination from the dashboard.
+///
+/// Calling replaces the Android app's Jitsi Meet SDK integration: `phone` and
+/// `video` toolbar buttons open a LiveKit room named from the two user ids, using
+/// the same `edu_lab_rtm_<low>_<high>` scheme `MessengerActivity.getRoomName`
+/// builds.
 struct MessengerView: View {
 
     @EnvironmentObject private var session: SessionStore
@@ -25,6 +30,7 @@ struct MessengerView: View {
     @State private var draft = ""
     @State private var isSending = false
     @State private var errorMessage: String?
+    @State private var pendingCall: PendingCall?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -34,9 +40,60 @@ struct MessengerView: View {
         .background(AppTheme.Palette.chatBackground.ignoresSafeArea())
         .navigationTitle("Messages")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                Button { start(.audio) } label: {
+                    Image(systemName: "phone")
+                }
+                .disabled(peer == nil)
+                .accessibilityLabel("Voice call")
+
+                Button { start(.video) } label: {
+                    Image(systemName: "video")
+                }
+                .disabled(peer == nil)
+                .accessibilityLabel("Video call")
+            }
+        }
         .errorAlert(message: $errorMessage)
         .task { await load() }
         .refreshable { await load() }
+        .fullScreenCover(item: $pendingCall) { call in
+            CallView(
+                model: CallViewModel(
+                    roomName: call.room,
+                    kind: call.kind,
+                    peerName: call.peerName,
+                    api: api,
+                    session: session
+                )
+            )
+        }
+    }
+
+    // MARK: - Calling
+
+    /// The other person in this thread, inferred from the messages on screen.
+    ///
+    /// `messenger_api.php` returns a thread rather than a peer record, so the
+    /// most recent message that is not ours is the only available source for the
+    /// peer's id — and the peer's id is what makes the 1-on-1 room deterministic
+    /// and shared with the other platform.
+    private var peer: (id: Int, name: String)? {
+        guard case let .loaded(messages) = state else { return nil }
+        guard let last = messages.last(where: { !$0.isMine && $0.senderId > 0 }) else { return nil }
+        let name = last.senderName.isEmpty ? "MediGyaan user" : last.senderName
+        return (last.senderId, name)
+    }
+
+    private func start(_ kind: CallKind) {
+        guard let peer else { return }
+        pendingCall = PendingCall.oneToOne(
+            myId: session.userId,
+            peerId: peer.id,
+            peerName: peer.name,
+            kind: kind
+        )
     }
 
     // MARK: - Messages

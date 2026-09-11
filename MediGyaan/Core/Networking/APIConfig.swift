@@ -21,6 +21,24 @@ enum APIConfig {
     static let requestTimeout: TimeInterval = 120
     static let resourceTimeout: TimeInterval = 180
 
+    /// The LiveKit SFU that carries audio and video calls.
+    ///
+    /// This replaces the Jitsi Meet SDK the Android app uses, which dialled the
+    /// public `meet.jit.si` service. Calls now run on our own single-node SFU,
+    /// deployed on the VPS that serves `medigyaan.com` — a *different* machine
+    /// from the shared hosting behind `baseURL` (`medigyaan.xyz`).
+    ///
+    /// The token endpoint necessarily lives on the SFU's host, because the API
+    /// secret that signs access tokens never leaves that box. Clients only ever
+    /// see a short-lived, room-scoped token.
+    enum LiveKit {
+        /// WebSocket endpoint clients connect to.
+        static let webSocketURL = "wss://medigyaan.com/rtc"
+
+        /// Mints a room-scoped access token for the signed-in user.
+        static let tokenURL = URL(string: "https://medigyaan.com/Neurons/livekit_token.php")!
+    }
+
     /// Every backend script the Android app is known to call.
     enum Endpoint: String, CaseIterable {
 

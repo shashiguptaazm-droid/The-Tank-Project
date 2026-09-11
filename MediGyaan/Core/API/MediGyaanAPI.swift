@@ -14,6 +14,9 @@ struct MediGyaanAPI {
     let predictor: PredictorAPI
     let referral: ReferralAPI
     let ai: AIAPI
+    /// Token issuance for the LiveKit SFU. Lives on a different host from the
+    /// rest of the backend, hence its own client.
+    let liveKit: LiveKitAPI
 
     init(client: HTTPClient = .shared) {
         auth = AuthAPI(client: client)
@@ -23,6 +26,7 @@ struct MediGyaanAPI {
         predictor = PredictorAPI(client: client)
         referral = ReferralAPI(client: client)
         ai = AIAPI(client: client)
+        liveKit = LiveKitAPI(client: client)
     }
 
     /// Live backend instance used by the running app.

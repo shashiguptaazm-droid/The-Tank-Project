@@ -137,6 +137,27 @@ final class HTTPClient {
         return try decodeObject(data)
     }
 
+    /// `POST`s a form body to an **absolute** URL, for services that do not live
+    /// under `APIConfig.baseURL`.
+    ///
+    /// The LiveKit token endpoint is served by the VPS that runs the SFU
+    /// (`medigyaan.com`), while the rest of the backend is on shared hosting
+    /// (`medigyaan.xyz`), so it cannot be expressed as an `Endpoint`.
+    func postObject(form: [String: String], toAbsolute url: URL) async throws -> [String: Any] {
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue(
+            "application/x-www-form-urlencoded; charset=utf-8",
+            forHTTPHeaderField: "Content-Type"
+        )
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.httpBody = HTTPClient.formEncode(form)
+        if let authToken, !authToken.isEmpty {
+            request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
+        }
+        return try decodeObject(try await execute(request))
+    }
+
     /// Uploads raw multipart form data.
     func upload<T: Decodable>(
         to url: URL,
