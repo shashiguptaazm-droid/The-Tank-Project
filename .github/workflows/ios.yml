@@ -41,15 +41,54 @@ jobs:
       - name: Show available simulators
         run: xcrun simctl list devices available | head -40
 
+      # xcodebuild writes its diagnostics to an authenticated log stream. To
+      # keep the actual compiler errors readable without repo credentials, the
+      # errors are parsed out and republished as check-run annotations, which
+      # anyone with read access to the repository can fetch.
       - name: Build
         run: |
+          set +e
           xcodebuild build \
             -project "$PROJECT" \
             -scheme "$SCHEME" \
             -destination "$DESTINATION" \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
-            -quiet
+            > build.log 2>&1
+          STATUS=$?
+          echo "xcodebuild exited: $STATUS"
+
+          python3 - <<'PARSE' || true
+          import re, pathlib
+          log = pathlib.Path('build.log').read_text(errors='replace').splitlines()
+          pat = re.compile(r'\berror:\s')
+          seen, uniq = set(), []
+          for line in log:
+              text = line.strip()
+              if pat.search(text) and text not in seen:
+                  seen.add(text)
+                  uniq.append(text)
+          print(f'TOTAL_UNIQUE_ERRORS={len(uniq)}')
+          if not uniq:
+              print('::error::Build failed but no "error:" lines were found; see the tail below.')
+              for line in log[-40:]:
+                  print(line)
+          # Annotations are capped per step, so batch them to lose as little as possible.
+          BATCH = 12
+          for i in range(0, min(len(uniq), 120), BATCH):
+              chunk = uniq[i:i + BATCH]
+              msg = ' | '.join(c[:200] for c in chunk)
+              msg = msg.replace('%', '%25').replace('\n', ' ').replace('\r', ' ')
+              print(f'::error::errors {i + 1}-{i + len(chunk)} of {len(uniq)}: {msg}')
+          PARSE
+
+          echo '--- last 60 lines of build.log ---'
+          tail -60 build.log
+
+          if [ "$STATUS" -ne 0 ]; then
+            echo 'Build failed.'
+            exit 1
+          fi
 
       - name: Test
         run: |
