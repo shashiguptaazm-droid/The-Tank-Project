@@ -97,15 +97,16 @@ private struct CallRoomContent: View {
         }
     }
 
-    private var endedView: some View {
+    /// Terminal state. `reason` is non-nil only when the call ended in failure.
+    private func endedView(reason: String?) -> some View {
         VStack(spacing: AppTheme.Spacing.md) {
             Image(systemName: "phone.down.fill")
                 .font(.system(size: 44))
                 .foregroundStyle(AppTheme.Palette.error)
-            Text(endedTitle)
+            Text(reason == nil ? "Call ended" : "Call failed")
                 .font(AppTheme.Font.headline)
                 .foregroundStyle(.white)
-            if let reason = model.errorMessage {
+            if let reason {
                 Text(reason)
                     .font(AppTheme.Font.caption)
                     .foregroundStyle(.white.opacity(0.7))
@@ -114,10 +115,6 @@ private struct CallRoomContent: View {
             }
             TextActionButton(title: "Close") { dismiss() }
         }
-    }
-
-    private var endedTitle: String {
-        model.errorMessage == nil ? "Call ended" : "Call failed"
     }
 
     private var connectedView: some View {
