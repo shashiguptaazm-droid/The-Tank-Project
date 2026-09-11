@@ -13,7 +13,7 @@ final class SessionStore: ObservableObject {
     @Published private(set) var isAuthenticated: Bool = false
     @Published var lastErrorMessage: String?
 
-    private let keychain: KeychainStore
+    private let secretStore: SecretStore
     private let defaults: UserDefaults
 
     private enum DefaultsKey {
@@ -22,15 +22,19 @@ final class SessionStore: ObservableObject {
         static let email = "mg.email"
     }
 
-    init(keychain: KeychainStore = .shared, defaults: UserDefaults = .standard) {
-        self.keychain = keychain
+    init(secretStore: SecretStore = KeychainStore.shared, defaults: UserDefaults = .standard) {
+        self.secretStore = secretStore
         self.defaults = defaults
         restore()
     }
 
     /// Token sent as a bearer header on authenticated requests.
+    ///
+    /// `nil` is expected on an unsigned simulator build, where the Keychain is
+    /// unavailable; the app tolerates that because the backend authenticates on
+    /// `user_id` rather than a bearer token.
     var authToken: String? {
-        keychain.get(.authToken)
+        secretStore.get(.authToken)
     }
 
     var userId: Int {
@@ -41,7 +45,7 @@ final class SessionStore: ObservableObject {
 
     /// Rehydrates a previous session, letting the user straight into the app.
     private func restore() {
-        let token = keychain.get(.authToken)
+        let token = secretStore.get(.authToken)
         let storedId = defaults.integer(forKey: DefaultsKey.userId)
 
         guard token?.isEmpty == false || storedId > 0 else {
@@ -68,10 +72,10 @@ final class SessionStore: ObservableObject {
         defaults.set(email, forKey: DefaultsKey.email)
 
         if let token, !token.isEmpty {
-            keychain.set(token, for: .authToken)
+            secretStore.set(token, for: .authToken)
         }
-        keychain.set(String(userId), for: .userId)
-        keychain.set(email, for: .email)
+        secretStore.set(String(userId), for: .userId)
+        secretStore.set(email, for: .email)
     }
 
     /// Replaces the cached profile after a `get_profilev1.php` refresh.
@@ -91,15 +95,15 @@ final class SessionStore: ObservableObject {
         defaults.removeObject(forKey: DefaultsKey.userId)
         defaults.removeObject(forKey: DefaultsKey.name)
         defaults.removeObject(forKey: DefaultsKey.email)
-        keychain.removeAll()
+        secretStore.removeAll()
     }
 
     /// Stores the Firebase-style push token reported to `api/update_fcmv2.php`.
     func storePushToken(_ token: String) {
-        keychain.set(token, for: .fcmToken)
+        secretStore.set(token, for: .fcmToken)
     }
 
     var pushToken: String? {
-        keychain.get(.fcmToken)
+        secretStore.get(.fcmToken)
     }
 }

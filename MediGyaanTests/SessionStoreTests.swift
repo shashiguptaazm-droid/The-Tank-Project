@@ -12,25 +12,28 @@ import XCTest
 final class SessionStoreTests: XCTestCase {
 
     private var defaults: UserDefaults!
-    private var keychain: KeychainStore!
+    private var secrets: InMemorySecretStore!
     private var suiteName: String!
 
     override func setUp() {
         super.setUp()
         suiteName = "MediGyaanTests.\(UUID().uuidString)"
         defaults = UserDefaults(suiteName: suiteName)
-        keychain = KeychainStore(service: suiteName)
+        // An in-memory store, not the Keychain: an unsigned simulator build has
+        // no keychain-access-groups entitlement, so SecItemAdd returns -34018
+        // and these tests would fail for reasons unrelated to session logic.
+        secrets = InMemorySecretStore()
     }
 
     override func tearDown() {
         defaults.removePersistentDomain(forName: suiteName)
-        keychain.removeAll()
+        secrets.removeAll()
         super.tearDown()
     }
 
     @MainActor
     private func makeStore() -> SessionStore {
-        SessionStore(keychain: keychain, defaults: defaults)
+        SessionStore(secretStore: secrets, defaults: defaults)
     }
 
     // MARK: - Session lifecycle
@@ -102,10 +105,32 @@ final class SessionStoreTests: XCTestCase {
         XCTAssertEqual(store.pushToken, "fcm-abc")
     }
 
+    /// The secret store is the source of the bearer token, so a round trip must
+    /// survive a fresh `SessionStore` over the same backing storage.
+    @MainActor
+    func testTokenIsPersistedInSecretStore() {
+        let store = makeStore()
+        store.signIn(userId: 9, name: "K", email: "k@example.com", token: "secret-token")
+
+        XCTAssertEqual(secrets.get(.authToken), "secret-token")
+        XCTAssertEqual(makeStore().authToken, "secret-token")
+    }
+
+    /// Sign-out must clear the secret store, not just the published state.
+    @MainActor
+    func testSignOutClearsSecretStore() {
+        let store = makeStore()
+        store.signIn(userId: 9, name: "K", email: "k@example.com", token: "secret-token")
+        store.signOut()
+
+        XCTAssertNil(secrets.get(.authToken))
+        XCTAssertNil(secrets.get(.fcmToken))
+    }
+
     /// A missing or empty token must not be treated as a valid session.
     @MainActor
     func testEmptyTokenDoesNotAuthenticate() {
-        keychain.set("", for: .authToken)
+        secrets.set("", for: .authToken)
         let store = makeStore()
 
         XCTAssertFalse(store.isAuthenticated)

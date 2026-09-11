@@ -1,12 +1,45 @@
 import Foundation
 import Security
 
-/// Keychain wrapper used for credentials and tokens.
+/// A credential key. Mirrors the small set of values the Android app wrote into
+/// unencrypted `SharedPreferences`.
+enum SecretKey: String, CaseIterable {
+    case authToken
+    case userId
+    case email
+    case password
+    case fcmToken
+}
+
+/// Storage for sensitive values.
 ///
-/// The Android app kept the user id, name, and e-mail in unencrypted
-/// `SharedPreferences`; on iOS the sensitive half of that state lives in the
-/// Keychain instead, while non-sensitive display data stays in `UserDefaults`.
-final class KeychainStore {
+/// Abstracted behind a protocol because the Keychain is unavailable in some
+/// legitimate configurations: an unsigned simulator build has no
+/// `keychain-access-groups` entitlement, so every `SecItemAdd` fails with
+/// `errSecMissingEntitlement` (-34018). Tests inject ``InMemorySecretStore`` so
+/// they exercise session logic rather than Keychain availability, and the
+/// production app keeps using the real Keychain.
+protocol SecretStore: AnyObject {
+    /// Stores a value, replacing any existing one. Returns `false` on failure.
+    @discardableResult
+    func set(_ value: String, for key: SecretKey) -> Bool
+
+    /// Reads a value, or `nil` when absent or unreadable.
+    func get(_ key: SecretKey) -> String?
+
+    /// Removes a single value.
+    @discardableResult
+    func remove(_ key: SecretKey) -> Bool
+
+    /// Removes every value this store owns.
+    @discardableResult
+    func removeAll() -> Bool
+}
+
+// MARK: - Keychain
+
+/// Keychain-backed store used in the running app.
+final class KeychainStore: SecretStore {
 
     static let shared = KeychainStore()
 
@@ -16,25 +49,16 @@ final class KeychainStore {
         self.service = service
     }
 
-    enum Key: String {
-        case authToken
-        case userId
-        case email
-        case password
-        case fcmToken
-    }
-
-    /// Stores a string, replacing any existing value.
     @discardableResult
-    func set(_ value: String, for key: Key) -> Bool {
+    func set(_ value: String, for key: SecretKey) -> Bool {
         guard let data = value.data(using: .utf8) else { return false }
         return set(data, for: key)
     }
 
     @discardableResult
-    func set(_ data: Data, for key: Key) -> Bool {
+    func set(_ data: Data, for key: SecretKey) -> Bool {
         // Delete first so the write is idempotent.
-        _ = remove(key)
+        remove(key)
 
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
@@ -43,17 +67,20 @@ final class KeychainStore {
             kSecValueData as String: data,
             kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
         ]
-        return SecItemAdd(query as CFDictionary, nil) == errSecSuccess
+        let status = SecItemAdd(query as CFDictionary, nil)
+        if status != errSecSuccess {
+            // -34018 on an unsigned build is expected and not actionable here.
+            print("[KeychainStore] set(\(key.rawValue)) failed with OSStatus \(status)")
+        }
+        return status == errSecSuccess
     }
 
-    /// Reads a string value, or `nil` when absent.
-    func get(_ key: Key) -> String? {
+    func get(_ key: SecretKey) -> String? {
         guard let data = getData(key) else { return nil }
         return String(data: data, encoding: .utf8)
     }
 
-    /// Reads raw data, or `nil` when absent.
-    func getData(_ key: Key) -> Data? {
+    func getData(_ key: SecretKey) -> Data? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
@@ -68,9 +95,8 @@ final class KeychainStore {
         return item as? Data
     }
 
-    /// Removes a single value.
     @discardableResult
-    func remove(_ key: Key) -> Bool {
+    func remove(_ key: SecretKey) -> Bool {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
@@ -80,11 +106,44 @@ final class KeychainStore {
         return status == errSecSuccess || status == errSecItemNotFound
     }
 
-    /// Clears every value owned by this service — used on sign-out.
     @discardableResult
     func removeAll() -> Bool {
-        Key.allCases.allSatisfy { remove($0) }
+        SecretKey.allCases.allSatisfy { remove($0) }
     }
 }
 
-extension KeychainStore.Key: CaseIterable {}
+// MARK: - In-memory
+
+/// Volatile store for tests and SwiftUI previews.
+final class InMemorySecretStore: SecretStore {
+
+    private var storage: [String: String] = [:]
+
+    init(initial: [SecretKey: String] = [:]) {
+        for (key, value) in initial {
+            storage[key.rawValue] = value
+        }
+    }
+
+    @discardableResult
+    func set(_ value: String, for key: SecretKey) -> Bool {
+        storage[key.rawValue] = value
+        return true
+    }
+
+    func get(_ key: SecretKey) -> String? {
+        storage[key.rawValue]
+    }
+
+    @discardableResult
+    func remove(_ key: SecretKey) -> Bool {
+        storage[key.rawValue] = nil
+        return true
+    }
+
+    @discardableResult
+    func removeAll() -> Bool {
+        storage.removeAll()
+        return true
+    }
+}

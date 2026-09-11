@@ -57,9 +57,10 @@ jobs:
             > build.log 2>&1
           STATUS=$?
           echo "xcodebuild exited: $STATUS"
+          export BUILD_STATUS=$STATUS
 
           python3 - <<'PARSE' || true
-          import re, pathlib
+          import os, re, pathlib
           log = pathlib.Path('build.log').read_text(errors='replace').splitlines()
           pat = re.compile(r'\berror:\s')
           seen, uniq = set(), []
@@ -69,7 +70,9 @@ jobs:
                   seen.add(text)
                   uniq.append(text)
           print(f'TOTAL_UNIQUE_ERRORS={len(uniq)}')
-          if not uniq:
+          # Only a genuine failure should raise an annotation; a clean build also
+          # has no "error:" lines.
+          if not uniq and os.environ.get('BUILD_STATUS', '0') != '0':
               print('::error::Build failed but no "error:" lines were found; see the tail below.')
               for line in log[-40:]:
                   print(line)
