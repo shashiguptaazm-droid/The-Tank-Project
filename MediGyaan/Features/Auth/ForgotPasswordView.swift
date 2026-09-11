@@ -155,6 +155,7 @@ struct ForgotPasswordView: View {
 
     // MARK: - Networking
 
+    @MainActor
     private func sendOtp() async {
         guard !email.trimmingCharacters(in: .whitespaces).isEmpty else {
             errorMessage = "Enter your email"
@@ -176,6 +177,7 @@ struct ForgotPasswordView: View {
         }
     }
 
+    @MainActor
     private func verifyOtp() async {
         guard otp.count >= 4 else {
             errorMessage = "Enter the code we sent you"
@@ -196,6 +198,7 @@ struct ForgotPasswordView: View {
         }
     }
 
+    @MainActor
     private func resetPassword() async {
         guard newPassword.count >= 6 else {
             errorMessage = "Password must be at least 6 characters"

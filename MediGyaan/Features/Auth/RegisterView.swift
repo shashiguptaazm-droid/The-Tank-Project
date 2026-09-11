@@ -88,6 +88,7 @@ struct RegisterView: View {
         .errorAlert(message: $errorMessage)
     }
 
+    @MainActor
     private func submit() async {
         if let validationError {
             errorMessage = validationError

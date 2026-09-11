@@ -70,12 +70,14 @@ struct TopicsView: View {
 
     // MARK: - Networking
 
+    @MainActor
     private func load() async {
         await state.load { [api] in
             try await api.study.topics()
         }
     }
 
+    @MainActor
     private func runSearch(_ text: String) async {
         let trimmed = text.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else {
@@ -227,6 +229,7 @@ struct QuizListView: View {
         }
     }
 
+    @MainActor
     private func load() async {
         let userId = session.userId
         await state.load { [api] in

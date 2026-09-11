@@ -164,6 +164,7 @@ struct ReferralView: View {
 
     // MARK: - Networking
 
+    @MainActor
     private func load() async {
         let userId = session.userId
         guard userId > 0 else { return }

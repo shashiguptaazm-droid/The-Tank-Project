@@ -173,6 +173,7 @@ struct GlobalSearchView: View {
 
     // MARK: - Networking
 
+    @MainActor
     private func search(_ text: String) async {
         let trimmed = text.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
@@ -203,6 +204,7 @@ struct GlobalSearchView: View {
         return topics.filter { seen.insert($0.id).inserted }
     }
 
+    @MainActor
     private func remember(_ term: String) {
         var terms = recentSearches.filter { $0.caseInsensitiveCompare(term) != .orderedSame }
         terms.insert(term, at: 0)

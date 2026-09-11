@@ -114,6 +114,7 @@ struct MessengerView: View {
 
     // MARK: - Networking
 
+    @MainActor
     private func load() async {
         let userId = session.userId
         guard userId > 0 else { return }
@@ -123,6 +124,7 @@ struct MessengerView: View {
         }
     }
 
+    @MainActor
     private func send() async {
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty, !isSending else { return }

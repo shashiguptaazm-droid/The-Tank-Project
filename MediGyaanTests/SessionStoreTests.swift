@@ -105,7 +105,7 @@ final class SessionStoreTests: XCTestCase {
     /// A missing or empty token must not be treated as a valid session.
     @MainActor
     func testEmptyTokenDoesNotAuthenticate() {
-        keychain.set("", forKey: .authToken)
+        keychain.set("", for: .authToken)
         let store = makeStore()
 
         XCTAssertFalse(store.isAuthenticated)

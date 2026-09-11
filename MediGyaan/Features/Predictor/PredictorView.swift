@@ -155,6 +155,7 @@ struct PredictorView: View {
 
     // MARK: - Networking
 
+    @MainActor
     private func predict() async {
         guard let score = Double(scoreText) else { return }
         let userId = session.userId

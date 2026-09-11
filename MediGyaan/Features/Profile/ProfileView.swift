@@ -141,6 +141,7 @@ struct ProfileView: View {
         }
     }
 
+    @MainActor
     private func load() async {
         let userId = session.userId
         guard userId > 0 else { return }
@@ -233,6 +234,7 @@ struct EditProfileView: View {
         }
     }
 
+    @MainActor
     private func save() async {
         guard !isSaving else { return }
         isSaving = true

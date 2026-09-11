@@ -130,6 +130,7 @@ struct ThesisHomeView: View {
 
     // MARK: - Networking
 
+    @MainActor
     private func load() async {
         let userId = session.userId
         guard userId > 0 else { return }
@@ -138,6 +139,7 @@ struct ThesisHomeView: View {
         }
     }
 
+    @MainActor
     private func createWorkspace() async {
         guard !isCreating else { return }
         isCreating = true
@@ -267,6 +269,7 @@ struct ThesisChapterView: View {
         }
     }
 
+    @MainActor
     private func save() async {
         guard !isSaving else { return }
         isSaving = true
@@ -287,6 +290,7 @@ struct ThesisChapterView: View {
         }
     }
 
+    @MainActor
     private func generate() async {
         guard !isGenerating else { return }
         isGenerating = true

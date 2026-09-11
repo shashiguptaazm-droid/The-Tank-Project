@@ -130,6 +130,7 @@ struct PosterStudioView: View {
 
     // MARK: - Actions
 
+    @MainActor
     private func loadImage() async {
         guard let selectedItem else { return }
         do {
@@ -144,6 +145,7 @@ struct PosterStudioView: View {
         }
     }
 
+    @MainActor
     private func analyze() async {
         guard let image, !isAnalyzing else { return }
         isAnalyzing = true

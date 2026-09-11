@@ -110,6 +110,7 @@ struct LeaderboardView: View {
         }
     }
 
+    @MainActor
     private func load() async {
         let userId = session.userId
         guard userId > 0 else { return }
@@ -222,6 +223,7 @@ struct HistoryView: View {
         }
     }
 
+    @MainActor
     private func load() async {
         let userId = session.userId
         guard userId > 0 else { return }

@@ -68,10 +68,10 @@ final class SessionStore: ObservableObject {
         defaults.set(email, forKey: DefaultsKey.email)
 
         if let token, !token.isEmpty {
-            keychain.set(token, forKey: .authToken)
+            keychain.set(token, for: .authToken)
         }
-        keychain.set(String(userId), forKey: .userId)
-        keychain.set(email, forKey: .email)
+        keychain.set(String(userId), for: .userId)
+        keychain.set(email, for: .email)
     }
 
     /// Replaces the cached profile after a `get_profilev1.php` refresh.
@@ -96,7 +96,7 @@ final class SessionStore: ObservableObject {
 
     /// Stores the Firebase-style push token reported to `api/update_fcmv2.php`.
     func storePushToken(_ token: String) {
-        keychain.set(token, forKey: .fcmToken)
+        keychain.set(token, for: .fcmToken)
     }
 
     var pushToken: String? {

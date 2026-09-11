@@ -117,6 +117,7 @@ struct ChallengesHubView: View {
 
     // MARK: - Networking
 
+    @MainActor
     private func join() async {
         let code = lobbyCode.trimmingCharacters(in: .whitespaces)
         guard !code.isEmpty, !isJoining else { return }
@@ -199,6 +200,7 @@ struct TopicChallengePickerView: View {
         }
     }
 
+    @MainActor
     private func load() async {
         await state.load { [api] in
             try await api.study.topics()
@@ -273,6 +275,7 @@ struct ChallengeListView: View {
         }
     }
 
+    @MainActor
     private func load() async {
         let userId = session.userId
         guard userId > 0 else { return }

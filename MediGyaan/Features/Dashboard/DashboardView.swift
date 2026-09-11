@@ -13,7 +13,7 @@ struct DashboardView: View {
     @Environment(\.api) private var api
     @AppStorage("mg.darkMode") private var darkMode = false
 
-    @StateObject private var viewModel = DashboardViewModel(api: .live, userId: 0)
+    @StateObject private var viewModel = DashboardViewModel()
     @State private var hasConfigured = false
     @State private var searchText = ""
     @State private var isShowingSearch = false
@@ -467,8 +467,7 @@ struct DashboardView: View {
     // MARK: - Loading
 
     private func reload() async {
-        viewModel = DashboardViewModel(api: api, userId: session.userId)
-        await viewModel.load()
+        await viewModel.load(api: api, userId: session.userId)
     }
 }
 

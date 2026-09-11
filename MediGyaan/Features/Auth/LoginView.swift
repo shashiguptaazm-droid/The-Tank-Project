@@ -110,6 +110,7 @@ struct LoginView: View {
 
     // MARK: - Networking
 
+    @MainActor
     private func submit() async {
         guard canSubmit, !isSubmitting else { return }
         isSubmitting = true

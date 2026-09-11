@@ -138,6 +138,7 @@ struct NewsFeedView: View {
 
     // MARK: - Networking
 
+    @MainActor
     private func load() async {
         let userId = session.userId
         guard userId > 0 else { return }
@@ -146,6 +147,7 @@ struct NewsFeedView: View {
         }
     }
 
+    @MainActor
     private func setLiked(post: Post, liked: Bool) async {
         _ = try? await api.social.setLiked(
             postId: post.id,
@@ -156,6 +158,7 @@ struct NewsFeedView: View {
         await load()
     }
 
+    @MainActor
     private func createPost() async {
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty, !isPosting else { return }

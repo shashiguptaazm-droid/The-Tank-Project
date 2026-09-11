@@ -88,6 +88,7 @@ struct ReferenceLibraryView: View {
         }
     }
 
+    @MainActor
     private func load() async {
         await state.load { [api] in
             try await api.thesis.references(sessionId: session.id)
@@ -167,6 +168,7 @@ struct PrismaView: View {
         }
     }
 
+    @MainActor
     private func save() async {
         guard !isSaving else { return }
         isSaving = true
@@ -263,6 +265,7 @@ struct ThemeExportView: View {
         .errorAlert(message: $errorMessage)
     }
 
+    @MainActor
     private func apply() async {
         guard !isExporting else { return }
         isExporting = true
@@ -351,6 +354,7 @@ struct ThesisChecklistView: View {
         }
     }
 
+    @MainActor
     private func load() async {
         await state.load { [api] in
             try await api.thesis.checklist(sessionId: session.id)
