@@ -68,7 +68,10 @@ final class QuizViewModel: ObservableObject {
         self.api = api
         self.userId = userId
 
-        await state.load { [api, quiz] in
+        // Assigns rather than using the mutating `load`, because `@Published` is
+        // a property wrapper and its wrapped value cannot be held `inout`
+        // across a suspension point.
+        state = await LoadState.result { [api, quiz] in
             let questions = try await api.study.questions(quizId: quiz.id)
             return QuizSession(
                 quizId: quiz.id,
