@@ -80,7 +80,7 @@ jobs:
           BATCH = 12
           for i in range(0, min(len(uniq), 120), BATCH):
               chunk = uniq[i:i + BATCH]
-              msg = ' | '.join(c[:200] for c in chunk)
+              msg = ' | '.join(c[:400] for c in chunk)
               msg = msg.replace('%', '%25').replace('\n', ' ').replace('\r', ' ')
               print(f'::error::errors {i + 1}-{i + len(chunk)} of {len(uniq)}: {msg}')
           PARSE
@@ -121,12 +121,12 @@ jobs:
                   uniq.append(text)
           fails = [u for u in uniq if 'error:' in u or 'failed' in u or 'XCTSkip' in u]
           print(f'TOTAL_TEST_SIGNALS={len(uniq)} FAILURES={len(fails)}')
-          BATCH = 12
-          for i in range(0, min(len(fails), 120), BATCH):
-              chunk = fails[i:i + BATCH]
-              msg = ' | '.join(c[:220] for c in chunk)
+          # One annotation per failure, untruncated: an assertion message that
+          # lists the offending endpoints is useless if it is cut off mid-list.
+          for i, line in enumerate(fails[:50]):
+              msg = line[:4000]
               msg = msg.replace('%', '%25').replace('\n', ' ').replace('\r', ' ')
-              print(f'::error::tests {i + 1}-{i + len(chunk)} of {len(fails)}: {msg}')
+              print(f'::error::test {i + 1} of {len(fails)}: {msg}')
           PARSE
 
           echo '--- last 80 lines of test.log ---'

@@ -210,6 +210,22 @@ final class LiveBackendTests: XCTestCase {
 
     // MARK: - Endpoint sweep
 
+    /// `GET`s an endpoint, retrying once on a transport failure.
+    ///
+    /// Production is a single shared LiteSpeed host, and firing 50-odd requests
+    /// back to back can have a connection reset. That surfaces as `.transport`
+    /// with no bearing on the endpoint's health, so one retry separates a genuine
+    /// outage from a dropped connection.
+    private func probe(_ endpoint: APIConfig.Endpoint) async throws {
+        do {
+            _ = try await client.getObject(endpoint)
+        } catch let error as APIError {
+            guard case .transport = error else { throw error }
+            try? await Task.sleep(for: .milliseconds(750))
+            _ = try await client.getObject(endpoint)
+        }
+    }
+
     /// Every configured endpoint must map to a real script: the host has to
     /// answer, and the path must not 404 (which is what a typo looks like).
     ///
@@ -217,8 +233,7 @@ final class LiveBackendTests: XCTestCase {
     /// legitimately answers 400/401/403 while validating input, so only a
     /// transport failure or a 404 is treated as unroutable. Other non-2xx
     /// statuses are collected and printed, keeping server-side degradation
-    /// visible in the CI log without making the build fail for reasons the app
-    /// cannot control.
+    /// visible without making the build fail for reasons the app cannot control.
     func testAllEndpointsAreRoutable() async throws {
         try skipIfOffline()
 
@@ -226,8 +241,11 @@ final class LiveBackendTests: XCTestCase {
         var degraded: [String] = []
 
         for endpoint in APIConfig.Endpoint.allCases {
+            // Pace the sweep: this is a shared production host, not a test rig.
+            try? await Task.sleep(for: .milliseconds(120))
+
             do {
-                _ = try await client.getObject(endpoint)
+                try await probe(endpoint)
             } catch let error as APIError {
                 switch error {
                 case .transport:
@@ -251,10 +269,14 @@ final class LiveBackendTests: XCTestCase {
             print("NOTE: \(degraded.count) endpoint(s) answered with a non-2xx status:")
             for entry in degraded.sorted() { print("   \(entry)") }
         }
+        if !unreachable.isEmpty {
+            print("FAIL: \(unreachable.count) endpoint(s) did not respond:")
+            for entry in unreachable.sorted() { print("   \(entry)") }
+        }
 
-        XCTAssertTrue(
-            unreachable.isEmpty,
-            "These endpoints are not routable:\n\(unreachable.joined(separator: "\n"))"
-        )
+        // One annotation per endpoint so CI diagnostics are never truncated.
+        for entry in unreachable.sorted() {
+            XCTFail("Unroutable endpoint — \(entry)")
+        }
     }
 }

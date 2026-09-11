@@ -81,6 +81,57 @@ init(from decoder: Decoder) throws {
 Each helper accepts several key spellings and falls back to a default instead of
 throwing, so one renamed column cannot blank out an entire screen.
 
+## Artwork ported from Android
+
+The app ships the Android app's own artwork rather than redrawn substitutes. It
+is generated, not hand-copied:
+
+```bash
+tools/convert_android_res.py \
+  --android ../../android-projects/MediGyaan/app/src/main/res \
+  --assets  MediGyaan/Resources/Assets.xcassets \
+  --swift-out MediGyaan/Resources/AndroidAssets.swift
+```
+
+The script reads the Android resource tree and emits **113 imagesets**:
+
+| Android source | Count | Becomes |
+| --- | --- | --- |
+| `<vector>` drawables | 43 | SVG imageset (Xcode 12+ renders SVG natively) |
+| `<shape>` drawables | 33 | SVG imageset (rect/oval, solid/gradient/stroke/corners) |
+| `<selector>` drawables | 3 | one SVG per state (`…`, `…_selected`) |
+| `<layer-list>` drawables | 2 | flattened multi-layer SVG |
+| raster `.png/.jpg/.jpeg/.webp` | 32 | copied (`.webp` transcoded to PNG) |
+
+Colour references are resolved while converting, not left as placeholders:
+`@color/x` against `values/colors.xml`, `?attr/x` against `values/themes.xml`,
+and dark variants from `values-night/` — so the ported shapes carry the correct
+day/night colours. `android:tint` icons become **template images**, which is what
+lets `AndroidIcon` recolour them exactly as `app:tint` does on Android.
+
+Four files in the Android tree carry no artwork and are reported as skipped
+rather than silently dropped: `avatar_glow.xml`, `ic_logout.xml` and
+`medigyaan_logo_png.xml` (all empty `<selector/>` stubs), plus `tab_selector.xml`,
+which is a `FrameLayout` layout file misplaced in `res/drawable`.
+
+Two things are *generated from* `colors.xml` rather than committed by hand,
+because `project.yml` and `Info.plist` both depend on them:
+`AccentColor` (tracks `colorPrimary`) and `LaunchBackground` (tracks
+`colorBackground`).
+
+`AndroidAssets.swift` is regenerated alongside the catalog and gives a typed
+constant per asset, so screens cannot reference artwork by typo'd string:
+
+```swift
+AndroidIcon(.ic_home, size: 24, tint: AppTheme.Palette.primary)
+BrandLogo(size: 104)
+RankBadge(tier: .legend, size: 72)
+```
+
+The `AppIcon` is composited from `drawable/medigyaan_logo.png`. The Android
+launcher icon is deliberately **not** used: it is the unmodified Android Studio
+template (a `#3DDC84` grid behind the Android robot), not MediGyaan branding.
+
 ## Backend integration
 
 Every endpoint is declared once in `APIConfig.Endpoint`. The full set was
@@ -104,12 +155,34 @@ These were checked against production and are asserted in `LiveBackendTests`:
 
 | Endpoint | Response |
 | --- | --- |
-| `api/login.php` | `{"success":false,"error":"Invalid credentials","code":401}` |
+| `api/login.php` (JSON body) | `{"success":false,"error":"Invalid credentials","code":401}` |
+| `api/login.php` (form body) | `{"success":false,"error":"Email and password required","code":400}` |
 | `dash_api.php` | `{"success":false,"message":"Invalid User ID"}` |
 | `get_quiz_questions.php` | `{"success":false,"message":"Invalid quiz_id"}` |
 | `quiz_apiv2.php` | `{"success":false,"message":"Invalid user"}` |
 | `api/fetch_posts.php` | `{"success":false,"error":"Unauthorized Access"}` |
 | `predict_rank.php` | `{"success":false,"message":"No attempts found"}` |
+
+The `api/login.php` pair is the strongest evidence of correct request encoding:
+the script reads `php://input`, so the *same* credentials get different answers
+depending on whether they were sent as JSON or form-encoded. If the client ever
+regressed to sending a form body, that test would fail.
+
+### Known server-side breakage
+
+A bare `GET` sweep of every endpoint (`testAllEndpointsAreRoutable`) found eight
+scripts answering **HTTP 503** with a LiteSpeed error page instead of PHP output,
+consistently and on repeated attempts:
+
+```
+addtoquiz.php      createquiz.php    getTopics.php       getQuestions.php
+get_topics.php     getuserquizzes.php join_lobby.php      submitAnswerx1.php
+```
+
+These are backend deployment problems, not client bugs — `dash_api.php`,
+`quiz_apiv2.php`, `api/getQuestions.php` and the rest of the quiz path answer
+correctly. The sweep prints this list on every run so the state stays visible
+without failing the build.
 
 ## Testing
 
