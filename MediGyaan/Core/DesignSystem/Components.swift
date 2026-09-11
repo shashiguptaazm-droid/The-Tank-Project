@@ -1,5 +1,103 @@
 import SwiftUI
 
+// MARK: - Artwork ported from the Android app
+
+/// Renders a vector drawable ported from the Android app's `res/drawable`.
+///
+/// Icons Android paints with `android:tint` are exported as template images, so
+/// they recolour with `foregroundStyle` exactly as `app:tint` does on Android.
+/// Android's 24dp icon grid maps 1:1 onto points, so `size: 24` is the faithful
+/// default.
+struct AndroidIcon: View {
+    let asset: AndroidAsset
+    var size: CGFloat = 24
+    var tint: Color = AppTheme.Palette.textSecondary
+
+    init(_ asset: AndroidAsset, size: CGFloat = 24, tint: Color = AppTheme.Palette.textSecondary) {
+        self.asset = asset
+        self.size = size
+        self.tint = tint
+    }
+
+    var body: some View {
+        Image(asset.rawValue)
+            .renderingMode(AndroidAsset.templateIcons.contains(asset) ? .template : .original)
+            .resizable()
+            .scaledToFit()
+            .frame(width: size, height: size)
+            .foregroundStyle(tint)
+    }
+}
+
+/// The MediGyaan wordmark (`drawable/medigyaan_logo.png`), used by the splash
+/// and login screens in place of a generic cross glyph.
+struct BrandLogo: View {
+    var size: CGFloat = 96
+
+    var body: some View {
+        Image(AndroidAsset.medigyaan_logo.rawValue)
+            .resizable()
+            .scaledToFit()
+            .frame(width: size, height: size)
+            .accessibilityLabel("MediGyaan")
+    }
+}
+
+/// Rank tiers, matching the `ic_*` / `rank_*` drawables on Android.
+/// `ic_rookie`, `ic_beginner`, `ic_skilled`, `ic_warrior`, `ic_master`,
+/// `ic_legend` are the raster tier art; the `rank_*` / `badge_*` drawables are
+/// the vector equivalents.
+enum RankTier: String, CaseIterable {
+    case rookie
+    case beginner
+    case skilled
+    case warrior
+    case master
+    case legend
+
+    /// Portrait art for the tier.
+    var artwork: AndroidAsset {
+        switch self {
+        case .rookie: return .ic_rookie
+        case .beginner: return .ic_beginner
+        case .skilled: return .ic_skilled
+        case .warrior: return .ic_warrior
+        case .master: return .ic_master
+        case .legend: return .ic_legend
+        }
+    }
+
+    /// Vector medallion for the tier.
+    var badge: AndroidAsset {
+        switch self {
+        case .rookie: return .rank_rookie
+        case .beginner: return .rank_begginer
+        case .skilled: return .badge_skilled
+        case .warrior: return .badge_warrior
+        case .master: return .badge_master
+        case .legend: return .badge_legend
+        }
+    }
+
+    var title: String {
+        rawValue.prefix(1).uppercased() + rawValue.dropFirst()
+    }
+}
+
+/// Circular rank medallion, rendered from the ported vector badge.
+struct RankBadge: View {
+    let tier: RankTier
+    var size: CGFloat = 72
+
+    var body: some View {
+        Image(tier.badge.rawValue)
+            .resizable()
+            .scaledToFit()
+            .frame(width: size, height: size)
+            .accessibilityLabel("\(tier.title) rank")
+    }
+}
+
 // MARK: - Buttons
 
 /// Ports `AppMaterialButton`: 24dp corner radius, primary tint, no caps.

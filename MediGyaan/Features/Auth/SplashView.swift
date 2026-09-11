@@ -15,9 +15,15 @@ struct SplashView: View {
             .ignoresSafeArea()
 
             VStack(spacing: AppTheme.Spacing.md) {
-                Image(systemName: "cross.case.fill")
-                    .font(.system(size: 62, weight: .semibold))
-                    .foregroundStyle(.white)
+                // `drawable/medigyaan_logo.png` is a gold emblem on black, so it
+                // is presented as a rounded tile rather than a bare glyph.
+                BrandLogo(size: 104)
+                    .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 26, style: .continuous)
+                            .stroke(.white.opacity(0.18), lineWidth: 1)
+                    )
+                    .shadow(color: .black.opacity(0.25), radius: 18, y: 8)
                     .scaleEffect(isAnimating ? 1.0 : 0.86)
 
                 VStack(spacing: AppTheme.Spacing.xxs) {

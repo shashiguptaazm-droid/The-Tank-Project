@@ -49,9 +49,8 @@ struct LoginView: View {
 
     private var header: some View {
         VStack(spacing: AppTheme.Spacing.sm) {
-            Image(systemName: "cross.case.fill")
-                .font(.system(size: 46))
-                .foregroundStyle(AppTheme.Palette.primary)
+            BrandLogo(size: 88)
+                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
                 .padding(.top, AppTheme.Spacing.xl)
             Text("Welcome back")
                 .font(AppTheme.Font.largeTitle)

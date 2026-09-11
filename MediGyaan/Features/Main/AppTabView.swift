@@ -35,14 +35,26 @@ struct AppTabView: View {
             }
         }
 
-        /// SF Symbol closest to the Android drawable.
+        /// The exact vector drawable the Android menu item points at.
+        var asset: AndroidAsset {
+            switch self {
+            case .home: return .ic_home
+            case .poster: return .ic_description
+            case .search: return .ic_search
+            case .history: return .ic_feed
+            case .messages: return .ic_message
+            }
+        }
+
+        /// SF Symbol equivalent, retained for contexts that cannot take an
+        /// asset name (for example `Label` inside a `Menu`).
         var systemImage: String {
             switch self {
-            case .home: return "house.fill"                 // ic_home
-            case .poster: return "doc.text.image"           // ic_description
-            case .search: return "magnifyingglass"          // ic_search
-            case .history: return "clock.arrow.circlepath"  // ic_feed
-            case .messages: return "bubble.left.and.bubble.right.fill" // ic_message
+            case .home: return "house.fill"
+            case .poster: return "doc.text.image"
+            case .search: return "magnifyingglass"
+            case .history: return "clock.arrow.circlepath"
+            case .messages: return "bubble.left.and.bubble.right.fill"
             }
         }
     }
@@ -55,7 +67,8 @@ struct AppTabView: View {
                 destination(for: tab)
                     .tag(tab)
                     .tabItem {
-                        Label(tab.title, systemImage: tab.systemImage)
+                        // Uses the ported Android drawable, not an SF Symbol.
+                        Label(tab.title, image: tab.asset.rawValue)
                     }
             }
         }
