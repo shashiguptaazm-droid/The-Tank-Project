@@ -9,6 +9,7 @@ struct SocialHubView: View {
     private enum Section: String, CaseIterable, Identifiable {
         case feed = "Feed"
         case messages = "Messages"
+        case shared = "Shared MCQs"
 
         var id: String { rawValue }
     }
@@ -31,10 +32,12 @@ struct SocialHubView: View {
                     NewsFeedView()
                 case .messages:
                     MessengerView()
+                case .shared:
+                    SharedQuestionsView()
                 }
             }
             .screenBackground()
-            .navigationTitle("Social")
+            .navigationTitle("Community & Social")
         }
     }
 }

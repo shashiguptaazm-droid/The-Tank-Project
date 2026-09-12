@@ -45,6 +45,8 @@ struct DashboardView: View {
                 case .profile: ProfileView()
                 case .settings: SettingsView()
                 case .help: HelpView()
+                case .aiChat: AiChatView()
+                case .sharedQuestions: SharedQuestionsView()
                 }
             }
             .sheet(isPresented: $isShowingMenu) { drawer }
@@ -350,7 +352,7 @@ struct DashboardView: View {
         }
     }
 
-    /// Four `#132238` tiles with 30sp emoji.
+    /// Six `#132238` tiles with 30sp emoji.
     private var quickTiles: some View {
         LazyVGrid(
             columns: [
@@ -364,13 +366,23 @@ struct DashboardView: View {
             }
             .buttonStyle(.plain)
 
-            NavigationLink { HistoryView() } label: {
-                QuickTile(emoji: "📜", title: "History")
+            NavigationLink { AiChatView() } label: {
+                QuickTile(emoji: "🤖", title: "Medical AI")
             }
             .buttonStyle(.plain)
 
             NavigationLink { TopicsView() } label: {
                 QuickTile(emoji: "📚", title: "Subjects")
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink { SharedQuestionsView() } label: {
+                QuickTile(emoji: "📊", title: "Shared MCQs")
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink { HistoryView() } label: {
+                QuickTile(emoji: "📜", title: "History")
             }
             .buttonStyle(.plain)
 
@@ -431,6 +443,8 @@ struct DashboardView: View {
         NavigationStack {
             List {
                 Section {
+                    drawerLink("Medical AI Studio 🤖", .aiChat)
+                    drawerLink("Shared Questions Analytics 📊", .sharedQuestions)
                     drawerLink("Leaderboard", .leaderboard)
                     drawerLink("Thesis Studio", .thesis)
                     drawerLink("Rank Predictor", .predictor)
@@ -457,6 +471,7 @@ struct DashboardView: View {
     private enum DrawerDestination: Hashable {
         case leaderboard, thesis, predictor, referral, poster
         case profile, settings, help
+        case aiChat, sharedQuestions
     }
 
     private func drawerLink(_ title: String, _ destination: DrawerDestination) -> some View {

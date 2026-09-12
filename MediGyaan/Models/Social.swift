@@ -58,6 +58,75 @@ struct Post: Decodable, Identifiable, Hashable {
     }
 }
 
+/// A question shared by the user, tracked from `shared_api.php`.
+/// Ports `SharedQuestionModel` from Android's `SharedQuestionsActivity.kt`.
+struct SharedQuestion: Decodable, Identifiable, Hashable {
+    let id: Int
+    let question: String
+    let totalAttempts: Int
+    let totalCorrect: Int
+    let accuracy: Double
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.flexibleContainer()
+        id = container.flexInt("question_id", "id")
+        question = container.flexString("question", "question_text", "text")
+        totalAttempts = container.flexInt("total_attempts", "attempts", "count")
+        totalCorrect = container.flexInt("total_correct", "correct")
+        accuracy = container.flexDouble("accuracy", "accuracy_rate")
+    }
+
+    init(
+        id: Int,
+        question: String,
+        totalAttempts: Int = 0,
+        totalCorrect: Int = 0,
+        accuracy: Double = 0.0
+    ) {
+        self.id = id
+        self.question = question
+        self.totalAttempts = totalAttempts
+        self.totalCorrect = totalCorrect
+        self.accuracy = accuracy
+    }
+}
+
+/// A peer attempt record on a shared question from `attempts_api.php`.
+/// Ports `AttemptModel` from Android's `QuestionAttemptsActivity.kt`.
+struct QuestionAttemptPeer: Decodable, Identifiable, Hashable {
+    let id: String
+    let temporaryUserId: String
+    let userAnswer: String
+    let isCorrect: Bool
+    let name: String
+    let createdAt: String
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.flexibleContainer()
+        temporaryUserId = container.flexString("temporary_user_id", "user_id")
+        userAnswer = container.flexString("user_answer", "answer")
+        isCorrect = container.flexBool("is_correct")
+        name = container.flexString("name", "user_name", "student")
+        createdAt = container.flexString("created_at", "date", "time")
+        id = "\(temporaryUserId)_\(createdAt)"
+    }
+
+    init(
+        temporaryUserId: String,
+        userAnswer: String,
+        isCorrect: Bool,
+        name: String,
+        createdAt: String
+    ) {
+        self.temporaryUserId = temporaryUserId
+        self.userAnswer = userAnswer
+        self.isCorrect = isCorrect
+        self.name = name
+        self.createdAt = createdAt
+        self.id = "\(temporaryUserId)_\(createdAt)"
+    }
+}
+
 /// A comment on a post.
 struct Comment: Decodable, Identifiable, Hashable {
     let id: Int

@@ -11,6 +11,9 @@ struct QuizView: View {
 
     @StateObject private var viewModel: QuizViewModel
     @State private var isConfirmingSubmit = false
+    @State private var isShowingShareSheet = false
+    @State private var isShowingAskAiSheet = false
+    @State private var isShowingJumpSheet = false
 
     init(quiz: Quiz) {
         self.quiz = quiz
@@ -29,6 +32,54 @@ struct QuizView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .tabBar)
         .toolbar(.visible, for: .navigationBar)
+        .toolbar {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                if viewModel.currentQuestion != nil {
+                    // Audio Reader (TTS)
+                    Button {
+                        viewModel.toggleAudio()
+                    } label: {
+                        Image(systemName: viewModel.isSpeaking ? "speaker.wave.3.fill" : "speaker.wave.2")
+                            .foregroundStyle(viewModel.isSpeaking ? AppTheme.Palette.accent : AppTheme.Palette.primary)
+                    }
+
+                    // Ask AI Assistant
+                    Button {
+                        isShowingAskAiSheet = true
+                    } label: {
+                        Image(systemName: "brain.head.profile")
+                            .foregroundStyle(AppTheme.Palette.primary)
+                    }
+
+                    // Share Question
+                    Button {
+                        isShowingShareSheet = true
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+
+                    // Question Grid Jump
+                    Button {
+                        isShowingJumpSheet = true
+                    } label: {
+                        Image(systemName: "square.grid.3x3")
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $isShowingShareSheet) {
+            if let question = viewModel.currentQuestion {
+                QuestionShareSheet(question: question, userId: session.userId)
+            }
+        }
+        .sheet(isPresented: $isShowingAskAiSheet) {
+            if let question = viewModel.currentQuestion {
+                AskAiSheet(question: question)
+            }
+        }
+        .sheet(isPresented: $isShowingJumpSheet) {
+            jumpGridSheet
+        }
         .task {
             // `@StateObject` is built before the environment exists, so the API
             // client and session user are supplied here instead.
@@ -72,6 +123,11 @@ struct QuizView: View {
                     if let question = viewModel.currentQuestion {
                         questionCard(question)
                         optionsList(question)
+
+                        // Explanation card appears once answered
+                        if viewModel.isQuestionAnswered(question) {
+                            explanationCard(question)
+                        }
                     }
                 }
                 .padding(AppTheme.Spacing.md)
@@ -82,7 +138,7 @@ struct QuizView: View {
         .screenBackground()
     }
 
-    // MARK: - Header
+    // MARK: - Header with Gamification Badges
 
     private var header: some View {
         VStack(spacing: AppTheme.Spacing.sm) {
@@ -90,6 +146,34 @@ struct QuizView: View {
                 Text("Question \(viewModel.currentIndex + 1) of \(viewModel.questions.count)")
                     .font(AppTheme.Font.caption.weight(.medium))
                     .foregroundStyle(AppTheme.Palette.textSecondary)
+
+                // Combo streak badge
+                if viewModel.combo > 1 {
+                    HStack(spacing: 3) {
+                        Text("🔥")
+                        Text("\(viewModel.combo) Streak")
+                            .font(.system(size: 11, weight: .bold))
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.orange.opacity(0.18))
+                    .foregroundStyle(Color.orange)
+                    .clipShape(Capsule())
+                }
+
+                // XP badge
+                if viewModel.expEarned > 0 {
+                    HStack(spacing: 3) {
+                        Text("⭐")
+                        Text("+\(viewModel.expEarned) XP")
+                            .font(.system(size: 11, weight: .bold))
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.blue.opacity(0.15))
+                    .foregroundStyle(AppTheme.Palette.primary)
+                    .clipShape(Capsule())
+                }
 
                 Spacer()
 
@@ -114,7 +198,7 @@ struct QuizView: View {
         .background(AppTheme.Palette.cardBackground)
     }
 
-    // MARK: - Question
+    // MARK: - Question Card
 
     private func questionCard(_ question: Question) -> some View {
         CardContainer {
@@ -145,18 +229,149 @@ struct QuizView: View {
         }
     }
 
-    /// Uses `OptionRow`, which ports `PrepLadderOptionStyle` +
-    /// `option_selector_rounded` (12dp radius, 16dp padding, 16sp text and a
-    /// 2dp `@color/primary` stroke when checked).
+    // MARK: - Options List with Instant Review
+
     private func optionsList(_ question: Question) -> some View {
         VStack(spacing: 0) {
             ForEach(Array(question.options.enumerated()), id: \.offset) { index, option in
                 OptionRow(
                     text: option,
                     index: index,
-                    isSelected: viewModel.selectedIndex(for: question) == index
+                    isSelected: viewModel.selectedIndex(for: question) == index,
+                    reviewState: optionReviewState(for: question, index: index)
                 ) {
-                    viewModel.answer(selectedIndex: index, question: question)
+                    viewModel.selectOption(index: index, question: question)
+                }
+            }
+        }
+    }
+
+    private func optionReviewState(for question: Question, index: Int) -> OptionReviewState {
+        guard let answer = viewModel.answers[question.id] else { return .neutral }
+        if index == question.correctIndex {
+            return .correct
+        } else if index == answer.selectedIndex {
+            return .wrong
+        }
+        return .neutral
+    }
+
+    // MARK: - Explanation Card
+
+    private func explanationCard(_ question: Question) -> some View {
+        CardContainer {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                HStack {
+                    Label("Clinical Explanation", systemImage: "lightbulb.fill")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(Color(hex: 0x2E_7D_32))
+
+                    Spacer()
+
+                    Button {
+                        isShowingAskAiSheet = true
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "brain.head.profile")
+                            Text("Ask AI")
+                        }
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(Color(hex: 0x39_49_AB))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Color(hex: 0xE8_EA_F6))
+                        .clipShape(Capsule())
+                    }
+                }
+
+                Text(question.explanation.isEmpty
+                    ? "Correct option: \(question.correctOption ?? "A"). Review the topic thoroughly in your MediGyaan notes."
+                    : question.explanation)
+                    .font(AppTheme.Font.body)
+                    .foregroundStyle(AppTheme.Palette.textPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Divider()
+
+                HStack {
+                    Button {
+                        isShowingShareSheet = true
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "square.and.arrow.up")
+                            Text("Share MCQ Card")
+                        }
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(AppTheme.Palette.primary)
+                    }
+
+                    Spacer()
+
+                    Button {
+                        viewModel.toggleAudio()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: viewModel.isSpeaking ? "speaker.wave.3.fill" : "speaker.wave.2")
+                            Text(viewModel.isSpeaking ? "Stop" : "Listen")
+                        }
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(AppTheme.Palette.textSecondary)
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Jump Grid Sheet
+
+    private var jumpGridSheet: some View {
+        NavigationStack {
+            ScrollView {
+                LazyVGrid(
+                    columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 5),
+                    spacing: 12
+                ) {
+                    ForEach(Array(viewModel.questions.enumerated()), id: \.offset) { index, q in
+                        let isAnswered = viewModel.isQuestionAnswered(q)
+                        let isCorrect = viewModel.answers[q.id]?.isCorrect ?? false
+                        let isCurrent = viewModel.currentIndex == index
+
+                        Button {
+                            viewModel.jump(to: index)
+                            isShowingJumpSheet = false
+                        } label: {
+                            Text("\(index + 1)")
+                                .font(.system(size: 15, weight: .bold))
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 48)
+                                .background(
+                                    isAnswered
+                                        ? (isCorrect ? AppTheme.Palette.success.opacity(0.18) : AppTheme.Palette.danger.opacity(0.18))
+                                        : Color.primary.opacity(0.06)
+                                )
+                                .foregroundStyle(
+                                    isAnswered
+                                        ? (isCorrect ? AppTheme.Palette.success : AppTheme.Palette.danger)
+                                        : AppTheme.Palette.textPrimary
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(
+                                            isCurrent ? AppTheme.Palette.primary : Color.clear,
+                                            lineWidth: 2
+                                        )
+                                )
+                        }
+                    }
+                }
+                .padding()
+            }
+            .navigationTitle("Jump to Question")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { isShowingJumpSheet = false }
                 }
             }
         }

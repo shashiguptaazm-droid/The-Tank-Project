@@ -1,15 +1,12 @@
 import Foundation
+import AVFoundation
+import UIKit
 
-/// Drives a quiz attempt: question delivery, timing, scoring, and sync.
-///
-/// Consolidates the logic spread across the Android `QuizManagerActivity`,
-/// `QuizViewerActivity`, `MCQActivity`, and `TestActivity`.
-///
-/// The API client and user id arrive through `start(api:userId:)` rather than
-/// `init`, because a `@StateObject` is constructed before the SwiftUI
-/// environment (and therefore the session) is available.
+/// Drives an MCQ practice / quiz session: question delivery, timing, instant scoring,
+/// audio reading (TTS), combo streaks, and backend synchronization.
+/// Ports the full behavior of Android's `MCQActivity.kt`.
 @MainActor
-final class QuizViewModel: ObservableObject {
+final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
 
     @Published private(set) var state: LoadState<QuizSession> = .idle
     @Published private(set) var currentIndex: Int = 0
@@ -18,14 +15,23 @@ final class QuizViewModel: ObservableObject {
     @Published private(set) var isSubmitting = false
     @Published private(set) var result: QuizAttempt?
 
+    // Gamification & instant feedback (mirrors MCQActivity.kt)
+    @Published private(set) var combo: Int = 0
+    @Published private(set) var expEarned: Int = 0
+    @Published private(set) var isAnswerRevealed: Bool = false
+    @Published private(set) var isSpeaking: Bool = false
+
     private let quiz: Quiz
     private var api: MediGyaanAPI = .live
     private var userId: Int = 0
     private var startedAt = Date()
     private var timerTask: Task<Void, Never>?
+    private let speechSynthesizer = AVSpeechSynthesizer()
 
     init(quiz: Quiz) {
         self.quiz = quiz
+        super.init()
+        speechSynthesizer.delegate = self
     }
 
     // MARK: - Derived state
@@ -61,16 +67,16 @@ final class QuizViewModel: ObservableObject {
         answers[question.id]?.selectedIndex
     }
 
+    func isQuestionAnswered(_ question: Question) -> Bool {
+        answers[question.id] != nil
+    }
+
     // MARK: - Lifecycle
 
-    /// Fetches the questions and starts the countdown.
     func start(api: MediGyaanAPI, userId: Int) async {
         self.api = api
         self.userId = userId
 
-        // Assigns rather than using the mutating `load`, because `@Published` is
-        // a property wrapper and its wrapped value cannot be held `inout`
-        // across a suspension point.
         state = await LoadState.result { [api, quiz] in
             let questions = try await api.study.questions(quizId: quiz.id)
             return QuizSession(
@@ -86,7 +92,10 @@ final class QuizViewModel: ObservableObject {
         startedAt = Date()
         currentIndex = 0
         answers = [:]
-        // Fall back to a minute per question when the quiz has no time limit.
+        combo = 0
+        expEarned = 0
+        isAnswerRevealed = false
+
         secondsRemaining = session.durationSeconds > 0
             ? session.durationSeconds
             : session.questions.count * 60
@@ -109,36 +118,108 @@ final class QuizViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Answering
+    // MARK: - Answering & Instant Review (MCQActivity style)
 
-    /// Records an answer for a question.
-    func answer(selectedIndex: Int, question: Question) {
+    /// Submits an answer with immediate validation, combo increment, and haptic feedback.
+    func selectOption(index: Int, question: Question) {
+        guard answers[question.id] == nil else { return } // Already answered
+
+        let isCorrect = (index == question.correctIndex)
         answers[question.id] = AttemptAnswer(
             questionId: question.id,
-            selectedIndex: selectedIndex,
+            selectedIndex: index,
             correctIndex: question.correctIndex
         )
+        isAnswerRevealed = true
+
+        // Gamification logic matching MCQActivity.kt
+        if isCorrect {
+            combo += 1
+            expEarned += 10 + (combo * 2)
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        } else {
+            combo = 0
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+        }
+
+        // Background sync to submitAnswerx1.php (fire-and-forget)
+        Task {
+            let optionLetters = ["A", "B", "C", "D", "E"]
+            let letter = optionLetters.indices.contains(index) ? optionLetters[index] : "\(index + 1)"
+            let params = [
+                "question_id": String(question.id),
+                "answer": letter,
+                "user_id": String(userId)
+            ]
+            _ = try? await api.study.syncUserCache(UserCachePayload(formFields: params))
+        }
     }
 
     func goToNext() {
+        stopAudio()
         guard !isLastQuestion else { return }
         currentIndex += 1
+        isAnswerRevealed = (currentQuestion.flatMap { answers[$0.id] } != nil)
     }
 
     func goToPrevious() {
+        stopAudio()
         guard currentIndex > 0 else { return }
         currentIndex -= 1
+        isAnswerRevealed = (currentQuestion.flatMap { answers[$0.id] } != nil)
     }
 
     func jump(to index: Int) {
+        stopAudio()
         guard questions.indices.contains(index) else { return }
         currentIndex = index
+        isAnswerRevealed = (currentQuestion.flatMap { answers[$0.id] } != nil)
+    }
+
+    // MARK: - Audio Reader (TTS)
+
+    func toggleAudio() {
+        if isSpeaking {
+            stopAudio()
+        } else if let q = currentQuestion {
+            speak(question: q)
+        }
+    }
+
+    private func speak(question: Question) {
+        stopAudio()
+        let cleanText = question.text.replacingOccurrences(of: #"^\d+[.\s\-)\]]+\s*"#, with: "", options: .regularExpression)
+        var speech = "Question: \(cleanText). "
+        let letters = ["A", "B", "C", "D", "E"]
+        for (i, opt) in question.options.enumerated() {
+            let l = letters.indices.contains(i) ? letters[i] : "\(i + 1)"
+            speech += "Option \(l): \(opt). "
+        }
+
+        let utterance = AVSpeechUtterance(string: speech)
+        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        utterance.rate = AVSpeechUtteranceDefaultSpeechRate
+        speechSynthesizer.speak(utterance)
+        isSpeaking = true
+    }
+
+    func stopAudio() {
+        if speechSynthesizer.isSpeaking {
+            speechSynthesizer.stopSpeaking(at: .immediate)
+        }
+        isSpeaking = false
+    }
+
+    nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        Task { @MainActor in
+            self.isSpeaking = false
+        }
     }
 
     // MARK: - Submission
 
-    /// Builds the attempt, shows the result, and syncs it to the backend.
     func finish() async {
+        stopAudio()
         guard result == nil, !isSubmitting else { return }
         isSubmitting = true
         timerTask?.cancel()
@@ -153,13 +234,11 @@ final class QuizViewModel: ObservableObject {
             finishedAt: Date()
         )
         result = attempt
-
-        // A failed sync must not block the result screen; the Android app also
-        // treated this as best-effort.
         _ = try? await api.study.syncAttempt(attempt)
     }
 
     deinit {
         timerTask?.cancel()
+        speechSynthesizer.stopSpeaking(at: .immediate)
     }
 }

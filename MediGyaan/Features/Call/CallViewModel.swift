@@ -1,6 +1,41 @@
+import AudioToolbox
 import AVFoundation
 import LiveKit
 import SwiftUI
+import UIKit
+
+/// Manages ringing and dialing tones for audio and video calls.
+/// Mirrors Android's `CallRingtoneManager.kt`.
+@MainActor
+final class CallRingtoneHelper {
+    static let shared = CallRingtoneHelper()
+    private var timer: Timer?
+    private var isRinging = false
+
+    func start() {
+        guard !isRinging else { return }
+        isRinging = true
+        tick()
+        timer = Timer.scheduledTimer(withTimeInterval: 3.2, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.tick()
+            }
+        }
+    }
+
+    private func tick() {
+        guard isRinging else { return }
+        // Standard telephony call signaling tone in iOS
+        AudioServicesPlaySystemSound(1005)
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+    }
+
+    func stop() {
+        isRinging = false
+        timer?.invalidate()
+        timer = nil
+    }
+}
 
 /// Drives a LiveKit call: connects the `Room`, tracks the local media state, and
 /// exposes the in-call controls.
@@ -78,6 +113,9 @@ final class CallViewModel: ObservableObject {
                 displayName: displayName
             )
 
+            // Start dialing ringtone while connecting & waiting for peer
+            CallRingtoneHelper.shared.start()
+
             try await room.connect(url: token.url, token: token.token)
             phase = .connected
 
@@ -85,6 +123,7 @@ final class CallViewModel: ObservableObject {
             // already in effect.
             await publishInitialMedia()
         } catch {
+            CallRingtoneHelper.shared.stop()
             let message = (error as? APIError)?.errorDescription ?? error.localizedDescription
             errorMessage = message
             phase = .ended(reason: message)
@@ -119,6 +158,7 @@ final class CallViewModel: ObservableObject {
     /// Leaves the room. Idempotent, so it is safe from both the hang-up button
     /// and `onDisappear`.
     func end() async {
+        CallRingtoneHelper.shared.stop()
         if room.connectionState != .disconnected {
             await room.disconnect()
         }

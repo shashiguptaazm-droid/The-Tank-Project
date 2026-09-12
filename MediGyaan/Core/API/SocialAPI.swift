@@ -115,6 +115,40 @@ struct SocialAPI {
             as: Acknowledgment.self
         )
     }
+
+    /// Loads questions shared by the user (`shared_api.php?user_id=X`).
+    func sharedQuestions(userId: Int) async throws -> [SharedQuestion] {
+        struct Wrapper: Decodable {
+            let items: [SharedQuestion]
+            init(from decoder: Decoder) throws {
+                let container = try decoder.flexibleContainer()
+                items = container.flexArray("questions", "data", "results")
+            }
+        }
+        let wrapper = try await client.get(
+            .shared,
+            query: ["user_id": String(userId)],
+            as: Wrapper.self
+        )
+        return wrapper.items
+    }
+
+    /// Loads peer attempts on a shared question (`attempts_api.php?question_id=X&user_id=Y`).
+    func questionAttempts(questionId: Int, userId: Int) async throws -> [QuestionAttemptPeer] {
+        struct Wrapper: Decodable {
+            let items: [QuestionAttemptPeer]
+            init(from decoder: Decoder) throws {
+                let container = try decoder.flexibleContainer()
+                items = container.flexArray("attempts", "data", "results")
+            }
+        }
+        let wrapper = try await client.get(
+            .attempts,
+            query: ["question_id": String(questionId), "user_id": String(userId)],
+            as: Wrapper.self
+        )
+        return wrapper.items
+    }
 }
 
 /// Rank prediction and college lookup.

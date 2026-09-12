@@ -79,6 +79,14 @@ private struct CallRoomContent: View {
                 break
             }
         }
+        .onChange(of: model.hasRemoteParticipant) { hasRemote in
+            if hasRemote {
+                CallRingtoneHelper.shared.stop()
+            }
+        }
+        .onDisappear {
+            CallRingtoneHelper.shared.stop()
+        }
     }
 
     // MARK: - States
@@ -148,7 +156,20 @@ private struct CallRoomContent: View {
         let participants = model.remoteParticipants
 
         if participants.isEmpty {
-            waitingView
+            if model.kind == .video, let track = model.localCameraTrack {
+                // WhatsApp-style: Full-screen local camera preview while ringing
+                ZStack {
+                    SwiftUIVideoView(track, layoutMode: .fill, mirrorMode: .auto)
+                        .ignoresSafeArea()
+
+                    Color.black.opacity(0.35)
+                        .ignoresSafeArea()
+
+                    waitingView
+                }
+            } else {
+                waitingView
+            }
         } else if participants.count == 1, let track = participants[0].firstCameraVideoTrack {
             SwiftUIVideoView(track, layoutMode: .fill)
                 .ignoresSafeArea()
@@ -200,10 +221,21 @@ private struct CallRoomContent: View {
                 strokeColor: AppTheme.Ink.teal,
                 strokeWidth: 2
             )
-            Text("Waiting for \(model.peerName) to join…")
-                .font(AppTheme.Font.callout)
-                .foregroundStyle(.white.opacity(0.85))
-                .multilineTextAlignment(.center)
+            
+            VStack(spacing: 6) {
+                Text(model.peerName)
+                    .font(AppTheme.Font.title.weight(.bold))
+                    .foregroundStyle(.white)
+
+                HStack(spacing: 8) {
+                    ProgressView()
+                        .tint(.white)
+                        .scaleEffect(0.8)
+                    Text("Ringing…")
+                        .font(AppTheme.Font.callout.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.85))
+                }
+            }
         }
         .padding(AppTheme.Spacing.xxl)
     }
@@ -212,16 +244,18 @@ private struct CallRoomContent: View {
 
     @ViewBuilder
     private var localPreview: some View {
-        if model.cameraEnabled, let track = model.localCameraTrack {
-            // `.auto` mirrors the front camera, matching every other video app.
+        // Floating PiP card is only displayed once remote participant connects
+        if model.hasRemoteParticipant, model.cameraEnabled, let track = model.localCameraTrack {
+            // `.auto` mirrors the front camera, matching WhatsApp and FaceTime.
             SwiftUIVideoView(track, layoutMode: .fill, mirrorMode: .auto)
-                .frame(width: 104, height: 148)
+                .frame(width: 108, height: 154)
                 .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
-                        .stroke(.white.opacity(0.25), lineWidth: 1)
+                        .stroke(.white.opacity(0.35), lineWidth: 1.5)
                 )
-                .shadow(color: .black.opacity(0.4), radius: 8, y: 3)
+                .shadow(color: .black.opacity(0.5), radius: 10, y: 4)
+                .transition(.scale.combined(with: .opacity))
         }
     }
 

@@ -272,14 +272,25 @@ struct SectionHeader: View {
 // MARK: - MCQ options
 
 /// Ports `PrepLadderOptionStyle` + `option_selector_rounded`:
+/// Instant grading feedback states for MCQ options matching Android's MCQActivity.
+enum OptionReviewState: Equatable {
+    case neutral
+    case correct
+    case wrong
+}
+
+/// Ports `PrepLadderOptionStyle` + `option_selector_rounded`:
 /// 12dp radius, 16dp padding, 16sp text, 12dp bottom margin.
 ///
 /// * default — `?attr/colorSurface` fill with a 1dp `@color/divider` stroke
 /// * checked — `@color/primary_variant` fill with a 2dp `@color/primary` stroke
+/// * correct — Light green fill with 2dp success stroke and checkmark
+/// * wrong — Light red fill with 2dp danger stroke and xmark
 struct OptionRow: View {
     let text: String
     let index: Int
     let isSelected: Bool
+    var reviewState: OptionReviewState = .neutral
     let action: () -> Void
 
     var body: some View {
@@ -287,39 +298,91 @@ struct OptionRow: View {
             HStack(alignment: .top, spacing: AppTheme.Spacing.sm) {
                 Text(optionLetter)
                     .font(AppTheme.Font.body.weight(.bold))
-                    .foregroundStyle(isSelected
-                        ? AppTheme.Palette.onPrimary
-                        : AppTheme.Palette.textSecondary)
+                    .foregroundStyle(letterColor)
                     .frame(width: 22, alignment: .leading)
 
                 Text(text)
                     .font(AppTheme.Font.body)
-                    .foregroundStyle(isSelected
-                        ? AppTheme.Palette.onPrimary
-                        : AppTheme.Palette.textPrimary)
+                    .foregroundStyle(textColor)
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Spacer(minLength: 0)
+
+                if reviewState == .correct {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 20))
+                        .foregroundStyle(AppTheme.Palette.success)
+                } else if reviewState == .wrong {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 20))
+                        .foregroundStyle(AppTheme.Palette.danger)
+                }
             }
             .padding(AppTheme.Spacing.lg)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: AppTheme.Radius.option, style: .continuous)
-                    .fill(isSelected
-                        ? AppTheme.Palette.primaryVariant
-                        : AppTheme.Palette.optionBackground)
+                    .fill(backgroundColor)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: AppTheme.Radius.option, style: .continuous)
-                    .stroke(
-                        isSelected ? AppTheme.Palette.primary : AppTheme.Palette.optionStroke,
-                        lineWidth: isSelected ? 2 : 1
-                    )
+                    .stroke(borderColor, lineWidth: strokeWidth)
             )
         }
         .buttonStyle(.plain)
         .padding(.bottom, AppTheme.Spacing.optionGap)
+    }
+
+    private var letterColor: Color {
+        switch reviewState {
+        case .correct:
+            return AppTheme.Palette.success
+        case .wrong:
+            return AppTheme.Palette.danger
+        case .neutral:
+            return isSelected ? AppTheme.Palette.onPrimary : AppTheme.Palette.textSecondary
+        }
+    }
+
+    private var textColor: Color {
+        switch reviewState {
+        case .correct:
+            return AppTheme.Palette.textPrimary
+        case .wrong:
+            return AppTheme.Palette.danger
+        case .neutral:
+            return isSelected ? AppTheme.Palette.onPrimary : AppTheme.Palette.textPrimary
+        }
+    }
+
+    private var backgroundColor: Color {
+        switch reviewState {
+        case .correct:
+            return AppTheme.Palette.success.opacity(0.12)
+        case .wrong:
+            return AppTheme.Palette.danger.opacity(0.12)
+        case .neutral:
+            return isSelected ? AppTheme.Palette.primaryVariant : AppTheme.Palette.optionBackground
+        }
+    }
+
+    private var borderColor: Color {
+        switch reviewState {
+        case .correct:
+            return AppTheme.Palette.success
+        case .wrong:
+            return AppTheme.Palette.danger
+        case .neutral:
+            return isSelected ? AppTheme.Palette.primary : AppTheme.Palette.optionStroke
+        }
+    }
+
+    private var strokeWidth: CGFloat {
+        if reviewState != .neutral || isSelected {
+            return 2
+        }
+        return 1
     }
 
     /// A / B / C / D like the Android radiogroup.
