@@ -164,7 +164,9 @@ class LiveKitCallActivity : AppCompatActivity() {
         } else {
             cameraButton.visibility = View.VISIBLE
             flipCameraButton.visibility = View.VISIBLE
+            audioPlaceholder.visibility = View.GONE
             localVideoContainer.visibility = View.VISIBLE
+            setLocalPipFullScreen(true) // Start local camera in full-screen (WhatsApp style)
             isSpeakerOn = true
         }
         updateSpeakerUI()
@@ -267,20 +269,28 @@ class LiveKitCallActivity : AppCompatActivity() {
                 newRoom.initVideoRenderer(localVideoView)
                 newRoom.initVideoRenderer(remoteVideoView)
 
+                localVideoView.setEnableHardwareScaler(true)
+                localVideoView.setMirror(true)
+                remoteVideoView.setEnableHardwareScaler(true)
+
                 // Setup audio routing
                 configureAudioRouting()
 
-                // 3. Connect to WebSocket
-                newRoom.connect(WS_URL, token)
-
-                // 4. Publish local media tracks
-                newRoom.localParticipant.setMicrophoneEnabled(true)
+                // 3. Immediately start local camera preview (WhatsApp style)
                 if (isVideoCall) {
+                    audioPlaceholder.visibility = View.GONE
+                    setLocalPipFullScreen(true)
                     newRoom.localParticipant.setCameraEnabled(true)
                     attachLocalVideoTrack()
                 }
 
-                // 5. Collect room events
+                // 4. Connect to WebSocket
+                newRoom.connect(WS_URL, token)
+
+                // 5. Publish local microphone
+                newRoom.localParticipant.setMicrophoneEnabled(true)
+
+                // 6. Collect room events
                 observeRoomEvents(newRoom)
 
                 // Check if remote peer is already in the room
@@ -322,6 +332,9 @@ class LiveKitCallActivity : AppCompatActivity() {
                             track.addRenderer(remoteVideoView)
                             remoteVideoView.visibility = View.VISIBLE
                             audioPlaceholder.visibility = View.GONE
+                            if (isVideoCall) {
+                                setLocalPipFullScreen(false) // Shrink local camera to top-right PiP!
+                            }
                         }
                     }
                     is RoomEvent.TrackUnsubscribed -> {
@@ -329,9 +342,16 @@ class LiveKitCallActivity : AppCompatActivity() {
                         if (track is VideoTrack) {
                             track.removeRenderer(remoteVideoView)
                             remoteVideoView.visibility = View.GONE
-                            if (!isVideoCall) {
+                            if (isVideoCall) {
+                                setLocalPipFullScreen(true) // Expand local camera back to full-screen
+                            } else {
                                 audioPlaceholder.visibility = View.VISIBLE
                             }
+                        }
+                    }
+                    is RoomEvent.TrackPublished -> {
+                        if (event.publication.track is VideoTrack) {
+                            attachLocalVideoTrack()
                         }
                     }
                     is RoomEvent.ParticipantConnected -> {
@@ -425,11 +445,41 @@ class LiveKitCallActivity : AppCompatActivity() {
     }
 
     private fun attachLocalVideoTrack() {
-        val camPub = room?.localParticipant?.getTrackPublication(Track.Source.CAMERA)
-        val track = camPub?.track as? VideoTrack
-        if (track != null) {
-            track.addRenderer(localVideoView)
-            localVideoContainer.visibility = View.VISIBLE
+        scope.launch {
+            for (i in 0 until 15) {
+                val camPub = room?.localParticipant?.getTrackPublication(Track.Source.CAMERA)
+                val track = camPub?.track as? VideoTrack
+                if (track != null) {
+                    track.addRenderer(localVideoView)
+                    localVideoContainer.visibility = if (isCameraOff) View.GONE else View.VISIBLE
+                    break
+                }
+                delay(120)
+            }
+        }
+    }
+
+    private fun setLocalPipFullScreen(isFull: Boolean) {
+        runOnUiThread {
+            val params = localVideoContainer.layoutParams as? FrameLayout.LayoutParams ?: return@runOnUiThread
+            if (isFull) {
+                params.width = FrameLayout.LayoutParams.MATCH_PARENT
+                params.height = FrameLayout.LayoutParams.MATCH_PARENT
+                params.setMargins(0, 0, 0, 0)
+                localVideoContainer.background = null
+                localVideoContainer.elevation = 0f
+                localVideoView.setZOrderMediaOverlay(false)
+            } else {
+                val density = resources.displayMetrics.density
+                params.width = (120 * density).toInt()
+                params.height = (160 * density).toInt()
+                params.setMargins(0, (50 * density).toInt(), (16 * density).toInt(), 0)
+                params.gravity = android.view.Gravity.TOP or android.view.Gravity.END
+                localVideoContainer.setBackgroundResource(R.drawable.bg_pip_border)
+                localVideoContainer.elevation = 6f * density
+                localVideoView.setZOrderMediaOverlay(true)
+            }
+            localVideoContainer.layoutParams = params
         }
     }
 
