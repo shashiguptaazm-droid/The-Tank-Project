@@ -189,6 +189,14 @@ class MCQActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             val parsed = qParam?.toIntOrNull()
             if (parsed != null && parsed > 0) return parsed
         }
+        if (intent?.action == Intent.ACTION_SEND) {
+            val text = intent.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+            val match = Regex("""(?:question_id|id)[=\/](\d+)""").find(text)
+            if (match != null) {
+                val id = match.groupValues[1].toIntOrNull()
+                if (id != null && id > 0) return id
+            }
+        }
         val value = intent.extras?.get("question_id") ?: return 0
         return when (value) {
             is Int -> value
@@ -1459,7 +1467,9 @@ private class QuestionPickerAdapter(
             (questionImageView.drawable as? android.graphics.drawable.BitmapDrawable)?.bitmap
         } else null
 
-        val sheet = QuestionShareBottomSheet.newInstance(shareData, attachedBitmap)
+        val sheet = QuestionShareBottomSheet.newInstance(shareData, attachedBitmap) {
+            addQuestionToQuiz()
+        }
         sheet.show(supportFragmentManager, QuestionShareBottomSheet.TAG)
     }
 

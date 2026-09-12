@@ -11,6 +11,7 @@ import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.checkbox.MaterialCheckBox
 
 class QuestionShareBottomSheet : BottomSheetDialogFragment() {
@@ -18,17 +19,20 @@ class QuestionShareBottomSheet : BottomSheetDialogFragment() {
     private var shareData: QuestionShareHelper.QuestionShareData? = null
     private var attachedBitmap: Bitmap? = null
     private var shareAsImage: Boolean = true
+    var onAddToQuizRequested: (() -> Unit)? = null
 
     companion object {
         const val TAG = "QuestionShareBottomSheet"
 
         fun newInstance(
             data: QuestionShareHelper.QuestionShareData,
-            bitmap: Bitmap? = null
+            bitmap: Bitmap? = null,
+            onAddToQuiz: (() -> Unit)? = null
         ): QuestionShareBottomSheet {
             val sheet = QuestionShareBottomSheet()
             sheet.shareData = data
             sheet.attachedBitmap = bitmap
+            sheet.onAddToQuizRequested = onAddToQuiz
             return sheet
         }
     }
@@ -56,6 +60,9 @@ class QuestionShareBottomSheet : BottomSheetDialogFragment() {
         val txtPreviewQuestion = view.findViewById<TextView>(R.id.txtPreviewQuestion)
         val txtPreviewOptions = view.findViewById<TextView>(R.id.txtPreviewOptions)
 
+        val btnMediGyaanCard = view.findViewById<MaterialCardView>(R.id.btnShareMediGyaanCard)
+        val btnMediGyaanGrid = view.findViewById<LinearLayout>(R.id.btnShareMediGyaan)
+
         val btnWhatsApp = view.findViewById<LinearLayout>(R.id.btnShareWhatsApp)
         val btnTelegram = view.findViewById<LinearLayout>(R.id.btnShareTelegram)
         val btnInstagram = view.findViewById<LinearLayout>(R.id.btnShareInstagram)
@@ -64,6 +71,7 @@ class QuestionShareBottomSheet : BottomSheetDialogFragment() {
         val btnLinkedIn = view.findViewById<LinearLayout>(R.id.btnShareLinkedIn)
         val btnSMS = view.findViewById<LinearLayout>(R.id.btnShareSMS)
         val btnCopy = view.findViewById<LinearLayout>(R.id.btnShareCopy)
+        val btnMoreGrid = view.findViewById<LinearLayout>(R.id.btnShareMoreGrid)
         val btnMore = view.findViewById<MaterialButton>(R.id.btnShareMore)
 
         // Subtitle & preview
@@ -99,6 +107,15 @@ class QuestionShareBottomSheet : BottomSheetDialogFragment() {
                 shareAsImage = (checkedId == R.id.btnFormatImage)
             }
         }
+
+        val onMediGyaanClick = View.OnClickListener {
+            val ctx = context ?: return@OnClickListener
+            QuestionShareHelper.showMediGyaanShareDialog(ctx, data, chkIncludeAnswer.isChecked, onAddToQuizRequested)
+            dismiss()
+        }
+
+        btnMediGyaanCard?.setOnClickListener(onMediGyaanClick)
+        btnMediGyaanGrid?.setOnClickListener(onMediGyaanClick)
 
         btnWhatsApp.setOnClickListener {
             val ctx = context ?: return@setOnClickListener
@@ -145,6 +162,12 @@ class QuestionShareBottomSheet : BottomSheetDialogFragment() {
         btnCopy.setOnClickListener {
             val ctx = context ?: return@setOnClickListener
             QuestionShareHelper.copyToClipboard(ctx, data, chkIncludeAnswer.isChecked)
+            dismiss()
+        }
+
+        btnMoreGrid?.setOnClickListener {
+            val ctx = context ?: return@setOnClickListener
+            QuestionShareHelper.shareChooser(ctx, data, shareAsImage, chkIncludeAnswer.isChecked, attachedBitmap)
             dismiss()
         }
 

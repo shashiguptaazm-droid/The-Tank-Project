@@ -176,6 +176,71 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Featured In-App Share (MediGyaan) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnShareMediGyaanCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardBackgroundColor="#EEF2FF"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#C7D2FE"
+            app:strokeWidth="1.5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_social_medigyaan">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center"
+                        android:src="@mipmap/ic_launcher" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Share in MediGyaan"
+                        android:textColor="#1E1B4B"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Community Feed • 1v1 Battle • My Quizzes"
+                        android:textColor="#4F46E5"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="#4338CA" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Social Channels Section Title -->
         <TextView
             android:layout_width="wrap_content"
@@ -186,13 +251,48 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
-        <!-- Row 1: WhatsApp, Telegram, Instagram, X (Twitter) -->
+        <!-- Row 1: MediGyaan, WhatsApp, Telegram, Instagram, X (Twitter) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:orientation="horizontal"
-            android:weightSum="4">
+            android:weightSum="5">
+
+            <!-- MediGyaan -->
+            <LinearLayout
+                android:id="@+id/btnShareMediGyaan"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_social_medigyaan">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center"
+                        android:src="@mipmap/ic_launcher" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="MediGyaan"
+                    android:textColor="#1E1B4B"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <!-- WhatsApp -->
             <LinearLayout
@@ -205,11 +305,11 @@
                 android:focusable="true"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="6dp">
+                android:padding="4dp">
 
                 <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:src="@drawable/ic_social_whatsapp" />
 
                 <TextView
@@ -232,11 +332,11 @@
                 android:focusable="true"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="6dp">
+                android:padding="4dp">
 
                 <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:src="@drawable/ic_social_telegram" />
 
                 <TextView
@@ -259,11 +359,11 @@
                 android:focusable="true"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="6dp">
+                android:padding="4dp">
 
                 <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:src="@drawable/ic_social_instagram" />
 
                 <TextView
@@ -286,11 +386,11 @@
                 android:focusable="true"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="6dp">
+                android:padding="4dp">
 
                 <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:src="@drawable/ic_social_x_twitter" />
 
                 <TextView
@@ -303,13 +403,13 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Row 2: Facebook, LinkedIn, Messages, Copy -->
+        <!-- Row 2: Facebook, LinkedIn, Messages, Copy, More -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:orientation="horizontal"
-            android:weightSum="4">
+            android:weightSum="5">
 
             <!-- Facebook -->
             <LinearLayout
@@ -322,11 +422,11 @@
                 android:focusable="true"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="6dp">
+                android:padding="4dp">
 
                 <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:src="@drawable/ic_social_facebook" />
 
                 <TextView
@@ -349,11 +449,11 @@
                 android:focusable="true"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="6dp">
+                android:padding="4dp">
 
                 <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:src="@drawable/ic_social_linkedin" />
 
                 <TextView
@@ -376,11 +476,11 @@
                 android:focusable="true"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="6dp">
+                android:padding="4dp">
 
                 <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:src="@drawable/ic_social_sms" />
 
                 <TextView
@@ -403,11 +503,11 @@
                 android:focusable="true"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="6dp">
+                android:padding="4dp">
 
                 <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:src="@drawable/ic_social_copy" />
 
                 <TextView
@@ -415,6 +515,33 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:text="Copy Text"
+                    android:textColor="#1A1C2E"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- More Apps Grid Item -->
+            <LinearLayout
+                android:id="@+id/btnShareMoreGrid"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <ImageView
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@drawable/ic_social_more" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="More"
                     android:textColor="#1A1C2E"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -428,7 +555,7 @@
             android:layout_height="52dp"
             android:layout_marginTop="4dp"
             android:backgroundTint="#5C6BC0"
-            android:text="More Apps..."
+            android:text="More Options &amp; Apps..."
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="15sp"

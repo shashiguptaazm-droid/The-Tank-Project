@@ -495,6 +495,91 @@ object QuestionShareHelper {
         context.startActivity(chooser)
     }
 
+    /**
+     * Share inside MediGyaan:
+     * Offers Post to Feed, 1v1 Topic Challenge, Add to Custom Quiz, and View Shared Questions.
+     */
+    fun showMediGyaanShareDialog(
+        context: Context,
+        data: QuestionShareData,
+        includeAnswer: Boolean = false,
+        onAddToQuiz: (() -> Unit)? = null
+    ) {
+        val options = arrayOf(
+            "📢 Post to MediGyaan Feed (Discuss with Doctors)",
+            "⚔️ Challenge a Peer (1v1 Topic Battle)",
+            "📑 Add to My Custom Quiz",
+            "📊 View My Shared Questions"
+        )
+
+        androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle("Share inside MediGyaan")
+            .setIcon(R.mipmap.ic_launcher)
+            .setItems(options) { dialog, which ->
+                dialog.dismiss()
+                when (which) {
+                    0 -> postToCommunityFeed(context, data, includeAnswer)
+                    1 -> challengePeer(context, data)
+                    2 -> {
+                        if (onAddToQuiz != null) {
+                            onAddToQuiz.invoke()
+                        } else {
+                            Toast.makeText(context, "Opening quiz selector...", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    3 -> viewSharedQuestions(context, data)
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    fun postToCommunityFeed(context: Context, data: QuestionShareData, includeAnswer: Boolean) {
+        runCatching {
+            val text = buildShareText(data, includeAnswer)
+            val focusJson = org.json.JSONObject().apply {
+                put("post_id", data.questionId)
+                put("name", "MediGyaan Doctor")
+                put("photo", "")
+                put("caption", text)
+                put("file_paths", org.json.JSONArray())
+                put("likes", 0)
+            }
+            val intent = Intent(context, NewsFeedActivity::class.java).apply {
+                putExtra(NewsFeedActivity.EXTRA_FOCUS_POST_ID, data.questionId)
+                putExtra(NewsFeedActivity.EXTRA_FOCUS_POST_JSON, focusJson.toString())
+            }
+            context.startActivity(intent)
+            Toast.makeText(context, "Shared to MediGyaan Community Feed! 📢", Toast.LENGTH_SHORT).show()
+        }.onFailure { e ->
+            Log.e(TAG, "Failed to open NewsFeedActivity: ${e.message}", e)
+        }
+    }
+
+    fun challengePeer(context: Context, data: QuestionShareData) {
+        runCatching {
+            val intent = Intent(context, TopicChallengeSelectionActivity::class.java).apply {
+                putExtra("SELECTED_SUBJECT", data.subject)
+                putExtra("SELECTED_TOPIC", data.topic)
+                putExtra("MODE", "FRIENDS")
+            }
+            context.startActivity(intent)
+        }.onFailure { e ->
+            Log.e(TAG, "Failed to open TopicChallengeSelectionActivity: ${e.message}", e)
+        }
+    }
+
+    fun viewSharedQuestions(context: Context, data: QuestionShareData) {
+        runCatching {
+            val intent = Intent(context, SharedQuestionsActivity::class.java).apply {
+                putExtra("USER_ID", data.userId)
+            }
+            context.startActivity(intent)
+        }.onFailure { e ->
+            Log.e(TAG, "Failed to open SharedQuestionsActivity: ${e.message}", e)
+        }
+    }
+
     private fun isPackageInstalled(context: Context, packageName: String): Boolean {
         return runCatching {
             context.packageManager.getPackageInfo(packageName, 0)

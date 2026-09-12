@@ -438,7 +438,7 @@ fun RegisterScreen(
                     Spacer(modifier = Modifier.height(18.dp))
 
                     Text(
-                        text = "RankWarz",
+                        text = "MediGyaan",
                         color = Color.White,
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Black,

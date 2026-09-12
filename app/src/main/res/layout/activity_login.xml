@@ -58,7 +58,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="18dp"
-                    android:text="RankWarz"
+                    android:text="@string/app_name"
                     android:textColor="?attr/colorOnPrimary"
                     android:textSize="28sp"
                     android:fontFamily="sans-serif-black"

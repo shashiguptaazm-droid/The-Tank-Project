@@ -132,7 +132,7 @@ fun ForgotPasswordScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "RankWarz",
+                        text = "MediGyaan",
                         color = Color.White,
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Black,

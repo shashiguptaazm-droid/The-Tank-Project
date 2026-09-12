@@ -21,8 +21,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * Service to handle FCM notifications for RankWarz EduLabs.
- * Handles Chat, Challenge Invites, and General notifications with image support.
+ * Service to handle FCM notifications for MediGyaan.
+ * Handles Chat, Challenge Invites, Calls, and General notifications with image support.
  */
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
