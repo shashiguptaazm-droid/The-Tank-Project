@@ -69,6 +69,7 @@ enum AndroidAsset: String, CaseIterable {
     case ic_help = "ic_help"
     case ic_home = "ic_home"
     case ic_image_placeholder = "ic_image_placeholder"
+    case ic_launcher = "ic_launcher"
     case ic_launcher_background = "ic_launcher_background"
     case ic_launcher_foreground = "ic_launcher_foreground"
     case ic_legend = "ic_legend"
