@@ -43,6 +43,7 @@ struct GlobalSearchView: View {
             }
             .screenBackground()
             .navigationTitle("Search")
+            .toolbar(.visible, for: .navigationBar)
             .navigationBarTitleDisplayMode(.inline)
             .errorAlert(message: $errorMessage)
         }

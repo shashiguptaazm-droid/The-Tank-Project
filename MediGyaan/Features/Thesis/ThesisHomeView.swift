@@ -40,6 +40,7 @@ struct ThesisHomeView: View {
         }
         .screenBackground()
         .navigationTitle("Thesis Studio")
+        .toolbar(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .errorAlert(message: $errorMessage)
         .task { await load() }
@@ -260,6 +261,7 @@ struct ThesisChapterView: View {
         }
         .screenBackground()
         .navigationTitle(chapter.title.isEmpty ? "Chapter" : chapter.title)
+        .toolbar(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .errorAlert(message: $errorMessage)
         .onAppear {

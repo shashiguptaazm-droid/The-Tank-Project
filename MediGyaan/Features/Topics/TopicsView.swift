@@ -43,6 +43,7 @@ struct TopicsView: View {
             }
             .screenBackground()
             .navigationTitle("Learn")
+            .toolbar(.visible, for: .navigationBar)
             .searchable(text: $searchText, prompt: "Search topics")
             .onChange(of: searchText) { newValue in
                 Task { await runSearch(newValue) }
@@ -178,6 +179,7 @@ struct QuizListView: View {
         }
         .screenBackground()
         .navigationTitle(topic.name)
+        .toolbar(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .task { await load() }
     }

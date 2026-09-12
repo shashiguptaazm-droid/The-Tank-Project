@@ -32,6 +32,7 @@ struct PosterStudioView: View {
             }
             .screenBackground()
             .navigationTitle("Poster Studio")
+            .toolbar(.visible, for: .navigationBar)
             .navigationBarTitleDisplayMode(.inline)
             .errorAlert(message: $errorMessage)
             .onChange(of: selectedItem) { _ in

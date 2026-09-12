@@ -31,6 +31,7 @@ struct PredictorView: View {
         }
         .screenBackground()
         .navigationTitle("Rank Predictor")
+        .toolbar(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
     }
 

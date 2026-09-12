@@ -50,6 +50,7 @@ struct LeaderboardView: View {
         }
         .screenBackground()
         .navigationTitle("Leaderboard")
+        .toolbar(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .task { await load() }
         .refreshable { await load() }
@@ -184,6 +185,7 @@ struct HistoryView: View {
         }
         .screenBackground()
         .navigationTitle("Attempt history")
+        .toolbar(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .task { await load() }
         .refreshable { await load() }

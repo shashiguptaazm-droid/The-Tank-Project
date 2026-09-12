@@ -28,6 +28,7 @@ struct QuizView: View {
         .navigationTitle(quiz.title.isEmpty ? "Practice" : quiz.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .tabBar)
+        .toolbar(.visible, for: .navigationBar)
         .task {
             // `@StateObject` is built before the environment exists, so the API
             // client and session user are supplied here instead.

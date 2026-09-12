@@ -51,6 +51,7 @@ struct SettingsView: View {
             }
         }
         .navigationTitle("Settings")
+        .toolbar(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog(
             "Sign out of MediGyaan?",
@@ -108,6 +109,7 @@ struct HelpView: View {
         }
         .screenBackground()
         .navigationTitle("Help & support")
+        .toolbar(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -138,6 +140,7 @@ struct AboutView: View {
         }
         .screenBackground()
         .navigationTitle("About")
+        .toolbar(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
     }
 }

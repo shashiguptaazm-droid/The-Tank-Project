@@ -32,6 +32,7 @@ struct ReferralView: View {
         }
         .screenBackground()
         .navigationTitle("Refer & earn")
+        .toolbar(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .task { await load() }
         .refreshable { await load() }

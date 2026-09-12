@@ -36,6 +36,7 @@ struct ReferenceLibraryView: View {
         }
         .screenBackground()
         .navigationTitle("References")
+        .toolbar(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText, prompt: "Search references")
         .task { await load() }
@@ -143,6 +144,7 @@ struct PrismaView: View {
         }
         .screenBackground()
         .navigationTitle("PRISMA flow")
+        .toolbar(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .errorAlert(message: $errorMessage)
     }
@@ -261,6 +263,7 @@ struct ThemeExportView: View {
         }
         .screenBackground()
         .navigationTitle("Export theme")
+        .toolbar(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .errorAlert(message: $errorMessage)
     }
@@ -314,6 +317,7 @@ struct ThesisChecklistView: View {
         }
         .screenBackground()
         .navigationTitle("Checklist")
+        .toolbar(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .task { await load() }
         .refreshable { await load() }

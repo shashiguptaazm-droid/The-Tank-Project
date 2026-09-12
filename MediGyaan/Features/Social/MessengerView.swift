@@ -39,6 +39,7 @@ struct MessengerView: View {
         }
         .background(AppTheme.Palette.chatBackground.ignoresSafeArea())
         .navigationTitle("Messages")
+        .toolbar(.visible, for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
