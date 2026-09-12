@@ -6,6 +6,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.media.AudioAttributes
+import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -61,18 +64,83 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val roomName = data["room_name"]
             ?: (if (isVideo) body.substringAfter("VIDEO_CALL_INVITE:") else body.substringAfter("AUDIO_CALL_INVITE:")).trim()
         val callerName = title.ifBlank { "Incoming Call" }
+        val notificationId = (senderId.toIntOrNull() ?: 1000) + 5000
 
-        val callIntent = Intent(this, LiveKitCallActivity::class.java).apply {
+        // 1. Immediately start continuous phone ringtone and vibration
+        CallRingtoneManager.start(applicationContext)
+
+        // 2. Full-Screen Intent for lockscreen/screen off
+        val fullScreenIntent = IncomingCallActivity.createIntent(
+            context = this,
+            roomName = roomName,
+            peerName = callerName,
+            isVideo = isVideo,
+            imageUrl = img,
+            notificationId = notificationId
+        )
+
+        val fullScreenPendingIntent = PendingIntent.getActivity(
+            this,
+            notificationId,
+            fullScreenIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // 3. Direct Accept action
+        val acceptIntent = Intent(this, LiveKitCallActivity::class.java).apply {
             putExtra(LiveKitCallActivity.EXTRA_ROOM_NAME, roomName)
             putExtra(LiveKitCallActivity.EXTRA_PEER_NAME, callerName)
             putExtra(LiveKitCallActivity.EXTRA_IS_VIDEO, isVideo)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
+        val acceptPendingIntent = PendingIntent.getActivity(
+            this,
+            notificationId + 1,
+            acceptIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
-        val displayBody = if (isVideo) "📹 Incoming Video Call (Tap to answer)" else "📞 Incoming Audio Call (Tap to answer)"
-        val notificationId = (senderId.toIntOrNull() ?: 1000) + 5000
+        // 4. Direct Decline action
+        val declineIntent = Intent(this, CallActionReceiver::class.java).apply {
+            action = CallActionReceiver.ACTION_DECLINE
+            putExtra(CallActionReceiver.EXTRA_NOTIFICATION_ID, notificationId)
+        }
+        val declinePendingIntent = PendingIntent.getBroadcast(
+            this,
+            notificationId + 2,
+            declineIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
-        showNotification(callerName, displayBody, callIntent, notificationId, CHANNEL_CALL, img)
+        val displayTitle = callerName
+        val displayBody = if (isVideo) "📹 Incoming Video Call..." else "📞 Incoming Audio Call..."
+
+        val ringtoneUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE)
+            ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+
+        val builder = NotificationCompat.Builder(this, CHANNEL_CALL_RINGING)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(displayTitle)
+            .setContentText(displayBody)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_CALL)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setAutoCancel(true)
+            .setOngoing(true)
+            .setSound(ringtoneUri)
+            .setContentIntent(fullScreenPendingIntent)
+            .setFullScreenIntent(fullScreenPendingIntent, true)
+            .addAction(R.drawable.ic_call_end, "Decline", declinePendingIntent)
+            .addAction(R.drawable.ic_call, "Accept", acceptPendingIntent)
+
+        dispatchNotification(notificationId, CHANNEL_CALL_RINGING, builder)
+
+        // Proactively start the IncomingCallActivity when permitted
+        try {
+            startActivity(fullScreenIntent)
+        } catch (e: Exception) {
+            Log.w(TAG, "Cannot launch incoming call activity directly: ${e.message}")
+        }
     }
 
     private fun sendChatMessage(data: Map<String, String>, title: String, body: String, img: String) {
@@ -198,17 +266,41 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = when (channelId) {
-                CHANNEL_CALL -> "Incoming Calls"
-                CHANNEL_CHAT -> "Direct Messages"
-                CHANNEL_CHALLENGE -> "Game Challenges"
-                else -> "General Updates"
+            if (channelId == CHANNEL_CALL_RINGING) {
+                val ringtoneUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE)
+                    ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+
+                val audioAttributes = AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .build()
+
+                val callChannel = NotificationChannel(
+                    CHANNEL_CALL_RINGING,
+                    "Incoming Call Alerts",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    description = "Incoming audio and video call ringing notifications"
+                    setSound(ringtoneUri, audioAttributes)
+                    enableVibration(true)
+                    vibrationPattern = longArrayOf(0, 1000, 1000, 1000, 1000)
+                    lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+                    setBypassDnd(true)
+                }
+                manager.createNotificationChannel(callChannel)
+            } else {
+                val name = when (channelId) {
+                    CHANNEL_CALL -> "Incoming Calls"
+                    CHANNEL_CHAT -> "Direct Messages"
+                    CHANNEL_CHALLENGE -> "Game Challenges"
+                    else -> "General Updates"
+                }
+                val channel = NotificationChannel(channelId, name, NotificationManager.IMPORTANCE_HIGH).apply {
+                    description = "Notifications for $name"
+                    enableVibration(true)
+                }
+                manager.createNotificationChannel(channel)
             }
-            val channel = NotificationChannel(channelId, name, NotificationManager.IMPORTANCE_HIGH).apply {
-                description = "Notifications for $name"
-                enableVibration(true)
-            }
-            manager.createNotificationChannel(channel)
         }
 
         manager.notify(id, builder.build())
@@ -227,6 +319,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         private const val TAG = "FCM_DEBUG_LOG"
         private const val IMAGE_BASE_URL = "https://medigyaan.xyz/Neurons/"
 
+        const val CHANNEL_CALL_RINGING = "incoming_call_ringing_channel_v3"
         private const val CHANNEL_CALL = "call_channel"
         private const val CHANNEL_CHAT = "chat_channel"
         private const val CHANNEL_CHALLENGE = "challenge_channel"

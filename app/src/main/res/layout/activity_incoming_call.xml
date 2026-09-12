@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0F141C"
+    android:keepScreenOn="true">
+
+    <!-- Top Call Type Badge & Caller Info -->
+    <LinearLayout
+        android:id="@+id/callerHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="60dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp">
+
+        <TextView
+            android:id="@+id/txtCallType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_circle_dark"
+            android:paddingStart="16dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="6dp"
+            android:text="📹 Incoming Video Call"
+            android:textColor="#4E9FFF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtCallerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Doctor / Student"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtCallSubtext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="MediGyaan Secure Call"
+            android:textColor="#8B949E"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- Center Avatar -->
+    <FrameLayout
+        android:id="@+id/avatarContainer"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_centerInParent="true">
+
+        <ImageView
+            android:id="@+id/imgCallerAvatar"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:contentDescription="Caller Avatar"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_user_placeholder" />
+    </FrameLayout>
+
+    <!-- Bottom Actions: Decline & Accept -->
+    <LinearLayout
+        android:id="@+id/actionsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="60dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <!-- Decline Button -->
+        <LinearLayout
+            android:id="@+id/layoutDecline"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/btnDecline"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/bg_circle_red"
+                android:contentDescription="Decline Call"
+                android:elevation="6dp"
+                android:padding="16dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_call_end"
+                app:tint="#FFFFFF" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Decline"
+                android:textColor="#FF5C5C"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Accept Button -->
+        <LinearLayout
+            android:id="@+id/layoutAccept"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/btnAccept"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/bg_circle_green"
+                android:contentDescription="Accept Call"
+                android:elevation="6dp"
+                android:padding="16dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_call"
+                app:tint="#FFFFFF" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Accept"
+                android:textColor="#3FB950"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

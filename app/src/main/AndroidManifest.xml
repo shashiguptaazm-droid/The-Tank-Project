@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
@@ -246,6 +248,24 @@
         <activity android:name=".SettingsActivity" android:exported="false" />
         <activity android:name=".SupportActivity" android:exported="false" />
         <activity android:name=".VideoPlayerActivity" android:exported="false" android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".IncomingCallActivity"
+            android:exported="false"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
+        <receiver
+            android:name=".CallActionReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.rankwarz.edulabsrtm.ACTION_DECLINE_CALL" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".LiveKitCallActivity"
             android:exported="false"

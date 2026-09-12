@@ -31,6 +31,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
@@ -109,6 +110,10 @@ class LiveKitCallActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_livekit_call)
+
+        // Make sure incoming call ringtone is stopped when call connects/opens
+        CallRingtoneManager.stop()
+        (getSystemService(Context.NOTIFICATION_SERVICE) as? android.app.NotificationManager)?.cancelAll()
 
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
@@ -371,18 +376,27 @@ class LiveKitCallActivity : AppCompatActivity() {
         }
     }
 
+    private var ringbackJob: Job? = null
+
     private fun startRinging() {
-        try {
-            if (toneGenerator == null) {
-                toneGenerator = ToneGenerator(AudioManager.STREAM_VOICE_CALL, 70)
+        stopRinging()
+        ringbackJob = scope.launch {
+            try {
+                val tg = ToneGenerator(AudioManager.STREAM_VOICE_CALL, 80)
+                toneGenerator = tg
+                while (isActive) {
+                    tg.startTone(ToneGenerator.TONE_SUP_RINGTONE, 2000)
+                    delay(4500)
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to start ringtone: ${e.message}")
             }
-            toneGenerator?.startTone(ToneGenerator.TONE_SUP_RINGTONE)
-        } catch (e: Exception) {
-            Log.w(TAG, "Failed to start ringtone: ${e.message}")
         }
     }
 
     private fun stopRinging() {
+        ringbackJob?.cancel()
+        ringbackJob = null
         try {
             toneGenerator?.stopTone()
             toneGenerator?.release()
@@ -526,6 +540,7 @@ class LiveKitCallActivity : AppCompatActivity() {
 
     private fun endCall() {
         isCallEnding = true
+        CallRingtoneManager.stop()
         stopRinging()
         timerJob?.cancel()
         callTimeoutJob?.cancel()
@@ -542,6 +557,7 @@ class LiveKitCallActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         isCallEnding = true
+        CallRingtoneManager.stop()
         stopRinging()
         timerJob?.cancel()
         callTimeoutJob?.cancel()
