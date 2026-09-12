@@ -30,6 +30,24 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
+    <queries>
+        <package android:name="com.whatsapp" />
+        <package android:name="com.whatsapp.w4b" />
+        <package android:name="org.telegram.messenger" />
+        <package android:name="com.instagram.android" />
+        <package android:name="com.twitter.android" />
+        <package android:name="com.facebook.katana" />
+        <package android:name="com.linkedin.android" />
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="*/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="smsto" />
+        </intent>
+    </queries>
+
     <application
         android:name=".EduLabsApplication"
         android:allowBackup="true"
@@ -160,7 +178,23 @@
         <activity android:name=".SinglePlayerTestModeActivity" android:exported="false" />
 
         <activity android:name=".LoginActivity" android:exported="false" />
-        <activity android:name=".MCQActivity" android:exported="false" />
+        <activity
+            android:name=".MCQActivity"
+            android:exported="true">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="medigyaan.xyz"
+                    android:path="/Neurons/share.php" />
+                <data
+                    android:scheme="https"
+                    android:host="medigyaan.xyz"
+                    android:pathPrefix="/question" />
+            </intent-filter>
+        </activity>
         <activity android:name=".GlobalSearchActivity" android:exported="false" />
         <activity android:name=".NewsFeedActivity" android:exported="false" />
         <activity android:name=".ProfileActivity" android:exported="false" />

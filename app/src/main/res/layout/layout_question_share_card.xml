@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/shareCardRoot"
+    android:layout_width="600dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_share_card"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Top Header Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/shareCardLogo"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:src="@mipmap/ic_launcher" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MediGyaan"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NEET-PG / Medical MCQ Challenge"
+                android:textColor="#9FB3CC"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/shareCardTopicBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_share_badge"
+            android:text="Pharmacology"
+            android:textColor="#64DFDF"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Divider line -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="#2E4068" />
+
+    <!-- Optional Question Image -->
+    <ImageView
+        android:id="@+id/shareCardQuestionImage"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:layout_marginBottom="16dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:visibility="gone" />
+
+    <!-- Question Text -->
+    <TextView
+        android:id="@+id/shareCardQuestionText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="5dp"
+        android:text="Which of the following is the most appropriate next step in management?"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <!-- Space -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="18dp" />
+
+    <!-- Option A -->
+    <LinearLayout
+        android:id="@+id/shareCardOptionALayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_share_option"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <TextView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="@drawable/bg_share_letter"
+            android:gravity="center"
+            android:text="A"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/shareCardOptionAText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:text="Option A description text"
+            android:textColor="#E0E6ED"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <!-- Option B -->
+    <LinearLayout
+        android:id="@+id/shareCardOptionBLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_share_option"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <TextView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="@drawable/bg_share_letter"
+            android:gravity="center"
+            android:text="B"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/shareCardOptionBText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:text="Option B description text"
+            android:textColor="#E0E6ED"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <!-- Option C -->
+    <LinearLayout
+        android:id="@+id/shareCardOptionCLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_share_option"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <TextView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="@drawable/bg_share_letter"
+            android:gravity="center"
+            android:text="C"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/shareCardOptionCText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:text="Option C description text"
+            android:textColor="#E0E6ED"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <!-- Option D -->
+    <LinearLayout
+        android:id="@+id/shareCardOptionDLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_share_option"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <TextView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="@drawable/bg_share_letter"
+            android:gravity="center"
+            android:text="D"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/shareCardOptionDText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:text="Option D description text"
+            android:textColor="#E0E6ED"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <!-- Optional Answer / Explanation Container -->
+    <LinearLayout
+        android:id="@+id/shareCardAnswerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="14dp"
+        android:background="#1B3B2B"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/shareCardAnswerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Correct Answer: Option A"
+            android:textColor="#48E599"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/shareCardExplanationText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="#C8EAD9"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Divider line -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="14dp"
+        android:background="#2E4068" />
+
+    <!-- Card Footer -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🧠 Can you solve this? Attempt on MediGyaan App!"
+            android:textColor="#F4C95D"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/shareCardLink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="medigyaan.xyz"
+            android:textColor="#64DFDF"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+</LinearLayout>

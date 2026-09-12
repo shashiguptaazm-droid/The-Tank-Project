@@ -91,7 +91,7 @@
                     android:layout_marginEnd="8dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@android:drawable/ic_menu_share"
-                    android:contentDescription="Share on WhatsApp" />
+                    android:contentDescription="Share question on social media" />
 
                 <ImageButton
                     android:id="@+id/addToQuizBtn"

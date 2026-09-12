@@ -158,8 +158,8 @@ class MCQActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             Log.d(TAG, "Loaded fixed test with ${allQuestionIds.size} questions. First ID: ${allQuestionIds.getOrNull(0)}")
             topicLayout.visibility = View.GONE
             fetchQuestion(allQuestionIds[currentIndex])
-        } else if (intent.hasExtra("question_id")) {
-            // Support for single question intent override
+        } else if (intent.hasExtra("question_id") || intent.data != null) {
+            // Support for single question intent or deep link override
             val singleId = readQuestionIdExtra()
             if (singleId > 0) {
                 Log.d(TAG, "Loading single question ID: $singleId")
@@ -173,7 +173,7 @@ class MCQActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 fetchTopics()
                 fetchQuestion(null)
             }
-        }else {
+        } else {
             isFixedTest = false
             fetchTopics()
             fetchQuestion(null)
@@ -181,6 +181,14 @@ class MCQActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
     private fun readQuestionIdExtra(): Int {
+        val dataUri = intent?.data
+        if (dataUri != null) {
+            val qParam = dataUri.getQueryParameter("question_id")
+                ?: dataUri.getQueryParameter("id")
+                ?: dataUri.lastPathSegment
+            val parsed = qParam?.toIntOrNull()
+            if (parsed != null && parsed > 0) return parsed
+        }
         val value = intent.extras?.get("question_id") ?: return 0
         return when (value) {
             is Int -> value
@@ -316,8 +324,13 @@ private class QuestionPickerAdapter(
 
         shareWhatsappBtn.setOnClickListener {
             animateButton(it)
-            showButtonFeedback("Share challenge", it)
-            shareToWhatsApp()
+            showButtonFeedback("Share question", it)
+            openShareQuestionDialog()
+        }
+
+        questionCard.setOnLongClickListener {
+            openShareQuestionDialog()
+            true
         }
 
         addToQuizBtn.setOnClickListener {
@@ -1408,25 +1421,50 @@ private class QuestionPickerAdapter(
         setupAppBottomNavigation(bottomNav, R.id.nav_home)
     }
 
+    private fun openShareQuestionDialog() {
+        val qObj = currentQuestionObj
+        if (qObj == null) {
+            showButtonFeedback("No question to share", shareWhatsappBtn)
+            return
+        }
+
+        val qId = qObj.optInt("question_id", 0)
+        val qText = questionText.text.toString().ifBlank { qObj.optString("question", "") }
+        val optA = optionA.text.toString().ifBlank { qObj.optString("option_a", "") }
+        val optB = optionB.text.toString().ifBlank { qObj.optString("option_b", "") }
+        val optC = optionC.text.toString().ifBlank { qObj.optString("option_c", "") }
+        val optD = optionD.text.toString().ifBlank { qObj.optString("option_d", "") }
+        val imgUrl = qObj.optString("question_image").takeIf { it.isNotBlank() && it != "null" }
+        val correctAns = qObj.optString("correct_answer", qObj.optString("correct_option", "")).trim()
+        val exp = explanationText.text.toString().takeIf { it.isNotBlank() } ?: qObj.optString("explanation", "")
+        val isAns = qObj.optBoolean("answered", false) || correctAns.isNotBlank()
+
+        val shareData = QuestionShareHelper.QuestionShareData(
+            questionId = qId,
+            questionText = qText,
+            optionA = optA,
+            optionB = optB,
+            optionC = optC,
+            optionD = optD,
+            subject = currentSubject,
+            topic = currentQuestionTopic,
+            imageUrl = imgUrl,
+            userId = userId,
+            correctAnswer = correctAns.ifBlank { null },
+            explanation = exp.ifBlank { null },
+            isAnswered = isAns
+        )
+
+        val attachedBitmap = if (questionImageView.visibility == View.VISIBLE) {
+            (questionImageView.drawable as? android.graphics.drawable.BitmapDrawable)?.bitmap
+        } else null
+
+        val sheet = QuestionShareBottomSheet.newInstance(shareData, attachedBitmap)
+        sheet.show(supportFragmentManager, QuestionShareBottomSheet.TAG)
+    }
+
     private fun shareToWhatsApp() {
-        val qId = currentQuestionObj?.optInt("question_id", 0) ?: 0
-        val shareUrl = "https://medigyaan.xyz/Neurons/share.php?question_id=$qId&ref=$userId"
-        val message = "🧠 *MCQ Challenge!*\n👉 *Attempt here:* $shareUrl"
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, message)
-            `package` = "com.whatsapp" // ✅ WhatsApp's real package name
-        }
-        try {
-            startActivity(intent)
-        } catch (_: Exception) {
-            // WhatsApp not installed → share anywhere via the system sheet
-            val fallback = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, message)
-            }
-            startActivity(Intent.createChooser(fallback, "Share via"))
-        }
+        openShareQuestionDialog()
     }
 
     private fun addQuestionToQuiz() {
