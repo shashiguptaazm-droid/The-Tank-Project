@@ -18,18 +18,35 @@ struct DashboardView: View {
     @State private var searchText = ""
     @State private var isShowingSearch = false
     @State private var isShowingMenu = false
+    @State private var path = NavigationPath()
 
     private var stats: DashboardStats { viewModel.state.value ?? .empty }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             VStack(spacing: 0) {
-                topBar
+                if path.isEmpty {
+                    topBar
+                        .transition(.opacity)
+                }
                 content
             }
+            .animation(.easeInOut(duration: 0.18), value: path.isEmpty)
             .inkBackground()
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $isShowingSearch) { GlobalSearchView() }
+            .navigationDestination(for: DrawerDestination.self) { dest in
+                switch dest {
+                case .leaderboard: LeaderboardView()
+                case .thesis: ThesisHomeView()
+                case .predictor: PredictorView()
+                case .referral: ReferralView()
+                case .poster: PosterStudioView()
+                case .profile: ProfileView()
+                case .settings: SettingsView()
+                case .help: HelpView()
+                }
+            }
             .sheet(isPresented: $isShowingMenu) { drawer }
             .task {
                 guard !hasConfigured else { return }
@@ -414,16 +431,16 @@ struct DashboardView: View {
         NavigationStack {
             List {
                 Section {
-                    NavigationLink("Leaderboard") { LeaderboardView() }
-                    NavigationLink("Thesis Studio") { ThesisHomeView() }
-                    NavigationLink("Rank Predictor") { PredictorView() }
-                    NavigationLink("Referral") { ReferralView() }
-                    NavigationLink("Poster Studio") { PosterStudioView() }
+                    drawerLink("Leaderboard", .leaderboard)
+                    drawerLink("Thesis Studio", .thesis)
+                    drawerLink("Rank Predictor", .predictor)
+                    drawerLink("Referral", .referral)
+                    drawerLink("Poster Studio", .poster)
                 }
                 Section {
-                    NavigationLink("Profile") { ProfileView() }
-                    NavigationLink("Settings") { SettingsView() }
-                    NavigationLink("Help & support") { HelpView() }
+                    drawerLink("Profile", .profile)
+                    drawerLink("Settings", .settings)
+                    drawerLink("Help & support", .help)
                 }
             }
             .navigationTitle("Menu")
@@ -432,6 +449,22 @@ struct DashboardView: View {
                     Button("Close") { isShowingMenu = false }
                 }
             }
+        }
+    }
+
+    /// Drawer destinations pushed onto the main stack after the sheet dismisses,
+    /// so the pushed screen appears over the dashboard with the custom top bar hidden.
+    private enum DrawerDestination: Hashable {
+        case leaderboard, thesis, predictor, referral, poster
+        case profile, settings, help
+    }
+
+    private func drawerLink(_ title: String, _ destination: DrawerDestination) -> some View {
+        Button {
+            isShowingMenu = false
+            path.append(destination)
+        } label: {
+            Text(title)
         }
     }
 
