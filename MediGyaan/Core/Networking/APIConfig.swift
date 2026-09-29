@@ -11,12 +11,11 @@ import Foundation
 /// read a JSON body. See `HTTPClient` for the two request encodings.
 enum APIConfig {
 
-    /// HTTPS root of the production backend (`medigyaan.xyz`).
-    static let baseURL = URL(string: "https://medigyaan.xyz/Neurons/")!
+    /// HTTPS root of the production backend (`medigyaan.com`).
+    static let baseURL = URL(string: "https://medigyaan.com/Neurons/")!
 
-    /// A few legacy scripts are only served over plain HTTP. The
-    /// `NSAppTransportSecurity` exception in Info.plist permits this.
-    static let legacyBaseURL = URL(string: "http://medigyaan.xyz/Neurons/")!
+    /// Legacy fallback URL.
+    static let legacyBaseURL = URL(string: "https://medigyaan.com/Neurons/")!
 
     static let requestTimeout: TimeInterval = 120
     static let resourceTimeout: TimeInterval = 180
@@ -25,8 +24,7 @@ enum APIConfig {
     ///
     /// This replaces the Jitsi Meet SDK the Android app uses, which dialled the
     /// public `meet.jit.si` service. Calls now run on our own single-node SFU,
-    /// deployed on the VPS that serves `medigyaan.com` — a *different* machine
-    /// from the shared hosting behind `baseURL` (`medigyaan.xyz`).
+    /// deployed on the VPS that serves `medigyaan.com`.
     ///
     /// The token endpoint necessarily lives on the SFU's host, because the API
     /// secret that signs access tokens never leaves that box. Clients only ever

@@ -306,7 +306,7 @@ struct QuestionShareSheet: View {
     // MARK: - Actions
 
     private var shareURL: String {
-        "https://medigyaan.xyz/Neurons/share.php?question_id=\(question.id)&ref=\(userId)"
+        "https://medigyaan.com/Neurons/share.php?question_id=\(question.id)&ref=\(userId)"
     }
 
     private var shareText: String {

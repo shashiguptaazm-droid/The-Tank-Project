@@ -689,15 +689,17 @@ def main() -> int:
             write_imageset(assets, name, dest_name, vector=False)
             inventory["raster"].append(name)
 
-    # ---- AppIcon from the brand logo ------------------------------------ #
+    # ---- Icons composited from the brand logo ---------------------------- #
     logo = res / "drawable" / "medigyaan_logo.png"
     appicon = assets / "AppIcon.appiconset"
     appicon.mkdir(parents=True, exist_ok=True)
     if logo.exists():
+        icon_png = appicon / "AppIcon-1024.png"
         subprocess.run(
             ["convert", str(logo), "-resize", "1024x1024", "-background", "none",
              "-gravity", "center", "-extent", "1024x1024",
-             str(appicon / "AppIcon-1024.png")],
+             "-strip",
+             str(icon_png)],
             check=True, capture_output=True,
         )
         (appicon / "Contents.json").write_text(json.dumps({
@@ -707,6 +709,11 @@ def main() -> int:
             }],
             "info": {"author": "xcode", "version": 1},
         }, indent=2) + "\n")
+
+        launcher = assets / "ic_launcher.imageset"
+        launcher.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(icon_png, launcher / "ic_launcher.png")
+        write_imageset(assets, "ic_launcher", "ic_launcher.png", vector=False)
     # ---- Colorsets contractually required by project.yml / Info.plist --- #
     # Generated from colors.xml so AccentColor tracks `colorPrimary` and
     # LaunchBackground tracks `colorBackground` instead of drifting.

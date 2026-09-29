@@ -126,6 +126,10 @@ struct College: Decodable, Identifiable, Hashable {
     let closingRank: Int
     let fees: String
     let website: URL?
+    let averageStipend: String
+    let collegeLogo: String
+    let bondYears: String
+    let bondPenalty: String
 
     init(from decoder: Decoder) throws {
         let container = try decoder.flexibleContainer()
@@ -138,5 +142,9 @@ struct College: Decodable, Identifiable, Hashable {
         fees = container.flexString("fees", "fee", "tuition")
         let site = container.flexString("website", "url", "link")
         website = site.isEmpty ? nil : URL(string: site)
+        averageStipend = container.flexString("average_stipend", "stipend")
+        collegeLogo = container.flexString("college_logo", "logo", "logo_path")
+        bondYears = container.flexString("bond_years", "bond")
+        bondPenalty = container.flexString("bond_penalty", "penalty")
     }
 }

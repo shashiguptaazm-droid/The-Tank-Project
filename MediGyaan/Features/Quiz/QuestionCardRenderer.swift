@@ -151,7 +151,7 @@ struct QuestionCardExportView: View {
 
                 Spacer()
 
-                Text("medigyaan.xyz")
+                Text("medigyaan.com")
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(Color(hex: 0x64_DF_DF))
             }

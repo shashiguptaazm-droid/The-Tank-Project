@@ -120,7 +120,7 @@ struct ReferralView: View {
 
     private func shareURL(for info: ReferralInfo) -> URL? {
         guard !info.code.isEmpty else { return nil }
-        return URL(string: "https://medigyaan.xyz/Neurons/referral.php?code=\(info.code)")
+        return URL(string: "https://medigyaan.com/Neurons/referral.php?code=\(info.code)")
     }
 
     private var howItWorks: some View {

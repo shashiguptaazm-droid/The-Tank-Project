@@ -141,8 +141,7 @@ final class HTTPClient {
     /// under `APIConfig.baseURL`.
     ///
     /// The LiveKit token endpoint is served by the VPS that runs the SFU
-    /// (`medigyaan.com`), while the rest of the backend is on shared hosting
-    /// (`medigyaan.xyz`), so it cannot be expressed as an `Endpoint`.
+    /// (`medigyaan.com`).
     func postObject(form: [String: String], toAbsolute url: URL) async throws -> [String: Any] {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"

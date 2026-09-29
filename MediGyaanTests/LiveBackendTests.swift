@@ -2,7 +2,7 @@ import XCTest
 @testable import MediGyaan
 
 /// Integration tests that exercise the **live** PHP backend at
-/// `medigyaan.xyz/Neurons/`.
+/// `medigyaan.com/Neurons/`.
 ///
 /// These assert the negative paths, which are deterministic, require no
 /// credentials, and prove the Swift client is genuinely wire-compatible with the
@@ -34,7 +34,7 @@ final class LiveBackendTests: XCTestCase {
         }.resume()
 
         _ = semaphore.wait(timeout: .now() + 12)
-        try XCTSkipUnless(reachable, "medigyaan.xyz is unreachable; skipping live backend test.")
+        try XCTSkipUnless(reachable, "medigyaan.com is unreachable; skipping live backend test.")
     }
 
     /// Asserts the thrown error is a backend `success:false` carrying `expected`.

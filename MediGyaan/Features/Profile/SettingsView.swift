@@ -35,7 +35,7 @@ struct SettingsView: View {
 
             Section("Data") {
                 Toggle("Auto-sync progress", isOn: $autoSync)
-                LabeledContent("Backend", value: "medigyaan.xyz")
+                LabeledContent("Backend", value: "medigyaan.com")
                 LabeledContent("App version", value: Bundle.main.shortVersion)
             }
 
@@ -97,7 +97,7 @@ struct HelpView: View {
 
                 CardContainer {
                     VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
-                        Label("support@medigyaan.xyz", systemImage: "envelope.fill")
+                        Label("support@medigyaan.com", systemImage: "envelope.fill")
                             .font(AppTheme.Font.callout)
                         Label("Response within 24 hours", systemImage: "clock.fill")
                             .font(AppTheme.Font.caption)

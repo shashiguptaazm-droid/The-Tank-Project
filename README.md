@@ -1,7 +1,7 @@
 # MediGyaan for iOS
 
 A native **SwiftUI** rewrite of the MediGyaan Android app, talking to the **same
-live PHP backend** at `medigyaan.xyz/Neurons/`.
+live PHP backend** at `medigyaan.com/Neurons/`.
 
 - **Language:** Swift 5.9 · **UI:** SwiftUI (no UIKit screens)
 - **Minimum iOS:** 16.0 (mirrors Android `minSdk 26`)

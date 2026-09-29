@@ -34,11 +34,11 @@ final class HTTPClientTests: XCTestCase {
     func testEndpointURLsUseTheProductionHost() {
         XCTAssertEqual(
             APIConfig.Endpoint.login.url.absoluteString,
-            "https://medigyaan.xyz/Neurons/api/login.php"
+            "https://medigyaan.com/Neurons/api/login.php"
         )
         XCTAssertEqual(
             APIConfig.Endpoint.dashboard.url.absoluteString,
-            "https://medigyaan.xyz/Neurons/dash_api.php"
+            "https://medigyaan.com/Neurons/dash_api.php"
         )
     }
 
@@ -47,14 +47,14 @@ final class HTTPClientTests: XCTestCase {
     func testLeaderboardEndpointIsConfigured() {
         XCTAssertEqual(
             APIConfig.Endpoint.leaderboard.url.absoluteString,
-            "https://medigyaan.xyz/Neurons/leaderboard1.php"
+            "https://medigyaan.com/Neurons/leaderboard1.php"
         )
     }
 
     func testEveryEndpointProducesAValidURL() {
         for endpoint in APIConfig.Endpoint.allCases {
             XCTAssertTrue(
-                endpoint.url.absoluteString.hasPrefix("https://medigyaan.xyz/Neurons/"),
+                endpoint.url.absoluteString.hasPrefix("https://medigyaan.com/Neurons/"),
                 "\(endpoint.rawValue) produced an unexpected URL"
             )
             XCTAssertTrue(endpoint.rawValue.hasSuffix(".php"), "\(endpoint.rawValue) is not a script")

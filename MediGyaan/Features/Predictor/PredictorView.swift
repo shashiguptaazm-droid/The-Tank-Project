@@ -176,19 +176,36 @@ struct PredictorView: View {
 struct CollegeRow: View {
     let college: College
 
+    private var logoURL: URL? {
+        guard !college.collegeLogo.isEmpty else { return nil }
+        if college.collegeLogo.starts(with: "http") {
+            return URL(string: college.collegeLogo)
+        }
+        let clean = college.collegeLogo.trimmingCharacters(in: CharacterSet(charactersIn: "./"))
+        return URL(string: "https://medigyaan.com/Neurons/" + clean)
+    }
+
     var body: some View {
         CardContainer(padding: AppTheme.Spacing.sm) {
             HStack(spacing: AppTheme.Spacing.md) {
-                Image(systemName: "building.columns.fill")
-                    .font(.system(size: 18))
-                    .foregroundStyle(AppTheme.Palette.primary)
-                    .frame(width: 38, height: 38)
-                    .background(
-                        RoundedRectangle(cornerRadius: AppTheme.Radius.sm)
-                            .fill(AppTheme.Palette.primary.opacity(0.12))
-                    )
+                if let logoURL {
+                    AsyncImage(url: logoURL) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 38, height: 38)
+                                .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.sm))
+                        default:
+                            fallbackIcon
+                        }
+                    }
+                } else {
+                    fallbackIcon
+                }
 
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 3) {
                     Text(college.name.isEmpty ? "College" : college.name)
                         .font(AppTheme.Font.callout.weight(.semibold))
                         .lineLimit(2)
@@ -197,10 +214,46 @@ struct CollegeRow: View {
                             .font(AppTheme.Font.caption)
                             .foregroundStyle(AppTheme.Palette.textSecondary)
                     }
-                    if college.closingRank > 0 {
-                        Text("Closing rank \(college.closingRank)")
-                            .font(AppTheme.Font.caption)
-                            .foregroundStyle(AppTheme.Palette.textSecondary)
+
+                    // Chips row
+                    HStack(spacing: 6) {
+                        if college.closingRank > 0 {
+                            Text("Cutoff: \(college.closingRank)")
+                                .font(.system(size: 10, weight: .bold))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Capsule().fill(Color.orange.opacity(0.18)))
+                                .foregroundStyle(Color.orange)
+                        }
+
+                        if !college.fees.isEmpty && college.fees != "0" {
+                            Text("₹\(college.fees)")
+                                .font(.system(size: 10, weight: .bold))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Capsule().fill(AppTheme.Palette.primary.opacity(0.18)))
+                                .foregroundStyle(AppTheme.Palette.primary)
+                        }
+
+                        if !college.averageStipend.isEmpty && college.averageStipend != "0" {
+                            Text("Stipend: ₹\(college.averageStipend)")
+                                .font(.system(size: 10, weight: .bold))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Capsule().fill(Color.green.opacity(0.18)))
+                                .foregroundStyle(Color.green)
+                        }
+
+                        if !college.bondYears.isEmpty {
+                            let bondText = college.bondYears == "0" ? "No Bond" : "\(college.bondYears) yr bond"
+                            let bondColor = college.bondYears == "0" ? Color.blue : Color.red
+                            Text(bondText)
+                                .font(.system(size: 10, weight: .bold))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Capsule().fill(bondColor.opacity(0.18)))
+                                .foregroundStyle(bondColor)
+                        }
                     }
                 }
 
@@ -211,6 +264,17 @@ struct CollegeRow: View {
                     .foregroundStyle(AppTheme.Palette.textSecondary.opacity(0.6))
             }
         }
+    }
+
+    private var fallbackIcon: some View {
+        Image(systemName: "building.columns.fill")
+            .font(.system(size: 18))
+            .foregroundStyle(AppTheme.Palette.primary)
+            .frame(width: 38, height: 38)
+            .background(
+                RoundedRectangle(cornerRadius: AppTheme.Radius.sm)
+                    .fill(AppTheme.Palette.primary.opacity(0.12))
+            )
     }
 }
 
