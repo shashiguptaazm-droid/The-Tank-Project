@@ -1,28 +1,39 @@
-﻿import SwiftUI
+import SwiftUI
 
 /// Standalone Medical AI Assistant Chat screen.
-/// Ports `AiChatActivity.kt` from the Android MediGyaan application.
+/// Ports `AiChatActivity.kt` from the Android MediGyaan application 1:1.
 struct AiChatView: View {
 
     @EnvironmentObject private var session: SessionStore
     @Environment(\.api) private var api
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = AiChatViewModel()
     @State private var isShowingDocPicker = false
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Header Bar
+                // Header Bar matching Android's ChatHeader
                 chatHeader
 
                 Divider()
+                    .background(Color(hex: 0x2C3140))
+
+                // Horizontal Tool Chips Carousel
+                toolChipsBar
+
+                Divider()
+                    .background(Color(hex: 0x2C3140).opacity(0.5))
 
                 // Messages Stream
                 ScrollViewReader { proxy in
                     ScrollView {
-                        LazyVStack(alignment: .leading, spacing: 16) {
-                            // Prompt Suggestions (shown at the top)
-                            suggestionsBar
+                        LazyVStack(alignment: .leading, spacing: 14) {
+                            // Prompt Suggestions (shown when few messages)
+                            if viewModel.messages.count <= 1 {
+                                welcomeHeader
+                                suggestionsBar
+                            }
 
                             ForEach(viewModel.messages) { message in
                                 messageRow(message)
@@ -34,8 +45,8 @@ struct AiChatView: View {
                                     .id("typing")
                             }
                         }
-                        .padding(.horizontal, AppTheme.Spacing.md)
-                        .padding(.vertical, AppTheme.Spacing.md)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 12)
                     }
                     .onChange(of: viewModel.messages.count) { _ in
                         withAnimation {
@@ -53,45 +64,16 @@ struct AiChatView: View {
                     }
                 }
 
-                Divider()
-
                 // Attachment Preview Banner (if attached)
                 if let attachment = viewModel.attachedDocumentName {
                     attachmentBanner(attachment)
                 }
 
-                // Input Bar
-                inputBar
+                // Input Composer Bar
+                inputComposer
             }
-            .screenBackground()
-            .navigationTitle("Medical AI Studio")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Button(role: .destructive) {
-                            viewModel.clearChat()
-                        } label: {
-                            Label("Clear Chat", systemImage: "trash")
-                        }
-
-                        Button {
-                            viewModel.attachDocument(name: "Clinical_Case_Report.pdf")
-                        } label: {
-                            Label("Attach Clinical Case (PDF)", systemImage: "doc.fill")
-                        }
-
-                        Button {
-                            viewModel.attachDocument(name: "Lab_Panel_Results.pdf")
-                        } label: {
-                            Label("Attach Lab Panel (PDF)", systemImage: "cross.case.fill")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                            .font(.system(size: 18))
-                    }
-                }
-            }
+            .background(Color(hex: 0x0E131F).ignoresSafeArea())
+            .navigationBarHidden(true)
             .overlay(alignment: .bottom) {
                 if let toast = viewModel.toastMessage {
                     Text(toast)
@@ -101,7 +83,7 @@ struct AiChatView: View {
                         .padding(.vertical, 8)
                         .background(Color.black.opacity(0.85))
                         .clipShape(Capsule())
-                        .padding(.bottom, 70)
+                        .padding(.bottom, 72)
                         .transition(.opacity)
                 }
             }
@@ -111,84 +93,216 @@ struct AiChatView: View {
         }
     }
 
-    // MARK: - Header
+    // MARK: - Top Header (ChatHeader)
 
     private var chatHeader: some View {
-        HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color(hex: 0x39_49_AB), Color(hex: 0x1E_88_E5)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 40, height: 40)
-
-                Image(systemName: "brain.head.profile")
-                    .font(.system(size: 20))
-                    .foregroundStyle(.white)
+        HStack(spacing: 10) {
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(Color(hex: 0xDDE7F5))
+                    .frame(width: 32, height: 32)
             }
 
+            // Circular MG Avatar Badge
+            ZStack {
+                Circle()
+                    .fill(Color(hex: 0x272A52))
+                    .frame(width: 36, height: 36)
+
+                Text("MG")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(Color.white)
+            }
+
+            // Title and Always Active pulse
             VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
-                    Text("MediGyaan Clinical AI")
-                        .font(.system(size: 15, weight: .bold))
-                        .foregroundStyle(Color(hex: 0x1A_1C_2E))
+                Text("Medigyaan AI")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(Color.white)
 
+                HStack(spacing: 5) {
                     Circle()
-                        .fill(Color(hex: 0x4C_AF_50))
-                        .frame(width: 8, height: 8)
-                }
+                        .fill(Color(hex: 0x4CAF50))
+                        .frame(width: 7, height: 7)
 
-                Text("Specialized Medical Reasoning • NEET-PG & Clinical")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color.secondary)
+                    Text("Always Active")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(Color(hex: 0x9FB1C7))
+                }
             }
 
             Spacer()
+
+            // Model Mode Pill Button (cycles Balanced -> Fast -> Reasoning)
+            Button {
+                viewModel.cycleModelMode()
+            } label: {
+                Text(viewModel.modelMode.rawValue)
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(Color(hex: 0xBAC7FF))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(Color(hex: 0x1C202B))
+                    .clipShape(Capsule())
+                    .overlay(
+                        Capsule()
+                            .stroke(Color(hex: 0x373C4E), lineWidth: 1)
+                    )
+            }
+
+            // History Button
+            Button {
+                viewModel.clearChat()
+            } label: {
+                Image(systemName: "clock.arrow.circlepath")
+                    .font(.system(size: 16))
+                    .foregroundStyle(Color(hex: 0xDDE7F5))
+                    .frame(width: 32, height: 32)
+            }
+
+            // Overflow Menu
+            Menu {
+                Button {
+                    viewModel.attachDocument(name: "Clinical_Case_Report.pdf")
+                } label: {
+                    Label("📄 Upload Document", systemImage: "doc.fill")
+                }
+
+                Button {
+                    viewModel.onToolChipTapped("🔬 PubMed")
+                } label: {
+                    Label("🔬 PubMed Validator", systemImage: "cross.case.fill")
+                }
+
+                Button {
+                    viewModel.onToolChipTapped("🎓 Thesis")
+                } label: {
+                    Label("🎓 Thesis Topics", systemImage: "graduationcap.fill")
+                }
+
+                Button {
+                    viewModel.onToolChipTapped("🎯 Counselor")
+                } label: {
+                    Label("🎯 AI College Predictor", systemImage: "target")
+                }
+
+                Button {
+                    viewModel.onToolChipTapped("🖼️ Poster")
+                } label: {
+                    Label("🖼️ AI Poster Gen", systemImage: "photo.fill")
+                }
+
+                Button {
+                    viewModel.onToolChipTapped("📚 Chapter")
+                } label: {
+                    Label("📚 Chapter Draft", systemImage: "book.fill")
+                }
+
+                Divider()
+
+                Button(role: .destructive) {
+                    viewModel.clearChat()
+                } label: {
+                    Label("Clear Chat", systemImage: "trash")
+                }
+            } label: {
+                Image(systemName: "ellipsis")
+                    .font(.system(size: 18))
+                    .foregroundStyle(Color(hex: 0xDDE7F5))
+                    .rotationEffect(.degrees(90))
+                    .frame(width: 32, height: 32)
+            }
         }
-        .padding(.horizontal, AppTheme.Spacing.md)
-        .padding(.vertical, 10)
-        .background(AppTheme.Palette.cardBackground)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Color(hex: 0x111624))
+    }
+
+    // MARK: - Tool Chips Bar (Matches Android's Horizontal Tool Chips)
+
+    private var toolChipsBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(viewModel.toolChips, id: \.self) { chip in
+                    Button {
+                        viewModel.onToolChipTapped(chip)
+                    } label: {
+                        Text(chip)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(Color(hex: 0xDDE7F5))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color(hex: 0x1C2232))
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color(hex: 0x2E364B), lineWidth: 1)
+                            )
+                    }
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+        }
+        .background(Color(hex: 0x111624))
+    }
+
+    // MARK: - Welcome Header
+
+    private var welcomeHeader: some View {
+        VStack(spacing: 6) {
+            Text("🧠")
+                .font(.system(size: 38))
+                .padding(.top, 8)
+
+            Text("How can I help you today?")
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(Color.white)
+
+            Text("Ask about NEET PG, diseases, drugs — or use the tools above.")
+                .font(.system(size: 12))
+                .foregroundStyle(Color(hex: 0x9FB1C7))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
     }
 
     // MARK: - Suggestions
 
     private var suggestionsBar: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Suggested Medical Topics")
-                .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(Color.secondary)
+            Text("Suggested Medical Queries")
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(Color(hex: 0x8FA3BD))
                 .textCase(.uppercase)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
                     ForEach(viewModel.suggestions) { suggestion in
                         Button {
-                            Task {
-                                await viewModel.selectSuggestion(
-                                    suggestion,
-                                    api: api,
-                                    userId: session.userId
-                                )
-                            }
+                            viewModel.selectSuggestion(
+                                suggestion,
+                                api: api,
+                                userId: session.userId
+                            )
                         } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: suggestion.icon)
-                                    .font(.system(size: 13))
+                                    .font(.system(size: 12))
                                 Text(suggestion.title)
-                                    .font(.system(size: 13, weight: .semibold))
+                                    .font(.system(size: 12, weight: .semibold))
                             }
                             .padding(.horizontal, 12)
                             .padding(.vertical, 8)
-                            .background(Color(hex: 0xEE_F2_FF))
-                            .foregroundStyle(Color(hex: 0x39_49_AB))
+                            .background(Color(hex: 0x1C2232))
+                            .foregroundStyle(Color(hex: 0xBAC7FF))
                             .clipShape(Capsule())
                             .overlay(
                                 Capsule()
-                                    .stroke(Color(hex: 0xC7_D2_FE), lineWidth: 1)
+                                    .stroke(Color(hex: 0x2E364B), lineWidth: 1)
                             )
                         }
                         .disabled(viewModel.isLoading)
@@ -196,122 +310,455 @@ struct AiChatView: View {
                 }
             }
         }
-        .padding(.bottom, 6)
+        .padding(.vertical, 6)
     }
 
     // MARK: - Message Rows
 
+    @ViewBuilder
     private func messageRow(_ message: AiChatMessage) -> some View {
-        VStack(alignment: message.isUser ? .trailing : .leading, spacing: 6) {
-            HStack {
-                if message.isUser { Spacer(minLength: 40) }
+        if message.isUser {
+            userMessageBubble(message)
+        } else {
+            assistantMessageCard(message)
+        }
+    }
 
-                VStack(alignment: message.isUser ? .trailing : .leading, spacing: 6) {
-                    // Attachment chip inside user message
-                    if let doc = message.attachmentName {
-                        HStack(spacing: 6) {
-                            Image(systemName: "doc.fill")
-                            Text(doc)
-                                .lineLimit(1)
-                        }
-                        .font(.system(size: 12, weight: .semibold))
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .background(Color.white.opacity(0.2))
+    // MARK: - User Message Bubble (Lavender Pill with Edit button)
+
+    private func userMessageBubble(_ message: AiChatMessage) -> some View {
+        VStack(alignment: .trailing, spacing: 4) {
+            // Attachment badge if attached
+            if let doc = message.attachmentName {
+                HStack(spacing: 6) {
+                    Image(systemName: "doc.fill")
+                    Text(doc)
+                        .lineLimit(1)
+                }
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(Color(hex: 0xBAC7FF))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(Color(hex: 0x272A52))
+                .clipShape(Capsule())
+            }
+
+            // Message text container
+            Text(message.text)
+                .font(.system(size: 14))
+                .foregroundStyle(Color(hex: 0x111B21))
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(
+                    UnevenRoundedRectangle(
+                        topLeadingRadius: 18,
+                        bottomLeadingRadius: 18,
+                        bottomTrailingRadius: 3,
+                        topTrailingRadius: 18
+                    )
+                    .fill(Color(hex: 0xBAC7FF))
+                )
+                .frame(maxWidth: 300, alignment: .trailing)
+
+            // Sub-row: timestamp + Edit chip
+            HStack(spacing: 6) {
+                Text(formattedTime(message.timestamp))
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color(hex: 0x8FA3BD))
+
+                Button {
+                    viewModel.startEdit(message: message)
+                } label: {
+                    Text("✏️ Edit")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Color(hex: 0xBAC7FF))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(Color(hex: 0x1C2232))
                         .clipShape(Capsule())
-                    }
-
-                    // Message text
-                    Text(LocalizedStringKey(message.text))
-                        .font(.system(size: 15))
-                        .foregroundStyle(message.isUser ? Color.white : AppTheme.Palette.textPrimary)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .fill(message.isUser ? Color(hex: 0x39_49_AB) : AppTheme.Palette.cardBackground)
-                        )
                         .overlay(
-                            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .stroke(
-                                    message.isUser ? Color.clear : Color.primary.opacity(0.08),
-                                    lineWidth: 1
-                                )
+                            Capsule().stroke(Color(hex: 0x2E364B), lineWidth: 0.8)
                         )
                 }
-
-                if !message.isUser { Spacer(minLength: 40) }
             }
+        }
+        .frame(maxWidth: .infinity, alignment: .trailing)
+        .padding(.vertical, 2)
+    }
 
-            // Action toolbar for assistant messages (TTS, Copy, Share)
-            if !message.isUser {
-                HStack(spacing: 16) {
-                    Button {
-                        viewModel.toggleSpeech(for: message)
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: viewModel.isSpeaking ? "speaker.wave.3.fill" : "speaker.wave.2")
-                            Text(viewModel.isSpeaking ? "Stop" : "Read")
-                        }
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(AppTheme.Palette.textSecondary)
-                    }
+    // MARK: - Assistant Message Card (Dark Card with AI badge)
 
-                    Button {
-                        viewModel.copyMessage(message)
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: "doc.on.doc")
-                            Text("Copy")
-                        }
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(AppTheme.Palette.textSecondary)
-                    }
+    private func assistantMessageCard(_ message: AiChatMessage) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top, spacing: 10) {
+                // AI circular avatar
+                ZStack {
+                    Circle()
+                        .fill(Color(hex: 0x272A52))
+                        .frame(width: 30, height: 30)
 
-                    ShareLink(item: message.text) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "square.and.arrow.up")
-                            Text("Share")
-                        }
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(AppTheme.Palette.textSecondary)
-                    }
-
-                    Spacer()
+                    Text("AI")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(Color.white)
                 }
-                .padding(.leading, 6)
+                .padding(.top, 2)
+
+                // Dark card container
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(LocalizedStringKey(message.text))
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color(hex: 0xF2F6FC))
+                        .lineSpacing(3)
+
+                    // Action row: TTS, Copy, Share, Feedback, Regenerate, Response Time
+                    HStack(spacing: 12) {
+                        Button {
+                            viewModel.toggleSpeech(for: message)
+                        } label: {
+                            HStack(spacing: 3) {
+                                Image(systemName: viewModel.isSpeaking ? "speaker.wave.3.fill" : "speaker.wave.2")
+                                Text(viewModel.isSpeaking ? "Stop" : "Read")
+                            }
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(Color(hex: 0x8FA3BD))
+                        }
+
+                        Button {
+                            viewModel.copyMessage(message)
+                        } label: {
+                            HStack(spacing: 3) {
+                                Image(systemName: "doc.on.doc")
+                                Text("Copy")
+                            }
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(Color(hex: 0x8FA3BD))
+                        }
+
+                        ShareLink(item: message.text) {
+                            Image(systemName: "square.and.arrow.up")
+                                .font(.system(size: 11))
+                                .foregroundStyle(Color(hex: 0x8FA3BD))
+                        }
+
+                        Button {
+                            viewModel.toggleFeedback(for: message, like: true)
+                        } label: {
+                            Image(systemName: message.feedback == 1 ? "hand.thumbsup.fill" : "hand.thumbsup")
+                                .font(.system(size: 11))
+                                .foregroundStyle(message.feedback == 1 ? Color(hex: 0x62E49D) : Color(hex: 0x8FA3BD))
+                        }
+
+                        Button {
+                            viewModel.toggleFeedback(for: message, like: false)
+                        } label: {
+                            Image(systemName: message.feedback == -1 ? "hand.thumbsdown.fill" : "hand.thumbsdown")
+                                .font(.system(size: 11))
+                                .foregroundStyle(message.feedback == -1 ? Color(hex: 0xEF5350) : Color(hex: 0x8FA3BD))
+                        }
+
+                        Button {
+                            viewModel.regenerate(message: message, api: api, userId: session.userId)
+                        } label: {
+                            Image(systemName: "arrow.clockwise")
+                                .font(.system(size: 11))
+                                .foregroundStyle(Color(hex: 0x8FA3BD))
+                        }
+
+                        Spacer()
+
+                        if let ms = message.responseTimeMs {
+                            Text("⚡ \(ms)ms")
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundStyle(Color(hex: 0x8FA3BD))
+                        }
+                    }
+                    .padding(.top, 4)
+                }
+                .padding(12)
+                .background(
+                    UnevenRoundedRectangle(
+                        topLeadingRadius: 3,
+                        bottomLeadingRadius: 18,
+                        bottomTrailingRadius: 18,
+                        topTrailingRadius: 18
+                    )
+                    .fill(Color(hex: 0x161C2A))
+                )
+                .overlay(
+                    UnevenRoundedRectangle(
+                        topLeadingRadius: 3,
+                        bottomLeadingRadius: 18,
+                        bottomTrailingRadius: 18,
+                        topTrailingRadius: 18
+                    )
+                    .stroke(Color(hex: 0x2A3348), lineWidth: 1)
+                )
             }
 
-            // Related MCQs Card (mirrors Android's question search cards)
+            // Attached Feature Cards (matching Android)
+            if let counsel = message.counselCard {
+                counselorFeatureCard(counsel)
+            }
+
+            if let thesis = message.thesisCard {
+                thesisFeatureCard(thesis)
+            }
+
+            if let chapter = message.chapterCard {
+                chapterFeatureCard(chapter)
+            }
+
             if !message.relatedQuestions.isEmpty {
                 relatedQuestionsCard(message.relatedQuestions)
             }
         }
+        .padding(.vertical, 2)
+    }
+
+    // MARK: - NEET PG AI Counselor Card (Collapsible)
+
+    @State private var isCounselorExpanded = true
+
+    private func counselorFeatureCard(_ data: CounselCardData) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            // Card Header
+            Button {
+                withAnimation { isCounselorExpanded.toggle() }
+            } label: {
+                HStack(spacing: 8) {
+                    ZStack {
+                        Circle()
+                            .fill(Color(hex: 0x2A325F))
+                            .frame(width: 28, height: 28)
+                        Text("✨")
+                            .font(.system(size: 14))
+                    }
+
+                    Text("✨ NEET PG AI Counselor")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(Color.white)
+
+                    Spacer()
+
+                    Image(systemName: isCounselorExpanded ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Color(hex: 0x8FA3BD))
+                }
+            }
+
+            if isCounselorExpanded {
+                if !data.summary.isEmpty {
+                    Text(data.summary)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color(hex: 0xDDE7F5))
+                        .padding(.vertical, 2)
+                }
+
+                // Options count & Sort bar
+                HStack {
+                    Text("\(data.results.count) options found")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Color(hex: 0x8FA3BD))
+
+                    Spacer()
+
+                    HStack(spacing: 4) {
+                        Text("↕ Recommended")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(Color(hex: 0xBAC7FF))
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color(hex: 0x252C3E))
+                    .clipShape(Capsule())
+                }
+
+                // List of Colleges
+                ForEach(data.results) { college in
+                    collegeCard(college)
+                }
+            }
+        }
+        .padding(14)
+        .background(Color(hex: 0x151B28))
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color(hex: 0x2E3A52), lineWidth: 1)
+        )
+        .padding(.leading, 40)
+    }
+
+    private func collegeCard(_ college: CounselCollege) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(college.institute)
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(Color.white)
+                        .lineLimit(2)
+
+                    Text(college.course)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(Color(hex: 0x48D6C8))
+                }
+
+                Spacer()
+
+                // Chance pill
+                Text(college.chance)
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(chanceColor(college.chance))
+                    .clipShape(Capsule())
+            }
+
+            HStack(spacing: 6) {
+                infoTag(college.state)
+                infoTag(college.quota)
+                infoTag("Closing: #\(college.closingRank)")
+            }
+
+            HStack(spacing: 12) {
+                Text("Fee: \(college.feePerYear)")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color(hex: 0xF4C95D))
+
+                Text("Stipend: \(college.stipendYear1)")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color(hex: 0x62E49D))
+
+                Text("Bond: \(college.bondYears)")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color(hex: 0x8FA3BD))
+            }
+        }
+        .padding(10)
+        .background(Color(hex: 0x1E2638))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color(hex: 0x303E5A), lineWidth: 1)
+        )
+    }
+
+    private func infoTag(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 10, weight: .medium))
+            .foregroundStyle(Color(hex: 0xBAC7FF))
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(Color(hex: 0x252F46))
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+    }
+
+    private func chanceColor(_ chance: String) -> Color {
+        switch chance.lowercased() {
+        case "dream": return Color(hex: 0x7C3AED)
+        case "target": return Color(hex: 0x2563EB)
+        default: return Color(hex: 0x059669)
+        }
+    }
+
+    // MARK: - Thesis Feature Card
+
+    private func thesisFeatureCard(_ data: ThesisCardData) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Text("🎓")
+                    .font(.system(size: 16))
+                Text("Thesis Topics Catalog")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(Color.white)
+            }
+
+            ForEach(data.results) { topic in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(topic.displayTitle)
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(Color.white)
+
+                    Text(topic.snippet)
+                        .font(.system(size: 11))
+                        .foregroundStyle(Color(hex: 0x9FB1C7))
+                        .lineLimit(2)
+
+                    HStack {
+                        infoTag(topic.studyType)
+                        infoTag("Difficulty: \(topic.difficulty)")
+                    }
+                }
+                .padding(8)
+                .background(Color(hex: 0x1E2638))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+        }
+        .padding(12)
+        .background(Color(hex: 0x151B28))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16).stroke(Color(hex: 0x2E3A52), lineWidth: 1)
+        )
+        .padding(.leading, 40)
+    }
+
+    // MARK: - Chapter Feature Card
+
+    private func chapterFeatureCard(_ data: ChapterCardData) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Text("📚")
+                    .font(.system(size: 16))
+                Text("Drafted Chapter: \(data.chapterName)")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(Color.white)
+            }
+
+            ForEach(data.sections, id: \.self) { sec in
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color(hex: 0x62E49D))
+                    Text(sec)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color(hex: 0xDDE7F5))
+                }
+            }
+        }
+        .padding(12)
+        .background(Color(hex: 0x151B28))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16).stroke(Color(hex: 0x2E3A52), lineWidth: 1)
+        )
+        .padding(.leading, 40)
     }
 
     // MARK: - Related MCQs Card
 
     private func relatedQuestionsCard(_ questions: [Question]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
+            HStack(spacing: 6) {
                 Image(systemName: "checklist")
-                    .foregroundStyle(Color(hex: 0x39_49_AB))
+                    .foregroundStyle(Color(hex: 0x48D6C8))
                 Text("Related Practice MCQs")
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(Color(hex: 0x1A_1C_2E))
+                    .foregroundStyle(Color.white)
             }
 
             ForEach(questions) { q in
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(q.text)
-                            .font(.system(size: 13))
+                            .font(.system(size: 12))
                             .lineLimit(2)
-                            .foregroundStyle(Color(hex: 0x1A_1C_2E))
+                            .foregroundStyle(Color(hex: 0xDDE7F5))
 
                         Text("Topic: \(q.topic.isEmpty ? q.subject : q.topic)")
                             .font(.system(size: 11))
-                            .foregroundStyle(Color.secondary)
+                            .foregroundStyle(Color(hex: 0x8FA3BD))
                     }
 
                     Spacer()
@@ -328,27 +775,26 @@ struct AiChatView: View {
                         viewModel.activeQuizToLaunch = quiz
                     } label: {
                         Text("Practice")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundStyle(.white)
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(Color(hex: 0x07111F))
                             .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(Color(hex: 0x39_49_AB))
+                            .padding(.vertical, 5)
+                            .background(Color(hex: 0x48D6C8))
                             .clipShape(Capsule())
                     }
                 }
-                .padding(10)
-                .background(Color.white)
+                .padding(8)
+                .background(Color(hex: 0x1E2638))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             }
         }
         .padding(12)
-        .background(Color(hex: 0xEE_F2_FF))
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .background(Color(hex: 0x151B28))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(Color(hex: 0xC7_D2_FE), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 16).stroke(Color(hex: 0x2E3A52), lineWidth: 1)
         )
-        .padding(.top, 4)
+        .padding(.leading, 40)
     }
 
     // MARK: - Typing Indicator
@@ -357,14 +803,17 @@ struct AiChatView: View {
         HStack(spacing: 8) {
             ProgressView()
                 .scaleEffect(0.8)
+                .tint(Color(hex: 0xBAC7FF))
+
             Text("MediGyaan AI is analyzing clinical evidence…")
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(Color.secondary)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(Color(hex: 0x8FA3BD))
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .background(AppTheme.Palette.cardBackground)
+        .padding(.vertical, 8)
+        .background(Color(hex: 0x161C2A))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(.leading, 40)
     }
 
     // MARK: - Attachment Banner
@@ -372,11 +821,11 @@ struct AiChatView: View {
     private func attachmentBanner(_ name: String) -> some View {
         HStack(spacing: 8) {
             Image(systemName: "doc.fill")
-                .foregroundStyle(Color(hex: 0x39_49_AB))
+                .foregroundStyle(Color(hex: 0xBAC7FF))
 
             Text(name)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(Color(hex: 0x1A_1C_2E))
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Color.white)
                 .lineLimit(1)
 
             Spacer()
@@ -385,77 +834,122 @@ struct AiChatView: View {
                 viewModel.removeAttachment()
             } label: {
                 Image(systemName: "xmark.circle.fill")
-                    .foregroundStyle(Color.secondary)
+                    .foregroundStyle(Color(hex: 0x8FA3BD))
             }
         }
-        .padding(.horizontal, AppTheme.Spacing.md)
-        .padding(.vertical, 8)
-        .background(Color(hex: 0xE8_EA_F6))
+        .padding(.horizontal, 14)
+        .padding(.vertical, 6)
+        .background(Color(hex: 0x1C2232))
     }
 
-    // MARK: - Input Bar
+    // MARK: - Input Composer Bar (Matches Android's 26dp pill)
 
-    private var inputBar: some View {
+    private var inputComposer: some View {
         HStack(spacing: 8) {
-            // Document attachment button
-            Menu {
-                Button {
-                    viewModel.attachDocument(name: "Clinical_Case_Report.pdf")
+            // Pill container
+            HStack(spacing: 6) {
+                // Document attachment paperclip
+                Menu {
+                    Button {
+                        viewModel.attachDocument(name: "Clinical_Case_Report.pdf")
+                    } label: {
+                        Label("Clinical Case Report (PDF)", systemImage: "doc.text.fill")
+                    }
+
+                    Button {
+                        viewModel.attachDocument(name: "Diagnostic_Lab_Panel.pdf")
+                    } label: {
+                        Label("Diagnostic Lab Panel", systemImage: "cross.case.fill")
+                    }
+
+                    Button {
+                        viewModel.attachDocument(name: "ECG_Telemetry_Report.pdf")
+                    } label: {
+                        Label("ECG / Telemetry Report", systemImage: "waveform.path.ecg")
+                    }
                 } label: {
-                    Label("Clinical Case Report", systemImage: "doc.text.fill")
+                    Image(systemName: "paperclip")
+                        .font(.system(size: 18))
+                        .foregroundStyle(Color(hex: 0x8FA3BD))
+                        .frame(width: 32, height: 32)
                 }
 
-                Button {
-                    viewModel.attachDocument(name: "Diagnostic_Lab_Panel.pdf")
-                } label: {
-                    Label("Diagnostic Lab Panel", systemImage: "cross.case.fill")
-                }
+                // Text Input
+                TextField("Ask anything…", text: $viewModel.input, axis: .vertical)
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color.white)
+                    .lineLimit(1...4)
+                    .padding(.vertical, 6)
 
+                // Mic voice button
                 Button {
-                    viewModel.attachDocument(name: "ECG_Telemetry_Report.pdf")
+                    viewModel.showToast("Voice input activated 🎙️")
                 } label: {
-                    Label("ECG / Telemetry Report", systemImage: "waveform.path.ecg")
+                    Image(systemName: "mic.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Color(hex: 0x8FA3BD))
+                        .frame(width: 30, height: 30)
                 }
-            } label: {
-                Image(systemName: "paperclip")
-                    .font(.system(size: 20))
-                    .foregroundStyle(Color(hex: 0x5C_6B_C0))
-                    .frame(width: 36, height: 36)
             }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Color(hex: 0x161C2A))
+            .clipShape(RoundedRectangle(cornerRadius: 24))
+            .overlay(
+                RoundedRectangle(cornerRadius: 24)
+                    .stroke(Color(hex: 0x2A3348), lineWidth: 1)
+            )
 
-            // Text Input
-            TextField("Ask clinical question, drug, or disease…", text: $viewModel.input, axis: .vertical)
-                .lineLimit(1...4)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(AppTheme.Palette.cardBackground)
-                .clipShape(RoundedRectangle(cornerRadius: 18))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18)
-                        .stroke(Color.primary.opacity(0.12), lineWidth: 1)
-                )
+            // Circular Send / Stop Button
+            if viewModel.isLoading {
+                Button {
+                    viewModel.stopGenerating()
+                } label: {
+                    ZStack {
+                        Circle()
+                            .fill(Color(hex: 0xEF5350))
+                            .frame(width: 38, height: 38)
 
-            // Send Button
-            Button {
-                Task {
-                    await viewModel.sendCurrentInput(
-                        api: api,
-                        userId: session.userId
-                    )
+                        Rectangle()
+                            .fill(Color.white)
+                            .frame(width: 12, height: 12)
+                    }
                 }
-            } label: {
-                Image(systemName: "arrow.up.circle.fill")
-                    .font(.system(size: 34))
-                    .foregroundStyle(
-                        viewModel.input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || viewModel.isLoading
-                            ? Color.gray.opacity(0.35)
-                            : Color(hex: 0x39_49_AB)
-                    )
+            } else {
+                Button {
+                    viewModel.sendCurrentInput(api: api, userId: session.userId)
+                } label: {
+                    ZStack {
+                        Circle()
+                            .fill(
+                                viewModel.input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                                    ? Color(hex: 0x252F46)
+                                    : Color(hex: 0x5C6BC0)
+                            )
+                            .frame(width: 38, height: 38)
+
+                        Image(systemName: "arrow.up")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundStyle(Color.white)
+                    }
+                }
+                .disabled(viewModel.input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
-            .disabled(viewModel.input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || viewModel.isLoading)
         }
-        .padding(.horizontal, AppTheme.Spacing.md)
+        .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .background(AppTheme.Palette.background)
+        .background(Color(hex: 0x0E131F))
     }
+
+    private func formattedTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        return formatter.string(from: date)
+    }
+}
+
+#Preview {
+    AiChatView()
+        .environmentObject(SessionStore())
+        .environment(\.api, .live)
 }

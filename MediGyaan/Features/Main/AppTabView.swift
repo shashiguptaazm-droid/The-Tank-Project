@@ -19,7 +19,7 @@ struct AppTabView: View {
 
     enum Tab: Hashable, CaseIterable {
         case home
-        case poster
+        case aiChat
         case search
         case history
         case messages
@@ -28,7 +28,7 @@ struct AppTabView: View {
         var title: String {
             switch self {
             case .home: return "Home"
-            case .poster: return "Poster"
+            case .aiChat: return "AI Chat"
             case .search: return "Search"
             case .history: return "History"
             case .messages: return "Messages"
@@ -39,7 +39,7 @@ struct AppTabView: View {
         var asset: AndroidAsset {
             switch self {
             case .home: return .ic_home
-            case .poster: return .ic_description
+            case .aiChat: return .ic_comment
             case .search: return .ic_search
             case .history: return .ic_feed
             case .messages: return .ic_message
@@ -51,7 +51,7 @@ struct AppTabView: View {
         var systemImage: String {
             switch self {
             case .home: return "house.fill"
-            case .poster: return "doc.text.image"
+            case .aiChat: return "bubble.left.and.bubble.right.fill"
             case .search: return "magnifyingglass"
             case .history: return "clock.arrow.circlepath"
             case .messages: return "bubble.left.and.bubble.right.fill"
@@ -76,17 +76,13 @@ struct AppTabView: View {
     }
 
     /// Each tab maps to the Android activity that lived in the nav host.
-    ///
-    /// `DashboardView`, `PosterStudioView` and `GlobalSearchView` own their
-    /// navigation stacks; the history and messenger screens are also pushed from
-    /// the dashboard, so they deliberately do not, and get one here instead.
     @ViewBuilder
     private func destination(for tab: Tab) -> some View {
         switch tab {
         case .home:
             DashboardView()
-        case .poster:
-            PosterStudioView()
+        case .aiChat:
+            AiChatView()
         case .search:
             GlobalSearchView()
         case .history:

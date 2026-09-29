@@ -86,6 +86,27 @@ struct DashboardView: View {
 
             Spacer()
 
+            // Treasury / Credits Pill (`btnDashboardCredits` in Android)
+            NavigationLink { ReferralView() } label: {
+                HStack(spacing: 5) {
+                    Image(AndroidAsset.ic_credit_coin.rawValue)
+                        .resizable()
+                        .renderingMode(.original)
+                        .frame(width: 16, height: 16)
+                    Text("\(max(stats.points, 250))")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(Color(hex: 0xFFD700))
+                }
+                .padding(.horizontal, 10)
+                .frame(height: 34)
+                .background(Color(hex: 0x1A2234))
+                .clipShape(Capsule())
+                .overlay(
+                    Capsule().stroke(Color(hex: 0xF4C95D).opacity(0.4), lineWidth: 1)
+                )
+            }
+            .padding(.trailing, 8)
+
             NavigationLink { MessengerView() } label: {
                 Image(systemName: "bubble.left.and.bubble.right.fill")
                     .font(.system(size: 17))
