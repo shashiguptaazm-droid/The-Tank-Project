@@ -1,0 +1,15 @@
+{
+  "images": [
+    {
+      "filename": "bg_streak_banner.svg",
+      "idiom": "universal"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  },
+  "properties": {
+    "preserves-vector-representation": true
+  }
+}

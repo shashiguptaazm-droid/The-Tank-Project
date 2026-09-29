@@ -1,0 +1,13 @@
+{
+  "images": [
+    {
+      "filename": "avatar_face_derma.png",
+      "idiom": "universal",
+      "scale": "1x"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}

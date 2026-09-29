@@ -1,0 +1,15 @@
+{
+  "images": [
+    {
+      "filename": "bg_bottom_sheet_guardian.svg",
+      "idiom": "universal"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  },
+  "properties": {
+    "preserves-vector-representation": true
+  }
+}

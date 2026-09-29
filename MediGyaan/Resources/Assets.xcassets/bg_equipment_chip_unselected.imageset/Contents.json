@@ -1,0 +1,15 @@
+{
+  "images": [
+    {
+      "filename": "bg_equipment_chip_unselected.svg",
+      "idiom": "universal"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  },
+  "properties": {
+    "preserves-vector-representation": true
+  }
+}

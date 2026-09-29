@@ -1,0 +1,13 @@
+{
+  "images": [
+    {
+      "filename": "bg_card_custom_mode.jpg",
+      "idiom": "universal",
+      "scale": "1x"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}

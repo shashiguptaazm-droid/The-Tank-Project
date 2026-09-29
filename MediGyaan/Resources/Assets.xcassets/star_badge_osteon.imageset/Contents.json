@@ -1,0 +1,13 @@
+{
+  "images": [
+    {
+      "filename": "star_badge_osteon.png",
+      "idiom": "universal",
+      "scale": "1x"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}
