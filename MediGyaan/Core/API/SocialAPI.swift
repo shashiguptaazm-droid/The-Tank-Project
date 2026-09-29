@@ -116,6 +116,42 @@ struct SocialAPI {
         )
     }
 
+    /// Loads medical reels (`api/getReels.php`).
+    func reels() async throws -> [Reel] {
+        try await client.get(.getReels, as: [Reel].self)
+    }
+
+    /// Uploads an attachment to the VPS high-speed upload engine (`api/upload`).
+    func uploadAttachment(data: Data, filename: String, mimeType: String) async throws -> URL {
+        var request = URLRequest(url: APIConfig.VPS.uploadURL.appending(queryItems: [
+            URLQueryItem(name: "token", value: APIConfig.VPS.uploadToken),
+            URLQueryItem(name: "filename", value: filename)
+        ]))
+        request.httpMethod = "POST"
+        request.setValue(mimeType, forHTTPHeaderField: "Content-Type")
+        request.setValue(String(data.count), forHTTPHeaderField: "Content-Length")
+        request.setValue(filename, forHTTPHeaderField: "X-Filename")
+        request.setValue(APIConfig.VPS.uploadToken, forHTTPHeaderField: "X-Token")
+        request.httpBody = data
+
+        let (responseData, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+            throw APIError.server("Upload failed with server error")
+        }
+
+        struct UploadResponse: Decodable {
+            let success: Bool?
+            let ok: Bool?
+            let fileUrl: String?
+            let url: String?
+        }
+        let decoded = try JSONDecoder().decode(UploadResponse.self, from: responseData)
+        guard let rawUrl = decoded.fileUrl ?? decoded.url, let url = URL(string: rawUrl) else {
+            throw APIError.server("Server did not return a valid file URL")
+        }
+        return url
+    }
+
     /// Loads questions shared by the user (`shared_api.php?user_id=X`).
     func sharedQuestions(userId: Int) async throws -> [SharedQuestion] {
         struct Wrapper: Decodable {

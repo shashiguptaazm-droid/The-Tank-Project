@@ -263,10 +263,12 @@ Three deliberate changes, all security-motivated:
 
 Implemented end to end: authentication (login, register, OTP recovery),
 dashboard, topics, quiz runner with scoring and sync, leaderboard, attempt
-history, profile, settings, news feed, messenger, challenges hub, rank
-predictor, referrals, the thesis studio (chapters, references, PRISMA,
-checklist, theme export), and audio/video calling over the self-hosted LiveKit
-SFU.
+history, profile, settings, news feed, messenger (with high-speed VPS chunked
+attachment upload and rich media previews), challenges hub, rank predictor,
+referrals, the thesis studio (chapters, references, PRISMA, checklist, theme
+export), audio/video calling over the self-hosted LiveKit SFU, **full-screen
+vertical medical reels (`ReelsView`)**, and the **authoritative 27 Animal
+Avatar Warriors companion system (`WarriorSelectionView`)**.
 
-Still to port from Android: reels, the home-screen widget, offline Room-style
+Still to port from Android: the home-screen widget, offline Room-style
 caching, and admin/quiz-authoring screens.

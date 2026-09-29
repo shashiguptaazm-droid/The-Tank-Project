@@ -37,6 +37,12 @@ enum APIConfig {
         static let tokenURL = URL(string: "https://medigyaan.com/Neurons/livekit_token.php")!
     }
 
+    /// Dedicated high-speed VPS chunked upload engine for attachments.
+    enum VPS {
+        static let uploadURL = URL(string: "https://medigyaan.com/api/upload")!
+        static let uploadToken = "00b0e86a671d6635ca9cbdfc98bc5ff4dc2e"
+    }
+
     /// Every backend script the Android app is known to call.
     enum Endpoint: String, CaseIterable {
 
@@ -93,6 +99,11 @@ enum APIConfig {
         case messenger = "messenger_api.php"
         case closeFriends = "get_close_friends.php"
         case followUnfollow = "follow_unfollow_apiv4.php"
+
+        // MARK: Reels & Media
+        case getReels = "api/getReels.php"
+        case postsSearch = "api/posts_search.php"
+        case videosSearch = "api/videos_search.php"
 
         // MARK: Thesis suite
         case thesisSession = "thesis_session_backend.php"

@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 /// Messenger, backed by `messenger_api.php`.
 ///
@@ -31,6 +32,8 @@ struct MessengerView: View {
     @State private var isSending = false
     @State private var errorMessage: String?
     @State private var pendingCall: PendingCall?
+    @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var isUploadingAttachment = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -69,6 +72,12 @@ struct MessengerView: View {
                     session: session
                 )
             )
+        }
+        .onChange(of: selectedPhotoItem) { item in
+            guard let item else { return }
+            Task {
+                await uploadAttachment(item)
+            }
         }
     }
 
@@ -140,6 +149,19 @@ struct MessengerView: View {
 
     private var composer: some View {
         HStack(spacing: AppTheme.Spacing.sm) {
+            PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                if isUploadingAttachment {
+                    ProgressView().tint(AppTheme.Palette.primary)
+                        .frame(width: 38, height: 38)
+                } else {
+                    Image(systemName: "paperclip")
+                        .font(.system(size: 20))
+                        .foregroundStyle(AppTheme.Palette.textSecondary)
+                        .frame(width: 38, height: 38)
+                }
+            }
+            .disabled(isUploadingAttachment || isSending)
+
             TextField("Message", text: $draft, axis: .vertical)
                 .lineLimit(1 ... 4)
                 .padding(.horizontal, AppTheme.Spacing.lg)
@@ -205,6 +227,26 @@ struct MessengerView: View {
             errorMessage = (error as? APIError)?.errorDescription ?? error.localizedDescription
         }
     }
+
+    @MainActor
+    private func uploadAttachment(_ item: PhotosPickerItem) async {
+        isUploadingAttachment = true
+        defer { isUploadingAttachment = false; selectedPhotoItem = nil }
+
+        do {
+            guard let data = try await item.loadTransferable(type: Data.self) else { return }
+            let filename = "img_\(Int(Date().timeIntervalSince1970)).jpg"
+            let uploadedURL = try await api.social.uploadAttachment(
+                data: data,
+                filename: filename,
+                mimeType: "image/jpeg"
+            )
+            draft = uploadedURL.absoluteString
+            await send()
+        } catch {
+            errorMessage = (error as? APIError)?.errorDescription ?? error.localizedDescription
+        }
+    }
 }
 
 /// A single chat bubble, coloured from the `whatsapp_bubble_*` tokens.
@@ -239,16 +281,45 @@ struct MessageBubble: View {
                         .foregroundStyle(AppTheme.Palette.textSecondary)
                 }
 
-                Text(message.text)
-                    .font(AppTheme.Font.body)
-                    .foregroundStyle(textColor)
-                    .padding(.horizontal, AppTheme.Spacing.md)
-                    .padding(.vertical, AppTheme.Spacing.sm)
+                if let url = URL(string: message.text.trimmingCharacters(in: .whitespacesAndNewlines)),
+                   url.scheme != nil,
+                   message.text.contains("/uploads/") || ["jpg", "jpeg", "png", "webp", "gif"].contains(url.pathExtension.lowercased()) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(maxWidth: 240, maxHeight: 240)
+                                .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.option, style: .continuous))
+                        case .failure(_):
+                            Text("⚠️ Image attachment")
+                                .font(AppTheme.Font.caption)
+                                .foregroundStyle(.red)
+                        case .empty:
+                            ProgressView()
+                                .frame(width: 100, height: 100)
+                        @unknown default:
+                            EmptyView()
+                        }
+                    }
+                    .padding(4)
                     .background(
                         RoundedRectangle(cornerRadius: AppTheme.Radius.option, style: .continuous)
                             .fill(bubbleFill)
                     )
-                    .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    Text(message.text)
+                        .font(AppTheme.Font.body)
+                        .foregroundStyle(textColor)
+                        .padding(.horizontal, AppTheme.Spacing.md)
+                        .padding(.vertical, AppTheme.Spacing.sm)
+                        .background(
+                            RoundedRectangle(cornerRadius: AppTheme.Radius.option, style: .continuous)
+                                .fill(bubbleFill)
+                        )
+                        .fixedSize(horizontal: false, vertical: true)
+                }
 
                 Text(message.sentAt, style: .time)
                     .font(.system(size: 10))

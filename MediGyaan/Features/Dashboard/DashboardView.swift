@@ -19,6 +19,7 @@ struct DashboardView: View {
     @State private var isShowingSearch = false
     @State private var isShowingMenu = false
     @State private var path = NavigationPath()
+    @AppStorage("selected_avatar_name") private var selectedAvatarName: String = "Mantis • Zerek"
 
     private var stats: DashboardStats { viewModel.state.value ?? .empty }
 
@@ -47,6 +48,8 @@ struct DashboardView: View {
                 case .help: HelpView()
                 case .aiChat: AiChatView()
                 case .sharedQuestions: SharedQuestionsView()
+                case .reels: ReelsView()
+                case .warriors: WarriorSelectionView()
                 }
             }
             .sheet(isPresented: $isShowingMenu) { drawer }
@@ -172,6 +175,23 @@ struct DashboardView: View {
                         .font(AppTheme.Font.title)
                         .foregroundStyle(AppTheme.Ink.textPrimary)
                         .lineLimit(1)
+
+                    NavigationLink { WarriorSelectionView() } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "shield.fill")
+                                .font(.system(size: 10))
+                            Text(selectedAvatarName)
+                                .font(.system(size: 11, weight: .semibold))
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 8))
+                        }
+                        .foregroundStyle(AppTheme.Ink.teal)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Capsule().fill(AppTheme.Ink.teal.opacity(0.16)))
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, 2)
 
                     Text("\(stats.streak) Days Active")
                         .font(AppTheme.Font.subheadline)
@@ -390,6 +410,16 @@ struct DashboardView: View {
                 QuickTile(emoji: "💌", title: "Referral")
             }
             .buttonStyle(.plain)
+
+            NavigationLink { ReelsView() } label: {
+                QuickTile(emoji: "🎬", title: "Medical Reels")
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink { WarriorSelectionView() } label: {
+                QuickTile(emoji: "🛡️", title: "27 Warriors")
+            }
+            .buttonStyle(.plain)
         }
     }
 
@@ -449,6 +479,8 @@ struct DashboardView: View {
                     drawerLink("Thesis Studio", .thesis)
                     drawerLink("Rank Predictor", .predictor)
                     drawerLink("Referral", .referral)
+                    drawerLink("Medical Reels 🎬", .reels)
+                    drawerLink("27 Avatar Warriors 🛡️", .warriors)
                     drawerLink("Poster Studio", .poster)
                 }
                 Section {
@@ -472,6 +504,7 @@ struct DashboardView: View {
         case leaderboard, thesis, predictor, referral, poster
         case profile, settings, help
         case aiChat, sharedQuestions
+        case reels, warriors
     }
 
     private func drawerLink(_ title: String, _ destination: DrawerDestination) -> some View {
