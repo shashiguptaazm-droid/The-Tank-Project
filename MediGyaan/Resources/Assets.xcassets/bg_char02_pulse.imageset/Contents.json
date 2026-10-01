@@ -1,0 +1,13 @@
+{
+    "images":  [
+                   {
+                       "scale":  "1x",
+                       "filename":  "bg_char02_pulse.jpg",
+                       "idiom":  "universal"
+                   }
+               ],
+    "info":  {
+                 "author":  "xcode",
+                 "version":  1
+             }
+}

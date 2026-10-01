@@ -68,9 +68,11 @@ struct WarriorSelectionView: View {
                         .stroke(current.glowColor, lineWidth: 2)
                         .frame(width: 60, height: 60)
 
-                    Image(systemName: "shield.checkered")
-                        .font(.system(size: 28))
-                        .foregroundStyle(current.glowColor)
+                    Image(current.avatarImageName)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 48, height: 48)
+                        .clipShape(Circle())
                 }
 
                 VStack(alignment: .leading, spacing: 3) {
@@ -149,14 +151,32 @@ struct WarriorCard: View {
                 }
             }
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(warrior.name)
-                    .font(AppTheme.Font.headline)
-                    .foregroundStyle(AppTheme.Palette.textPrimary)
+            HStack(spacing: AppTheme.Spacing.sm) {
+                ZStack {
+                    Circle()
+                        .fill(warrior.glowColor.opacity(0.18))
+                        .frame(width: 44, height: 44)
 
-                Text(warrior.specialty)
-                    .font(.system(size: 12))
-                    .foregroundStyle(AppTheme.Palette.textSecondary)
+                    Circle()
+                        .stroke(warrior.glowColor, lineWidth: 1.5)
+                        .frame(width: 44, height: 44)
+
+                    Image(warrior.avatarImageName)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 36, height: 36)
+                        .clipShape(Circle())
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(warrior.name)
+                        .font(AppTheme.Font.headline)
+                        .foregroundStyle(AppTheme.Palette.textPrimary)
+
+                    Text(warrior.specialty)
+                        .font(.system(size: 12))
+                        .foregroundStyle(AppTheme.Palette.textSecondary)
+                }
             }
 
             Text("\"\(warrior.catchphrase)\"")
@@ -245,17 +265,30 @@ struct WarriorDetailSheet: View {
                     // Header card
                     CardContainer {
                         VStack(spacing: AppTheme.Spacing.sm) {
-                            Circle()
-                                .fill(warrior.glowColor.opacity(0.2))
-                                .frame(width: 80, height: 80)
-                                .overlay(
-                                    Circle().stroke(warrior.glowColor, lineWidth: 3)
-                                )
-                                .overlay(
-                                    Image(systemName: "bolt.shield.fill")
-                                        .font(.system(size: 38))
-                                        .foregroundStyle(warrior.glowColor)
-                                )
+                            ZStack {
+                                Circle()
+                                    .fill(warrior.glowColor.opacity(0.2))
+                                    .frame(width: 90, height: 90)
+
+                                Circle()
+                                    .stroke(warrior.glowColor, lineWidth: 3)
+                                    .frame(width: 90, height: 90)
+
+                                Image(warrior.avatarImageName)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 74, height: 74)
+                                    .clipShape(Circle())
+                            }
+
+                            if let glb = warrior.glbModelName {
+                                Label("3D Model Ready (\(glb))", systemImage: "cube.fill")
+                                    .font(.system(size: 11, weight: .semibold))
+                                    .foregroundStyle(warrior.glowColor)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 3)
+                                    .background(Capsule().fill(warrior.glowColor.opacity(0.15)))
+                            }
 
                             Text(warrior.displayName)
                                 .font(AppTheme.Font.title2)

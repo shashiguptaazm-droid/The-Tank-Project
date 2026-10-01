@@ -25,6 +25,37 @@ struct Warrior: Identifiable, Hashable {
         Color(hex: glowColorHex)
     }
 
+    /// Corresponding avatar image asset name (avatar_01 through avatar_27)
+    var avatarImageName: String {
+        String(format: "avatar_%02d", id)
+    }
+
+    /// Corresponding 3D GLB asset filename if available (char01_axiom through char19_somnus)
+    var glbModelName: String? {
+        let glbMap: [Int: String] = [
+            1: "char01_axiom.glb",
+            2: "char02_pulse.glb",
+            3: "char03_catalyst.glb",
+            4: "char04_necros.glb",
+            5: "char05_pharma.glb",
+            6: "char06_microx.glb",
+            7: "char07_verdict.glb",
+            8: "char08_cura.glb",
+            9: "char09_medicus.glb",
+            10: "char10_surgon.glb",
+            11: "char11_vita.glb",
+            12: "char12_pedia.glb",
+            13: "char13_osteon.glb",
+            14: "char14_optix.glb",
+            15: "char15_resona.glb",
+            16: "char16_derma.glb",
+            17: "char17_synapse.glb",
+            18: "char18_rayne.glb",
+            19: "char19_somnus.glb"
+        ]
+        return glbMap[id]
+    }
+
     enum Archetype: String, CaseIterable {
         case vitality = "Vitality & Recovery"
         case fortification = "Fortification & Shield"
