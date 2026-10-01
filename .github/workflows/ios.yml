@@ -17,6 +17,8 @@ jobs:
     name: Build & Test (iOS Simulator)
     runs-on: macos-15
     timeout-minutes: 45
+    permissions:
+      contents: write
 
     env:
       SCHEME: MediGyaan
@@ -137,6 +139,20 @@ jobs:
           path: build/MediGyaan.ipa
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish GitHub Release with IPA
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/ios-swiftui' || github.ref == 'refs/heads/main'
+        with:
+          tag_name: v4.0-latest
+          name: MediGyaan v4.0 iOS Release
+          body: "MediGyaan iOS v4.0 release package with complete 3D warrior suite, medical equipment, and asset bundle."
+          files: build/MediGyaan.ipa
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Test
         continue-on-error: true
