@@ -788,10 +788,10 @@ struct AiChatView: View {
                 let quiz = Quiz(
                     id: q.id,
                     title: q.topic.isEmpty ? "Related Practice" : q.topic,
-                    questionCount: 1,
-                    durationSeconds: 120,
+                    topic: q.topic,
                     subject: q.subject,
-                    topic: q.topic
+                    questionCount: 1,
+                    durationSeconds: 120
                 )
                 viewModel.activeQuizToLaunch = quiz
             } label: {
