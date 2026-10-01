@@ -146,12 +146,7 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
         Task {
             let optionLetters = ["A", "B", "C", "D", "E"]
             let letter = optionLetters.indices.contains(index) ? optionLetters[index] : "\(index + 1)"
-            let params = [
-                "question_id": String(question.id),
-                "answer": letter,
-                "user_id": String(userId)
-            ]
-            _ = try? await api.study.syncUserCache(UserCachePayload(formFields: params))
+            _ = try? await api.study.submitAnswer(questionId: question.id, answer: letter, userId: userId)
         }
     }
 

@@ -63,6 +63,19 @@ struct StudyAPI {
         try await client.post(form: attempt.syncFormFields, to: .syncGameStats, as: Acknowledgment.self)
     }
 
+    /// Submits a single answer in the background (`submitAnswerx1.php`).
+    func submitAnswer(questionId: Int, answer: String, userId: Int) async throws -> Acknowledgment {
+        try await client.post(
+            form: [
+                "question_id": String(questionId),
+                "answer": answer,
+                "user_id": String(userId)
+            ],
+            to: .submitAnswer,
+            as: Acknowledgment.self
+        )
+    }
+
     // MARK: - Topics
 
     /// Loads the topic catalogue (`get_topics.php`).

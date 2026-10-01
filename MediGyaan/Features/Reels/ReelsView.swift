@@ -28,7 +28,7 @@ struct ReelsView: View {
                             .font(.system(size: 48))
                             .foregroundStyle(.white.opacity(0.6))
                         Text("No Reels Available")
-                            .font(AppTheme.Font.title3)
+                            .font(.title3)
                             .foregroundStyle(.white)
                         Button("Refresh") {
                             Task { await loadReels() }
