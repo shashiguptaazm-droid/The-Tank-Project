@@ -87,8 +87,15 @@ struct AiChatView: View {
                         .transition(.opacity)
                 }
             }
-            .navigationDestination(item: $viewModel.activeQuizToLaunch) { quiz in
-                QuizView(quiz: quiz)
+            .navigationDestination(
+                isPresented: Binding(
+                    get: { viewModel.activeQuizToLaunch != nil },
+                    set: { if !$0 { viewModel.activeQuizToLaunch = nil } }
+                )
+            ) {
+                if let quiz = viewModel.activeQuizToLaunch {
+                    QuizView(quiz: quiz)
+                }
             }
         }
     }
@@ -749,43 +756,7 @@ struct AiChatView: View {
             }
 
             ForEach(questions) { q in
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(q.text)
-                            .font(.system(size: 12))
-                            .lineLimit(2)
-                            .foregroundStyle(Color(hex: 0xDDE7F5))
-
-                        Text("Topic: \(q.topic.isEmpty ? q.subject : q.topic)")
-                            .font(.system(size: 11))
-                            .foregroundStyle(Color(hex: 0x8FA3BD))
-                    }
-
-                    Spacer()
-
-                    Button {
-                        let quiz = Quiz(
-                            id: q.id,
-                            title: q.topic.isEmpty ? "Related Practice" : q.topic,
-                            questionCount: 1,
-                            durationSeconds: 120,
-                            subject: q.subject,
-                            topic: q.topic
-                        )
-                        viewModel.activeQuizToLaunch = quiz
-                    } label: {
-                        Text("Practice")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundStyle(Color(hex: 0x07111F))
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(Color(hex: 0x48D6C8))
-                            .clipShape(Capsule())
-                    }
-                }
-                .padding(8)
-                .background(Color(hex: 0x1E2638))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+                relatedQuestionRow(q)
             }
         }
         .padding(12)
@@ -795,6 +766,47 @@ struct AiChatView: View {
             RoundedRectangle(cornerRadius: 16).stroke(Color(hex: 0x2E3A52), lineWidth: 1)
         )
         .padding(.leading, 40)
+    }
+
+    private func relatedQuestionRow(_ q: Question) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(q.text)
+                    .font(.system(size: 12))
+                    .lineLimit(2)
+                    .foregroundStyle(Color(hex: 0xDDE7F5))
+
+                let topicTitle = q.topic.isEmpty ? q.subject : q.topic
+                Text("Topic: \(topicTitle)")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color(hex: 0x8FA3BD))
+            }
+
+            Spacer()
+
+            Button {
+                let quiz = Quiz(
+                    id: q.id,
+                    title: q.topic.isEmpty ? "Related Practice" : q.topic,
+                    questionCount: 1,
+                    durationSeconds: 120,
+                    subject: q.subject,
+                    topic: q.topic
+                )
+                viewModel.activeQuizToLaunch = quiz
+            } label: {
+                Text("Practice")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(Color(hex: 0x07111F))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(Color(hex: 0x48D6C8))
+                    .clipShape(Capsule())
+            }
+        }
+        .padding(8)
+        .background(Color(hex: 0x1E2638))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     // MARK: - Typing Indicator

@@ -164,6 +164,23 @@ struct StudyAPI {
         try await client.get(.singleQuestion, query: ["question_id": String(id)], as: Question.self)
     }
 
+    /// Searches questions by topic or query (`api/getQuestions.php`).
+    func searchQuestions(query text: String) async throws -> [Question] {
+        struct Wrapper: Decodable {
+            let items: [Question]
+            init(from decoder: Decoder) throws {
+                let container = try decoder.flexibleContainer()
+                items = container.flexArray("questions", "data", "results")
+            }
+        }
+        let wrapper = try await client.get(
+            .questionsApi,
+            query: ["query": text, "q": text, "topic": text],
+            as: Wrapper.self
+        )
+        return wrapper.items
+    }
+
     /// Shares a quiz, returning the public link (`quiz_share.php`).
     func shareQuiz(quizId: Int, userId: Int) async throws -> Acknowledgment {
         try await client.post(
