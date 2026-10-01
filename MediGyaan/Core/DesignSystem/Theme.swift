@@ -267,6 +267,10 @@ enum AppTheme {
         static let display = SwiftUI.Font.system(size: 34, weight: .bold)
         /// 22sp bold — dashboard user name.
         static let title = SwiftUI.Font.system(size: 22, weight: .bold)
+        /// 20sp bold — secondary titles.
+        static let title2 = SwiftUI.Font.system(size: 20, weight: .bold)
+        /// 18sp bold — tertiary titles.
+        static let title3 = SwiftUI.Font.system(size: 18, weight: .bold)
         /// 22sp — dashboard stat values.
         static let statValue = SwiftUI.Font.system(size: 22, weight: .bold, design: .rounded)
         /// 21sp — AI predicted rank value.
