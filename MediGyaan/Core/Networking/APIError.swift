@@ -53,4 +53,9 @@ enum APIError: LocalizedError, Equatable {
         if case let .server(_, code) = self { return code }
         return nil
     }
+
+    /// Convenience constructor for server error with just a message
+    static func server(_ message: String) -> APIError {
+        .server(message: message, code: nil)
+    }
 }

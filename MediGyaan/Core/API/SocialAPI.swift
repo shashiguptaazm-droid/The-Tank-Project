@@ -136,7 +136,7 @@ struct SocialAPI {
 
         let (responseData, response) = try await URLSession.shared.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-            throw APIError.server("Upload failed with server error")
+            throw APIError.server(message: "Upload failed with server error", code: nil)
         }
 
         struct UploadResponse: Decodable {
@@ -147,7 +147,7 @@ struct SocialAPI {
         }
         let decoded = try JSONDecoder().decode(UploadResponse.self, from: responseData)
         guard let rawUrl = decoded.fileUrl ?? decoded.url, let url = URL(string: rawUrl) else {
-            throw APIError.server("Server did not return a valid file URL")
+            throw APIError.server(message: "Server did not return a valid file URL", code: nil)
         }
         return url
     }
