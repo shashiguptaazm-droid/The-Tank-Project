@@ -45,30 +45,39 @@ final class SessionStore: ObservableObject {
 
     /// Rehydrates a previous session, letting the user straight into the app.
     private func restore() {
-        let token = secretStore.get(.authToken)
         let storedId = defaults.integer(forKey: DefaultsKey.userId)
 
-        guard token?.isEmpty == false || storedId > 0 else {
+        guard storedId > 0 else {
+            currentUser = nil
             isAuthenticated = false
             return
         }
 
         currentUser = User(
             id: storedId,
-            name: defaults.string(forKey: DefaultsKey.name) ?? "",
+            name: defaults.string(forKey: DefaultsKey.name) ?? "Aspirant",
             email: defaults.string(forKey: DefaultsKey.email) ?? ""
         )
-        isAuthenticated = storedId > 0
+        isAuthenticated = true
+    }
+
+    /// Signs in with guest / demo credentials (userId: 1)
+    func signInAsGuest() {
+        signIn(userId: 1, name: "Aspirant", email: "student@medigyaan.com")
     }
 
     /// Records a successful sign-in.
     func signIn(userId: Int, name: String, email: String, token: String? = nil) {
-        let user = User(id: userId, name: name, email: email)
+        guard userId > 0 else {
+            lastErrorMessage = "Invalid user identification."
+            return
+        }
+        let user = User(id: userId, name: name.isEmpty ? "Aspirant" : name, email: email)
         currentUser = user
-        isAuthenticated = userId > 0
+        isAuthenticated = true
 
         defaults.set(userId, forKey: DefaultsKey.userId)
-        defaults.set(name, forKey: DefaultsKey.name)
+        defaults.set(user.name, forKey: DefaultsKey.name)
         defaults.set(email, forKey: DefaultsKey.email)
 
         if let token, !token.isEmpty {

@@ -102,8 +102,22 @@ struct LoginView: View {
     }
 
     private var secondaryActions: some View {
-        SecondaryButton(title: "Create an account", systemImage: "person.badge.plus") {
-            isShowingRegister = true
+        VStack(spacing: AppTheme.Spacing.sm) {
+            SecondaryButton(title: "Create an account", systemImage: "person.badge.plus") {
+                isShowingRegister = true
+            }
+
+            Button {
+                session.signInAsGuest()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "sparkles")
+                    Text("Instant Demo Access (Explore as Guest)")
+                }
+                .font(AppTheme.Font.subheadline.weight(.semibold))
+                .foregroundStyle(AppTheme.Palette.primary)
+                .padding(.vertical, 8)
+            }
         }
     }
 
@@ -121,7 +135,7 @@ struct LoginView: View {
                 password: password
             )
 
-            guard response.success else {
+            guard response.success, response.userId > 0 else {
                 // `api/login.php` mirrors the Android "Invalid credentials" text.
                 errorMessage = response.message.isEmpty ? "Invalid credentials" : response.message
                 return

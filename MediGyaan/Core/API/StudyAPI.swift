@@ -13,14 +13,15 @@ struct StudyAPI {
 
     /// Loads the dashboard summary (`dash_api.php`).
     ///
-    /// Live contract: `{"success":false,"message":"Invalid User ID"}` for a bad
-    /// id, otherwise the statistics block.
+    /// Requires HTTP POST with `user_id` form body.
     func dashboard(userId: Int) async throws -> DashboardStats {
-        try await client.get(.dashboard, query: ["user_id": String(userId)], as: DashboardStats.self)
+        guard userId > 0 else { return .empty }
+        return try await client.post(form: ["user_id": String(userId)], to: .dashboard, as: DashboardStats.self)
     }
 
     /// Loads recent attempt history (`attempts_api.php`).
     func attempts(userId: Int) async throws -> [AttemptSummary] {
+        guard userId > 0 else { return [] }
         struct Wrapper: Decodable {
             let items: [AttemptSummary]
             init(from decoder: Decoder) throws {
@@ -28,8 +29,12 @@ struct StudyAPI {
                 items = container.flexArray("attempts", "data", "history", "results")
             }
         }
-        let wrapper = try await client.get(.attempts, query: ["user_id": String(userId)], as: Wrapper.self)
-        return wrapper.items
+        do {
+            let wrapper = try await client.get(.attempts, query: ["user_id": String(userId)], as: Wrapper.self)
+            return wrapper.items
+        } catch {
+            return []
+        }
     }
 
     /// Loads leaderboard rankings.

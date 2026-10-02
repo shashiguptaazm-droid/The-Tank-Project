@@ -99,7 +99,14 @@ struct AuthAPI {
 
     /// Fetches the full profile (`get_profilev1.php`).
     func profile(userId: Int) async throws -> User {
-        try await client.get(.profile, query: ["user_id": String(userId)], as: User.self)
+        guard userId > 0 else {
+            return User(id: 0, name: "Aspirant", email: "")
+        }
+        return try await client.get(
+            .profile,
+            query: ["user_id": String(userId), "viewer_id": String(userId)],
+            as: User.self
+        )
     }
 
     /// Updates the profile. The backend accepts a form body here.
