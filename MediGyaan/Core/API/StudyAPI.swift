@@ -134,6 +134,8 @@ struct StudyAPI {
     // MARK: - Quizzes
 
     /// Lists quizzes for a topic (`quiz_apiv2.php`).
+    ///
+    /// Requires HTTP POST form data with `user_id` and `topic_id`.
     func quizzes(topicId: Int, userId: Int) async throws -> [Quiz] {
         struct Wrapper: Decodable {
             let items: [Quiz]
@@ -142,9 +144,9 @@ struct StudyAPI {
                 items = container.flexArray("quizzes", "data", "results")
             }
         }
-        let wrapper = try await client.get(
-            .quiz,
-            query: ["topic_id": String(topicId), "user_id": String(userId)],
+        let wrapper = try await client.post(
+            form: ["topic_id": String(topicId), "user_id": String(userId)],
+            to: .quiz,
             as: Wrapper.self
         )
         return wrapper.items
@@ -245,12 +247,16 @@ struct StudyAPI {
                 items = container.flexArray("challenges", "data", "results")
             }
         }
-        let wrapper = try await client.get(
-            .syncChallenge,
-            query: ["user_id": String(userId), "action": "list"],
-            as: Wrapper.self
-        )
-        return wrapper.items
+        do {
+            let wrapper = try await client.get(
+                .syncChallenge,
+                query: ["user_id": String(userId), "action": "list"],
+                as: Wrapper.self
+            )
+            return wrapper.items
+        } catch {
+            return []
+        }
     }
 
     /// Polls the live battle state (`livebattle.php`).

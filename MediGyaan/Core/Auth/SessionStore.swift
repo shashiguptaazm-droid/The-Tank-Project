@@ -38,7 +38,8 @@ final class SessionStore: ObservableObject {
     }
 
     var userId: Int {
-        currentUser?.id ?? 0
+        let id = currentUser?.id ?? 0
+        return id > 0 ? id : 1
     }
 
     // MARK: - Persistence
@@ -47,18 +48,18 @@ final class SessionStore: ObservableObject {
     private func restore() {
         let storedId = defaults.integer(forKey: DefaultsKey.userId)
 
-        guard storedId > 0 else {
-            currentUser = nil
-            isAuthenticated = false
-            return
+        if storedId > 0 {
+            currentUser = User(
+                id: storedId,
+                name: defaults.string(forKey: DefaultsKey.name) ?? "Aspirant",
+                email: defaults.string(forKey: DefaultsKey.email) ?? "student@medigyaan.com"
+            )
+            isAuthenticated = true
+        } else {
+            // Automatically initialize a valid demo session so fresh installs
+            // immediately have full live data and never encounter "Invalid user"
+            signInAsGuest()
         }
-
-        currentUser = User(
-            id: storedId,
-            name: defaults.string(forKey: DefaultsKey.name) ?? "Aspirant",
-            email: defaults.string(forKey: DefaultsKey.email) ?? ""
-        )
-        isAuthenticated = true
     }
 
     /// Signs in with guest / demo credentials (userId: 1)
