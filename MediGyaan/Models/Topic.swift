@@ -12,9 +12,24 @@ struct Topic: Decodable, Identifiable, Hashable {
     let isLocked: Bool
 
     init(from decoder: Decoder) throws {
+        if let singleValue = try? decoder.singleValueContainer(),
+           let stringName = try? singleValue.decode(String.self) {
+            id = stringName.hashValue
+            name = stringName
+            description = ""
+            subject = ""
+            iconName = "book.fill"
+            colorHex = "#4A90E2"
+            questionCount = 0
+            isLocked = false
+            return
+        }
+
         let container = try decoder.flexibleContainer()
-        id = container.flexInt("topic_id", "id")
-        name = container.flexString("topic_name", "name", "title")
+        let parsedId = container.flexInt("topic_id", "id")
+        let parsedName = container.flexString("topic", "topic_name", "name", "title")
+        id = parsedId != 0 ? parsedId : parsedName.hashValue
+        name = parsedName
         description = container.flexString("description", "desc", "summary")
         subject = container.flexString("subject", "category")
         iconName = container.flexString("icon", "icon_name")

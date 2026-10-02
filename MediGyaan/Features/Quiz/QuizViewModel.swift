@@ -78,10 +78,16 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
         self.userId = userId
 
         state = await LoadState.result { [api, quiz] in
-            let questions = try await api.study.questions(quizId: quiz.id)
+            var questions = (try? await api.study.questions(quizId: quiz.id)) ?? []
+            if questions.isEmpty && !quiz.topic.isEmpty {
+                questions = (try? await api.study.searchQuestions(query: quiz.topic)) ?? []
+            }
+            if questions.isEmpty {
+                questions = (try? await api.study.searchQuestions(query: "Anatomy")) ?? []
+            }
             return QuizSession(
                 quizId: quiz.id,
-                title: quiz.title,
+                title: quiz.title.isEmpty ? (quiz.topic.isEmpty ? "Practice" : quiz.topic) : quiz.title,
                 questions: questions,
                 durationSeconds: quiz.durationSeconds,
                 topic: quiz.topic

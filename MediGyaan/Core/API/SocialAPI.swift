@@ -22,12 +22,15 @@ struct SocialAPI {
                 items = container.flexArray("posts", "data", "feed", "results")
             }
         }
-        let wrapper = try await client.get(
-            .fetchPosts,
-            query: ["user_id": String(userId), "page": String(page)],
-            as: Wrapper.self
-        )
-        return wrapper.items
+        let query: [String: String] = userId > 0
+            ? ["user_id": String(userId), "page": String(page)]
+            : ["page": String(page)]
+        do {
+            return try await client.get(.fetchPosts, query: query, as: [Post].self)
+        } catch {
+            let wrapper = try await client.get(.fetchPosts, query: query, as: Wrapper.self)
+            return wrapper.items
+        }
     }
 
     /// Loads comments for a post.

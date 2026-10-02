@@ -150,6 +150,8 @@ final class HTTPClient {
             forHTTPHeaderField: "Content-Type"
         )
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(APIConfig.appSignature, forHTTPHeaderField: "X-App-Signature")
+        request.setValue(APIConfig.userAgent, forHTTPHeaderField: "User-Agent")
         request.httpBody = HTTPClient.formEncode(form)
         if let authToken, !authToken.isEmpty {
             request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
@@ -166,6 +168,8 @@ final class HTTPClient {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue(multipart.contentType, forHTTPHeaderField: "Content-Type")
+        request.setValue(APIConfig.appSignature, forHTTPHeaderField: "X-App-Signature")
+        request.setValue(APIConfig.userAgent, forHTTPHeaderField: "User-Agent")
         request.httpBody = multipart.finalize()
         let data = try await execute(request)
         return try decode(data, as: type)
@@ -188,6 +192,8 @@ final class HTTPClient {
             request.setValue(contentType, forHTTPHeaderField: "Content-Type")
         }
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(APIConfig.appSignature, forHTTPHeaderField: "X-App-Signature")
+        request.setValue(APIConfig.userAgent, forHTTPHeaderField: "User-Agent")
         if let authToken, !authToken.isEmpty {
             request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
         }

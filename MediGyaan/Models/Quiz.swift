@@ -83,19 +83,26 @@ struct Question: Decodable, Identifiable, Hashable {
         // Preferred shape: an explicit options array.
         var parsed = container.flexStringArray("options", "option_list", "choices")
         if parsed.isEmpty {
-            // Fallback: separate option1..option4 columns.
-            parsed = ["option1", "option2", "option3", "option4"]
+            // Fallback: separate option1..option4 or option_a..option_d columns.
+            parsed = ["option1", "option2", "option3", "option4", "option_a", "option_b", "option_c", "option_d"]
                 .map { container.flexString($0) }
                 .filter { !$0.isEmpty }
         }
         options = parsed
 
-        // `correct_option` may be a 1-based answer number, a 0-based index, or
+        // `correct_option` may be A/B/C/D, a 1-based answer number, a 0-based index, or
         // the answer text itself, depending on which script produced the row.
-        // A value inside `1...options.count` is treated as 1-based unless the
-        // response also carries an explicit `correct_index`.
         let rawCorrect = container.flexString("correct_option", "correct", "answer", "correct_answer")
-        if let numeric = Int(rawCorrect) {
+        let upper = rawCorrect.trimmingCharacters(in: .whitespaces).uppercased()
+        if upper == "A" || upper == "OPTION_A" || upper == "OPTION A" {
+            correctIndex = 0
+        } else if upper == "B" || upper == "OPTION_B" || upper == "OPTION B" {
+            correctIndex = 1
+        } else if upper == "C" || upper == "OPTION_C" || upper == "OPTION C" {
+            correctIndex = 2
+        } else if upper == "D" || upper == "OPTION_D" || upper == "OPTION D" {
+            correctIndex = 3
+        } else if let numeric = Int(rawCorrect) {
             let hasExplicitIndex = !container.flexString("correct_index", "answer_index").isEmpty
             if numeric >= 1, numeric <= options.count, !hasExplicitIndex {
                 correctIndex = numeric - 1

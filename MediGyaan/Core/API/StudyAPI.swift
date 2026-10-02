@@ -78,7 +78,7 @@ struct StudyAPI {
 
     // MARK: - Topics
 
-    /// Loads the topic catalogue (`get_topics.php`).
+    /// Loads the topic catalogue (`api/getTopics.php` or `api/topicsearch.php`).
     func topics(subject: String? = nil) async throws -> [Topic] {
         struct Wrapper: Decodable {
             let items: [Topic]
@@ -87,9 +87,12 @@ struct StudyAPI {
                 items = container.flexArray("topics", "data", "results", "subjects")
             }
         }
-        var query: [String: String] = [:]
-        if let subject, !subject.isEmpty { query["subject"] = subject }
-        let wrapper = try await client.get(.topics, query: query, as: Wrapper.self)
+        if let subject, !subject.isEmpty {
+            let wrapper = try await client.get(.topicsApi, query: ["subject": subject], as: Wrapper.self)
+            return wrapper.items
+        }
+        // If no subject is passed, load topics across curriculum via topic search
+        let wrapper = try await client.get(.topicSearch, query: ["q": "a"], as: Wrapper.self)
         return wrapper.items
     }
 
@@ -151,9 +154,9 @@ struct StudyAPI {
                 items = container.flexArray("questions", "data", "results")
             }
         }
-        let wrapper = try await client.get(
-            .quizQuestions,
-            query: ["quiz_id": String(quizId)],
+        let wrapper = try await client.post(
+            form: ["quiz_id": String(quizId)],
+            to: .quizQuestions,
             as: Wrapper.self
         )
         return wrapper.items

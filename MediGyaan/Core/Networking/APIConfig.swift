@@ -20,6 +20,12 @@ enum APIConfig {
     static let requestTimeout: TimeInterval = 120
     static let resourceTimeout: TimeInterval = 180
 
+    /// Required security signature matching the backend check in Neurons/api/*.php.
+    static let appSignature = "EduLabsRTM_Secure_v1_2026"
+
+    /// iOS Client User-Agent
+    static let userAgent = "MediGyaan-iOS/4.0"
+
     /// The LiveKit SFU that carries audio and video calls.
     ///
     /// This replaces the Jitsi Meet SDK the Android app uses, which dialled the
@@ -70,6 +76,7 @@ enum APIConfig {
         // MARK: Topics, quizzes & tests
         case topics = "get_topics.php"
         case topicsLegacy = "getTopics.php"
+        case topicsApi = "api/getTopics.php"
         case topicSearch = "api/topicsearch.php"
         case search = "api/searchv2.php"
         case quiz = "quiz_apiv2.php"
