@@ -139,7 +139,7 @@ struct College: Decodable, Identifiable, Hashable {
         seats = container.flexInt("seats", "total_seats")
         openingRank = container.flexInt("opening_rank", "rank_from")
         closingRank = container.flexInt("closing_rank", "rank_to")
-        fees = container.flexString("fees", "fee", "tuition")
+        fees = container.flexString("fee_per_year", "total_fee", "fees", "fee", "tuition")
         let site = container.flexString("website", "url", "link")
         website = site.isEmpty ? nil : URL(string: site)
         averageStipend = container.flexString("average_stipend", "stipend")

@@ -213,16 +213,24 @@ struct PredictorAPI {
     /// Looks up colleges for a predicted rank (`predictor_app.php`).
     func colleges(rank: Int, state: String? = nil) async throws -> [College] {
         struct Wrapper: Decodable {
-            let items: [College]
+            let safe: [College]
+            let target: [College]
+            let dream: [College]
+            let direct: [College]
+
             init(from decoder: Decoder) throws {
                 let container = try decoder.flexibleContainer()
-                items = container.flexArray("colleges", "data", "results")
+                safe = container.flexArray("safe_colleges")
+                target = container.flexArray("target_colleges")
+                dream = container.flexArray("dream_colleges")
+                direct = container.flexArray("colleges", "data", "results")
             }
         }
         var query: [String: String] = ["rank": String(rank)]
         if let state, !state.isEmpty { query["state"] = state }
         let wrapper = try await client.get(.predictorApp, query: query, as: Wrapper.self)
-        return wrapper.items
+        let combined = wrapper.target + wrapper.safe + wrapper.dream + wrapper.direct
+        return combined.isEmpty ? [] : Array(combined.prefix(100))
     }
 }
 
