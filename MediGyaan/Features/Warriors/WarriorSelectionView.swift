@@ -24,6 +24,50 @@ struct WarriorSelectionView: View {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
                 activeWarriorHeader
 
+                NavigationLink {
+                    GuardianShowcaseView(initialWarriorId: selectedAvatarId)
+                } label: {
+                    HStack(spacing: 12) {
+                        ZStack {
+                            Circle()
+                                .fill(AppTheme.Ink.gold.opacity(0.2))
+                                .frame(width: 44, height: 44)
+                            Image(systemName: "cube.transparent.fill")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundStyle(AppTheme.Ink.gold)
+                        }
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack {
+                                Text("3D GUARDIAN SHOWCASE")
+                                    .font(.system(size: 13, weight: .heavy))
+                                    .foregroundStyle(Color.white)
+                                Spacer()
+                                Text("INSPECT")
+                                    .font(.system(size: 10, weight: .black))
+                                    .foregroundStyle(AppTheme.Ink.teal)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 3)
+                                    .background(Capsule().fill(AppTheme.Ink.teal.opacity(0.15)))
+                            }
+
+                            Text("Explore 4-Slot Tactical Arsenals, Live Scans & Origin Lore")
+                                .font(.system(size: 11))
+                                .foregroundStyle(AppTheme.Palette.textSecondary)
+                        }
+                    }
+                    .padding(14)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(Color(hex: "#0A172C"))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .stroke(AppTheme.Ink.teal.opacity(0.5), lineWidth: 1.5)
+                            )
+                    )
+                }
+                .buttonStyle(.plain)
+
                 archetypeFilterBar
 
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: AppTheme.Spacing.md) {
@@ -339,6 +383,28 @@ struct WarriorDetailSheet: View {
                                 .foregroundStyle(AppTheme.Palette.textPrimary)
                         }
                     }
+
+                    NavigationLink {
+                        GuardianShowcaseView(initialWarriorId: warrior.id)
+                    } label: {
+                        HStack {
+                            Image(systemName: "cube.fill")
+                            Text("Open in 3D Showcase")
+                        }
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(Color.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(Color(hex: "#0A172C"))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .stroke(warrior.glowColor, lineWidth: 1.5)
+                                )
+                        )
+                    }
+                    .buttonStyle(.plain)
 
                     Button(isSelected ? "Equipped" : "Equip This Warrior") {
                         onEquip()
