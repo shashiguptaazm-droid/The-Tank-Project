@@ -90,6 +90,7 @@ struct SocialAPI {
 
     /// Loads a conversation thread (`messenger_api.php`).
     func messages(conversationId: String, userId: Int) async throws -> [ChatMessage] {
+        guard userId > 0 else { return [] }
         struct Wrapper: Decodable {
             let items: [ChatMessage]
             init(from decoder: Decoder) throws {
@@ -97,12 +98,25 @@ struct SocialAPI {
                 items = container.flexArray("messages", "data", "chat", "results")
             }
         }
-        let wrapper = try await client.get(
-            .messenger,
-            query: ["conversation_id": conversationId, "user_id": String(userId)],
-            as: Wrapper.self
-        )
-        return wrapper.items
+        let receiverId = Int(conversationId) ?? 1
+        do {
+            return try await client.get(
+                .messenger,
+                query: ["fetch_messages": String(receiverId), "user_id": String(userId)],
+                as: [ChatMessage].self
+            )
+        } catch {
+            do {
+                let wrapper = try await client.get(
+                    .messenger,
+                    query: ["fetch_messages": String(receiverId), "user_id": String(userId)],
+                    as: Wrapper.self
+                )
+                return wrapper.items
+            } catch {
+                return []
+            }
+        }
     }
 
     /// Sends a message (`messenger_api.php`).

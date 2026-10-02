@@ -255,26 +255,55 @@ final class HTTPClient {
         // The backend signals logical failures inside a `success: false` body,
         // but it also uses 401/503 for some paths.
         if http.statusCode == 401 {
-            if let envelope = try? decoder.decode(Envelope.self, from: data),
-               let message = envelope.error ?? envelope.message {
-                throw APIError.server(message: message, code: envelope.code)
-            }
-            throw APIError.unauthorized
+            let message = (try? decoder.decode(Envelope.self, from: data))?.error ?? (try? decoder.decode(Envelope.self, from: data))?.message
+            let err = APIError.server(message: message ?? "Unauthorized", code: 401)
+            APILogger.shared.record(
+                method: method,
+                url: url,
+                statusCode: http.statusCode,
+                durationMs: elapsedMs,
+                headers: requestHeaders,
+                requestBody: request.httpBody,
+                responseBody: data,
+                error: err
+            )
+            throw err
         }
 
         guard (200 ..< 300).contains(http.statusCode) else {
             // Prefer the backend's own explanation when it sent JSON.
-            if let envelope = try? decoder.decode(Envelope.self, from: data),
-               envelope.success == false {
-                throw APIError.server(message: envelope.error ?? envelope.message, code: envelope.code)
-            }
-            throw APIError.httpStatus(http.statusCode)
+            let envelope = try? decoder.decode(Envelope.self, from: data)
+            let message = envelope?.error ?? envelope?.message ?? "HTTP \(http.statusCode)"
+            let err = APIError.server(message: message, code: envelope?.code ?? http.statusCode)
+            APILogger.shared.record(
+                method: method,
+                url: url,
+                statusCode: http.statusCode,
+                durationMs: elapsedMs,
+                headers: requestHeaders,
+                requestBody: request.httpBody,
+                responseBody: data,
+                error: err
+            )
+            throw err
         }
 
         // A 200 that still contains `success: false` is a logical failure.
         if let envelope = try? decoder.decode(Envelope.self, from: data),
            envelope.success == false {
-            throw APIError.server(message: envelope.error ?? envelope.message, code: envelope.code)
+            let message = envelope.error ?? envelope.message ?? "Request rejected by server"
+            let err = APIError.server(message: message, code: envelope.code)
+            APILogger.shared.record(
+                method: method,
+                url: url,
+                statusCode: http.statusCode,
+                durationMs: elapsedMs,
+                headers: requestHeaders,
+                requestBody: request.httpBody,
+                responseBody: data,
+                error: err
+            )
+            throw err
         }
 
         return data
