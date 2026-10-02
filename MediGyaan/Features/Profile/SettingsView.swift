@@ -33,10 +33,11 @@ struct SettingsView: View {
                 Toggle("Sound effects", isOn: $soundEffects)
             }
 
-            Section("Data") {
+            Section("Data & Diagnostics") {
                 Toggle("Auto-sync progress", isOn: $autoSync)
                 LabeledContent("Backend", value: "medigyaan.com")
                 LabeledContent("App version", value: Bundle.main.shortVersion)
+                NavigationLink("Network Inspector (Live Logs)") { NetworkInspectorView() }
             }
 
             Section("Support") {

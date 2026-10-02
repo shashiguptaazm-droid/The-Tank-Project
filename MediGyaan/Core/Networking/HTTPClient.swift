@@ -201,17 +201,56 @@ final class HTTPClient {
     }
 
     private func execute(_ request: URLRequest) async throws -> Data {
+        let startTime = CFAbsoluteTimeGetCurrent()
+        let requestHeaders = request.allHTTPHeaderFields ?? [:]
+        let url = request.url ?? URL(string: "https://medigyaan.com/")!
+        let method = request.httpMethod ?? "GET"
+
         let data: Data
         let response: URLResponse
         do {
             (data, response) = try await session.data(for: request)
         } catch {
+            let elapsedMs = Int((CFAbsoluteTimeGetCurrent() - startTime) * 1000)
+            APILogger.shared.record(
+                method: method,
+                url: url,
+                statusCode: 0,
+                durationMs: elapsedMs,
+                headers: requestHeaders,
+                requestBody: request.httpBody,
+                responseBody: nil,
+                error: error
+            )
             throw APIError.transport(message: error.localizedDescription)
         }
 
         guard let http = response as? HTTPURLResponse else {
+            let elapsedMs = Int((CFAbsoluteTimeGetCurrent() - startTime) * 1000)
+            APILogger.shared.record(
+                method: method,
+                url: url,
+                statusCode: 0,
+                durationMs: elapsedMs,
+                headers: requestHeaders,
+                requestBody: request.httpBody,
+                responseBody: data,
+                error: APIError.invalidResponse
+            )
             throw APIError.invalidResponse
         }
+
+        let elapsedMs = Int((CFAbsoluteTimeGetCurrent() - startTime) * 1000)
+        APILogger.shared.record(
+            method: method,
+            url: url,
+            statusCode: http.statusCode,
+            durationMs: elapsedMs,
+            headers: requestHeaders,
+            requestBody: request.httpBody,
+            responseBody: data,
+            error: nil
+        )
 
         // The backend signals logical failures inside a `success: false` body,
         // but it also uses 401/503 for some paths.
