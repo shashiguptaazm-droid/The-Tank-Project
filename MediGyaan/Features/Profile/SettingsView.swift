@@ -7,10 +7,10 @@ struct SettingsView: View {
     @EnvironmentObject private var session: SessionStore
     @Environment(\.dismiss) private var dismiss
 
-    @AppStorage("mg.darkMode") private var darkMode = false
-    @AppStorage("mg.notifications") private var notifications = true
-    @AppStorage("mg.soundEffects") private var soundEffects = true
-    @AppStorage("mg.autoSync") private var autoSync = true
+    @AppStorage(AppPreferences.darkMode) private var darkMode = false
+    @AppStorage(AppPreferences.notifications) private var notifications = true
+    @AppStorage(AppPreferences.soundEffects) private var soundEffects = true
+    @AppStorage(AppPreferences.autoSync) private var autoSync = true
 
     @State private var isConfirmingSignOut = false
 

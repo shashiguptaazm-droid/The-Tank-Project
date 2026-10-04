@@ -16,7 +16,7 @@ struct GlobalSearchView: View {
     @State private var isSearching = false
     @State private var hasSearched = false
     @State private var errorMessage: String?
-    @AppStorage("mg.recentSearches") private var recentSearchesJSON = "[]"
+    @AppStorage(AppPreferences.recentSearches) private var recentSearchesJSON = "[]"
 
     private var recentSearches: [String] {
         (try? JSONDecoder().decode([String].self, from: Data(recentSearchesJSON.utf8))) ?? []

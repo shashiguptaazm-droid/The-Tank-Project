@@ -11,7 +11,7 @@ struct DashboardView: View {
 
     @EnvironmentObject private var session: SessionStore
     @Environment(\.api) private var api
-    @AppStorage("mg.darkMode") private var darkMode = false
+    @AppStorage(AppPreferences.darkMode) private var darkMode = false
 
     @StateObject private var viewModel = DashboardViewModel()
     @State private var hasConfigured = false
