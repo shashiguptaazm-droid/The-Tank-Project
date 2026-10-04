@@ -209,4 +209,14 @@ final class DailyStatsManager {
             )
         }.sorted { $0.accuracy > $1.accuracy }
     }
+
+    /// Export raw JSON representation of daily stats.
+    func exportRawJson() -> String {
+        let data = load()
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: data),
+              let str = String(data: jsonData, encoding: .utf8) else {
+            return "{}"
+        }
+        return str
+    }
 }
