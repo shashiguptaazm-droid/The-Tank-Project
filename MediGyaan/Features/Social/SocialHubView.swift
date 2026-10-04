@@ -222,7 +222,24 @@ struct PostCard: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                if let imageURL = post.imageURL {
+                // Multi-image paging slider matching Android NewsFeedAdapter / ImageSliderAdapter
+                if !post.filePaths.isEmpty {
+                    TabView {
+                        ForEach(post.filePaths, id: \.self) { path in
+                            let fullURL = path.hasPrefix("http") ? path : "https://medigyaan.com/Neurons/\(path.trimmingCharacters(in: CharacterSet(charactersIn: "./")))"
+                            if let url = URL(string: fullURL) {
+                                AsyncImage(url: url) { img in
+                                    img.resizable().scaledToFill()
+                                } placeholder: {
+                                    Rectangle().fill(AppTheme.Palette.cardBackgroundElevated)
+                                }
+                            }
+                        }
+                    }
+                    .frame(height: 220)
+                    .tabViewStyle(.page(indexDisplayMode: .automatic))
+                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                } else if let imageURL = post.imageURL {
                     AsyncImage(url: imageURL) { image in
                         image.resizable().scaledToFill()
                     } placeholder: {

@@ -8,6 +8,7 @@ struct Post: Decodable, Identifiable, Hashable {
     let authorAvatarURL: URL?
     let content: String
     let imageURL: URL?
+    let filePaths: [String]
     let likeCount: Int
     let commentCount: Int
     let shareCount: Int
@@ -23,8 +24,9 @@ struct Post: Decodable, Identifiable, Hashable {
         authorAvatarURL = avatar.isEmpty ? nil : URL(string: avatar)
         content = container.flexString("caption", "content", "post", "text", "body", "description")
         let image = container.flexString("image", "image_url", "post_image", "media")
-        let filePaths = container.flexStringArray("file_paths", "files", "images")
-        let resolvedImage = !image.isEmpty ? image : (filePaths.first ?? "")
+        let files = container.flexStringArray("file_paths", "files", "images")
+        filePaths = files
+        let resolvedImage = !image.isEmpty ? image : (files.first ?? "")
         imageURL = resolvedImage.isEmpty ? nil : URL(string: resolvedImage)
         likeCount = container.flexInt("likes", "like_count", "total_likes")
         commentCount = container.flexInt("comments", "comment_count", "total_comments")
@@ -40,6 +42,7 @@ struct Post: Decodable, Identifiable, Hashable {
         authorAvatarURL: URL? = nil,
         content: String,
         imageURL: URL? = nil,
+        filePaths: [String] = [],
         likeCount: Int = 0,
         commentCount: Int = 0,
         shareCount: Int = 0,
@@ -52,6 +55,7 @@ struct Post: Decodable, Identifiable, Hashable {
         self.authorAvatarURL = authorAvatarURL
         self.content = content
         self.imageURL = imageURL
+        self.filePaths = filePaths
         self.likeCount = likeCount
         self.commentCount = commentCount
         self.shareCount = shareCount
