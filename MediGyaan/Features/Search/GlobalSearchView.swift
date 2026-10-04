@@ -149,17 +149,156 @@ struct GlobalSearchView: View {
         }
     }
 
+    @State private var activeFilter: String = "ALL"
+    @State private var searchResults: [SearchResultItem] = []
+
+    private let filterOptions = ["ALL", "QUESTIONS", "TOPICS", "USERS", "POSTS"]
+
+    private var filteredResults: [SearchResultItem] {
+        switch activeFilter {
+        case "QUESTIONS":
+            return searchResults.filter { if case .question = $0 { return true } else { return false } }
+        case "TOPICS":
+            return searchResults.filter { if case .topic = $0 { return true } else { return false } }
+        case "USERS":
+            return searchResults.filter { if case .user = $0 { return true } else { return false } }
+        case "POSTS":
+            return searchResults.filter { if case .post = $0 { return true } else { return false } }
+        default:
+            return searchResults
+        }
+    }
+
     private var results: some View {
-        ScrollView {
-            LazyVStack(spacing: AppTheme.Spacing.sm) {
-                ForEach(Array(topicResults.enumerated()), id: \.element.id) { index, topic in
-                    NavigationLink { QuizListView(topic: topic) } label: {
-                        TopicRow(topic: topic, tint: AppTheme.Palette.accent(for: index))
+        VStack(spacing: 0) {
+            // Filter chips
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: AppTheme.Spacing.xs) {
+                    ForEach(filterOptions, id: \.self) { filter in
+                        let isSelected = filter == activeFilter
+                        Button {
+                            activeFilter = filter
+                        } label: {
+                            Text(filter)
+                                .font(AppTheme.Font.caption.weight(.semibold))
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 7)
+                                .background(Capsule().fill(isSelected ? AppTheme.Palette.primary : AppTheme.Palette.cardBackgroundElevated))
+                                .foregroundStyle(isSelected ? Color.white : AppTheme.Palette.textSecondary)
+                        }
                     }
-                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, AppTheme.Spacing.lg)
+                .padding(.vertical, AppTheme.Spacing.xs)
+            }
+
+            ScrollView {
+                LazyVStack(spacing: AppTheme.Spacing.sm) {
+                    ForEach(filteredResults) { item in
+                        resultRow(item)
+                    }
+                }
+                .padding(AppTheme.Spacing.lg)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func resultRow(_ item: SearchResultItem) -> some View {
+        switch item {
+        case let .question(id, text, subject, _):
+            CardContainer(padding: AppTheme.Spacing.sm) {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        TagBadge(text: subject.isEmpty ? "Question" : subject, tint: AppTheme.Palette.primary)
+                        Spacer()
+                        Text("#\(id)").font(AppTheme.Font.caption2).foregroundStyle(AppTheme.Palette.textMuted)
+                    }
+                    Text(text)
+                        .font(AppTheme.Font.callout)
+                        .foregroundStyle(AppTheme.Palette.textPrimary)
+                        .lineLimit(3)
                 }
             }
-            .padding(AppTheme.Spacing.lg)
+
+        case let .topic(name, subject):
+            CardContainer(padding: AppTheme.Spacing.sm) {
+                HStack(spacing: AppTheme.Spacing.md) {
+                    Image(systemName: "book.fill")
+                        .foregroundStyle(AppTheme.Palette.accent)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(name)
+                            .font(AppTheme.Font.headline)
+                            .foregroundStyle(AppTheme.Palette.textPrimary)
+                        Text(subject)
+                            .font(AppTheme.Font.caption)
+                            .foregroundStyle(AppTheme.Palette.textSecondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12))
+                        .foregroundStyle(AppTheme.Palette.textMuted)
+                }
+            }
+
+        case let .user(id, name, photo, _):
+            CardContainer(padding: AppTheme.Spacing.sm) {
+                HStack(spacing: AppTheme.Spacing.md) {
+                    if let url = URL(string: photo), !photo.isEmpty {
+                        AsyncImage(url: url) { img in
+                            img.resizable().scaledToFill()
+                        } placeholder: {
+                            Circle().fill(AppTheme.Palette.cardBackgroundElevated)
+                        }
+                        .frame(width: 38, height: 38)
+                        .clipShape(Circle())
+                    } else {
+                        Image(systemName: "person.circle.fill")
+                            .font(.system(size: 38))
+                            .foregroundStyle(AppTheme.Palette.primary)
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(name.isEmpty ? "Doctor" : name)
+                            .font(AppTheme.Font.headline)
+                            .foregroundStyle(AppTheme.Palette.textPrimary)
+                        Text("Warrior #\(id)")
+                            .font(AppTheme.Font.caption2)
+                            .foregroundStyle(AppTheme.Palette.textMuted)
+                    }
+                    Spacer()
+                }
+            }
+
+        case let .post(id, author, _, caption, _, likes, date):
+            CardContainer(padding: AppTheme.Spacing.sm) {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(author).font(AppTheme.Font.caption.weight(.bold)).foregroundStyle(AppTheme.Palette.textPrimary)
+                        Spacer()
+                        Text(date).font(AppTheme.Font.caption2).foregroundStyle(AppTheme.Palette.textMuted)
+                    }
+                    Text(caption).font(AppTheme.Font.callout).foregroundStyle(AppTheme.Palette.textSecondary).lineLimit(2)
+                    HStack {
+                        Image(systemName: "heart.fill").foregroundStyle(Color.red).font(.system(size: 11))
+                        Text("\(likes)").font(AppTheme.Font.caption2).foregroundStyle(AppTheme.Palette.textMuted)
+                    }
+                }
+            }
+
+        case let .video(id, title, author, _, _, _, likes, date):
+            CardContainer(padding: AppTheme.Spacing.sm) {
+                HStack(spacing: AppTheme.Spacing.md) {
+                    Image(systemName: "play.rectangle.fill")
+                        .font(.title2)
+                        .foregroundStyle(Color.red)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(title).font(AppTheme.Font.headline).lineLimit(1)
+                        Text("\(author) • \(likes) likes").font(AppTheme.Font.caption2).foregroundStyle(AppTheme.Palette.textMuted)
+                    }
+                    Spacer()
+                }
+            }
         }
     }
 
