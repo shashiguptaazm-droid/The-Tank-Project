@@ -138,13 +138,14 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
     // MARK: - Sending Messages
 
     func sendCurrentInput(api: MediGyaanAPI, userId: Int) {
-        let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
+        let raw = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !raw.isEmpty else { return }
+        let corrected = AiAutoCorrect.correct(text: raw)
         input = ""
         let attachment = attachedDocumentName
         attachedDocumentName = nil
 
-        send(prompt: trimmed, attachmentName: attachment, api: api, userId: userId)
+        send(prompt: corrected, attachmentName: attachment, api: api, userId: userId)
     }
 
     func selectSuggestion(_ suggestion: AiPromptSuggestion, api: MediGyaanAPI, userId: Int) {
@@ -232,6 +233,15 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
             } catch {
                 replyText = generateClinicalFallback(for: prompt)
             }
+
+            AiTrainingLogger.log(
+                userId: userId,
+                source: "ai_chat",
+                prompt: prompt,
+                response: replyText,
+                status: "completed",
+                contextJson: "{\"attachment\":\"\(attachmentName ?? "")\"}"
+            )
 
             let endTime = DispatchTime.now()
             let elapsedNanos = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
