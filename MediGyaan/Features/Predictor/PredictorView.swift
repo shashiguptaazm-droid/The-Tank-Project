@@ -278,14 +278,19 @@ struct CollegeRow: View {
     }
 }
 
-/// Detailed college information. Ports `CollegeDetailActivity`.
+/// Detailed college information. Ports Android `CollegeDetailActivity.kt` and `CollegeHtmlRepository.kt`.
 struct CollegeDetailView: View {
 
     let college: College
 
+    @State private var detailData: CollegeDetailData?
+    @State private var isLoading = false
+    @State private var showAllRows = false
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                // Header Card
                 CardContainer {
                     VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
                         Text(college.name.isEmpty ? "College" : college.name)
@@ -296,9 +301,16 @@ struct CollegeDetailView: View {
                                 .font(AppTheme.Font.callout)
                                 .foregroundStyle(AppTheme.Palette.textSecondary)
                         }
+
+                        if let address = detailData?.address, !address.isEmpty {
+                            Text(address)
+                                .font(AppTheme.Font.caption)
+                                .foregroundStyle(AppTheme.Palette.textMuted)
+                        }
                     }
                 }
 
+                // Grid Quick Stats
                 LazyVGrid(
                     columns: Array(repeating: GridItem(.flexible(), spacing: AppTheme.Spacing.sm), count: 2),
                     spacing: AppTheme.Spacing.sm
@@ -309,9 +321,149 @@ struct CollegeDetailView: View {
                     StatTile(value: college.fees.isEmpty ? "—" : college.fees, label: "Fees", systemImage: "indianrupeesign", tint: AppTheme.Palette.accent)
                 }
 
-                if let website = college.website {
+                // Deep Scraped Details Card
+                if isLoading {
+                    CardContainer {
+                        HStack(spacing: AppTheme.Spacing.md) {
+                            ProgressView()
+                            Text("Loading college profile & fee details...")
+                                .font(AppTheme.Font.subheadline)
+                                .foregroundStyle(AppTheme.Palette.textSecondary)
+                        }
+                        .padding(.vertical, AppTheme.Spacing.sm)
+                    }
+                } else if let detail = detailData, !detail.dataInReview {
+                    // Fee Structure Section
+                    if !detail.annualFee.isEmpty || !detail.nriFee.isEmpty {
+                        CardContainer {
+                            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+                                Label("Fee Structure", systemImage: "banknote.fill")
+                                    .font(AppTheme.Font.headline)
+                                    .foregroundStyle(Color.blue)
+
+                                if !detail.annualFee.isEmpty {
+                                    HStack {
+                                        Text("Annual Fee:")
+                                            .font(AppTheme.Font.callout)
+                                            .foregroundStyle(AppTheme.Palette.textSecondary)
+                                        Spacer()
+                                        Text(detail.annualFee)
+                                            .font(AppTheme.Font.callout.weight(.semibold))
+                                    }
+                                }
+
+                                if !detail.nriFee.isEmpty {
+                                    HStack {
+                                        Text("NRI Fee:")
+                                            .font(AppTheme.Font.callout)
+                                            .foregroundStyle(AppTheme.Palette.textSecondary)
+                                        Spacer()
+                                        Text(detail.nriFee)
+                                            .font(AppTheme.Font.callout.weight(.semibold))
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Stipend Breakdown Section
+                    if !detail.stipend1.isEmpty || !detail.stipend2.isEmpty || !detail.stipend3.isEmpty {
+                        CardContainer {
+                            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+                                Label("Resident Stipend", systemImage: "cross.case.fill")
+                                    .font(AppTheme.Font.headline)
+                                    .foregroundStyle(Color.green)
+
+                                if !detail.stipend1.isEmpty {
+                                    HStack {
+                                        Text("1st Year:")
+                                            .font(AppTheme.Font.callout)
+                                        Spacer()
+                                        Text(detail.stipend1)
+                                            .font(AppTheme.Font.callout.weight(.semibold))
+                                    }
+                                }
+                                if !detail.stipend2.isEmpty {
+                                    HStack {
+                                        Text("2nd Year:")
+                                            .font(AppTheme.Font.callout)
+                                        Spacer()
+                                        Text(detail.stipend2)
+                                            .font(AppTheme.Font.callout.weight(.semibold))
+                                    }
+                                }
+                                if !detail.stipend3.isEmpty {
+                                    HStack {
+                                        Text("3rd Year:")
+                                            .font(AppTheme.Font.callout)
+                                        Spacer()
+                                        Text(detail.stipend3)
+                                            .font(AppTheme.Font.callout.weight(.semibold))
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Officials Section
+                    if !detail.dean.isEmpty || !detail.nodalOfficer.isEmpty {
+                        CardContainer {
+                            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+                                Label("Administration", systemImage: "person.crop.circle.fill")
+                                    .font(AppTheme.Font.headline)
+                                    .foregroundStyle(Color.orange)
+
+                                if !detail.dean.isEmpty {
+                                    Text("Dean / Principal: \(detail.dean)")
+                                        .font(AppTheme.Font.callout)
+                                }
+                                if !detail.nodalOfficer.isEmpty {
+                                    Text("Nodal Officer: \(detail.nodalOfficer)")
+                                        .font(AppTheme.Font.callout)
+                                }
+                            }
+                        }
+                    }
+
+                    // Toggle Extra Details
+                    if !detail.allFields.isEmpty {
+                        Button {
+                            withAnimation { showAllRows.toggle() }
+                        } label: {
+                            HStack {
+                                Text(showAllRows ? "Hide Full Parameters" : "View Full Parameters")
+                                    .font(AppTheme.Font.subheadline.weight(.semibold))
+                                Image(systemName: showAllRows ? "chevron.up" : "chevron.down")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, AppTheme.Spacing.sm)
+                        }
+
+                        if showAllRows {
+                            CardContainer {
+                                VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+                                    ForEach(detail.allFields.sorted(by: { $0.key < $1.key }), id: \.key) { k, v in
+                                        HStack {
+                                            Text(k)
+                                                .font(AppTheme.Font.caption)
+                                                .foregroundStyle(AppTheme.Palette.textSecondary)
+                                            Spacer()
+                                            Text(v)
+                                                .font(AppTheme.Font.caption.weight(.medium))
+                                        }
+                                        Divider()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Official website link
+                if let urlString = detailData?.website.isEmpty == false ? detailData?.website : college.website?.absoluteString,
+                   let website = URL(string: urlString) {
                     Link(destination: website) {
-                        Label("Visit website", systemImage: "safari.fill")
+                        Label("Visit Official Portal", systemImage: "safari.fill")
                             .font(AppTheme.Font.callout.weight(.semibold))
                             .frame(maxWidth: .infinity)
                             .frame(height: 46)
@@ -326,8 +478,13 @@ struct CollegeDetailView: View {
             .padding(AppTheme.Spacing.md)
         }
         .screenBackground()
-        .navigationTitle("College")
+        .navigationTitle("College Details")
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            isLoading = true
+            detailData = await CollegeHtmlRepository.shared.loadCollege(collegeName: college.name)
+            isLoading = false
+        }
     }
 }
 
