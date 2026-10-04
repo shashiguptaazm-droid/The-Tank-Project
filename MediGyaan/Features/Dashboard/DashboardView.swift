@@ -295,13 +295,17 @@ struct DashboardView: View {
         }
     }
 
-    /// `#0D1A2B` card with Wins / Accuracy / Streak / Battles.
     private var detailsCard: some View {
         InkCard(fill: AppTheme.Ink.surface, radius: AppTheme.Radius.card) {
             HStack(spacing: 0) {
                 InkStatTile(value: "\(stats.correct)", label: "Wins ✅")
                 divider
-                InkStatTile(value: String(format: "%.0f%%", percentileAccuracy), label: "Accuracy 🎯")
+                NavigationLink {
+                    AccuracyView()
+                } label: {
+                    InkStatTile(value: String(format: "%.0f%%", percentileAccuracy), label: "Accuracy 🎯")
+                }
+                .buttonStyle(.plain)
                 divider
                 InkStatTile(value: "\(stats.streak)", label: "Streak")
                 divider
@@ -444,26 +448,34 @@ struct DashboardView: View {
         }
     }
 
-    /// `#2B1B18` streak card.
+    /// `#2B1B18` streak card navigating to AccuracyView (matching Android DashboardActivity.kt line 1140).
     private var streakCard: some View {
-        InkCard(fill: AppTheme.Ink.streakCard, radius: AppTheme.Radius.card) {
-            HStack(spacing: AppTheme.Spacing.md) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("🔥 Daily Learning Streak")
-                        .font(AppTheme.Font.cardTitle)
-                        .foregroundStyle(AppTheme.Ink.textPrimary)
-                    Text("\(stats.streak) Days Active")
-                        .font(AppTheme.Font.subheadline)
-                        .foregroundStyle(AppTheme.Ink.textSecondary)
-                    if stats.todayAttempted > 0 {
-                        Text("\(stats.todayCorrect)/\(stats.todayAttempted) correct today")
-                            .font(AppTheme.Font.caption)
-                            .foregroundStyle(AppTheme.Ink.success)
+        NavigationLink {
+            AccuracyView()
+        } label: {
+            InkCard(fill: AppTheme.Ink.streakCard, radius: AppTheme.Radius.card) {
+                HStack(spacing: AppTheme.Spacing.md) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("🔥 Daily Learning Streak")
+                            .font(AppTheme.Font.cardTitle)
+                            .foregroundStyle(AppTheme.Ink.textPrimary)
+                        Text("\(stats.streak) Days Active")
+                            .font(AppTheme.Font.subheadline)
+                            .foregroundStyle(AppTheme.Ink.textSecondary)
+                        if stats.todayAttempted > 0 {
+                            Text("\(stats.todayCorrect)/\(stats.todayAttempted) correct today")
+                                .font(AppTheme.Font.caption)
+                                .foregroundStyle(AppTheme.Ink.success)
+                        }
                     }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(AppTheme.Ink.textSecondary)
                 }
-                Spacer()
             }
         }
+        .buttonStyle(.plain)
     }
 
     /// `#2D2341` invite card, shown once there is something to act on.
