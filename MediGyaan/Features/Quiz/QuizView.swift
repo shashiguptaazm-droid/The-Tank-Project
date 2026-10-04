@@ -513,6 +513,29 @@ struct QuizResultView: View {
                 .padding(.horizontal, AppTheme.Spacing.md)
 
                 VStack(spacing: AppTheme.Spacing.sm) {
+                    if !attempt.answers.isEmpty {
+                        NavigationLink {
+                            ReviewView(questions: reviewQuestions(from: attempt))
+                        } label: {
+                            HStack {
+                                Image(systemName: "list.bullet.clipboard")
+                                Text("Review Answers")
+                            }
+                            .font(AppTheme.Font.headline)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(
+                                RoundedRectangle(cornerRadius: AppTheme.Radius.md)
+                                    .fill(AppTheme.Palette.cardBackgroundElevated)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: AppTheme.Radius.md)
+                                            .stroke(AppTheme.Palette.primary.opacity(0.4), lineWidth: 1)
+                                    )
+                            )
+                            .foregroundStyle(Color.white)
+                        }
+                    }
+
                     PrimaryButton(title: "Done") { onDone() }
                 }
                 .padding(.horizontal, AppTheme.Spacing.md)
@@ -521,6 +544,31 @@ struct QuizResultView: View {
         }
         .screenBackground()
         .navigationBarBackButtonHidden(true)
+    }
+
+    private func reviewQuestions(from attempt: QuizAttempt) -> [ReviewQuestionItem] {
+        return attempt.answers.map { ans in
+            let letters = ["A", "B", "C", "D", "E"]
+            let userLetter = letters.indices.contains(ans.selectedIndex) ? letters[ans.selectedIndex] : ""
+            let correctLetter = letters.indices.contains(ans.correctIndex) ? letters[ans.correctIndex] : ""
+            return ReviewQuestionItem(
+                question_id: ans.questionId,
+                question: "Question #\(ans.questionId)",
+                option_a: "",
+                option_b: "",
+                option_c: "",
+                option_d: "",
+                option_e: "",
+                selected_option: userLetter,
+                correct_option: correctLetter,
+                selected_answer_text: "",
+                correct_answer_text: "",
+                score_change: ans.isCorrect ? 1 : 0,
+                explanation: "",
+                image_url: "",
+                is_correct: ans.isCorrect ? 1 : 0
+            )
+        }
     }
 }
 

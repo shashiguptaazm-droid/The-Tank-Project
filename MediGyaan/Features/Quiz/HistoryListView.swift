@@ -120,6 +120,23 @@ struct HistoryListView: View {
                         .foregroundStyle(item.percentage >= 70 ? AppTheme.Palette.success : (item.percentage >= 50 ? AppTheme.Palette.warning : AppTheme.Palette.error))
                 }
                 .padding(.top, 2)
+
+                if !item.reviewJson.isEmpty {
+                    Divider().padding(.vertical, 2)
+                    NavigationLink {
+                        ReviewView(reviewJson: item.reviewJson)
+                    } label: {
+                        HStack {
+                            Text("Review Answers")
+                                .font(AppTheme.Font.caption.weight(.semibold))
+                                .foregroundStyle(AppTheme.Palette.primary)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption2)
+                                .foregroundStyle(AppTheme.Palette.textMuted)
+                        }
+                    }
+                }
             }
         }
     }
