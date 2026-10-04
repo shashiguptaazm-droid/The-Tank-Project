@@ -159,6 +159,20 @@ final class HTTPClient {
         return try decodeObject(try await execute(request))
     }
 
+    /// `GET`s an **absolute** URL and returns the raw JSON object, for services
+    /// that do not live under `APIConfig.baseURL` — the LiveKit token endpoint on
+    /// the SFU host, and the NCBI E-utilities used by ``PubMedCitationService``.
+    ///
+    /// Deliberately sends no `X-App-Signature`: that header identifies the app to
+    /// *our* PHP backend and is meaningless to third parties.
+    func getObject(toAbsolute url: URL) async throws -> [String: Any] {
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(APIConfig.userAgent, forHTTPHeaderField: "User-Agent")
+        return try decodeObject(try await execute(request))
+    }
+
     /// Uploads raw multipart form data.
     func upload<T: Decodable>(
         to url: URL,
