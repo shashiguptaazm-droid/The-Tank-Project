@@ -184,9 +184,9 @@ struct StudyAPI {
         init(from decoder: Decoder) throws {
             let container = try decoder.flexibleContainer()
             success = container.flexBool("success")
-            allQuestionIds = container.flexIntArray("all_question_ids", "question_ids")
+            allQuestionIds = container.flexArray("all_question_ids", "question_ids")
             currentIndex = container.flexInt("current_index")
-            question = try? container.decodeIfPresent(Question.self, forKey: "data")
+            question = try? container.decodeIfPresent(Question.self, forKey: AnyCodingKey("data"))
         }
     }
 
