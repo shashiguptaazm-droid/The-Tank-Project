@@ -18,6 +18,7 @@ struct DashboardView: View {
     @State private var searchText = ""
     @State private var isShowingSearch = false
     @State private var isShowingMenu = false
+    @State private var isShowingRapidFire = false
     @State private var path = NavigationPath()
     @AppStorage("selected_avatar_name") private var selectedAvatarName: String = "Mantis • Zerek"
     @AppStorage("selected_subject_preference") private var selectedGoal: String = "NEET PG"
@@ -54,6 +55,20 @@ struct DashboardView: View {
                 }
             }
             .sheet(isPresented: $isShowingMenu) { drawer }
+            .fullScreenCover(isPresented: $isShowingRapidFire) {
+                NavigationStack {
+                    QuizView(
+                        quiz: Quiz(
+                            id: 0,
+                            title: "Rapid Fire Practice",
+                            topic: "",
+                            subject: selectedGoal,
+                            questionCount: 0,
+                            durationSeconds: 0
+                        )
+                    )
+                }
+            }
             .task {
                 guard !hasConfigured else { return }
                 hasConfigured = true
@@ -362,17 +377,8 @@ struct DashboardView: View {
                 }
                 .buttonStyle(.plain)
 
-                NavigationLink {
-                    QuizView(
-                        quiz: Quiz(
-                            id: 0,
-                            title: "Rapid Fire Practice",
-                            topic: "",
-                            subject: selectedGoal,
-                            questionCount: 0,
-                            durationSeconds: 0
-                        )
-                    )
+                Button {
+                    isShowingRapidFire = true
                 } label: {
                     BattleModeCard(
                         tag: "⚡ FAST",

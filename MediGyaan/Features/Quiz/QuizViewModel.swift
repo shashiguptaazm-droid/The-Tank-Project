@@ -33,7 +33,11 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
     private var userId: Int = 0
     private var startedAt = Date()
     private var timerTask: Task<Void, Never>?
-    private let speechSynthesizer = AVSpeechSynthesizer()
+    private lazy var speechSynthesizer: AVSpeechSynthesizer = {
+        let synth = AVSpeechSynthesizer()
+        synth.delegate = self
+        return synth
+    }()
 
     init(quiz: Quiz) {
         self.quiz = quiz
@@ -42,7 +46,6 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
             self.selectedTopic = quiz.topic
         }
         super.init()
-        speechSynthesizer.delegate = self
     }
 
     // MARK: - Derived state
@@ -114,7 +117,8 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
             let fetchedTopics = try await api.study.topics(subject: currentSubject)
             var names = ["All Topics"]
             names.append(contentsOf: fetchedTopics.map { $0.name }.filter { !$0.isEmpty })
-            self.topicsList = Array(NSOrderedSet(array: names)) as? [String] ?? names
+            var seen = Set<String>()
+            self.topicsList = names.filter { seen.insert($0).inserted }
         } catch {
             self.topicsList = ["All Topics"]
         }
@@ -179,10 +183,13 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
         expEarned = 0
         isAnswerRevealed = false
 
-        secondsRemaining = quiz.durationSeconds > 0
-            ? quiz.durationSeconds
-            : (allQuestionIds.isEmpty ? loaded.count : allQuestionIds.count) * 60
-        startTimer()
+        if quiz.durationSeconds > 0 {
+            secondsRemaining = quiz.durationSeconds
+            startTimer()
+        } else {
+            secondsRemaining = 0
+            timerTask?.cancel()
+        }
     }
 
     /// User switches topic from the in-session topic dropdown (matching Android MCQActivity onItemSelected)
@@ -194,6 +201,7 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
     }
 
     private func startTimer() {
+        guard secondsRemaining > 0 else { return }
         timerTask?.cancel()
         timerTask = Task { [weak self] in
             while !Task.isCancelled {

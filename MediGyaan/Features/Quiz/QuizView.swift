@@ -33,6 +33,16 @@ struct QuizView: View {
         .toolbar(.hidden, for: .tabBar)
         .toolbar(.visible, for: .navigationBar)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(AppTheme.Palette.textPrimary)
+                }
+            }
+
             ToolbarItemGroup(placement: .topBarTrailing) {
                 if viewModel.currentQuestion != nil {
                     // Audio Reader (TTS)
@@ -180,17 +190,31 @@ struct QuizView: View {
 
                 Spacer()
 
-                HStack(spacing: AppTheme.Spacing.xxs) {
-                    Image(systemName: "timer")
-                    Text(viewModel.formattedTimeRemaining)
-                        .monospacedDigit()
+                if viewModel.secondsRemaining > 0 {
+                    HStack(spacing: AppTheme.Spacing.xxs) {
+                        Image(systemName: "timer")
+                        Text(viewModel.formattedTimeRemaining)
+                            .monospacedDigit()
+                    }
+                    .font(AppTheme.Font.caption.weight(.semibold))
+                    .foregroundStyle(
+                        viewModel.secondsRemaining <= 30
+                            ? AppTheme.Palette.danger
+                            : AppTheme.Palette.primary
+                    )
+                } else {
+                    HStack(spacing: 3) {
+                        Image(systemName: "bolt.fill")
+                            .font(.system(size: 10))
+                        Text("Rapid Fire")
+                            .font(.system(size: 11, weight: .bold))
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.purple.opacity(0.15))
+                    .foregroundStyle(Color.purple)
+                    .clipShape(Capsule())
                 }
-                .font(AppTheme.Font.caption.weight(.semibold))
-                .foregroundStyle(
-                    viewModel.secondsRemaining <= 30
-                        ? AppTheme.Palette.danger
-                        : AppTheme.Palette.primary
-                )
             }
 
             ProgressView(value: viewModel.progress)
