@@ -12,6 +12,7 @@ import SwiftUI
 struct AccuracyView: View {
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.api) private var api
     @EnvironmentObject private var session: SessionStore
 
     @State private var selectedTab: Int = 0 // 0: 7 Days, 1: 30 Days, 2: Topics
@@ -508,7 +509,7 @@ struct AccuracyView: View {
         Task {
             do {
                 if let user = session.currentUser {
-                    let stats = try await ApiClient.shared.fetchDashboard(userId: user.id)
+                    let stats = try await api.study.dashboard(userId: user.id)
                     await MainActor.run {
                         if stats.attempted > 0 {
                             overallAttempted = stats.attempted

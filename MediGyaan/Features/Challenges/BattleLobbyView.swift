@@ -105,7 +105,7 @@ struct BattleLobbyView: View {
                             .background(Circle().fill(Color.black))
                     }
 
-                    Text(session.user?.name ?? "Warrior")
+                    Text(session.currentUser?.name ?? "Warrior")
                         .font(AppTheme.Font.headline)
                         .foregroundStyle(AppTheme.Palette.textPrimary)
                         .lineLimit(1)
