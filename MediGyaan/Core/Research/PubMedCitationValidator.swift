@@ -573,7 +573,7 @@ enum PubMedCitationValidator {
             .components(separatedByPattern: Pattern.sentenceBreak)
             .map { segment -> String in
                 var value = segment.trimmingCharacters(in: .whitespacesAndNewlines)
-                while let last = value.last, terminalPunctuation.contains(last) {
+                while let last = value.last, let scalar = last.unicodeScalars.first, terminalPunctuation.contains(scalar) {
                     value.removeLast()
                 }
                 return value

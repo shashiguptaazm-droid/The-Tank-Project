@@ -13,6 +13,34 @@ struct QuestionShareSheet: View {
     @State private var includeAnswer: Bool = false
     @State private var hasCopied: Bool = false
 
+    init(data: QuestionShareHelper.QuestionShareData) {
+        self.data = data
+    }
+
+    init(question: Question, userId: Int = 0) {
+        let optA = question.options.indices.contains(0) ? question.options[0] : ""
+        let optB = question.options.indices.contains(1) ? question.options[1] : ""
+        let optC = question.options.indices.contains(2) ? question.options[2] : ""
+        let optD = question.options.indices.contains(3) ? question.options[3] : ""
+        let letters = ["A", "B", "C", "D", "E"]
+        let corr = question.options.indices.contains(question.correctIndex) ? letters[question.correctIndex] : nil
+
+        self.data = QuestionShareHelper.QuestionShareData(
+            questionId: question.id,
+            questionText: question.text,
+            optionA: optA,
+            optionB: optB,
+            optionC: optC,
+            optionD: optD,
+            subject: question.subject.isEmpty ? "Medical MCQ" : question.subject,
+            topic: question.topic,
+            imageURL: question.imageURL?.absoluteString,
+            userId: userId,
+            correctAnswer: corr,
+            explanation: question.explanation
+        )
+    }
+
     private var shareText: String {
         QuestionShareHelper.buildShareText(data: data, includeAnswer: includeAnswer)
     }

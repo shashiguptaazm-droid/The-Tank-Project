@@ -63,6 +63,11 @@ enum AppTheme {
         static let textPrimary = adaptive(light: Color(hex: 0x1A1C2E), dark: Color(hex: 0xFFFFFF))
         /// `text_secondary` — #5F6368 day / #C7C7C7 night.
         static let textSecondary = adaptive(light: Color(hex: 0x5F6368), dark: Color(hex: 0xC7C7C7))
+        /// Muted / disabled text — #9E9E9E day / #757575 night.
+        static let textMuted = adaptive(light: Color(hex: 0x9E9E9E), dark: Color(hex: 0x757575))
+
+        /// Elevated card background — #F8F9FA day / #2A2A2A night.
+        static let cardBackgroundElevated = adaptive(light: Color(hex: 0xF8F9FA), dark: Color(hex: 0x2A2A2A))
 
         /// `primary_dark` — #3949AB day / #5C6BC0 night.
         static let primaryDark = adaptive(light: Color(hex: 0x3949AB), dark: Color(hex: 0x5C6BC0))
@@ -287,8 +292,10 @@ enum AppTheme {
         static let callout = SwiftUI.Font.system(size: 14, weight: .medium)
         /// 13sp — dashboard streak line.
         static let subheadline = SwiftUI.Font.system(size: 13)
-        /// 12sp — labels and captions.
+        /// 12sp labels and captions.
         static let caption = SwiftUI.Font.system(size: 12)
+        /// 11sp secondary caption.
+        static let caption2 = SwiftUI.Font.system(size: 11)
         /// 12sp bold — XP text and mode tags.
         static let captionBold = SwiftUI.Font.system(size: 12, weight: .bold)
         /// 11sp — stat tile labels.
