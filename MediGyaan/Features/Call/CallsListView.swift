@@ -10,7 +10,7 @@ import SwiftUI
 struct CallsListView: View {
 
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var api: MediGyaanAPI
+    @Environment(\.api) private var api
     @EnvironmentObject private var session: SessionStore
     @State private var calls: [CallLogItem] = []
     @State private var selectedFilter: String = "All" // "All", "Missed", "Incoming", "Outgoing"
