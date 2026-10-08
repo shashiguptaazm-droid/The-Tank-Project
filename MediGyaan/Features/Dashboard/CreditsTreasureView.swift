@@ -101,11 +101,11 @@ struct CreditsTreasureView: View {
                 Spacer()
 
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text("XP Status")
+                    Text("Streak Status")
                         .font(AppTheme.Font.caption)
                         .foregroundStyle(AppTheme.Palette.textMuted)
 
-                    Text("\(session.user?.xp ?? 0) XP")
+                    Text("\(session.currentUser?.streak ?? 0) Days")
                         .font(AppTheme.Font.callout.weight(.bold))
                         .foregroundStyle(AppTheme.Palette.primary)
                 }
@@ -260,7 +260,7 @@ struct CreditsTreasureView: View {
                 .foregroundStyle(AppTheme.Palette.textPrimary)
 
             ForEach(credits.rankMilestones) { milestone in
-                let currentXp = session.user?.xp ?? 0
+                let currentXp = (session.currentUser?.overallCorrect ?? 0) * 10
                 let isClaimed = credits.isRankClaimed(milestone.tierName)
                 let canClaim = credits.canClaimRankReward(milestone, currentXp: currentXp)
 

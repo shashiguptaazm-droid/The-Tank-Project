@@ -10,6 +10,8 @@ import SwiftUI
 struct CallsListView: View {
 
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var api: MediGyaanAPI
+    @EnvironmentObject private var session: SessionStore
     @State private var calls: [CallLogItem] = []
     @State private var selectedFilter: String = "All" // "All", "Missed", "Incoming", "Outgoing"
     @State private var inspectingCall: CallLogItem? = nil
@@ -73,9 +75,13 @@ struct CallsListView: View {
         )) {
             if let dest = activeCallDestination {
                 CallView(
-                    roomName: dest.room,
-                    peerName: dest.peer,
-                    callKind: dest.isVideo ? .video : .audio
+                    model: CallViewModel(
+                        roomName: dest.room,
+                        kind: dest.isVideo ? .video : .audio,
+                        peerName: dest.peer,
+                        api: api,
+                        session: session
+                    )
                 )
             }
         }

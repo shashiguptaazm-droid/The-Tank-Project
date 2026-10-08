@@ -86,7 +86,7 @@ struct EquipmentCatalogView: View {
                             .rotation3DEffect(.degrees(rotationAngle), axis: (x: 0, y: 1, z: 0))
 
                         Text(selectedItem.fileName)
-                            .font(.system(size: 11, weight: .monospaced))
+                            .font(.system(size: 11, design: .monospaced))
                             .foregroundStyle(AppTheme.Palette.textMuted)
                     }
 

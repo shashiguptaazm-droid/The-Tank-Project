@@ -103,6 +103,7 @@ struct RankBadge: View {
 /// Ports `AppMaterialButton`: 24dp corner radius, primary tint, no caps.
 struct PrimaryButton: View {
     let title: String
+    var icon: String? = nil
     var isLoading: Bool = false
     var isEnabled: Bool = true
     /// `SubmitButtonStyle` uses a 26dp radius and bold text.
@@ -112,11 +113,17 @@ struct PrimaryButton: View {
     var body: some View {
         Button(action: action) {
             ZStack {
-                Text(title)
-                    .font(isSubmit
-                        ? .system(size: 15, weight: .bold)
-                        : AppTheme.Font.body.weight(.medium))
-                    .opacity(isLoading ? 0 : 1)
+                HStack(spacing: 8) {
+                    if let icon {
+                        Image(systemName: icon)
+                            .font(.system(size: 16, weight: .bold))
+                    }
+                    Text(title)
+                        .font(isSubmit
+                            ? .system(size: 15, weight: .bold)
+                            : AppTheme.Font.body.weight(.medium))
+                }
+                .opacity(isLoading ? 0 : 1)
                 if isLoading {
                     ProgressView().tint(AppTheme.Palette.onPrimary)
                 }
