@@ -20,6 +20,7 @@ struct DashboardView: View {
     @State private var isShowingMenu = false
     @State private var path = NavigationPath()
     @AppStorage("selected_avatar_name") private var selectedAvatarName: String = "Mantis • Zerek"
+    @AppStorage("selected_subject_preference") private var selectedGoal: String = "NEET PG"
 
     private var stats: DashboardStats { viewModel.state.value ?? .empty }
 
@@ -361,7 +362,18 @@ struct DashboardView: View {
                 }
                 .buttonStyle(.plain)
 
-                NavigationLink { TopicChallengePickerView(mode: .solo) } label: {
+                NavigationLink {
+                    QuizView(
+                        quiz: Quiz(
+                            id: 0,
+                            title: "Rapid Fire Practice",
+                            topic: "",
+                            subject: selectedGoal,
+                            questionCount: 0,
+                            durationSeconds: 0
+                        )
+                    )
+                } label: {
                     BattleModeCard(
                         tag: "⚡ FAST",
                         emoji: "🚀",

@@ -192,6 +192,45 @@ struct QuizView: View {
 
             ProgressView(value: viewModel.progress)
                 .tint(AppTheme.Palette.primary)
+
+            // In-Session Topic Selector Bar (matching Android MCQActivity topicSpinner)
+            if !viewModel.topicsList.isEmpty {
+                HStack {
+                    Label(viewModel.selectedTopic, systemImage: "folder.fill")
+                        .font(AppTheme.Font.caption.weight(.semibold))
+                        .foregroundStyle(AppTheme.Palette.primary)
+                        .lineLimit(1)
+
+                    Spacer()
+
+                    Menu {
+                        ForEach(viewModel.topicsList, id: \.self) { topicName in
+                            Button {
+                                Task { await viewModel.selectTopic(topicName) }
+                            } label: {
+                                HStack {
+                                    Text(topicName)
+                                    if topicName == viewModel.selectedTopic {
+                                        Image(systemName: "checkmark")
+                                    }
+                                }
+                            }
+                        }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text("Switch Topic")
+                                .font(AppTheme.Font.caption.weight(.bold))
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(.system(size: 10, weight: .bold))
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Capsule().fill(AppTheme.Palette.primary.opacity(0.12)))
+                        .foregroundStyle(AppTheme.Palette.primary)
+                    }
+                }
+                .padding(.top, 2)
+            }
         }
         .padding(.horizontal, AppTheme.Spacing.md)
         .padding(.vertical, AppTheme.Spacing.sm)
@@ -331,9 +370,12 @@ struct QuizView: View {
                     columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 5),
                     spacing: 12
                 ) {
-                    ForEach(Array(viewModel.questions.enumerated()), id: \.offset) { index, q in
-                        let isAnswered = viewModel.isQuestionAnswered(q)
-                        let isCorrect = viewModel.answers[q.id]?.isCorrect ?? false
+                    let totalCount = viewModel.totalQuestionsCount
+                    let itemsCount = min(totalCount, 200) // Render up to first 200 for smooth performance
+                    ForEach(0..<itemsCount, id: \.self) { index in
+                        let question = viewModel.questions.indices.contains(index) ? viewModel.questions[index] : nil
+                        let isAnswered = question.map { viewModel.isQuestionAnswered($0) } ?? false
+                        let isCorrect = question.flatMap { viewModel.answers[$0.id]?.isCorrect } ?? false
                         let isCurrent = viewModel.currentIndex == index
 
                         Button {

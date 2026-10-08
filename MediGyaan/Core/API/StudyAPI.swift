@@ -174,6 +174,51 @@ struct StudyAPI {
         try await client.get(.singleQuestion, query: ["question_id": String(id)], as: Question.self)
     }
 
+    /// Response from `api/getQuestions.php` matching Android's `MCQActivity.kt`.
+    struct GetQuestionsResponse: Decodable {
+        let success: Bool
+        let allQuestionIds: [Int]
+        let currentIndex: Int
+        let question: Question?
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.flexibleContainer()
+            success = container.flexBool("success")
+            allQuestionIds = container.flexIntArray("all_question_ids", "question_ids")
+            currentIndex = container.flexInt("current_index")
+            question = try? container.decodeIfPresent(Question.self, forKey: "data")
+        }
+    }
+
+    /// Fetches the question stream matching Android's `MCQActivity.kt`:
+    /// `getQuestions.php?subject=<subject>&topic=<topic>&user_id=<userId>`
+    func fetchQuestions(
+        subject: String,
+        topic: String? = nil,
+        userId: Int = 1,
+        questionId: Int? = nil,
+        limit: Int? = nil
+    ) async throws -> (question: Question?, allQuestionIds: [Int]) {
+        var query: [String: String] = [
+            "user_id": String(userId),
+            "t": String(Int(Date().timeIntervalSince1970 * 1000))
+        ]
+        if let questionId, questionId > 0 {
+            query["question_id"] = String(questionId)
+        } else {
+            query["subject"] = subject
+            if let topic, !topic.isEmpty, topic != "All Topics" {
+                query["topic"] = topic
+            }
+            if let limit {
+                query["limit"] = String(limit)
+            }
+        }
+
+        let resp = try await client.get(.questionsApi, query: query, as: GetQuestionsResponse.self)
+        return (resp.question, resp.allQuestionIds)
+    }
+
     /// Searches questions by topic or query (`api/getQuestions.php`).
     func searchQuestions(query text: String) async throws -> [Question] {
         struct Wrapper: Decodable {

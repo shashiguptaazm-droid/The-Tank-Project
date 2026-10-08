@@ -21,7 +21,14 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
     @Published private(set) var isAnswerRevealed: Bool = false
     @Published private(set) var isSpeaking: Bool = false
 
+    // Topic selector & Question pool (matching Android MCQActivity.kt topicSpinner & all_question_ids)
+    @Published var selectedTopic: String = "All Topics"
+    @Published private(set) var topicsList: [String] = ["All Topics"]
+    @Published private(set) var allQuestionIds: [Int] = []
+    @Published private(set) var isLoadingQuestion: Bool = false
+
     private let quiz: Quiz
+    private var currentSubject: String
     private var api: MediGyaanAPI = .live
     private var userId: Int = 0
     private var startedAt = Date()
@@ -30,6 +37,10 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
 
     init(quiz: Quiz) {
         self.quiz = quiz
+        self.currentSubject = quiz.subject.isEmpty ? "NEET PG" : quiz.subject
+        if !quiz.topic.isEmpty {
+            self.selectedTopic = quiz.topic
+        }
         super.init()
         speechSynthesizer.delegate = self
     }
@@ -43,7 +54,19 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
         return questions[currentIndex]
     }
 
-    var isLastQuestion: Bool { currentIndex >= questions.count - 1 }
+    var isLastQuestion: Bool {
+        if !allQuestionIds.isEmpty {
+            return currentIndex >= allQuestionIds.count - 1
+        }
+        return currentIndex >= questions.count - 1
+    }
+
+    var totalQuestionsCount: Int {
+        if !allQuestionIds.isEmpty {
+            return allQuestionIds.count
+        }
+        return questions.count
+    }
 
     var hasStarted: Bool {
         if case .idle = state { return false }
@@ -51,8 +74,9 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
     }
 
     var progress: Double {
-        guard !questions.isEmpty else { return 0 }
-        return Double(currentIndex + 1) / Double(questions.count)
+        let total = totalQuestionsCount
+        guard total > 0 else { return 0 }
+        return Double(currentIndex + 1) / Double(total)
     }
 
     var answeredCount: Int { answers.count }
@@ -77,24 +101,77 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
         self.api = api
         self.userId = userId
 
-        state = await LoadState.result { [api, quiz] in
-            var questions = (try? await api.study.questions(quizId: quiz.id)) ?? []
-            if questions.isEmpty && !quiz.topic.isEmpty {
-                questions = (try? await api.study.searchQuestions(query: quiz.topic)) ?? []
-            }
-            if questions.isEmpty {
-                questions = (try? await api.study.searchQuestions(query: "Anatomy")) ?? []
-            }
-            return QuizSession(
-                quizId: quiz.id,
-                title: quiz.title.isEmpty ? (quiz.topic.isEmpty ? "Practice" : quiz.topic) : quiz.title,
-                questions: questions,
-                durationSeconds: quiz.durationSeconds,
-                topic: quiz.topic
-            )
-        }
+        // Fetch curriculum topics for subject matching Android's fetchTopics()
+        await loadTopics()
 
-        guard let session = state.value, !session.questions.isEmpty else { return }
+        // Fetch initial question and pool of question IDs
+        await loadInitialQuestionSession()
+    }
+
+    /// Fetches all topics for the subject from api/getTopics.php (matching MCQActivity.kt fetchTopics)
+    func loadTopics() async {
+        do {
+            let fetchedTopics = try await api.study.topics(subject: currentSubject)
+            var names = ["All Topics"]
+            names.append(contentsOf: fetchedTopics.map { $0.name }.filter { !$0.isEmpty })
+            self.topicsList = Array(NSOrderedSet(array: names)) as? [String] ?? names
+        } catch {
+            self.topicsList = ["All Topics"]
+        }
+    }
+
+    /// Loads the question stream and question ID pool matching Android's fetchQuestion(null)
+    func loadInitialQuestionSession() async {
+        state = .loading
+        isLoadingQuestion = true
+        defer { isLoadingQuestion = false }
+
+        do {
+            // First check if fixed quiz has questions
+            if quiz.id > 0 {
+                let quizQuestions = (try? await api.study.questions(quizId: quiz.id)) ?? []
+                if !quizQuestions.isEmpty {
+                    applyLoadedQuestions(quizQuestions)
+                    return
+                }
+            }
+
+            // Otherwise, stream from getQuestions.php?subject=<subject>&topic=<topic>&user_id=<userId>
+            let (question, rawIds) = try await api.study.fetchQuestions(
+                subject: currentSubject,
+                topic: selectedTopic == "All Topics" ? nil : selectedTopic,
+                userId: userId
+            )
+
+            self.allQuestionIds = rawIds
+            if let firstQuestion = question {
+                applyLoadedQuestions([firstQuestion])
+            } else if let firstId = rawIds.first {
+                let singleQ = try await api.study.question(id: firstId)
+                applyLoadedQuestions([singleQ])
+            } else {
+                state = .loaded(QuizSession(
+                    quizId: quiz.id,
+                    title: quiz.title.isEmpty ? selectedTopic : quiz.title,
+                    questions: [],
+                    durationSeconds: quiz.durationSeconds,
+                    topic: selectedTopic
+                ))
+            }
+        } catch {
+            state = .failed(error.localizedDescription)
+        }
+    }
+
+    private func applyLoadedQuestions(_ loaded: [Question]) {
+        state = .loaded(QuizSession(
+            quizId: quiz.id,
+            title: quiz.title.isEmpty ? (selectedTopic.isEmpty ? "Practice" : selectedTopic) : quiz.title,
+            questions: loaded,
+            durationSeconds: quiz.durationSeconds,
+            topic: selectedTopic
+        ))
+
         startedAt = Date()
         currentIndex = 0
         answers = [:]
@@ -102,10 +179,18 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
         expEarned = 0
         isAnswerRevealed = false
 
-        secondsRemaining = session.durationSeconds > 0
-            ? session.durationSeconds
-            : session.questions.count * 60
+        secondsRemaining = quiz.durationSeconds > 0
+            ? quiz.durationSeconds
+            : (allQuestionIds.isEmpty ? loaded.count : allQuestionIds.count) * 60
         startTimer()
+    }
+
+    /// User switches topic from the in-session topic dropdown (matching Android MCQActivity onItemSelected)
+    func selectTopic(_ topic: String) async {
+        guard topic != selectedTopic else { return }
+        selectedTopic = topic
+        stopAudio()
+        await loadInitialQuestionSession()
     }
 
     private func startTimer() {
@@ -160,6 +245,7 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
         stopAudio()
         guard !isLastQuestion else { return }
         currentIndex += 1
+        ensureQuestionLoaded(at: currentIndex)
         isAnswerRevealed = (currentQuestion.flatMap { answers[$0.id] } != nil)
     }
 
@@ -167,14 +253,49 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
         stopAudio()
         guard currentIndex > 0 else { return }
         currentIndex -= 1
+        ensureQuestionLoaded(at: currentIndex)
         isAnswerRevealed = (currentQuestion.flatMap { answers[$0.id] } != nil)
     }
 
     func jump(to index: Int) {
         stopAudio()
-        guard questions.indices.contains(index) else { return }
+        guard index >= 0 && index < totalQuestionsCount else { return }
         currentIndex = index
+        ensureQuestionLoaded(at: currentIndex)
         isAnswerRevealed = (currentQuestion.flatMap { answers[$0.id] } != nil)
+    }
+
+    private func ensureQuestionLoaded(at index: Int) {
+        guard !questions.indices.contains(index) else { return }
+        guard allQuestionIds.indices.contains(index) else { return }
+        let questionId = allQuestionIds[index]
+        isLoadingQuestion = true
+        Task { [weak self] in
+            guard let self else { return }
+            defer { self.isLoadingQuestion = false }
+            if let fetched = try? await self.api.study.question(id: questionId) {
+                var currentList = self.questions
+                while currentList.count <= index {
+                    if currentList.count == index {
+                        currentList.append(fetched)
+                    } else {
+                        // placeholder
+                        currentList.append(fetched)
+                    }
+                }
+                currentList[index] = fetched
+                if let currentSession = self.state.value {
+                    self.state = .loaded(QuizSession(
+                        id: currentSession.id,
+                        quizId: currentSession.quizId,
+                        title: currentSession.title,
+                        questions: currentList,
+                        durationSeconds: currentSession.durationSeconds,
+                        topic: currentSession.topic
+                    ))
+                }
+            }
+        }
     }
 
     // MARK: - Audio Reader (TTS)
