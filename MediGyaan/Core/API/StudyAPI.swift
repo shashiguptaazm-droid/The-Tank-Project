@@ -171,7 +171,23 @@ struct StudyAPI {
 
     /// Loads one question (`api/get_single_question.php`).
     func question(id: Int) async throws -> Question {
-        try await client.get(.singleQuestion, query: ["question_id": String(id)], as: Question.self)
+        struct SingleWrapper: Decodable {
+            let success: Bool?
+            let data: Question?
+
+            init(from decoder: Decoder) throws {
+                let container = try? decoder.container(keyedBy: AnyCodingKey.self)
+                success = try? container?.decodeIfPresent(Bool.self, forKey: AnyCodingKey("success"))
+                data = try? container?.decodeIfPresent(Question.self, forKey: AnyCodingKey("data"))
+            }
+        }
+
+        // Try decoding wrapped response {"success": true, "data": {...}} first, then fallback to root Question
+        if let wrapped = try? await client.get(.singleQuestion, query: ["question_id": String(id)], as: SingleWrapper.self),
+           let q = wrapped.data {
+            return q
+        }
+        return try await client.get(.singleQuestion, query: ["question_id": String(id)], as: Question.self)
     }
 
     /// Response from `api/getQuestions.php` matching Android's `MCQActivity.kt`.
@@ -184,9 +200,20 @@ struct StudyAPI {
         init(from decoder: Decoder) throws {
             let container = try decoder.flexibleContainer()
             success = container.flexBool("success")
-            allQuestionIds = container.flexArray("all_question_ids", "question_ids")
             currentIndex = container.flexInt("current_index")
             question = try? container.decodeIfPresent(Question.self, forKey: AnyCodingKey("data"))
+
+            // Optimize allQuestionIds decoding: standard Decodable is instant (<1ms) for 50,000+ items,
+            // avoiding flexArray's 50,000+ JSONSerialization allocations which crash with out-of-memory.
+            if let ids = try? container.decodeIfPresent([Int].self, forKey: AnyCodingKey("all_question_ids")) {
+                allQuestionIds = ids
+            } else if let strIds = try? container.decodeIfPresent([String].self, forKey: AnyCodingKey("all_question_ids")) {
+                allQuestionIds = strIds.compactMap { Int($0) }
+            } else if let ids = try? container.decodeIfPresent([Int].self, forKey: AnyCodingKey("question_ids")) {
+                allQuestionIds = ids
+            } else {
+                allQuestionIds = container.flexArray("all_question_ids", "question_ids")
+            }
         }
     }
 

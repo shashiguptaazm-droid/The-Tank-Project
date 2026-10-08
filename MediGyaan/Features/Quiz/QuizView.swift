@@ -128,6 +128,9 @@ struct QuizView: View {
                         if viewModel.isQuestionAnswered(question) {
                             explanationCard(question)
                         }
+                    } else if viewModel.isLoadingQuestion {
+                        LoadingStateView(message: "Loading question…")
+                            .frame(maxWidth: .infinity, minHeight: 200)
                     }
                 }
                 .padding(AppTheme.Spacing.md)
@@ -143,7 +146,7 @@ struct QuizView: View {
     private var header: some View {
         VStack(spacing: AppTheme.Spacing.sm) {
             HStack {
-                Text("Question \(viewModel.currentIndex + 1) of \(viewModel.questions.count)")
+                Text("Question \(viewModel.currentIndex + 1) of \(viewModel.totalQuestionsCount)")
                     .font(AppTheme.Font.caption.weight(.medium))
                     .foregroundStyle(AppTheme.Palette.textSecondary)
 
@@ -465,7 +468,7 @@ struct QuizView: View {
                 .opacity(viewModel.isLastQuestion ? 0.4 : 1)
             }
 
-            Text("\(viewModel.answeredCount) of \(viewModel.questions.count) answered")
+            Text("\(viewModel.answeredCount) of \(viewModel.totalQuestionsCount) answered")
                 .font(AppTheme.Font.caption)
                 .foregroundStyle(AppTheme.Palette.textSecondary)
         }
