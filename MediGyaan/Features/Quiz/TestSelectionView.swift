@@ -216,10 +216,10 @@ public struct TestSelectionView: View {
         let mockQuiz = Quiz(
             id: testId,
             title: title,
-            questionCount: 50,
-            durationSeconds: 2700,
+            topic: "\(selectedCategory.rawValue) Mock Exam Series",
             subject: selectedCategory.rawValue,
-            topic: "\(selectedCategory.rawValue) Mock Exam Series"
+            questionCount: 50,
+            durationSeconds: 2700
         )
         testToLaunch = mockQuiz
     }
