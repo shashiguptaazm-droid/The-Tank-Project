@@ -58,7 +58,7 @@ public struct MedicalEquipmentItem: Identifiable, Hashable {
 /// Central clinical equipment repository mirroring Android's 40+ high-yield items.
 public enum MedicalEquipmentRepository {
 
-    public static let categories: [
+    public static let categories: [String] = [
         "All",
         "Cardiothoracic",
         "Anatomy",
@@ -68,7 +68,7 @@ public enum MedicalEquipmentRepository {
         "General & Ortho"
     ]
 
-    public static let items: [MedicalEquipmentItem]: [
+    public static let items: [MedicalEquipmentItem] = [
         // ─── ANATOMY ───
         MedicalEquipmentItem(
             id: "equip_anatom_bone_lever",
