@@ -140,7 +140,7 @@ struct MatchmakingQueueView: View {
             HStack(spacing: AppTheme.Spacing.md) {
                 // User Fighter Profile
                 fighterPod(
-                    name: session.user?.name ?? "You",
+                    name: session.currentUser?.name ?? "You",
                     rank: "Aspirant",
                     color: AppTheme.Palette.primary,
                     icon: "person.crop.circle.fill"

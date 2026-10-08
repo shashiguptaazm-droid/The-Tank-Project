@@ -1098,4 +1098,17 @@ enum GuardianRegistry {
             }
         }
     }
+
+    /// Creates an active battle/quiz loadout of powers for the specified avatar indices.
+    public static func createLoadout(avatarIndices: [Int]) -> [GuardianLoadoutSlot] {
+        var slots: [GuardianLoadoutSlot] = []
+        for index in avatarIndices {
+            if let kit = getHeroKit(for: index) {
+                for power in kit.allPowers {
+                    slots.append(GuardianLoadoutSlot(power: power))
+                }
+            }
+        }
+        return slots
+    }
 }

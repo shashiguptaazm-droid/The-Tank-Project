@@ -37,21 +37,21 @@ public struct MedicalEquipmentItem: Identifiable, Hashable {
         creditCost: Int,
         badgeColorHex: String
     ) {
-        self.id: id
-        self.name: name
-        self.specialty: specialty
-        self.category: category
-        self.fileName: fileName
-        self.anatomy: anatomy
-        self.clinicalUses: clinicalUses
-        self.disadvantages: disadvantages
-        self.statPrecision: statPrecision
-        self.statDifficulty: statDifficulty
-        self.statRarity: statRarity
-        self.statDamage: statDamage
-        self.statBuff: statBuff
-        self.creditCost: creditCost
-        self.badgeColorHex: badgeColorHex
+        self.id = id
+        self.name = name
+        self.specialty = specialty
+        self.category = category
+        self.fileName = fileName
+        self.anatomy = anatomy
+        self.clinicalUses = clinicalUses
+        self.disadvantages = disadvantages
+        self.statPrecision = statPrecision
+        self.statDifficulty = statDifficulty
+        self.statRarity = statRarity
+        self.statDamage = statDamage
+        self.statBuff = statBuff
+        self.creditCost = creditCost
+        self.badgeColorHex = badgeColorHex
     }
 }
 
