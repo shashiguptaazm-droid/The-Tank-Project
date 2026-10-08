@@ -33,11 +33,7 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
     private var userId: Int = 0
     private var startedAt = Date()
     private var timerTask: Task<Void, Never>?
-    private lazy var speechSynthesizer: AVSpeechSynthesizer = {
-        let synth = AVSpeechSynthesizer()
-        synth.delegate = self
-        return synth
-    }()
+    private var speechSynthesizer: AVSpeechSynthesizer?
 
     init(quiz: Quiz) {
         self.quiz = quiz
@@ -329,13 +325,18 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
         let utterance = AVSpeechUtterance(string: speech)
         utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate
-        speechSynthesizer.speak(utterance)
+        if speechSynthesizer == nil {
+            let synth = AVSpeechSynthesizer()
+            synth.delegate = self
+            speechSynthesizer = synth
+        }
+        speechSynthesizer?.speak(utterance)
         isSpeaking = true
     }
 
     func stopAudio() {
-        if speechSynthesizer.isSpeaking {
-            speechSynthesizer.stopSpeaking(at: .immediate)
+        if let synth = speechSynthesizer, synth.isSpeaking {
+            synth.stopSpeaking(at: .immediate)
         }
         isSpeaking = false
     }
@@ -369,6 +370,5 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
 
     deinit {
         timerTask?.cancel()
-        speechSynthesizer.stopSpeaking(at: .immediate)
     }
 }
