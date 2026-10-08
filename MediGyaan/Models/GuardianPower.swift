@@ -1,14 +1,14 @@
 import SwiftUI
 
 /// Educational cognitive power categories during MCQ quiz sessions.
-enum PowerCategory: String, CaseIterable, Codable {
+public enum PowerCategory: String, CaseIterable, Codable {
     case elimination = "ELIMINATION"
     case textFormat = "TEXT_FORMAT"
     case timeScore = "TIME_SCORE"
     case safetyNet = "SAFETY_NET"
     case overlay = "OVERLAY"
 
-    var displayName: String {
+    public var displayName: String {
         switch self {
         case .elimination: return "Elimination"
         case .textFormat: return "Text Format"
@@ -18,7 +18,7 @@ enum PowerCategory: String, CaseIterable, Codable {
         }
     }
 
-    var iconEmoji: String {
+    public var iconEmoji: String {
         switch self {
         case .elimination: return "🎯"
         case .textFormat: return "📝"
@@ -28,7 +28,7 @@ enum PowerCategory: String, CaseIterable, Codable {
         }
     }
 
-    var color: Color {
+    public var color: Color {
         switch self {
         case .elimination: return Color(hex: "#FF5252")
         case .textFormat: return Color(hex: "#E040FB")
@@ -40,15 +40,15 @@ enum PowerCategory: String, CaseIterable, Codable {
 }
 
 /// 3D configuration parameters matching Android's `Guardian3DConfig`.
-struct Guardian3DConfig: Codable, Hashable {
-    let modelGlbUrl: String?
-    let backgroundImageUrl: String?
-    let rimColorHex: UInt32
-    let cameraDistance: Float
-    let cameraHeight: Float
-    let pedestalRuneColor: UInt32?
+public struct Guardian3DConfig: Codable, Hashable {
+    public let modelGlbUrl: String?
+    public let backgroundImageUrl: String?
+    public let rimColorHex: UInt32
+    public let cameraDistance: Float
+    public let cameraHeight: Float
+    public let pedestalRuneColor: UInt32?
 
-    init(
+    public init(
         modelGlbUrl: String? = nil,
         backgroundImageUrl: String? = nil,
         rimColorHex: UInt32 = 0x40E0D0,
@@ -66,19 +66,19 @@ struct Guardian3DConfig: Codable, Hashable {
 }
 
 /// A Guardian power definition mapped to an Animal Warrior / MBBS Champion.
-struct GuardianPower: Identifiable, Codable, Hashable {
-    var id: String { powerId }
-    let powerId: String
-    let powerName: String
-    let powerCategory: PowerCategory
-    let description: String
-    let cooldownRounds: Int
-    let chargesPerQuiz: Int
-    let avatarIndex: Int
-    let renderConfig: Guardian3DConfig
-    let iconResName: String
+public struct GuardianPower: Identifiable, Codable, Hashable {
+    public var id: String { powerId }
+    public let powerId: String
+    public let powerName: String
+    public let powerCategory: PowerCategory
+    public let description: String
+    public let cooldownRounds: Int
+    public let chargesPerQuiz: Int
+    public let avatarIndex: Int
+    public let renderConfig: Guardian3DConfig
+    public let iconResName: String
 
-    init(
+    public init(
         powerId: String,
         powerName: String,
         powerCategory: PowerCategory,
