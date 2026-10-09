@@ -76,6 +76,12 @@ struct MatchmakingQueueView: View {
             }
             .padding(AppTheme.Spacing.md)
         }
+        .onAppear {
+            RemoteLogger.log(
+                tag: "Matchmaking_Queue_Start",
+                message: "User entered matchmaking queue for subject: \(subject), topic: \(topic ?? "All")"
+            )
+        }
         .onReceive(timer) { _ in
             if matchedOpponent == nil {
                 queueSeconds += 1
@@ -209,5 +215,9 @@ struct MatchmakingQueueView: View {
         matchedOpponent = opponents.randomElement()!
         opponentRank = ["Skilled", "Warrior", "Scholar", "Master"].randomElement()!
         statusText = "Match Confirmed!"
+        RemoteLogger.log(
+            tag: "Matchmaking_Found",
+            message: "Match found with \(matchedOpponent ?? "") (rank: \(opponentRank)) in \(queueSeconds)s for \(subject)"
+        )
     }
 }

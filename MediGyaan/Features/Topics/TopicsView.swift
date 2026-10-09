@@ -63,6 +63,12 @@ struct TopicsView: View {
                         TopicRow(topic: topic, tint: AppTheme.Palette.color(for: index))
                     }
                     .buttonStyle(.plain)
+                    .simultaneousGesture(TapGesture().onEnded {
+                        RemoteLogger.log(
+                            tag: "TopicsView_Select",
+                            message: "User tapped topic: \(topic.name) (ID: \(topic.id))"
+                        )
+                    })
                 }
             }
             .padding(AppTheme.Spacing.md)
@@ -73,6 +79,7 @@ struct TopicsView: View {
 
     @MainActor
     private func load() async {
+        RemoteLogger.log(tag: "TopicsView_load", message: "Fetching curriculum topics catalogue")
         state = await LoadState.result { [api] in
             try await api.study.topics()
         }
@@ -89,6 +96,7 @@ struct TopicsView: View {
         isSearching = true
         try? await Task.sleep(nanoseconds: 350_000_000)
         guard !Task.isCancelled else { return }
+        RemoteLogger.log(tag: "TopicsView_search", message: "Searching topics for query: '\(trimmed)'")
         searchResults = (try? await api.study.searchTopics(query: trimmed)) ?? []
         isSearching = false
     }

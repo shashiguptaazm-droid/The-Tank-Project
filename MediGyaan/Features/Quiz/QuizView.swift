@@ -317,7 +317,7 @@ struct QuizView: View {
                                     .clipShape(Capsule())
                                     .padding(8)
                                 }
-                            case .failure:
+                            case .failure(let error):
                                 HStack {
                                     Spacer()
                                     VStack(spacing: 6) {
@@ -333,6 +333,12 @@ struct QuizView: View {
                                 .frame(maxWidth: .infinity)
                                 .background(Color.secondary.opacity(0.06))
                                 .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.sm))
+                                .onAppear {
+                                    RemoteLogger.log(
+                                        tag: "Question_Image_Failed",
+                                        message: "Failed to load image for Q#\(question.id) at URL: \(imageURL.absoluteString). Error: \(error.localizedDescription)"
+                                    )
+                                }
                             @unknown default:
                                 EmptyView()
                             }

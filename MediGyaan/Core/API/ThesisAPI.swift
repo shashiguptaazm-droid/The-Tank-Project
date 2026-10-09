@@ -230,6 +230,10 @@ struct AIAPI {
     ) async throws -> String {
         var fields: [String: String] = [
             "prompt": prompt,
+            "question": prompt,
+            "query": prompt,
+            "input": prompt,
+            "message": prompt,
             "user_id": String(userId),
         ]
         if let model { fields["model"] = model }

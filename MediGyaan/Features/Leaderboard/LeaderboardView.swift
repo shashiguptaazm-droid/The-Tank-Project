@@ -116,6 +116,7 @@ struct LeaderboardView: View {
         let userId = session.userId
         guard userId > 0 else { return }
         let selectedScope = scope.rawValue
+        RemoteLogger.log(tag: "Leaderboard_load", message: "Fetching leaderboard (scope: \(selectedScope), userId: \(userId))")
         state = await LoadState.result { [api] in
             try await api.study.leaderboard(userId: userId, scope: selectedScope)
         }

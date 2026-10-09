@@ -230,14 +230,16 @@ struct AskAiSheet: View {
         var request = URLRequest(url: APIConfig.baseURL.appendingPathComponent("ask_ai2.php"))
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        let bodyString = "question=\(prompt.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")&query=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"
+        let encPrompt = prompt.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let encQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let bodyString = "prompt=\(encPrompt)&question=\(encPrompt)&query=\(encQuery)&input=\(encPrompt)&message=\(encPrompt)"
         request.httpBody = bodyString.data(using: .utf8)
         request.timeoutInterval = 20
 
         let (data, response) = try await URLSession.shared.data(for: request)
         if let http = response as? HTTPURLResponse, http.statusCode == 200,
            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-           let answer = json["answer"] as? String ?? json["response"] as? String, !answer.isEmpty {
+           let answer = json["answer"] as? String ?? json["response"] as? String ?? json["reply"] as? String, !answer.isEmpty {
             return answer
         }
 

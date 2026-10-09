@@ -22,6 +22,8 @@ struct MediGyaanApp: App {
     /// system.
     @AppStorage(AppPreferences.darkMode) private var darkMode = false
 
+    @Environment(\.scenePhase) private var scenePhase
+
     init() {
         RemoteLogger.initializeCrashReporting()
     }
@@ -33,6 +35,9 @@ struct MediGyaanApp: App {
                 .environment(\.api, .live)
                 .tint(AppTheme.Palette.primary)
                 .preferredColorScheme(darkMode ? .dark : .light)
+                .onChange(of: scenePhase) { newPhase in
+                    RemoteLogger.log(tag: "AppLifecycle", message: "Scene phase changed to: \(newPhase)")
+                }
         }
     }
 }

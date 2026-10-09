@@ -365,6 +365,9 @@ struct DashboardView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .simultaneousGesture(TapGesture().onEnded {
+                    RemoteLogger.log(tag: "Dashboard_Tap", message: "User tapped Find Match / Ranked (goal: \(selectedGoal))")
+                })
 
                 NavigationLink {
                     TopicChallengePickerView(mode: .challenge, subject: selectedGoal)
@@ -440,41 +443,65 @@ struct DashboardView: View {
                 QuickTile(emoji: "🏆", title: "Leaderboard")
             }
             .buttonStyle(.plain)
+            .simultaneousGesture(TapGesture().onEnded {
+                RemoteLogger.log(tag: "Dashboard_Tap", message: "User tapped QuickTile: Leaderboard")
+            })
 
             NavigationLink { AiChatView() } label: {
                 QuickTile(emoji: "🤖", title: "Medical AI")
             }
             .buttonStyle(.plain)
+            .simultaneousGesture(TapGesture().onEnded {
+                RemoteLogger.log(tag: "Dashboard_Tap", message: "User tapped QuickTile: Medical AI")
+            })
 
             NavigationLink { TopicsView() } label: {
                 QuickTile(emoji: "📚", title: "Subjects")
             }
             .buttonStyle(.plain)
+            .simultaneousGesture(TapGesture().onEnded {
+                RemoteLogger.log(tag: "Dashboard_Tap", message: "User tapped QuickTile: Subjects")
+            })
 
             NavigationLink { SharedQuestionsView() } label: {
                 QuickTile(emoji: "📊", title: "Shared MCQs")
             }
             .buttonStyle(.plain)
+            .simultaneousGesture(TapGesture().onEnded {
+                RemoteLogger.log(tag: "Dashboard_Tap", message: "User tapped QuickTile: Shared MCQs")
+            })
 
             NavigationLink { HistoryView() } label: {
                 QuickTile(emoji: "📜", title: "History")
             }
             .buttonStyle(.plain)
+            .simultaneousGesture(TapGesture().onEnded {
+                RemoteLogger.log(tag: "Dashboard_Tap", message: "User tapped QuickTile: History")
+            })
 
             NavigationLink { ReferralView() } label: {
                 QuickTile(emoji: "💌", title: "Referral")
             }
             .buttonStyle(.plain)
+            .simultaneousGesture(TapGesture().onEnded {
+                RemoteLogger.log(tag: "Dashboard_Tap", message: "User tapped QuickTile: Referral")
+            })
 
             NavigationLink { ReelsView() } label: {
                 QuickTile(emoji: "🎬", title: "Medical Reels")
             }
             .buttonStyle(.plain)
+            .simultaneousGesture(TapGesture().onEnded {
+                RemoteLogger.log(tag: "Dashboard_Tap", message: "User tapped QuickTile: Medical Reels")
+            })
 
             NavigationLink { WarriorSelectionView() } label: {
                 QuickTile(emoji: "🛡️", title: "27 Warriors")
             }
             .buttonStyle(.plain)
+            .simultaneousGesture(TapGesture().onEnded {
+                RemoteLogger.log(tag: "Dashboard_Tap", message: "User tapped QuickTile: 27 Warriors")
+            })
         }
     }
 

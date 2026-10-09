@@ -345,12 +345,28 @@ final class HTTPClient {
         do {
             return try decoder.decode(T.self, from: data)
         } catch {
+            let snippet = String(data: data.prefix(500), encoding: .utf8) ?? "<binary data>"
+            RemoteLogger.log(
+                tag: "DECODING_ERROR",
+                message: "Failed decoding \(String(describing: type)): \(error.localizedDescription)",
+                metadata: [
+                    "targetType": String(describing: type),
+                    "errorDescription": String(describing: error),
+                    "dataSnippet": snippet
+                ]
+            )
             throw APIError.decoding(underlying: String(describing: error))
         }
     }
 
     private func decodeObject(_ data: Data) throws -> [String: Any] {
         guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            let snippet = String(data: data.prefix(500), encoding: .utf8) ?? "<binary data>"
+            RemoteLogger.log(
+                tag: "DECODING_ERROR",
+                message: "Response was not a JSON dictionary",
+                metadata: ["dataSnippet": snippet]
+            )
             throw APIError.decoding(underlying: "Response was not a JSON object")
         }
         return object

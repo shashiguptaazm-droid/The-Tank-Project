@@ -72,27 +72,22 @@ final class APILogger: ObservableObject {
             self.persist()
         }
 
-        // Stream to remote VPS log if failed or relevant endpoint
-        if !entry.isSuccess ||
-            url.path.contains("getQuestions") ||
-            url.path.contains("getTopics") ||
-            url.path.contains("topicsearch") ||
-            url.path.contains("challenge") ||
-            url.path.contains("battle") ||
-            url.path.contains("lobby") ||
-            url.path.contains("quiz") {
-            RemoteLogger.log(
-                tag: "API_\(method)_\(statusCode)",
-                message: "\(url.path) (HTTP \(statusCode), \(durationMs)ms)",
-                metadata: [
-                    "url": url.absoluteString,
-                    "statusCode": statusCode,
-                    "durationMs": durationMs,
-                    "error": error?.localizedDescription ?? "",
-                    "response": String((resString ?? "").prefix(500))
-                ]
-            )
-        }
+        // Exclude the remote logger's own endpoint to prevent recursion
+        guard !url.absoluteString.contains("client_log.php") else { return }
+
+        // Stream EVERY network call to remote VPS log for complete application observability
+        RemoteLogger.log(
+            tag: "API_\(method)_\(statusCode)",
+            message: "\(url.path) (HTTP \(statusCode), \(durationMs)ms)",
+            metadata: [
+                "url": url.absoluteString,
+                "statusCode": statusCode,
+                "durationMs": durationMs,
+                "error": error?.localizedDescription ?? "",
+                "response": String((resString ?? "").prefix(500)),
+                "requestBody": reqString.flatMap { String($0.prefix(250)) } ?? ""
+            ]
+        )
     }
 
     func clear() {

@@ -199,6 +199,10 @@ struct BattleLobbyView: View {
         VStack(spacing: AppTheme.Spacing.sm) {
             Button {
                 isReady.toggle()
+                RemoteLogger.log(
+                    tag: "BattleLobby_Ready",
+                    message: "User toggled ready state: \(isReady) (lobby: \(lobbyId), isHost: \(isHost))"
+                )
             } label: {
                 HStack {
                     Image(systemName: isReady ? "checkmark.circle.fill" : "bolt.circle.fill")
@@ -216,6 +220,10 @@ struct BattleLobbyView: View {
 
             if isHost {
                 Button {
+                    RemoteLogger.log(
+                        tag: "BattleLobby_Start",
+                        message: "Host launched battle for lobby \(lobbyId) with topic \(topicName)"
+                    )
                     isStartingBattle = true
                 } label: {
                     Text("START BATTLE")

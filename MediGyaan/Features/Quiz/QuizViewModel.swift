@@ -253,6 +253,11 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
         )
         isAnswerRevealed = true
 
+        RemoteLogger.log(
+            tag: "Quiz_Answer",
+            message: "User answered Q#\(question.id) with index \(index) (Correct: \(isCorrect))"
+        )
+
         // Gamification logic matching MCQActivity.kt
         if isCorrect {
             combo += 1

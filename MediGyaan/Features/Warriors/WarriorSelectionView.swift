@@ -167,6 +167,10 @@ struct WarriorSelectionView: View {
         selectedAvatarId = warrior.id
         selectedAvatarName = warrior.displayName
         selectedAvatarTitle = warrior.title
+        RemoteLogger.log(
+            tag: "Warrior_Equipped",
+            message: "User equipped Warrior #\(warrior.id): \(warrior.name) (\(warrior.displayName), \(warrior.specialty))"
+        )
     }
 }
 

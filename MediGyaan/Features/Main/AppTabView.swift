@@ -73,6 +73,9 @@ struct AppTabView: View {
             }
         }
         .tint(AppTheme.Palette.primary)
+        .onChange(of: selection) { newTab in
+            RemoteLogger.log(tag: "Tab_Switch", message: "User selected tab: \(newTab.title)")
+        }
     }
 
     /// Each tab maps to the Android activity that lived in the nav host.
