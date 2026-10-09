@@ -102,7 +102,7 @@ struct ChallengesHubView: View {
                 NavigationLink { TopicChallengePickerView(mode: .solo) } label: {
                     QuickActionTile(title: "Single Player", systemImage: "person.fill", tint: AppTheme.Palette.info)
                 }
-                NavigationLink { MatchmakingView() } label: {
+                NavigationLink { MatchmakingArenaFlowView() } label: {
                     QuickActionTile(title: "Quick Match", systemImage: "person.2.fill", tint: AppTheme.Palette.accent)
                 }
                 NavigationLink { ChallengeListView() } label: {
@@ -195,12 +195,24 @@ struct TopicChallengePickerView: View {
         ScrollView {
             LazyVStack(spacing: AppTheme.Spacing.sm) {
                 ForEach(Array((state.value ?? []).enumerated()), id: \.element.id) { index, topic in
-                    NavigationLink {
-                        QuizListView(topic: topic)
-                    } label: {
-                        TopicRow(topic: topic, tint: AppTheme.Palette.color(for: index))
+                    if mode == .challenge {
+                        NavigationLink {
+                            MatchmakingArenaFlowView(
+                                subject: subject.isEmpty ? "NEET PG" : subject,
+                                topic: topic.name
+                            )
+                        } label: {
+                            TopicRow(topic: topic, tint: AppTheme.Palette.color(for: index))
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        NavigationLink {
+                            QuizListView(topic: topic)
+                        } label: {
+                            TopicRow(topic: topic, tint: AppTheme.Palette.color(for: index))
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
             }
             .padding(AppTheme.Spacing.md)
@@ -304,68 +316,13 @@ struct ChallengeListView: View {
     }
 }
 
-/// Matchmaking placeholder that surfaces the live lobby poller.
+/// 1:1 Live 1v1 Battle Arena Matchmaking flow.
 struct MatchmakingView: View {
-
-    @EnvironmentObject private var session: SessionStore
-    @State private var isSearching = false
-    @State private var secondsElapsed = 0
+    var subject: String = "NEET PG"
+    var topic: String? = nil
 
     var body: some View {
-        VStack(spacing: AppTheme.Spacing.lg) {
-            Spacer()
-
-            ZStack {
-                Circle()
-                    .fill(AppTheme.Palette.primary.opacity(0.10))
-                    .frame(width: 180, height: 180)
-                Image(systemName: "person.2.fill")
-                    .font(.system(size: 54))
-                    .foregroundStyle(AppTheme.Palette.primary)
-                    .opacity(isSearching ? 0.5 : 1)
-            }
-
-            VStack(spacing: AppTheme.Spacing.xs) {
-                Text(isSearching ? "Finding an opponent…" : "Ready to play?")
-                    .font(AppTheme.Font.title)
-                if isSearching {
-                    Text("Searching for \(secondsElapsed)s")
-                        .font(AppTheme.Font.caption)
-                        .foregroundStyle(AppTheme.Palette.textSecondary)
-                } else {
-                    Text("We'll match you with a student of similar accuracy.")
-                        .font(AppTheme.Font.callout)
-                        .foregroundStyle(AppTheme.Palette.textSecondary)
-                        .multilineTextAlignment(.center)
-                }
-            }
-
-            Spacer()
-
-            PrimaryButton(
-                title: isSearching ? "Cancel" : "Find Opponent",
-                isLoading: false,
-                isEnabled: true
-            ) {
-                isSearching.toggle()
-            }
-            .padding(.horizontal, AppTheme.Spacing.lg)
-        }
-        .screenBackground()
-        .navigationTitle("Quick Match")
-        .navigationBarTitleDisplayMode(.inline)
-        .task(id: isSearching) {
-            guard isSearching else { return }
-            secondsElapsed = 0
-            while isSearching, !Task.isCancelled {
-                try? await Task.sleep(nanoseconds: 1_000_000_000)
-                guard isSearching else { return }
-                secondsElapsed += 1
-                // Matchmaking against `livebattle.php` is polled here; until a
-                // lobby is assigned we keep the search loop alive.
-                if secondsElapsed >= 30 { isSearching = false }
-            }
-        }
+        MatchmakingArenaFlowView(subject: subject, topic: topic)
     }
 }
 

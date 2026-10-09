@@ -355,7 +355,7 @@ struct DashboardView: View {
                 ],
                 spacing: AppTheme.Spacing.split
             ) {
-                NavigationLink { MatchmakingView() } label: {
+                NavigationLink { MatchmakingArenaFlowView(subject: selectedGoal) } label: {
                     BattleModeCard(
                         tag: "⚔️ RANKED",
                         emoji: "🧭",
