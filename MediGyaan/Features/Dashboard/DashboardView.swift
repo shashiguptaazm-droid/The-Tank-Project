@@ -1196,6 +1196,7 @@ struct DashboardView: View {
             todayQuestionText = "A 45-year-old patient presents with painless progressive loss of vision. What is the most likely initial diagnostic modality?"
             todayQuestionOptions = ["A) Slit-lamp biomicroscopy", "B) Optical Coherence Tomography", "C) Fundus Fluorescein Angiography", "D) B-Scan Ultrasonography"]
         }
+    }
 }
 
 // MARK: - Dashboard Sub-views
@@ -1258,11 +1259,5 @@ struct QuickTile: View {
                 .fill(AppTheme.Ink.tile)
         )
     }
-}
-
-#Preview {
-    DashboardView()
-        .environmentObject(SessionStore())
-        .environment(\.api, .live)
 }
 
