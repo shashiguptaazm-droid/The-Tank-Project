@@ -298,6 +298,8 @@ enum AppTheme {
         static let section = SwiftUI.Font.system(size: 18, weight: .bold)
         /// 16sp — body copy.
         static let body = SwiftUI.Font.system(size: 16)
+        /// 16sp bold — emphasized body copy.
+        static let bodyBold = SwiftUI.Font.system(size: 16, weight: .bold)
         /// 15sp — `DashboardCardTextStyle`.
         static let cardTitle = SwiftUI.Font.system(size: 15, weight: .bold)
         /// 14sp — invitation titles.

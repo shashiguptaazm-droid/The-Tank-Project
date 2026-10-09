@@ -61,6 +61,9 @@ struct Question: Decodable, Identifiable, Hashable {
     let subject: String
     let marks: Int
     let negativeMarks: Double
+    let difficulty: String
+
+    var correctOptionIndex: Int { correctIndex }
 
     var correctOption: String? {
         guard options.indices.contains(correctIndex) else { return nil }
@@ -76,6 +79,8 @@ struct Question: Decodable, Identifiable, Hashable {
         subject = container.flexString("subject", "subject_name")
         marks = container.flexInt("marks", "mark", "positive_marks")
         negativeMarks = container.flexDouble("negative_marks", "negative")
+        let parsedDiff = container.flexString("difficulty", "level")
+        difficulty = parsedDiff.isEmpty ? "Medium" : parsedDiff
 
         let image = container.flexString("image", "image_url", "question_image", "img_url", "img")
         imageURL = Question.normalizeImageURL(image)
@@ -145,18 +150,20 @@ struct Question: Decodable, Identifiable, Hashable {
         id: Int,
         text: String,
         options: [String],
-        correctIndex: Int,
+        correctIndex: Int = 0,
+        correctOptionIndex: Int? = nil,
         explanation: String = "",
         imageURL: URL? = nil,
         topic: String = "",
         subject: String = "",
         marks: Int = 1,
-        negativeMarks: Double = 0
+        negativeMarks: Double = 0,
+        difficulty: String = "Medium"
     ) {
         self.id = id
         self.text = text
         self.options = options
-        self.correctIndex = correctIndex
+        self.correctIndex = correctOptionIndex ?? correctIndex
         self.explanation = explanation
         if let imageURL, imageURL.scheme == nil || imageURL.host == nil {
             self.imageURL = Question.normalizeImageURL(imageURL.absoluteString)
@@ -167,6 +174,7 @@ struct Question: Decodable, Identifiable, Hashable {
         self.subject = subject
         self.marks = marks
         self.negativeMarks = negativeMarks
+        self.difficulty = difficulty.isEmpty ? "Medium" : difficulty
     }
 }
 

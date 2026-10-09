@@ -363,65 +363,76 @@ struct TestActivityView: View {
     private func optionsListView(question: Question) -> some View {
         VStack(spacing: AppTheme.Spacing.sm) {
             ForEach(Array(question.options.enumerated()), id: \.offset) { index, optionText in
-                let optionLetter = String(UnicodeScalar(65 + index)!)
-                let isEliminated = eliminatedOptions.contains(index)
-
-                Button {
-                    guard !isAnswerSubmitted, !isEliminated else { return }
-                    submitOption(index: index, question: question)
-                } label: {
-                    HStack(spacing: 12) {
-                        // Letter Badge (A, B, C, D)
-                        ZStack {
-                            Circle()
-                                .fill(optionBadgeBackground(index: index, question: question))
-                                .frame(width: 32, height: 32)
-                            Text(optionLetter)
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundStyle(optionBadgeForeground(index: index, question: question))
-                        }
-
-                        // Option Content
-                        Text(optionText)
-                            .font(AppTheme.Font.body)
-                            .foregroundStyle(isEliminated ? AppTheme.Palette.textSecondary.opacity(0.4) : AppTheme.Palette.textPrimary)
-                            .multilineTextAlignment(.leading)
-                            .strikethrough(isEliminated)
-
-                        Spacer()
-
-                        // Indicator Icon
-                        if isAnswerSubmitted {
-                            if index == question.correctOptionIndex {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(Color.green)
-                            } else if index == selectedOptionIndex {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundStyle(Color.red)
-                            }
-                        }
-                    }
-                    .padding(AppTheme.Spacing.md)
-                    .background(
-                        RoundedRectangle(cornerRadius: AppTheme.Radius.option)
-                            .fill(optionCardBackground(index: index, question: question))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: AppTheme.Radius.option)
-                                    .stroke(optionBorderColor(index: index, question: question), lineWidth: 1.5)
-                            )
-                    )
-                }
-                .buttonStyle(.plain)
-                .disabled(isAnswerSubmitted || isEliminated)
-                .opacity(isEliminated ? 0.35 : 1.0)
+                optionRow(index: index, optionText: optionText, question: question)
             }
         }
+    }
+
+    private func optionRow(index: Int, optionText: String, question: Question) -> some View {
+        let optionLetter = String(UnicodeScalar(65 + index)!)
+        let isEliminated = eliminatedOptions.contains(index)
+        let isCorrectAnswer = (index == question.correctOptionIndex)
+        let isSelectedAnswer = (index == selectedOptionIndex)
+
+        return Button {
+            guard !isAnswerSubmitted, !isEliminated else { return }
+            submitOption(index: index, question: question)
+        } label: {
+            HStack(spacing: 12) {
+                // Letter Badge (A, B, C, D)
+                ZStack {
+                    Circle()
+                        .fill(optionBadgeBackground(index: index, question: question))
+                        .frame(width: 32, height: 32)
+                    Text(optionLetter)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(optionBadgeForeground(index: index, question: question))
+                }
+
+                // Option Content
+                Text(optionText)
+                    .font(AppTheme.Font.body)
+                    .foregroundStyle(isEliminated ? AppTheme.Palette.textSecondary.opacity(0.4) : AppTheme.Palette.textPrimary)
+                    .multilineTextAlignment(.leading)
+                    .strikethrough(isEliminated)
+
+                Spacer()
+
+                // Indicator Icon
+                if isAnswerSubmitted {
+                    if isCorrectAnswer {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(Color.green)
+                    } else if isSelectedAnswer {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(Color.red)
+                    }
+                }
+            }
+            .padding(AppTheme.Spacing.md)
+            .background(
+                RoundedRectangle(cornerRadius: AppTheme.Radius.option)
+                    .fill(optionCardBackground(index: index, question: question))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppTheme.Radius.option)
+                            .stroke(optionBorderColor(index: index, question: question), lineWidth: 1.5)
+                    )
+            )
+        }
+        .buttonStyle(.plain)
+        .disabled(isAnswerSubmitted || isEliminated)
+        .opacity(isEliminated ? 0.35 : 1.0)
     }
 
     // MARK: - Explanation Card View
 
     private func explanationCardView(question: Question) -> some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+        let correctLetter = String(UnicodeScalar(65 + question.correctOptionIndex)!)
+        let explanationText: String = question.explanation.isEmpty
+            ? "Correct answer is Option \(correctLetter). Review the key diagnostic principles and NEET-PG guidelines."
+            : question.explanation
+
+        return VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
             HStack {
                 Image(systemName: "lightbulb.fill")
                     .foregroundStyle(Color.yellow)
@@ -431,7 +442,7 @@ struct TestActivityView: View {
                 Spacer()
             }
 
-            Text(question.explanation.isEmpty ? "Correct answer is Option \(String(UnicodeScalar(65 + question.correctOptionIndex)!)). Review the key diagnostic principles and NEET-PG guidelines." : question.explanation)
+            Text(explanationText)
                 .font(AppTheme.Font.body)
                 .foregroundStyle(AppTheme.Palette.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
