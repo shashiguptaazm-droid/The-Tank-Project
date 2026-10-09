@@ -170,6 +170,8 @@ enum AppTheme {
         static let deepBlue = Color(hex: 0x2648D6)
         /// `#39537A` — rank card stroke.
         static let slate = Color(hex: 0x39537A)
+        /// Alias for card/surface stroke
+        static let border = slate
 
         // TEXT
         /// `#F2F6FC` — primary text.

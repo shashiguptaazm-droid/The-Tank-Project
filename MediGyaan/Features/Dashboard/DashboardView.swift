@@ -905,7 +905,7 @@ struct DashboardView: View {
 
                 // 4. Test Mode (Solo Mock Series)
                 NavigationLink {
-                    TestSelectionView(subject: selectedGoal)
+                    TestSelectionView()
                 } label: {
                     BattleModeCard(
                         tag: "🎮 TEST",
