@@ -481,70 +481,70 @@ struct PredictorView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 // Rank Chip
-                FilterChip(
+                PredictorFilterChip(
                     title: "Rank: \(selectedRank)",
                     isActive: selectedRank != originalRank,
                     action: { showingCustomRankSheet = true }
                 )
 
                 // Subject Chip
-                FilterChip(
+                PredictorFilterChip(
                     title: "Subject: \(selectedSubject.isEmpty ? "Any" : selectedSubject)",
                     isActive: !selectedSubject.isEmpty,
                     action: { activeFilterSheet = .subject }
                 )
 
                 // State Chip
-                FilterChip(
+                PredictorFilterChip(
                     title: "State: \(selectedState.isEmpty ? "Any" : selectedState)",
                     isActive: !selectedState.isEmpty,
                     action: { activeFilterSheet = .state }
                 )
 
                 // Category Chip
-                FilterChip(
+                PredictorFilterChip(
                     title: "Category: \(selectedCategory)",
                     isActive: selectedCategory != "GEN",
                     action: { activeFilterSheet = .category }
                 )
 
                 // Quota Chip
-                FilterChip(
+                PredictorFilterChip(
                     title: "Quota: \(selectedQuota)",
                     isActive: selectedQuota != "All India",
                     action: { activeFilterSheet = .quota }
                 )
 
                 // College Type Chip
-                FilterChip(
+                PredictorFilterChip(
                     title: "Type: \(selectedCollegeType.isEmpty ? "Any" : selectedCollegeType.capitalized)",
                     isActive: !selectedCollegeType.isEmpty,
                     action: { activeFilterSheet = .type }
                 )
 
                 // Fee Chip
-                FilterChip(
+                PredictorFilterChip(
                     title: "Fee: \(selectedMaxFee.isEmpty ? "Any" : "<= ₹\(selectedMaxFee)")",
                     isActive: !selectedMaxFee.isEmpty,
                     action: { activeFilterSheet = .fee }
                 )
 
                 // Bond Chip
-                FilterChip(
+                PredictorFilterChip(
                     title: "Bond: \(selectedMaxBond.isEmpty ? "Any" : "<= \(selectedMaxBond)y")",
                     isActive: !selectedMaxBond.isEmpty,
                     action: { activeFilterSheet = .bond }
                 )
 
                 // Stipend Chip
-                FilterChip(
+                PredictorFilterChip(
                     title: "Stipend: \(selectedMinStipend.isEmpty ? "Any" : ">= ₹\(selectedMinStipend)")",
                     isActive: !selectedMinStipend.isEmpty,
                     action: { activeFilterSheet = .stipend }
                 )
 
                 // Chance Chip
-                FilterChip(
+                PredictorFilterChip(
                     title: "Chance: \(selectedAiPreference.isEmpty ? "Any" : selectedAiPreference)",
                     isActive: !selectedAiPreference.isEmpty,
                     action: { activeFilterSheet = .chance }
@@ -1819,7 +1819,7 @@ struct PredictorPassPaywallView: View {
 
 // MARK: - Reusable Filter Chip
 
-struct FilterChip: View {
+struct PredictorFilterChip: View {
     let title: String
     let isActive: Bool
     let action: () -> Void
