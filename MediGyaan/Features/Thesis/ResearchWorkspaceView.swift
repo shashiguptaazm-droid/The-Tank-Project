@@ -35,7 +35,7 @@ struct ResearchWorkspaceView: View {
     ]
     @State private var isExecutingSkill: Bool = false
 
-    enum ResearchSection: String, CaseIterable, Identifiable {
+    enum ResearchSection: String, CaseIterable, Identifiable, Hashable {
         case dashboard = "Dashboard"
         case research = "Research (1-10)"
         case literature = "Literature (11-20)"
@@ -119,7 +119,7 @@ struct ResearchWorkspaceView: View {
     private var sectionScrollView: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                ForEach(ResearchSection.allCases) { section in
+                ForEach(ResearchSection.allCases, id: \.self) { section in
                     let isSelected = activeSection == section
                     Button {
                         activeSection = section
@@ -154,7 +154,7 @@ struct ResearchWorkspaceView: View {
     private var dashboardSection: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
             Text("Research Planner & Protocol")
-                .font(AppTheme.Font.titleBold)
+                .font(AppTheme.Font.title)
                 .foregroundStyle(AppTheme.Palette.textPrimary)
 
             CardContainer {
@@ -255,7 +255,7 @@ struct ResearchWorkspaceView: View {
     private var literatureSection: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
             Text("🔎 PubMed & MeSH Literature Engine")
-                .font(AppTheme.Font.titleBold)
+                .font(AppTheme.Font.title)
                 .foregroundStyle(AppTheme.Palette.textPrimary)
 
             CardContainer {
@@ -388,7 +388,7 @@ struct ResearchWorkspaceView: View {
     private var evidenceSection: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
             Text("Reference & Citation Audit Engine")
-                .font(AppTheme.Font.titleBold)
+                .font(AppTheme.Font.title)
                 .foregroundStyle(AppTheme.Palette.textPrimary)
 
             CardContainer {
@@ -468,7 +468,7 @@ struct ResearchWorkspaceView: View {
     private func skillsCenterSection(skills: [ResearchSkill]) -> some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
             Text("\(activeSection.rawValue) — Active Skills (\(skills.count))")
-                .font(AppTheme.Font.headlineBold)
+                .font(AppTheme.Font.headline)
                 .foregroundStyle(AppTheme.Palette.textPrimary)
 
             ForEach(skills) { skill in

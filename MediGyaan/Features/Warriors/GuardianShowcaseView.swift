@@ -20,6 +20,9 @@ struct GuardianShowcaseView: View {
     @State private var currentWarriorIndex: Int = 0
     @State private var selectedPowerSlot: Int = 2 // 0: Intel, 1: Strike, 2: Defense, 3: Surge
     @State private var showingStorySheet: Bool = false
+    @State private var showingArmory: Bool = false
+    @State private var is3DViewMode: Bool = true
+    @State private var isAutoRotating: Bool = true
     @State private var showEquippedToast: Bool = false
 
     private var allWarriors: [Warrior] {
@@ -117,10 +120,19 @@ struct GuardianShowcaseView: View {
             } else if let idx = allWarriors.firstIndex(where: { $0.id == selectedAvatarId }) {
                 currentWarriorIndex = idx
             }
+            RemoteLogger.log(
+                tag: "Showcase_3D_Open",
+                message: "Guardian Showcase opened for warrior #\(currentWarrior.id) - \(currentWarrior.name)"
+            )
         }
         .sheet(isPresented: $showingStorySheet) {
             if let story = currentHeroKit?.story {
                 GuardianStorySheet(warrior: currentWarrior, story: story)
+            }
+        }
+        .sheet(isPresented: $showingArmory) {
+            NavigationStack {
+                EquipmentCatalogView()
             }
         }
     }
@@ -155,15 +167,32 @@ struct GuardianShowcaseView: View {
 
             Spacer()
 
-            // Quick Cycle Arrow buttons
-            HStack(spacing: 4) {
+            // Armory & Quick Cycle Buttons
+            HStack(spacing: 6) {
+                Button {
+                    showingArmory = true
+                    RemoteLogger.log(tag: "Showcase_Open_Armory", message: "User opened 3D Equipment Armory from Guardian Showcase")
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "cross.case.fill")
+                            .font(.system(size: 11, weight: .bold))
+                        Text("ARMORY")
+                            .font(.system(size: 10, weight: .black))
+                    }
+                    .foregroundStyle(Color(hex: "#00E5FF"))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
+                    .background(Capsule().fill(Color(hex: "#0E223D")))
+                    .overlay(Capsule().stroke(Color(hex: "#00E5FF").opacity(0.4), lineWidth: 1))
+                }
+
                 Button {
                     cycleHero(step: -1)
                 } label: {
                     Image(systemName: "arrow.left")
                         .font(.system(size: 13, weight: .bold))
                         .foregroundStyle(Color.white)
-                        .frame(width: 32, height: 32)
+                        .frame(width: 30, height: 30)
                         .background(Circle().fill(Color(hex: "#101D33")))
                 }
 
@@ -173,7 +202,7 @@ struct GuardianShowcaseView: View {
                     Image(systemName: "arrow.right")
                         .font(.system(size: 13, weight: .bold))
                         .foregroundStyle(Color.white)
-                        .frame(width: 32, height: 32)
+                        .frame(width: 30, height: 30)
                         .background(Circle().fill(Color(hex: "#101D33")))
                 }
             }
@@ -223,7 +252,7 @@ struct GuardianShowcaseView: View {
 
     private var heroPedestalCard: some View {
         ZStack {
-            // Glow Pedestal Ring
+            // Glow Pedestal Background
             RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .fill(
                     LinearGradient(
@@ -245,19 +274,40 @@ struct GuardianShowcaseView: View {
                 )
 
             VStack(spacing: 8) {
-                // Top status row inside card
-                HStack {
+                // Top status and controls row inside card
+                HStack(spacing: 8) {
                     if let glb = currentWarrior.glbModelName {
-                        HStack(spacing: 5) {
-                            Image(systemName: "cube.fill")
-                                .font(.system(size: 10))
-                            Text("3D GLB (\(glb))")
-                                .font(.system(size: 10, weight: .bold))
+                        Button {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                is3DViewMode.toggle()
+                            }
+                            RemoteLogger.log(
+                                tag: "Showcase_3D_Toggle",
+                                message: "User toggled 3D mode: \(is3DViewMode) for \(currentWarrior.name)"
+                            )
+                        } label: {
+                            HStack(spacing: 5) {
+                                Image(systemName: is3DViewMode ? "cube.fill" : "photo.fill")
+                                    .font(.system(size: 10))
+                                Text(is3DViewMode ? "3D GLB ACTIVE" : "2D PORTRAIT")
+                                    .font(.system(size: 10, weight: .bold))
+                            }
+                            .foregroundStyle(is3DViewMode ? currentWarrior.glowColor : Color(hex: "#8EA4BF"))
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(Capsule().fill(is3DViewMode ? currentWarrior.glowColor.opacity(0.16) : Color(hex: "#101D33")))
+                            .overlay(Capsule().stroke(is3DViewMode ? currentWarrior.glowColor : Color.clear, lineWidth: 1))
                         }
-                        .foregroundStyle(currentWarrior.glowColor)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .background(Capsule().fill(currentWarrior.glowColor.opacity(0.16)))
+
+                        if is3DViewMode {
+                            Button {
+                                isAutoRotating.toggle()
+                            } label: {
+                                Image(systemName: isAutoRotating ? "arrow.triangle.2.circlepath.circle.fill" : "arrow.triangle.2.circlepath.circle")
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(isAutoRotating ? Color.yellow : Color.gray)
+                            }
+                        }
                     } else {
                         HStack(spacing: 5) {
                             Image(systemName: "sparkles")
@@ -288,31 +338,63 @@ struct GuardianShowcaseView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 14)
 
-                // Avatar Graphic with Pedestal Glow
-                ZStack {
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                gradient: Gradient(colors: [currentWarrior.glowColor.opacity(0.35), Color.clear]),
-                                center: .center,
-                                startRadius: 10,
-                                endRadius: 110
-                            )
+                // 3D Model Viewport OR 2D Avatar Graphic
+                if is3DViewMode, let glb = currentWarrior.glbModelName {
+                    ZStack {
+                        ThreeDModelWebView(
+                            modelName: glb,
+                            glowColorHex: currentWarrior.glowColorHex,
+                            autoRotate: isAutoRotating,
+                            cameraDistance: 3.2,
+                            cameraHeight: 1.1
                         )
-                        .frame(width: 190, height: 190)
+                        .frame(height: 200)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
 
-                    Circle()
-                        .stroke(currentWarrior.glowColor.opacity(0.6), lineWidth: 2.5)
-                        .frame(width: 140, height: 140)
+                        // Interaction hint overlay
+                        VStack {
+                            Spacer()
+                            HStack(spacing: 6) {
+                                Circle().fill(currentWarrior.glowColor).frame(width: 5, height: 5)
+                                Text("360° INSPECT • DRAG TO ROTATE • PINCH TO ZOOM")
+                                    .font(.system(size: 9, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(AppTheme.Palette.textMuted)
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 3)
+                            .background(Capsule().fill(Color(hex: "#050914").opacity(0.75)))
+                            .padding(.bottom, 4)
+                        }
+                    }
+                    .frame(height: 200)
+                } else {
+                    // Avatar Graphic with Pedestal Glow
+                    ZStack {
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    gradient: Gradient(colors: [currentWarrior.glowColor.opacity(0.35), Color.clear]),
+                                    center: .center,
+                                    startRadius: 10,
+                                    endRadius: 110
+                                )
+                            )
+                            .frame(width: 190, height: 190)
 
-                    Image(currentWarrior.avatarImageName)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 124, height: 124)
-                        .clipShape(Circle())
-                        .shadow(color: currentWarrior.glowColor.opacity(0.8), radius: 14)
+                        Circle()
+                            .stroke(currentWarrior.glowColor.opacity(0.6), lineWidth: 2.5)
+                            .frame(width: 140, height: 140)
+
+                        Image(currentWarrior.avatarImageName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 124, height: 124)
+                            .clipShape(Circle())
+                            .shadow(color: currentWarrior.glowColor.opacity(0.8), radius: 14)
+                    }
+                    .padding(.vertical, 4)
+                    .frame(height: 200)
                 }
-                .padding(.vertical, 4)
 
                 // Combat Attributes Gauges
                 HStack(spacing: 12) {
@@ -326,7 +408,7 @@ struct GuardianShowcaseView: View {
                 .padding(.bottom, 14)
             }
         }
-        .frame(height: 270)
+        .frame(height: 310)
     }
 
     private func attributeBadge(label: String, value: Int, color: Color) -> some View {

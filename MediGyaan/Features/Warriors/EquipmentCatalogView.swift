@@ -45,6 +45,12 @@ struct EquipmentCatalogView: View {
                     .background(Capsule().fill(Color(hex: "#00E5FF").opacity(0.18)))
             }
         }
+        .onAppear {
+            RemoteLogger.log(
+                tag: "Equipment_Armory_Open",
+                message: "Equipment Armory opened with \(MedicalEquipmentRepository.items.count) 3D items available"
+            )
+        }
         .onReceive(timer) { _ in
             if isAutoRotating {
                 rotationAngle += 0.8
@@ -69,25 +75,35 @@ struct EquipmentCatalogView: View {
                                 endRadius: 180
                             )
                         )
-                        .frame(height: 220)
+                        .frame(height: 240)
 
-                    // 3D Visualizer Simulation (Rotating Instrument Silhouette/Crest)
-                    VStack(spacing: 12) {
-                        Image(systemName: systemIconForItem(selectedItem))
-                            .font(.system(size: 72))
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [Color(hex: selectedItem.badgeColorHex), Color.white],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .shadow(color: Color(hex: selectedItem.badgeColorHex).opacity(0.5), radius: 20)
-                            .rotation3DEffect(.degrees(rotationAngle), axis: (x: 0, y: 1, z: 0))
+                    ThreeDModelWebView(
+                        modelName: selectedItem.fileName,
+                        glowColorHex: selectedItem.badgeColorHex,
+                        autoRotate: isAutoRotating,
+                        cameraDistance: 2.6,
+                        cameraHeight: 0.8
+                    )
+                    .frame(height: 240)
+                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
 
-                        Text(selectedItem.fileName)
-                            .font(.system(size: 11, design: .monospaced))
-                            .foregroundStyle(AppTheme.Palette.textMuted)
+                    // Model filename tag & drag hint
+                    VStack {
+                        Spacer()
+                        HStack(spacing: 8) {
+                            Text(selectedItem.fileName)
+                                .font(.system(size: 10, design: .monospaced))
+                                .foregroundStyle(AppTheme.Palette.textMuted)
+                            Text("•")
+                                .foregroundStyle(AppTheme.Palette.textMuted)
+                            Text("360° TOUCH ROTATE")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundStyle(Color(hex: selectedItem.badgeColorHex))
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 3)
+                        .background(Capsule().fill(Color(hex: "#050914").opacity(0.8)))
+                        .padding(.bottom, 6)
                     }
 
                     // Viewer Controls overlay
@@ -272,6 +288,10 @@ struct EquipmentCatalogView: View {
                 let isSelected = item.id == selectedItem.id
                 Button {
                     selectedItem = item
+                    RemoteLogger.log(
+                        tag: "Equipment_3D_Select",
+                        message: "Inspecting 3D equipment: #\(item.id) - \(item.name) (\(item.fileName))"
+                    )
                 } label: {
                     CardContainer {
                         HStack(spacing: AppTheme.Spacing.md) {
