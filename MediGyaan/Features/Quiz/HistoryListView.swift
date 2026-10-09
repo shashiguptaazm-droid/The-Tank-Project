@@ -68,6 +68,12 @@ struct HistoryListView: View {
         .screenBackground()
         .navigationTitle("Attempt History")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            RemoteLogger.log(
+                tag: "HistoryList_onAppear",
+                message: "Attempt history loaded: \(filteredList.count) items"
+            )
+        }
     }
 
     private func historyCard(_ item: QuizHistoryItem) -> some View {

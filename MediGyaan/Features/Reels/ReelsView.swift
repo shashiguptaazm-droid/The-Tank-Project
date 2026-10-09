@@ -72,10 +72,13 @@ struct ReelsView: View {
     private func loadReels() async {
         isLoading = true
         defer { isLoading = false }
+        RemoteLogger.log(tag: "Reels_load", message: "Fetching clinical reels")
         do {
             reels = try await api.social.reels()
+            RemoteLogger.log(tag: "Reels_loaded", message: "Loaded \(reels.count) reels")
         } catch {
             errorMessage = error.localizedDescription
+            RemoteLogger.log(tag: "Reels_error", message: "Reels load failed: \(error.localizedDescription)")
         }
     }
 

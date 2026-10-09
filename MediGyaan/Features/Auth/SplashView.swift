@@ -41,6 +41,7 @@ struct SplashView: View {
             }
         }
         .onAppear {
+            RemoteLogger.log(tag: "SplashView_onAppear", message: "Splash screen shown")
             withAnimation(.easeOut(duration: 0.7)) { isAnimating = true }
         }
     }

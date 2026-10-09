@@ -144,11 +144,13 @@ struct ProfileView: View {
     @MainActor
     private func load() async {
         let userId = session.userId
+        RemoteLogger.log(tag: "Profile_load", message: "Fetching profile for userId: \(userId)")
         guard userId > 0 else { return }
         profileState = await LoadState.result { [api] in
             try await api.auth.profile(userId: userId)
         }
         if let refreshed = profileState.value {
+            RemoteLogger.log(tag: "Profile_loaded", message: "Loaded profile for \(refreshed.name) (accuracy: \(refreshed.accuracy))")
             session.updateProfile(refreshed)
         }
     }

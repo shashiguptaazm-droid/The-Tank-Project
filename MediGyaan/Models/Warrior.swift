@@ -74,6 +74,9 @@ struct Warrior: Identifiable, Hashable {
         }
     }
 
+    /// Alias for allWarriors
+    static var all: [Warrior] { allWarriors }
+
     /// All 27 unique characters from the authoritative specification.
     static let allWarriors: [Warrior] = [
         Warrior(

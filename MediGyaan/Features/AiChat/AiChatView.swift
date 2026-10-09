@@ -97,6 +97,9 @@ struct AiChatView: View {
                     QuizView(quiz: quiz)
                 }
             }
+            .onAppear {
+                RemoteLogger.log(tag: "AiChat_onAppear", message: "Medical AI Chat screen opened")
+            }
         }
     }
 

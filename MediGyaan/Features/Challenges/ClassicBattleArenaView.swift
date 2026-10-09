@@ -741,6 +741,11 @@ struct ClassicBattleArenaView: View {
         selectedOptionIndex = index
         let isCorrect = (index == question.correctIndex)
 
+        RemoteLogger.log(
+            tag: "ClassicArena_Answer",
+            message: "User answered Q#\(question.id) (Option [\(["A","B","C","D"][index % 4])]): correct=\(isCorrect), streak=\(playerStreak)"
+        )
+
         if isCorrect {
             UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
             userCorrectCount += 1

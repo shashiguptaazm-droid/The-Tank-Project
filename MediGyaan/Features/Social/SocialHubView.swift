@@ -145,8 +145,11 @@ struct NewsFeedView: View {
     private func load() async {
         let userId = session.userId
         guard userId > 0 else { return }
+        RemoteLogger.log(tag: "SocialFeed_load", message: "Fetching social feed posts for userId: \(userId)")
         state = await LoadState.result { [api] in
-            try await api.social.posts(userId: userId)
+            let res = try await api.social.posts(userId: userId)
+            RemoteLogger.log(tag: "SocialFeed_loaded", message: "Fetched \(res.count) posts")
+            return res
         }
     }
 
@@ -167,6 +170,7 @@ struct NewsFeedView: View {
         guard !text.isEmpty, !isPosting else { return }
         isPosting = true
         defer { isPosting = false }
+        RemoteLogger.log(tag: "SocialFeed_createPost", message: "Creating user post")
 
         do {
             let response = try await api.social.createPost(userId: session.userId, content: text)

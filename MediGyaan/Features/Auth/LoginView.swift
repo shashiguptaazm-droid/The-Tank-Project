@@ -130,6 +130,7 @@ struct LoginView: View {
         defer { isSubmitting = false }
 
         do {
+            RemoteLogger.log(tag: "Auth_Login_Attempt", message: "User attempting login for email: \(email.trimmingCharacters(in: .whitespaces))")
             let response = try await api.auth.login(
                 email: email.trimmingCharacters(in: .whitespaces),
                 password: password
@@ -138,9 +139,11 @@ struct LoginView: View {
             guard response.success, response.userId > 0 else {
                 // `api/login.php` mirrors the Android "Invalid credentials" text.
                 errorMessage = response.message.isEmpty ? "Invalid credentials" : response.message
+                RemoteLogger.log(tag: "Auth_Login_Failed", message: "Login failed: \(errorMessage ?? "")")
                 return
             }
 
+            RemoteLogger.log(tag: "Auth_Login_Success", message: "User logged in successfully (id: \(response.userId))")
             session.signIn(
                 userId: response.userId,
                 name: response.name,
@@ -154,6 +157,7 @@ struct LoginView: View {
             }
         } catch {
             errorMessage = (error as? APIError)?.errorDescription ?? error.localizedDescription
+            RemoteLogger.log(tag: "Auth_Login_Error", message: "Login error: \(errorMessage ?? "")")
         }
     }
 }

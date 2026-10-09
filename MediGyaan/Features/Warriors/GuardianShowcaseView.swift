@@ -679,6 +679,11 @@ struct GuardianShowcaseView: View {
         selectedAvatarName = currentWarrior.displayName
         selectedAvatarTitle = currentWarrior.title
 
+        RemoteLogger.log(
+            tag: "Guardian_Equip",
+            message: "User equipped warrior: #\(currentWarrior.id) - \(currentWarrior.displayName)"
+        )
+
         withAnimation {
             showEquippedToast = true
         }

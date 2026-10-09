@@ -30,6 +30,7 @@ struct ChallengeResultView: View {
 
                 // Action buttons
                 PrimaryButton(title: "Return to Arena", icon: "house.fill") {
+                    RemoteLogger.log(tag: "ChallengeResult_Return", message: "User tapped Return to Arena (challenge: \(result.challengeId))")
                     if let onHome = onHome {
                         onHome()
                     } else {
@@ -43,6 +44,12 @@ struct ChallengeResultView: View {
         .screenBackground()
         .navigationTitle("Battle Results")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            RemoteLogger.log(
+                tag: "ChallengeResult_onAppear",
+                message: "Displayed results for \(result.challengeId): outcome=\(result.outcomeTitle), userScore=\(result.userScore), oppScore=\(result.opponentScore), correct=\(result.userCorrect)/\(result.totalQuestions)"
+            )
+        }
     }
 
     // MARK: - Banner
