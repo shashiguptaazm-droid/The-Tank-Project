@@ -848,8 +848,8 @@ struct TestActivityView: View {
                 ],
                 correctOptionIndex: 0,
                 explanation: "ST elevation in II, III, and aVF indicates an acute Inferior Wall Myocardial Infarction. In 85-90% of individuals with right-dominant circulation, this territory is supplied by the Right Coronary Artery (RCA).",
-                subject: "Cardiology",
                 topic: "Ischemic Heart Disease",
+                subject: "Cardiology",
                 difficulty: "High Yield"
             ),
             Question(
@@ -863,8 +863,8 @@ struct TestActivityView: View {
                 ],
                 correctOptionIndex: 0,
                 explanation: "Thyroid-stimulating immunoglobulin or TRAb binds to and stimulates TSH receptors on thyroid follicular cells, leading to Graves' Disease. Proptosis and pretibial myxedema are uniquely caused by retro-orbital and dermal TSH-receptor activation.",
-                subject: "Endocrinology",
                 topic: "Thyroid Disorders",
+                subject: "Endocrinology",
                 difficulty: "Clinical"
             ),
             Question(
@@ -878,8 +878,8 @@ struct TestActivityView: View {
                 ],
                 correctOptionIndex: 0,
                 explanation: "Muscle-invasive bladder cancer (T2 and above) requires radical cystectomy with bilateral pelvic lymphadenectomy and urinary diversion (often preceded by neoadjuvant cisplatin-based chemotherapy). Intravesical BCG is strictly reserved for non-muscle-invasive bladder cancer (Ta, T1, Cis).",
-                subject: "Urology",
                 topic: "Uro-Oncology",
+                subject: "Urology",
                 difficulty: "Expert"
             )
         ]

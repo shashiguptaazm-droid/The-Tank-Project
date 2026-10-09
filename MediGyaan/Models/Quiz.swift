@@ -176,6 +176,36 @@ struct Question: Decodable, Identifiable, Hashable {
         self.negativeMarks = negativeMarks
         self.difficulty = difficulty.isEmpty ? "Medium" : difficulty
     }
+
+    init(
+        id: Int,
+        text: String,
+        options: [String],
+        correctIndex: Int = 0,
+        correctOptionIndex: Int? = nil,
+        explanation: String = "",
+        imageURL: URL? = nil,
+        subject: String = "",
+        topic: String = "",
+        marks: Int = 1,
+        negativeMarks: Double = 0,
+        difficulty: String = "Medium"
+    ) {
+        self.init(
+            id: id,
+            text: text,
+            options: options,
+            correctIndex: correctIndex,
+            correctOptionIndex: correctOptionIndex,
+            explanation: explanation,
+            imageURL: imageURL,
+            topic: topic,
+            subject: subject,
+            marks: marks,
+            negativeMarks: negativeMarks,
+            difficulty: difficulty
+        )
+    }
 }
 
 /// One answered question inside an attempt, persisted locally and synced to
