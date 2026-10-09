@@ -36,9 +36,10 @@ public final class SearchService {
         async let globalTask = fetchSearchV2(keyword: encoded)
         async let postsTask = fetchPosts(keyword: encoded, userId: userId)
         async let topicsTask = fetchTopics(keyword: query, goalSubject: goalSubject)
+        async let videosTask = fetchVideos(keyword: encoded, userId: userId)
 
-        let (globalItems, posts, topics) = await (globalTask, postsTask, topicsTask)
-        return globalItems + topics + posts
+        let (globalItems, posts, topics, videos) = await (globalTask, postsTask, topicsTask, videosTask)
+        return globalItems + topics + posts + videos
     }
 
     private func fetchSearchV2(keyword: String) async -> [SearchResultItem] {
@@ -137,6 +138,35 @@ public final class SearchService {
                 }
             }
             return topics
+        } catch {
+            return []
+        }
+    }
+
+    private func fetchVideos(keyword: String, userId: Int) async -> [SearchResultItem] {
+        guard let url = URL(string: "https://medigyaan.com/Neurons/api/videos_search.php?q=\(keyword)&user_id=\(userId)") else { return [] }
+        var request = URLRequest(url: url)
+        request.setValue(appSignature, forHTTPHeaderField: "X-App-Signature")
+
+        do {
+            let (data, resp) = try await session.data(for: request)
+            guard (resp as? HTTPURLResponse)?.statusCode == 200,
+                  let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  root["status"] as? String == "success",
+                  let videos = root["videos"] as? [[String: Any]] else { return [] }
+
+            return videos.compactMap { v in
+                let id = v["video_id"] as? Int ?? 0
+                guard id > 0 else { return nil }
+                let title = v["title"] as? String ?? "Clinical Case Reel"
+                let author = v["author"] as? String ?? "MediGyaan"
+                let authorPhoto = v["author_photo"] as? String ?? ""
+                let videoURL = v["video_url"] as? String ?? ""
+                let thumbURL = v["thumbnail_url"] as? String ?? ""
+                let likes = v["likes"] as? Int ?? 0
+                let date = v["upload_date"] as? String ?? ""
+                return .video(id: id, title: title, author: author, authorPhoto: authorPhoto, videoURL: videoURL, thumbnailURL: thumbURL, likes: likes, uploadDate: date)
+            }
         } catch {
             return []
         }

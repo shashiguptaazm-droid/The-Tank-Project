@@ -20,12 +20,12 @@ import AVFoundation
 /// 4. Review Tracking & VPS Telemetry:
 ///    - Builds structured `reviewJson` mirroring Android's `reviewJson`.
 ///    - Emits real-time logs via `RemoteLogger` to `/Neurons/api/client_log.php`.
-public struct TestActivityView: View {
+struct TestActivityView: View {
 
-    public let quiz: Quiz
-    public let isChallenge: Bool
-    public let opponentName: String
-    public var onFinish: (() -> Void)?
+    let quiz: Quiz
+    let isChallenge: Bool
+    let opponentName: String
+    var onFinish: (() -> Void)?
 
     @EnvironmentObject private var session: SessionStore
     @Environment(\.api) private var api
@@ -65,7 +65,7 @@ public struct TestActivityView: View {
     @State private var reviewRecords: [TestQuestionReview] = []
     @State private var isExamCompleted: Bool = false
 
-    public init(
+    init(
         quiz: Quiz,
         isChallenge: Bool = false,
         opponentName: String = "Dr. Opponent",
@@ -877,13 +877,13 @@ public struct TestActivityView: View {
 
 // MARK: - Review Struct
 
-public struct TestQuestionReview: Identifiable, Codable {
-    public var id = UUID()
-    public let questionId: Int
-    public let questionText: String
-    public let selectedOption: Int?
-    public let correctOption: Int
-    public let isCorrect: Bool
+struct TestQuestionReview: Identifiable, Codable {
+    var id = UUID()
+    let questionId: Int
+    let questionText: String
+    let selectedOption: Int?
+    let correctOption: Int
+    let isCorrect: Bool
 }
 
 // MARK: - Zoom Image Viewer
