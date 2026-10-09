@@ -244,7 +244,7 @@ struct GlobalSearchView: View {
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(name)
-                                .font(AppTheme.Font.headlineBold)
+                                .font(AppTheme.Font.headline)
                                 .foregroundStyle(AppTheme.Palette.textPrimary)
                             Text(subject)
                                 .font(AppTheme.Font.caption)
@@ -279,7 +279,7 @@ struct GlobalSearchView: View {
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(name.isEmpty ? "Doctor / Peer" : name)
-                                .font(AppTheme.Font.headlineBold)
+                                .font(AppTheme.Font.headline)
                                 .foregroundStyle(AppTheme.Palette.textPrimary)
                             Text("Warrior #\(id) • Tap to view profile")
                                 .font(AppTheme.Font.caption)
@@ -334,7 +334,7 @@ struct GlobalSearchView: View {
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(title)
-                                .font(AppTheme.Font.headlineBold)
+                                .font(AppTheme.Font.headline)
                                 .foregroundStyle(AppTheme.Palette.textPrimary)
                                 .lineLimit(1)
                             Text("\(author) • \(likes) likes")
@@ -527,7 +527,7 @@ private struct PeerProfileModalView: View {
             HStack {
                 Spacer()
                 Button("Done") { dismiss() }
-                    .font(AppTheme.Font.headlineBold)
+                    .font(AppTheme.Font.headline)
                     .foregroundStyle(AppTheme.Palette.primary)
             }
             .padding()

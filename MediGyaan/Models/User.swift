@@ -27,6 +27,10 @@ struct User: Decodable, Identifiable, Hashable {
         return letters.joined().uppercased()
     }
 
+    var goal: String {
+        course.isEmpty ? "NEET PG" : course
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.flexibleContainer()
         id = container.flexInt("user_id", "userId", "id")
