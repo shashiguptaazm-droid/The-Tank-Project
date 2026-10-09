@@ -378,7 +378,7 @@ struct DashboardView: View {
                 Spacer()
 
                 NavigationLink {
-                    BattleLobbyView(lobbyId: lobbyId, hostId: 0, guestId: session.userId, subject: selectedGoal)
+                    BattleLobbyView(lobbyId: lobbyId, topicName: selectedGoal, isHost: false)
                 } label: {
                     Text("Accept")
                         .font(.system(size: 12, weight: .bold))
@@ -483,7 +483,7 @@ struct DashboardView: View {
                         .foregroundStyle(AppTheme.Ink.teal)
 
                     Text(displayName)
-                        .font(AppTheme.Font.titleBold)
+                        .font(AppTheme.Font.title)
                         .foregroundStyle(AppTheme.Ink.textPrimary)
                         .lineLimit(1)
 
@@ -627,7 +627,7 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("Quick Practice: \(selectedGoal)")
-                    .font(AppTheme.Font.headlineBold)
+                    .font(AppTheme.Font.headline)
                     .foregroundStyle(AppTheme.Ink.textPrimary)
 
                 Spacer()
@@ -724,7 +724,7 @@ struct DashboardView: View {
                                     .foregroundStyle(AppTheme.Ink.textSecondary)
                             }
                             Text("Clinical Case of the Day")
-                                .font(AppTheme.Font.headlineBold)
+                                .font(AppTheme.Font.headline)
                                 .foregroundStyle(AppTheme.Ink.textPrimary)
                         }
                         Spacer()
@@ -1196,6 +1196,67 @@ struct DashboardView: View {
             todayQuestionText = "A 45-year-old patient presents with painless progressive loss of vision. What is the most likely initial diagnostic modality?"
             todayQuestionOptions = ["A) Slit-lamp biomicroscopy", "B) Optical Coherence Tomography", "C) Fundus Fluorescein Angiography", "D) B-Scan Ultrasonography"]
         }
+}
+
+// MARK: - Dashboard Sub-views
+
+/// A tinted battle-mode card: uppercase tag, emoji, headline title, caption subtitle.
+struct BattleModeCard: View {
+    let tag: String
+    let emoji: String
+    let title: String
+    let subtitle: String
+    let fill: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+            Text(tag)
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(AppTheme.Ink.textTertiary)
+
+            Text(emoji)
+                .font(AppTheme.Font.display)
+
+            Text(title)
+                .font(AppTheme.Font.headline)
+                .foregroundStyle(AppTheme.Ink.textPrimary)
+                .lineLimit(2)
+
+            Text(subtitle)
+                .font(AppTheme.Font.caption)
+                .foregroundStyle(AppTheme.Ink.textSecondary)
+                .lineLimit(2)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(height: 150)
+        .padding(AppTheme.Spacing.lg)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous).fill(fill)
+        )
+    }
+}
+
+/// A `#132238` quick tile with an emoji icon and title.
+struct QuickTile: View {
+    let emoji: String
+    let title: String
+
+    var body: some View {
+        HStack(spacing: AppTheme.Spacing.sm) {
+            Text(emoji).font(.system(size: 26))
+            Text(title)
+                .font(AppTheme.Font.headline)
+                .foregroundStyle(AppTheme.Ink.textPrimary)
+                .lineLimit(1)
+            Spacer(minLength: 0)
+        }
+        .padding(AppTheme.Spacing.md)
+        .frame(height: 56)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .fill(AppTheme.Ink.tile)
+        )
     }
 }
 
@@ -1204,3 +1265,4 @@ struct DashboardView: View {
         .environmentObject(SessionStore())
         .environment(\.api, .live)
 }
+
