@@ -138,7 +138,7 @@ struct ResearchWorkspaceView: View {
                         )
                         .foregroundStyle(isSelected ? Color.white : AppTheme.Palette.textPrimary)
                         .overlay(
-                            Capsule().stroke(isSelected ? AppTheme.Palette.primary : AppTheme.Palette.border, lineWidth: 1)
+                            Capsule().stroke(isSelected ? AppTheme.Palette.primary : AppTheme.Palette.outline, lineWidth: 1)
                         )
                     }
                 }

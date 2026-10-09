@@ -55,6 +55,8 @@ enum AppTheme {
         static let cardBackground = adaptive(light: Color(hex: 0xFFFFFF), dark: Color(hex: 0x242424))
         /// `colorOutline` — #D0D7E2 day / #4A4A4A night.
         static let outline = adaptive(light: Color(hex: 0xD0D7E2), dark: Color(hex: 0x4A4A4A))
+        /// Alias for outline
+        static let border = outline
         /// `divider` — #1F000000 day (12% black) / #383838 night.
         static let divider = adaptive(light: Color(hex: 0x1F000000), dark: Color(hex: 0x383838))
 
