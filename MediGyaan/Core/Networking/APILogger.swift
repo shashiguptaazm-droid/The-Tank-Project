@@ -72,8 +72,15 @@ final class APILogger: ObservableObject {
             self.persist()
         }
 
-        // Stream to remote VPS log if failed or study endpoint
-        if !entry.isSuccess || url.path.contains("getQuestions") || url.path.contains("getTopics") {
+        // Stream to remote VPS log if failed or relevant endpoint
+        if !entry.isSuccess ||
+            url.path.contains("getQuestions") ||
+            url.path.contains("getTopics") ||
+            url.path.contains("topicsearch") ||
+            url.path.contains("challenge") ||
+            url.path.contains("battle") ||
+            url.path.contains("lobby") ||
+            url.path.contains("quiz") {
             RemoteLogger.log(
                 tag: "API_\(method)_\(statusCode)",
                 message: "\(url.path) (HTTP \(statusCode), \(durationMs)ms)",

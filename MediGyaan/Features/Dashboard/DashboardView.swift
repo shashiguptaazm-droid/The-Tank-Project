@@ -366,7 +366,9 @@ struct DashboardView: View {
                 }
                 .buttonStyle(.plain)
 
-                NavigationLink { TopicChallengePickerView(mode: .challenge) } label: {
+                NavigationLink {
+                    TopicChallengePickerView(mode: .challenge, subject: selectedGoal)
+                } label: {
                     BattleModeCard(
                         tag: "👥 FRIENDS",
                         emoji: "🤝",
@@ -376,6 +378,9 @@ struct DashboardView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .simultaneousGesture(TapGesture().onEnded {
+                    RemoteLogger.log(tag: "Dashboard_Tap", message: "User tapped Challenge (mode: friends, goal: \(selectedGoal))")
+                })
 
                 Button {
                     RemoteLogger.log(tag: "Dashboard_Tap", message: "User tapped Rapid Fire (goal: \(selectedGoal))")
@@ -401,6 +406,9 @@ struct DashboardView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .simultaneousGesture(TapGesture().onEnded {
+                    RemoteLogger.log(tag: "Dashboard_Tap", message: "User tapped Test Mode (goal: \(selectedGoal))")
+                })
 
                 NavigationLink { ChallengeListView() } label: {
                     BattleModeCard(
@@ -412,6 +420,9 @@ struct DashboardView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .simultaneousGesture(TapGesture().onEnded {
+                    RemoteLogger.log(tag: "Dashboard_Tap", message: "User tapped Create Room / Challenges (goal: \(selectedGoal))")
+                })
             }
         }
     }

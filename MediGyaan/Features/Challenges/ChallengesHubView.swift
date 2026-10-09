@@ -155,6 +155,7 @@ enum ChallengeMode {
 struct TopicChallengePickerView: View {
 
     let mode: ChallengeMode
+    var subject: String = ""
 
     @Environment(\.api) private var api
     @State private var state: LoadState<[Topic]> = .idle
@@ -181,6 +182,12 @@ struct TopicChallengePickerView: View {
         .screenBackground()
         .navigationTitle(mode.title)
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            RemoteLogger.log(
+                tag: "TopicChallengePicker_onAppear",
+                message: "Opened topic picker for mode: \(mode.title), subject: \(subject.isEmpty ? "All" : subject)"
+            )
+        }
         .task { await load() }
     }
 
@@ -202,8 +209,14 @@ struct TopicChallengePickerView: View {
 
     @MainActor
     private func load() async {
-        state = await LoadState.result { [api] in
-            try await api.study.topics()
+        RemoteLogger.log(
+            tag: "TopicChallengePicker_load",
+            message: "Fetching topics for mode: \(mode.title), subject: \(subject.isEmpty ? "All" : subject)"
+        )
+        state = await LoadState.result { [api, subject] in
+            let res = try await api.study.topics(subject: subject.isEmpty ? nil : subject)
+            RemoteLogger.log(tag: "TopicChallengePicker_loaded", message: "Successfully loaded \(res.count) topics for challenge")
+            return res
         }
     }
 }
@@ -238,6 +251,9 @@ struct ChallengeListView: View {
         .screenBackground()
         .navigationTitle("My Challenges")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            RemoteLogger.log(tag: "ChallengeList_onAppear", message: "ChallengeListView appeared")
+        }
         .task { await load() }
     }
 
@@ -278,9 +294,12 @@ struct ChallengeListView: View {
     @MainActor
     private func load() async {
         let userId = session.userId
+        RemoteLogger.log(tag: "ChallengeList_load", message: "Fetching challenges for userId: \(userId)")
         guard userId > 0 else { return }
         state = await LoadState.result { [api] in
-            try await api.study.challenges(userId: userId)
+            let res = try await api.study.challenges(userId: userId)
+            RemoteLogger.log(tag: "ChallengeList_loaded", message: "Fetched \(res.count) challenges")
+            return res
         }
     }
 }
