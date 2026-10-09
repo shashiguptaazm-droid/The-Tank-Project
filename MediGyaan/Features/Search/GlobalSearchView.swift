@@ -560,9 +560,3 @@ private struct PeerProfileModalView: View {
         .background(AppTheme.Palette.surface.ignoresSafeArea())
     }
 }
-
-#Preview {
-    GlobalSearchView()
-        .environmentObject(SessionStore())
-        .environment(\.api, .live)
-}

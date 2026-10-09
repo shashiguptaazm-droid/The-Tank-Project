@@ -274,6 +274,8 @@ enum AppTheme {
         static let display = SwiftUI.Font.system(size: 34, weight: .bold)
         /// 22sp bold — dashboard user name.
         static let title = SwiftUI.Font.system(size: 22, weight: .bold)
+        /// Alias for title
+        static let titleBold = title
         /// 20sp bold — secondary titles.
         static let title2 = SwiftUI.Font.system(size: 20, weight: .bold)
         /// 18sp bold — tertiary titles.
@@ -284,6 +286,8 @@ enum AppTheme {
         static let prediction = SwiftUI.Font.system(size: 21, weight: .bold, design: .rounded)
         /// 20sp — battle mode card titles.
         static let headline = SwiftUI.Font.system(size: 20, weight: .bold)
+        /// Alias for headline
+        static let headlineBold = headline
         /// 18sp — section headers ("Battle Modes ⚔️").
         static let section = SwiftUI.Font.system(size: 18, weight: .bold)
         /// 16sp — body copy.
