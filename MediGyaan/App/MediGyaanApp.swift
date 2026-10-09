@@ -22,6 +22,10 @@ struct MediGyaanApp: App {
     /// system.
     @AppStorage(AppPreferences.darkMode) private var darkMode = false
 
+    init() {
+        RemoteLogger.initializeCrashReporting()
+    }
+
     var body: some Scene {
         WindowGroup {
             RootView()

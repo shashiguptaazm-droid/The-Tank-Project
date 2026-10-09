@@ -97,6 +97,10 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
     // MARK: - Lifecycle
 
     func start(api: MediGyaanAPI, userId: Int) async {
+        RemoteLogger.log(
+            tag: "QuizViewModel_start",
+            message: "Starting Quiz - subject: \(currentSubject), topic: \(selectedTopic), quizId: \(quiz.id), userId: \(userId)"
+        )
         self.api = api
         self.userId = userId
 
@@ -109,19 +113,26 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
 
     /// Fetches all topics for the subject from api/getTopics.php (matching MCQActivity.kt fetchTopics)
     func loadTopics() async {
+        RemoteLogger.log(tag: "QuizViewModel_loadTopics", message: "Fetching topics for \(currentSubject)")
         do {
             let fetchedTopics = try await api.study.topics(subject: currentSubject)
             var names = ["All Topics"]
             names.append(contentsOf: fetchedTopics.map { $0.name }.filter { !$0.isEmpty })
             var seen = Set<String>()
             self.topicsList = names.filter { seen.insert($0).inserted }
+            RemoteLogger.log(tag: "QuizViewModel_loadTopics_success", message: "Loaded \(self.topicsList.count) topics")
         } catch {
+            RemoteLogger.log(tag: "QuizViewModel_loadTopics_error", message: "Failed: \(error.localizedDescription)")
             self.topicsList = ["All Topics"]
         }
     }
 
     /// Loads the question stream and question ID pool matching Android's fetchQuestion(null)
     func loadInitialQuestionSession() async {
+        RemoteLogger.log(
+            tag: "QuizViewModel_loadSession",
+            message: "Loading session for \(currentSubject) | \(selectedTopic)"
+        )
         state = .loading
         isLoadingQuestion = true
         defer { isLoadingQuestion = false }
@@ -143,6 +154,11 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
                 userId: userId
             )
 
+            RemoteLogger.log(
+                tag: "QuizViewModel_fetchQuestions_success",
+                message: "Fetched \(rawIds.count) ids. Has first question: \(question != nil)"
+            )
+
             self.allQuestionIds = rawIds
             if let firstQuestion = question {
                 applyLoadedQuestions([firstQuestion])
@@ -159,6 +175,10 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
                 ))
             }
         } catch {
+            RemoteLogger.log(
+                tag: "QuizViewModel_loadSession_error",
+                message: "Error loading session: \(error.localizedDescription)"
+            )
             state = .failed(error.localizedDescription)
         }
     }

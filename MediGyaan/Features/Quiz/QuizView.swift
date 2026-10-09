@@ -93,9 +93,13 @@ struct QuizView: View {
         .task {
             // `@StateObject` is built before the environment exists, so the API
             // client and session user are supplied here instead.
+            RemoteLogger.log(tag: "QuizView_task", message: "QuizView task running, hasStarted=\(viewModel.hasStarted)")
             if !viewModel.hasStarted {
                 await viewModel.start(api: api, userId: session.userId)
             }
+        }
+        .onAppear {
+            RemoteLogger.log(tag: "QuizView_onAppear", message: "QuizView appeared on screen")
         }
         .interactiveDismissDisabled(viewModel.result == nil && !viewModel.questions.isEmpty)
     }

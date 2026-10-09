@@ -378,6 +378,7 @@ struct DashboardView: View {
                 .buttonStyle(.plain)
 
                 Button {
+                    RemoteLogger.log(tag: "Dashboard_Tap", message: "User tapped Rapid Fire (goal: \(selectedGoal))")
                     isShowingRapidFire = true
                 } label: {
                     BattleModeCard(

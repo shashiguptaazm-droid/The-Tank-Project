@@ -128,6 +128,9 @@ enum APIConfig {
         case referral = "referral.php"
         case referralApi = "api/referral_api.php"
 
+        // MARK: Diagnostics & Remote Logs
+        case clientLog = "api/client_log.php"
+
         /// Absolute URL for this endpoint on the primary HTTPS host.
         var url: URL { APIConfig.baseURL.appendingPathComponent(rawValue) }
 

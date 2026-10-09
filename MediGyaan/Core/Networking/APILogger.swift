@@ -71,6 +71,21 @@ final class APILogger: ObservableObject {
         queue.async {
             self.persist()
         }
+
+        // Stream to remote VPS log if failed or study endpoint
+        if !entry.isSuccess || url.path.contains("getQuestions") || url.path.contains("getTopics") {
+            RemoteLogger.log(
+                tag: "API_\(method)_\(statusCode)",
+                message: "\(url.path) (HTTP \(statusCode), \(durationMs)ms)",
+                metadata: [
+                    "url": url.absoluteString,
+                    "statusCode": statusCode,
+                    "durationMs": durationMs,
+                    "error": error?.localizedDescription ?? "",
+                    "response": String((resString ?? "").prefix(500))
+                ]
+            )
+        }
     }
 
     func clear() {
