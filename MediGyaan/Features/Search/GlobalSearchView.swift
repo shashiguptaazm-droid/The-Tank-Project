@@ -37,7 +37,6 @@ struct GlobalSearchView: View {
     @State private var selectedQuizToLaunch: Quiz? = nil
     @State private var selectedVideoToPlay: (title: String, url: URL)? = nil
     @State private var selectedProfileUser: UserItem? = nil
-    @State private var selectedPostToView: CommunityPostItem? = nil
 
     @AppStorage(AppPreferences.recentSearches) private var recentSearchesJSON = "[]"
 
