@@ -255,7 +255,8 @@ struct AiChatView: View {
                     }
                 }
 
-                if let pico = viewModel.workspace.pico {
+                let pico = viewModel.workspace.pico
+                if !pico.population.isEmpty || !pico.intervention.isEmpty {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("PICO Framework:")
                             .font(.system(size: 10, weight: .bold))
