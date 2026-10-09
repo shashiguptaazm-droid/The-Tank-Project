@@ -15,6 +15,8 @@ struct AiChatMessage: Identifiable, Equatable {
     var counselCard: CounselCardData?
     var thesisCard: ThesisCardData?
     var chapterCard: ChapterCardData?
+    var skillOutcome: SkillOutcome?
+    var skillName: String?
 
     enum MessageRole: String, Codable {
         case user
@@ -34,7 +36,9 @@ struct AiChatMessage: Identifiable, Equatable {
         feedback: Int = 0,
         counselCard: CounselCardData? = nil,
         thesisCard: ThesisCardData? = nil,
-        chapterCard: ChapterCardData? = nil
+        chapterCard: ChapterCardData? = nil,
+        skillOutcome: SkillOutcome? = nil,
+        skillName: String? = nil
     ) {
         self.id = id
         self.role = role
@@ -48,6 +52,8 @@ struct AiChatMessage: Identifiable, Equatable {
         self.counselCard = counselCard
         self.thesisCard = thesisCard
         self.chapterCard = chapterCard
+        self.skillOutcome = skillOutcome
+        self.skillName = skillName
     }
 
     var isUser: Bool { role == .user }

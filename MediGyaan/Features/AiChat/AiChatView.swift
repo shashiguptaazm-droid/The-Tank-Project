@@ -9,12 +9,20 @@ struct AiChatView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = AiChatViewModel()
     @State private var isShowingDocPicker = false
+    @State private var isWorkspaceExpanded = false
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 // Header Bar matching Android's ChatHeader
                 chatHeader
+
+                // Research OS Workspace Bar
+                workspaceStatusBar
+
+                if let activeSkill = viewModel.activeSkillName {
+                    activeSkillIndicator(activeSkill)
+                }
 
                 Divider()
                     .background(Color(hex: 0x2C3140))
@@ -229,6 +237,74 @@ struct AiChatView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .background(Color(hex: 0x111624))
+    }
+
+    // MARK: - Research OS Workspace Status Bar (Collapsible)
+
+    private var workspaceStatusBar: some View {
+        DisclosureGroup(isExpanded: $isWorkspaceExpanded) {
+            VStack(alignment: .leading, spacing: 6) {
+                if !viewModel.workspace.researchQuestion.isEmpty {
+                    HStack(alignment: .top, spacing: 4) {
+                        Text("Question:")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(Color(hex: 0x00E5FF))
+                        Text(viewModel.workspace.researchQuestion)
+                            .font(.system(size: 11))
+                            .foregroundStyle(Color.white)
+                    }
+                }
+
+                if let pico = viewModel.workspace.pico {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("PICO Framework:")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(Color(hex: 0x00FF41))
+                        Text("P: \(pico.population) | I: \(pico.intervention) | C: \(pico.comparison) | O: \(pico.outcome)")
+                            .font(.system(size: 10))
+                            .foregroundStyle(Color(hex: 0xCBD5E1))
+                    }
+                }
+            }
+            .padding(.top, 4)
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "cube.transparent")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(Color(hex: 0x00E5FF))
+
+                Text("RESEARCH OS WORKSPACE")
+                    .font(.system(size: 10, weight: .black, design: .monospaced))
+                    .foregroundStyle(Color.white)
+
+                Spacer()
+
+                Text(viewModel.workspace.currentSection.uppercased())
+                    .font(.system(size: 9, weight: .black))
+                    .foregroundStyle(Color.yellow)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(Color.yellow.opacity(0.15)))
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(Color(hex: 0x0D111A))
+    }
+
+    private func activeSkillIndicator(_ skillName: String) -> some View {
+        HStack(spacing: 8) {
+            ProgressView()
+                .tint(Color(hex: 0x00E5FF))
+                .scaleEffect(0.8)
+            Text("⚡ Executing Skill: \(skillName)...")
+                .font(.system(size: 12, weight: .bold, design: .monospaced))
+                .foregroundStyle(Color(hex: 0x00E5FF))
+            Spacer()
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 6)
+        .background(Color(hex: 0x081528))
     }
 
     // MARK: - Tool Chips Bar (Matches Android's Horizontal Tool Chips)
@@ -505,6 +581,10 @@ struct AiChatView: View {
                 )
             }
 
+            if let outcome = message.skillOutcome {
+                skillOutcomeFeatureCard(outcome, skillName: message.skillName ?? "Clinical Research Skill")
+            }
+
             // Attached Feature Cards (matching Android)
             if let counsel = message.counselCard {
                 counselorFeatureCard(counsel)
@@ -523,6 +603,58 @@ struct AiChatView: View {
             }
         }
         .padding(.vertical, 2)
+    }
+
+    // MARK: - Research Skill Outcome Card
+
+    private func skillOutcomeFeatureCard(_ outcome: SkillOutcome, skillName: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                ZStack {
+                    Circle()
+                        .fill(Color(hex: 0x00E5FF).opacity(0.2))
+                        .frame(width: 28, height: 28)
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(Color(hex: 0x00E5FF))
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(skillName.uppercased())
+                        .font(.system(size: 11, weight: .black, design: .monospaced))
+                        .foregroundStyle(Color(hex: 0x00E5FF))
+
+                    if !outcome.uiNote.isEmpty {
+                        Text(outcome.uiNote)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(Color.white)
+                    }
+                }
+
+                Spacer()
+
+                Text("VERIFIED")
+                    .font(.system(size: 9, weight: .black))
+                    .foregroundStyle(Color(hex: 0x00FF41))
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(Color(hex: 0x00FF41).opacity(0.15)))
+            }
+
+            Text(LocalizedStringKey(outcome.contextText))
+                .font(.system(size: 13))
+                .foregroundStyle(Color(hex: 0xE2E8F0))
+                .lineSpacing(3)
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color(hex: 0x111927))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color(hex: 0x00E5FF).opacity(0.35), lineWidth: 1)
+                )
+        )
     }
 
     // MARK: - NEET PG AI Counselor Card (Collapsible)

@@ -30,6 +30,8 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
     @Published var activeQuizToLaunch: Quiz? = nil
     @Published var isSpeaking: Bool = false
     @Published var toastMessage: String? = nil
+    @Published var workspace: WorkspaceState = WorkspaceState()
+    @Published var activeSkillName: String? = nil
 
     private let speechSynthesizer = AVSpeechSynthesizer()
     private var activeTask: Task<Void, Never>? = nil
@@ -200,6 +202,24 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
                 context += "\(prev.role.rawValue): \(prev.text)\n"
             }
 
+            // 1. Research Skills Pipeline matching Android's AiChatActivity.kt
+            let routedSkill = ResearchSkillHandler.routeToSkill(text: prompt, hasPdf: attachmentName != nil)
+            var currentSkillOutcome: SkillOutcome? = nil
+            if routedSkill != "NONE" {
+                self.activeSkillName = routedSkill
+                currentSkillOutcome = await ResearchSkillHandler.executeSkill(
+                    skillName: routedSkill,
+                    userInput: prompt,
+                    pdfText: ""
+                )
+                if let outcome = currentSkillOutcome {
+                    context += "\n[SKILL \(routedSkill) CONTEXT]: \(outcome.contextText)\n"
+                }
+            }
+
+            // Append System Prompt Guidance
+            context += "\n" + ResearchSkillRegistry.systemPromptExtension
+
             var counselCard: CounselCardData? = nil
             var thesisCard: ThesisCardData? = nil
             var chapterCard: ChapterCardData? = nil
@@ -234,6 +254,10 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
                 replyText = generateClinicalFallback(for: prompt)
             }
 
+            // Update Research OS Workspace State from AI reply markers
+            self.workspace = ResearchSkillHandler.updateWorkspace(current: self.workspace, aiOutput: replyText)
+            self.activeSkillName = nil
+
             AiTrainingLogger.log(
                 userId: userId,
                 source: "ai_chat",
@@ -254,7 +278,9 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
                 responseTimeMs: max(elapsedMs, 280),
                 counselCard: counselCard,
                 thesisCard: thesisCard,
-                chapterCard: chapterCard
+                chapterCard: chapterCard,
+                skillOutcome: currentSkillOutcome,
+                skillName: routedSkill != "NONE" ? routedSkill : nil
             )
 
             messages.append(assistantMsg)

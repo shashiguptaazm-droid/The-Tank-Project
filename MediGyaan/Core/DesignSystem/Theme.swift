@@ -232,6 +232,8 @@ enum AppTheme {
 
         // Legacy scale retained for the screens not yet migrated to the exact
         // Android dp values above.
+        /// 4dp
+        static let xs: CGFloat = 4
         /// 8dp
         static let sm: CGFloat = 8
         /// 14dp

@@ -468,7 +468,7 @@ struct ClassicBattleArenaView: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 4)
             .background(
-                RoundedRectangle(cornerRadius: AppTheme.Radius.xs)
+                RoundedRectangle(cornerRadius: AppTheme.Radius.sm)
                     .fill(isActive ? tint.opacity(0.2) : Color.white.opacity(0.03))
             )
         }
