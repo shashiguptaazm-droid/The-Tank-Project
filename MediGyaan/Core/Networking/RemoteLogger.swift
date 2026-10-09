@@ -1,6 +1,32 @@
 import Foundation
 import UIKit
 
+// Global C-function pointer handlers (cannot capture local Swift context)
+private func globalExceptionHandler(_ exception: NSException) {
+    let symbols = exception.callStackSymbols.joined(separator: "\n")
+    let details: [String: Any] = [
+        "tag": "CRASH_NSException",
+        "name": exception.name.rawValue,
+        "reason": exception.reason ?? "Unknown reason",
+        "userInfo": "\(exception.userInfo ?? [:])",
+        "stack": symbols
+    ]
+    RemoteLogger.syncSend(payload: details)
+}
+
+private func globalSignalHandler(_ signum: Int32) {
+    let symbols = Thread.callStackSymbols.joined(separator: "\n")
+    let details: [String: Any] = [
+        "tag": "CRASH_Signal",
+        "signal": signum,
+        "signal_name": RemoteLogger.signalName(signum),
+        "stack": symbols
+    ]
+    RemoteLogger.syncSend(payload: details)
+    signal(signum, SIG_DFL)
+    raise(signum)
+}
+
 /// Sends real-time application logs, unhandled exceptions, and diagnostics
 /// directly to the VPS server (`/Neurons/api/client_log.php`).
 public enum RemoteLogger {
@@ -13,34 +39,14 @@ public enum RemoteLogger {
         log(tag: "AppLifecycle", message: "Application launched - iOS \(UIDevice.current.systemVersion) - \(UIDevice.current.model)")
 
         // Catch NSExceptions (e.g. fatal Objective-C / UIKit exceptions)
-        NSSetUncaughtExceptionHandler { exception in
-            let symbols = exception.callStackSymbols.joined(separator: "\n")
-            let details: [String: Any] = [
-                "tag": "CRASH_NSException",
-                "name": exception.name.rawValue,
-                "reason": exception.reason ?? "Unknown reason",
-                "userInfo": "\(exception.userInfo ?? [:])",
-                "stack": symbols
-            ]
-            syncSend(payload: details)
-        }
+        NSSetUncaughtExceptionHandler(globalExceptionHandler)
 
         // Catch POSIX Signals (SIGSEGV, SIGABRT, SIGBUS, SIGILL, SIGFPE)
-        for sig in [SIGABRT, SIGSEGV, SIGBUS, SIGILL, SIGFPE] {
-            signal(sig) { signum in
-                let symbols = Thread.callStackSymbols.joined(separator: "\n")
-                let details: [String: Any] = [
-                    "tag": "CRASH_Signal",
-                    "signal": signum,
-                    "signal_name": signalName(signum),
-                    "stack": symbols
-                ]
-                syncSend(payload: details)
-                // Re-raise default signal handler to terminate
-                signal(signum, SIG_DFL)
-                raise(signum)
-            }
-        }
+        signal(SIGABRT, globalSignalHandler)
+        signal(SIGSEGV, globalSignalHandler)
+        signal(SIGBUS, globalSignalHandler)
+        signal(SIGILL, globalSignalHandler)
+        signal(SIGFPE, globalSignalHandler)
     }
 
     public static func log(tag: String, message: String, metadata: [String: Any] = [:]) {
@@ -66,7 +72,7 @@ public enum RemoteLogger {
         URLSession.shared.dataTask(with: request).resume()
     }
 
-    private static func syncSend(payload: [String: Any]) {
+    fileprivate static func syncSend(payload: [String: Any]) {
         guard let data = try? JSONSerialization.data(withJSONObject: payload) else { return }
         var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
@@ -85,7 +91,7 @@ public enum RemoteLogger {
         _ = semaphore.wait(timeout: .now() + 3.0)
     }
 
-    private static func signalName(_ sig: Int32) -> String {
+    fileprivate static func signalName(_ sig: Int32) -> String {
         switch sig {
         case SIGABRT: return "SIGABRT"
         case SIGSEGV: return "SIGSEGV"
