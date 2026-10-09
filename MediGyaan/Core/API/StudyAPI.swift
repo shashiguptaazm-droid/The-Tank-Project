@@ -88,8 +88,25 @@ struct StudyAPI {
         struct Wrapper: Decodable {
             let items: [Topic]
             init(from decoder: Decoder) throws {
+                if let container = try? decoder.container(keyedBy: AnyCodingKey.self) {
+                    for key in ["topics", "data", "results", "subjects"] {
+                        if let topics = try? container.decodeIfPresent([Topic].self, forKey: AnyCodingKey(key)) {
+                            items = topics
+                            return
+                        }
+                        if let strings = try? container.decodeIfPresent([String].self, forKey: AnyCodingKey(key)) {
+                            items = strings.map { Topic(id: $0.hashValue, name: $0) }
+                            return
+                        }
+                    }
+                }
                 let container = try decoder.flexibleContainer()
-                items = container.flexArray("topics", "data", "results", "subjects")
+                let strArray = container.flexStringArray("topics", "data", "results", "subjects")
+                if !strArray.isEmpty {
+                    items = strArray.map { Topic(id: $0.hashValue, name: $0) }
+                } else {
+                    items = container.flexArray("topics", "data", "results", "subjects")
+                }
             }
         }
         if let subject, !subject.isEmpty {
@@ -106,8 +123,25 @@ struct StudyAPI {
         struct Wrapper: Decodable {
             let items: [Topic]
             init(from decoder: Decoder) throws {
+                if let container = try? decoder.container(keyedBy: AnyCodingKey.self) {
+                    for key in ["topics", "data", "results"] {
+                        if let topics = try? container.decodeIfPresent([Topic].self, forKey: AnyCodingKey(key)) {
+                            items = topics
+                            return
+                        }
+                        if let strings = try? container.decodeIfPresent([String].self, forKey: AnyCodingKey(key)) {
+                            items = strings.map { Topic(id: $0.hashValue, name: $0) }
+                            return
+                        }
+                    }
+                }
                 let container = try decoder.flexibleContainer()
-                items = container.flexArray("topics", "data", "results")
+                let strArray = container.flexStringArray("topics", "data", "results")
+                if !strArray.isEmpty {
+                    items = strArray.map { Topic(id: $0.hashValue, name: $0) }
+                } else {
+                    items = container.flexArray("topics", "data", "results")
+                }
             }
         }
         let wrapper = try await client.get(.topicSearch, query: ["q": text, "query": text], as: Wrapper.self)
@@ -119,8 +153,25 @@ struct StudyAPI {
         struct Wrapper: Decodable {
             let items: [Topic]
             init(from decoder: Decoder) throws {
+                if let container = try? decoder.container(keyedBy: AnyCodingKey.self) {
+                    for key in ["topics", "results", "data"] {
+                        if let topics = try? container.decodeIfPresent([Topic].self, forKey: AnyCodingKey(key)) {
+                            items = topics
+                            return
+                        }
+                        if let strings = try? container.decodeIfPresent([String].self, forKey: AnyCodingKey(key)) {
+                            items = strings.map { Topic(id: $0.hashValue, name: $0) }
+                            return
+                        }
+                    }
+                }
                 let container = try decoder.flexibleContainer()
-                items = container.flexArray("topics", "results", "data")
+                let strArray = container.flexStringArray("topics", "results", "data")
+                if !strArray.isEmpty {
+                    items = strArray.map { Topic(id: $0.hashValue, name: $0) }
+                } else {
+                    items = container.flexArray("topics", "results", "data")
+                }
             }
         }
         let wrapper = try await client.get(

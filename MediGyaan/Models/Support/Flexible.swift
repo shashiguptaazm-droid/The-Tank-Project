@@ -101,14 +101,44 @@ extension KeyedDecodingContainer where Key == AnyCodingKey {
                   let value = raw.value else { continue }
             if let array = value as? [Any] {
                 return array.compactMap { element in
-                    guard let data = try? JSONSerialization.data(withJSONObject: element) else { return nil }
-                    return try? JSONDecoder().decode(T.self, from: data)
+                    // 1. If element is already of type T (e.g. String as String, Int as Int)
+                    if let direct = element as? T { return direct }
+
+                    // 2. If element is a String and T is Topic
+                    if let str = element as? String, let topic = Topic(id: str.hashValue, name: str) as? T {
+                        return topic
+                    }
+
+                    // 3. For dictionaries/arrays that are valid JSON objects
+                    if JSONSerialization.isValidJSONObject(element),
+                       let data = try? JSONSerialization.data(withJSONObject: element) {
+                        return try? JSONDecoder().decode(T.self, from: data)
+                    }
+
+                    // 4. For primitives/scalars, wrap in [element] so it forms a valid top-level JSON array
+                    if let data = try? JSONSerialization.data(withJSONObject: [element]),
+                       let decoded = try? JSONDecoder().decode([T].self, from: data),
+                       let first = decoded.first {
+                        return first
+                    }
+
+                    return nil
                 }
             }
             // A single object where an array was expected.
-            if let data = try? JSONSerialization.data(withJSONObject: value),
+            if let direct = value as? T { return [direct] }
+            if let str = value as? String, let topic = Topic(id: str.hashValue, name: str) as? T {
+                return [topic]
+            }
+            if JSONSerialization.isValidJSONObject(value),
+               let data = try? JSONSerialization.data(withJSONObject: value),
                let single = try? JSONDecoder().decode(T.self, from: data) {
                 return [single]
+            }
+            if let data = try? JSONSerialization.data(withJSONObject: [value]),
+               let decoded = try? JSONDecoder().decode([T].self, from: data),
+               let first = decoded.first {
+                return [first]
             }
         }
         return []
@@ -124,7 +154,7 @@ extension KeyedDecodingContainer where Key == AnyCodingKey {
                     if let string = element as? String { return string }
                     if let int = element as? Int { return String(int) }
                     if let dict = element as? [String: Any] {
-                        return (dict["name"] as? String) ?? (dict["label"] as? String)
+                        return (dict["name"] as? String) ?? (dict["label"] as? String) ?? (dict["topic"] as? String)
                     }
                     return nil
                 }
@@ -145,9 +175,17 @@ extension KeyedDecodingContainer where Key == AnyCodingKey {
     func flexObject<T: Decodable>(_ names: String...) -> T? {
         for name in names {
             guard let raw = try? decodeIfPresent(AnyDecodable.self, forKey: AnyCodingKey(name)),
-                  let value = raw.value,
-                  let data = try? JSONSerialization.data(withJSONObject: value) else { continue }
-            if let object = try? JSONDecoder().decode(T.self, from: data) { return object }
+                  let value = raw.value else { continue }
+            if let direct = value as? T { return direct }
+            if JSONSerialization.isValidJSONObject(value),
+               let data = try? JSONSerialization.data(withJSONObject: value) {
+                if let object = try? JSONDecoder().decode(T.self, from: data) { return object }
+            }
+            if let data = try? JSONSerialization.data(withJSONObject: [value]),
+               let decoded = try? JSONDecoder().decode([T].self, from: data),
+               let first = decoded.first {
+                return first
+            }
         }
         return nil
     }
