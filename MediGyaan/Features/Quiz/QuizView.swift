@@ -14,6 +14,7 @@ struct QuizView: View {
     @State private var isShowingShareSheet = false
     @State private var isShowingAskAiSheet = false
     @State private var isShowingJumpSheet = false
+    @State private var selectedFullscreenImage: URL? = nil
 
     init(quiz: Quiz) {
         self.quiz = quiz
@@ -89,6 +90,14 @@ struct QuizView: View {
         }
         .sheet(isPresented: $isShowingJumpSheet) {
             jumpGridSheet
+        }
+        .fullScreenCover(isPresented: Binding(
+            get: { selectedFullscreenImage != nil },
+            set: { if !$0 { selectedFullscreenImage = nil } }
+        )) {
+            if let url = selectedFullscreenImage {
+                FullScreenImageView(imageURL: url)
+            }
         }
         .task {
             // `@StateObject` is built before the environment exists, so the API
@@ -274,13 +283,62 @@ struct QuizView: View {
         CardContainer {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
                 if let imageURL = question.imageURL {
-                    AsyncImage(url: imageURL) { image in
-                        image.resizable().scaledToFit()
-                    } placeholder: {
-                        ProgressView()
+                    Button {
+                        selectedFullscreenImage = imageURL
+                    } label: {
+                        AsyncImage(url: imageURL) { phase in
+                            switch phase {
+                            case .empty:
+                                HStack {
+                                    Spacer()
+                                    ProgressView()
+                                    Spacer()
+                                }
+                                .frame(height: 180)
+                                .background(Color.secondary.opacity(0.06))
+                                .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.sm))
+                            case .success(let image):
+                                ZStack(alignment: .bottomTrailing) {
+                                    image
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(maxWidth: .infinity, maxHeight: 280)
+                                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.sm))
+
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "plus.magnifyingglass")
+                                            .font(.system(size: 10, weight: .bold))
+                                        Text("Tap to zoom")
+                                            .font(.system(size: 11, weight: .medium))
+                                    }
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(.ultraThinMaterial)
+                                    .clipShape(Capsule())
+                                    .padding(8)
+                                }
+                            case .failure:
+                                HStack {
+                                    Spacer()
+                                    VStack(spacing: 6) {
+                                        Image(systemName: "photo.badge.exclamationmark")
+                                            .font(.system(size: 24))
+                                        Text("Image could not be loaded")
+                                            .font(AppTheme.Font.caption)
+                                    }
+                                    .foregroundStyle(AppTheme.Palette.textSecondary)
+                                    .padding(.vertical, AppTheme.Spacing.md)
+                                    Spacer()
+                                }
+                                .frame(maxWidth: .infinity)
+                                .background(Color.secondary.opacity(0.06))
+                                .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.sm))
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
                     }
-                    .frame(maxHeight: 180)
-                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.sm))
+                    .buttonStyle(.plain)
                 }
 
                 Text(question.text.isEmpty ? "Question" : question.text)

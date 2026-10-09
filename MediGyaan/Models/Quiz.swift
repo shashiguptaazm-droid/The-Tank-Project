@@ -77,8 +77,8 @@ struct Question: Decodable, Identifiable, Hashable {
         marks = container.flexInt("marks", "mark", "positive_marks")
         negativeMarks = container.flexDouble("negative_marks", "negative")
 
-        let image = container.flexString("image", "image_url", "question_image")
-        imageURL = image.isEmpty ? nil : URL(string: image)
+        let image = container.flexString("image", "image_url", "question_image", "img_url", "img")
+        imageURL = Question.normalizeImageURL(image)
 
         // Preferred shape: an explicit options array.
         var parsed = container.flexStringArray("options", "option_list", "choices")
@@ -118,6 +118,29 @@ struct Question: Decodable, Identifiable, Hashable {
         }
     }
 
+    /// Normalizes raw image paths/URLs from the backend (handling relative paths,
+    /// legacy medigyaan.xyz hosts, spaces, and empty/"null" values) to full HTTPS URLs.
+    static func normalizeImageURL(_ raw: String?) -> URL? {
+        guard let raw = raw?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !raw.isEmpty,
+              raw != "null",
+              raw != "0",
+              raw != "false",
+              raw != "nil" else {
+            return nil
+        }
+        let fixed = raw.replacingOccurrences(of: "medigyaan.xyz", with: "medigyaan.com")
+        if fixed.lowercased().hasPrefix("http://") || fixed.lowercased().hasPrefix("https://") {
+            let encoded = fixed.replacingOccurrences(of: " ", with: "%20")
+            return URL(string: encoded)
+        }
+        let cleaned = fixed.hasPrefix("./") ? String(fixed.dropFirst(2)) : fixed
+        let trimmed = cleaned.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        guard !trimmed.isEmpty else { return nil }
+        let fullString = "https://medigyaan.com/Neurons/\(trimmed)".replacingOccurrences(of: " ", with: "%20")
+        return URL(string: fullString)
+    }
+
     init(
         id: Int,
         text: String,
@@ -135,7 +158,11 @@ struct Question: Decodable, Identifiable, Hashable {
         self.options = options
         self.correctIndex = correctIndex
         self.explanation = explanation
-        self.imageURL = imageURL
+        if let imageURL, imageURL.scheme == nil || imageURL.host == nil {
+            self.imageURL = Question.normalizeImageURL(imageURL.absoluteString)
+        } else {
+            self.imageURL = imageURL
+        }
         self.topic = topic
         self.subject = subject
         self.marks = marks

@@ -161,9 +161,15 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
 
             self.allQuestionIds = rawIds
             if let firstQuestion = question {
+                if let img = firstQuestion.imageURL {
+                    RemoteLogger.log(tag: "Question_Image", message: "Q#\(firstQuestion.id) image URL: \(img.absoluteString)")
+                }
                 applyLoadedQuestions([firstQuestion])
             } else if let firstId = rawIds.first {
                 let singleQ = try await api.study.question(id: firstId)
+                if let img = singleQ.imageURL {
+                    RemoteLogger.log(tag: "Question_Image", message: "Q#\(singleQ.id) image URL: \(img.absoluteString)")
+                }
                 applyLoadedQuestions([singleQ])
             } else {
                 state = .loaded(QuizSession(
@@ -298,6 +304,9 @@ final class QuizViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelega
             guard let self else { return }
             defer { self.isLoadingQuestion = false }
             if let fetched = try? await self.api.study.question(id: questionId) {
+                if let img = fetched.imageURL {
+                    RemoteLogger.log(tag: "Question_Image", message: "Q#\(fetched.id) (index \(index)) image URL: \(img.absoluteString)")
+                }
                 var currentList = self.questions
                 while currentList.count <= index {
                     if currentList.count == index {
