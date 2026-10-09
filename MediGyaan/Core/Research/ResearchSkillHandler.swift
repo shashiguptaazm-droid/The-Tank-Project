@@ -14,38 +14,7 @@ public struct SkillOutcome: Hashable {
     }
 }
 
-/// Structured PICO data extracted by AI or user entry.
-public struct PicoData: Hashable {
-    public var population: String
-    public var intervention: String
-    public var comparison: String
-    public var outcome: String
 
-    public init(population: String = "", intervention: String = "", comparison: String = "", outcome: String = "") {
-        self.population = population
-        self.intervention = intervention
-        self.comparison = comparison
-        self.outcome = outcome
-    }
-}
-
-/// The "Research OS" Workspace state managed by AI Skills.
-/// 1:1 port of Android `WorkspaceState`.
-public struct WorkspaceState: Hashable {
-    public var researchQuestion: String
-    public var pico: PicoData?
-    public var currentSection: String
-
-    public init(
-        researchQuestion: String = "Clinical Evidence & Medical Synthesis",
-        pico: PicoData? = nil,
-        currentSection: String = "Literature"
-    ) {
-        self.researchQuestion = researchQuestion
-        self.pico = pico
-        self.currentSection = currentSection
-    }
-}
 
 /// Router, deterministic calculators, and execution engine for all 125+ skills.
 /// 1:1 port of Android's `ResearchSkillHandler.kt`.
@@ -119,6 +88,11 @@ public enum ResearchSkillHandler {
         userInput: String,
         pdfText: String
     ) async -> SkillOutcome {
+        RemoteLogger.log(
+            tag: "ResearchSkill_Execute",
+            message: "Running clinical skill: \(skillName)",
+            metadata: ["input_length": userInput.count, "has_pdf": !pdfText.isEmpty]
+        )
         switch skillName {
         case "Sample Size Calculator":
             return executeSampleSizeCalculator(input: userInput)

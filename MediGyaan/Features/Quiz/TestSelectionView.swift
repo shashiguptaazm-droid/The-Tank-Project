@@ -50,6 +50,7 @@ public struct TestSelectionView: View {
     @State private var testToLaunch: Quiz? = nil
     @State private var showingModeSheet: Bool = false
     @State private var activeTestIndex: Int = 0
+    @State private var isLaunchingChallenge: Bool = false
 
     // Local completed tests cache mirroring Android SharedPreferences COMPLETED_TESTS
     @AppStorage("completed_tests_set") private var completedTestsData: String = ""
@@ -108,18 +109,24 @@ public struct TestSelectionView: View {
             titleVisibility: .visible
         ) {
             Button("Solo Practice Mode") {
+                isLaunchingChallenge = false
                 startSoloMode()
             }
             Button("1v1 Arena Challenge") {
+                isLaunchingChallenge = true
                 startChallengeMode()
             }
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("Play Mock Test \(activeTestIndex) in Solo or 1v1 Battle Mode.")
         }
-        .sheet(item: $testToLaunch) { quiz in
-            NavigationStack {
-                QuizView(quiz: quiz)
+        .fullScreenCover(item: $testToLaunch) { quiz in
+            TestActivityView(
+                quiz: quiz,
+                isChallenge: isLaunchingChallenge,
+                opponentName: "Dr. Arena Challenger"
+            ) {
+                testToLaunch = nil
             }
         }
     }
@@ -213,6 +220,7 @@ public struct TestSelectionView: View {
     private func startSoloMode() {
         let testId = selectedCategory.startId + activeTestIndex - 1
         let title = "\(selectedCategory.rawValue) Mock \(activeTestIndex)"
+        RemoteLogger.log(tag: "TestSelection_StartSolo", message: "Launching Solo Practice for \(title) (ID: \(testId))")
         let mockQuiz = Quiz(
             id: testId,
             title: title,
@@ -225,7 +233,9 @@ public struct TestSelectionView: View {
     }
 
     private func startChallengeMode() {
-        // Triggers challenge invitation flow with unique test id
+        let testId = selectedCategory.startId + activeTestIndex - 1
+        let title = "\(selectedCategory.rawValue) Mock \(activeTestIndex)"
+        RemoteLogger.log(tag: "TestSelection_StartChallenge", message: "Launching 1v1 Battle Mode for \(title) (ID: \(testId))")
         startSoloMode()
     }
 }
