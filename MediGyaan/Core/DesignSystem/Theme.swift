@@ -219,6 +219,8 @@ enum AppTheme {
         static let option: CGFloat = 12
         /// 14dp — dashboard search field.
         static let field: CGFloat = 14
+        /// Alias for input fields
+        static let input: CGFloat = field
         /// 16dp — dashboard rank / battle cards.
         static let card: CGFloat = 16
         /// 18dp — `AppMaterialCardView` default.

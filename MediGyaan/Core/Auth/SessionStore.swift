@@ -42,6 +42,10 @@ final class SessionStore: ObservableObject {
         return id > 0 ? id : 1
     }
 
+    var userName: String {
+        currentUser?.name ?? "Doctor"
+    }
+
     // MARK: - Persistence
 
     /// Rehydrates a previous session, letting the user straight into the app.

@@ -127,7 +127,14 @@ struct MessengerView: View {
             allowedContentTypes: [.pdf, .plainText, .data],
             allowsMultipleSelection: false
         ) { result in
-            handleDocumentPicked(result)
+            switch result {
+            case .success(let urls):
+                if let url = urls.first {
+                    handleDocumentPicked(.success(url))
+                }
+            case .failure(let error):
+                handleDocumentPicked(.failure(error))
+            }
         }
         .sheet(item: $fullscreenImageURL) { url in
             FullScreenImageViewer(url: url)
