@@ -133,6 +133,98 @@ struct SocialAPI {
         )
     }
 
+    /// Sends a direct message with optional attachment strictly conforming to Android's `sendMessageToPhpBackend`.
+    func sendDirectMessage(
+        userId: Int,
+        receiverId: Int,
+        message: String,
+        attachment: String = ""
+    ) async throws -> Bool {
+        let form = [
+            "user_id": String(userId),
+            "receiver_id": String(receiverId),
+            "message": message,
+            "attachment": attachment
+        ]
+        let response = try await client.postObject(form: form, to: .messenger)
+        return (response["success"] as? Bool) ?? true
+    }
+
+    /// Deletes a message from thread (`messenger_api.php?delete_message=1`).
+    func deleteMessage(messageId: String, userId: Int) async throws -> Bool {
+        let response = try await client.getObject(
+            .messenger,
+            query: ["delete_message": "1", "message_id": messageId, "user_id": String(userId)]
+        )
+        return (response["success"] as? Bool) ?? true
+    }
+
+    /// Fetches list of user IDs followed / connected (`messenger_api.php?get_connections&user_id=X`).
+    func connections(userId: Int) async throws -> [Int] {
+        struct ConnectionItem: Decodable {
+            let userId: Int
+            enum CodingKeys: String, CodingKey {
+                case userId = "user_id"
+            }
+        }
+        struct Wrapper: Decodable {
+            let connections: [ConnectionItem]?
+            let data: [ConnectionItem]?
+        }
+        let url = APIConfig.baseURL.appendingPathComponent("messenger_api.php").appending(queryItems: [
+            URLQueryItem(name: "get_connections", value: nil),
+            URLQueryItem(name: "user_id", value: String(userId))
+        ])
+        var request = URLRequest(url: url)
+        request.setValue("EduLabs_Android_App", forHTTPHeaderField: "User-Agent")
+        request.setValue("EduLabsRTM_Secure_v1_2026", forHTTPHeaderField: "X-App-Signature")
+        let (data, _) = try await URLSession.shared.data(for: request)
+        if let array = try? JSONDecoder().decode([ConnectionItem].self, from: data) {
+            return array.map(\.userId).filter { $0 != userId && $0 > 0 }
+        }
+        if let wrapper = try? JSONDecoder().decode(Wrapper.self, from: data) {
+            let list = (wrapper.connections ?? wrapper.data ?? [])
+            return list.map(\.userId).filter { $0 != userId && $0 > 0 }
+        }
+        return []
+    }
+
+    /// Loads profile for a user (`get_profilev1.php?user_id=X&viewer_id=Y`).
+    func userProfile(userId: Int, viewerId: Int) async throws -> ChatUserItem {
+        let url = APIConfig.baseURL.appendingPathComponent("get_profilev1.php").appending(queryItems: [
+            URLQueryItem(name: "user_id", value: String(userId)),
+            URLQueryItem(name: "viewer_id", value: String(viewerId))
+        ])
+        var request = URLRequest(url: url)
+        request.setValue("EduLabs_Android_App", forHTTPHeaderField: "User-Agent")
+        request.setValue("EduLabsRTM_Secure_v1_2026", forHTTPHeaderField: "X-App-Signature")
+        let (data, _) = try await URLSession.shared.data(for: request)
+        let json = (try? JSONSerialization.jsonObject(with: data) as? [String: Any]) ?? [:]
+        let obj = (json["data"] as? [String: Any]) ?? json
+        let name = (obj["name"] as? String) ?? "User \(userId)"
+        var photo = (obj["photo"] as? String) ?? (obj["profile_pic"] as? String) ?? ""
+        if !photo.isEmpty && !photo.hasPrefix("http") {
+            photo = "https://medigyaan.com/Neurons/" + photo.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        }
+        return ChatUserItem(id: userId, name: name, image: photo, isOnline: false)
+    }
+
+    /// Blocks a user (`block_user.php`).
+    func blockUser(userId: Int, blockedUserId: Int) async throws -> Bool {
+        let url = APIConfig.baseURL.appendingPathComponent("block_user.php")
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.setValue("EduLabsRTM_Secure_v1_2026", forHTTPHeaderField: "X-App-Signature")
+        let bodyString = "user_id=\(userId)&blocked_user_id=\(blockedUserId)"
+        request.httpBody = bodyString.data(using: .utf8)
+        let (data, _) = try await URLSession.shared.data(for: request)
+        if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            return (json["success"] as? Bool) ?? false
+        }
+        return false
+    }
+
     /// Loads medical reels (`api/getReels.php`).
     func reels() async throws -> [Reel] {
         try await client.get(.getReels, as: [Reel].self)

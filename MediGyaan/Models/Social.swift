@@ -161,8 +161,10 @@ struct ChatMessage: Decodable, Identifiable, Hashable {
     let senderId: Int
     let senderName: String
     let text: String
+    let attachment: String
     let sentAt: Date
     let isMine: Bool
+    let isRead: Int
 
     init(from decoder: Decoder) throws {
         let container = try decoder.flexibleContainer()
@@ -172,7 +174,9 @@ struct ChatMessage: Decodable, Identifiable, Hashable {
         id = rawId.isEmpty ? UUID().uuidString : rawId
         senderName = container.flexString("sender_name", "name", "username")
         text = container.flexString("message", "text", "content", "body")
+        attachment = container.flexString("attachment", "file_url", "media_url", "url")
         isMine = container.flexBool("is_mine", "mine", "self")
+        isRead = container.flexInt("is_read", "read", "status")
         // Timestamps arrive as unix seconds or a MySQL datetime string.
         let raw = container.flexString("sent_at", "created_at", "time", "timestamp")
         if let seconds = Double(raw), seconds > 1_000_000_000 {
@@ -184,20 +188,54 @@ struct ChatMessage: Decodable, Identifiable, Hashable {
 
     init(
         id: String = UUID().uuidString,
-        conversationId: String,
+        conversationId: String = "",
         senderId: Int,
-        senderName: String,
+        senderName: String = "",
         text: String,
+        attachment: String = "",
         sentAt: Date = Date(),
-        isMine: Bool
+        isMine: Bool = false,
+        isRead: Int = 0
     ) {
         self.id = id
         self.conversationId = conversationId
         self.senderId = senderId
         self.senderName = senderName
         self.text = text
+        self.attachment = attachment
         self.sentAt = sentAt
         self.isMine = isMine
+        self.isRead = isRead
+    }
+}
+
+/// User representation for Messenger chat list and peer headers.
+/// 1:1 port of Android's `ChatUserItem`.
+public struct ChatUserItem: Identifiable, Hashable, Codable {
+    public let id: Int
+    public let name: String
+    public let image: String
+    public var isOnline: Bool
+    public var lastSeen: TimeInterval
+
+    public init(
+        id: Int,
+        name: String,
+        image: String,
+        isOnline: Bool = false,
+        lastSeen: TimeInterval = 0
+    ) {
+        self.id = id
+        self.name = name
+        self.image = image
+        self.isOnline = isOnline
+        self.lastSeen = lastSeen
+    }
+
+    public var imageURL: URL? {
+        if image.isEmpty { return nil }
+        if image.hasPrefix("http") { return URL(string: image) }
+        return URL(string: "https://medigyaan.com/Neurons/" + image.trimmingCharacters(in: CharacterSet(charactersIn: "/")))
     }
 }
 

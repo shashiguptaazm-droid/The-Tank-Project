@@ -1,7 +1,7 @@
 import Foundation
 
 /// Medical & Research Skill model strictly conforming to Android's `ResearchSkillRegistry.kt`.
-public struct ResearchSkill: Identifiable, Hashable {
+public struct ResearchSkill: Identifiable, Codable, Hashable {
     public let id: Int
     public let name: String
     public let description: String
