@@ -6,8 +6,9 @@ struct GoalStepView: View {
     @Environment(ProfileStore.self) private var profile
 
     var body: some View {
-        @Bindable var profile = profile
 
+        // Bindings over @Observable environment values:
+        @Bindable var profile = profile
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("What's your main focus?")
@@ -34,8 +35,9 @@ struct LevelStepView: View {
     @Environment(ProfileStore.self) private var profile
 
     var body: some View {
-        @Bindable var profile = profile
 
+        // Bindings over @Observable environment values:
+        @Bindable var profile = profile
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Your current level")
@@ -61,8 +63,9 @@ struct LocationStepView: View {
     @Environment(ProfileStore.self) private var profile
 
     var body: some View {
-        @Bindable var profile = profile
 
+        // Bindings over @Observable environment values:
+        @Bindable var profile = profile
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Where will you train?")
@@ -91,9 +94,14 @@ struct LocationStepView: View {
 struct AvailabilityStepView: View {
     private static let dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
-    var body: some View {
-        @State private var availabilityStore = AvailabilityDraft()
+    // @State belongs on the struct, never inside body (illegal placement was
+    // the "type '()' cannot conform to 'View'" CI error).
+    @State private var availabilityStore = AvailabilityDraft()
 
+    var body: some View {
+
+        // Bindings over @Observable environment values:
+        @Bindable var profile = profile
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Weekly availability")
@@ -105,13 +113,10 @@ struct AvailabilityStepView: View {
                     HStack {
                         Text(Self.dayNames[day])
                             .frame(width: 44, alignment: .leading)
-                        Slider(value: Binding(
-                            get: { Double(availabilityStore.minutes[day]) },
-                            set: { availabilityStore.minutes[day] = Int($0.rounded()) }
-                        ), in: 0...120, step: 5)
-                        Text("\(availabilityStore.minutes[day])m")
-                            .frame(width: 48, alignment: .trailing)
-                            .monospacedDigit()
+                        Stepper("\(availabilityStore.minutes[day])m",
+                                value: $availabilityStore.minutes[day],
+                                in: 0...120, step: 5)
+                            .font(.subheadline.monospacedDigit())
                     }
                 }
             }

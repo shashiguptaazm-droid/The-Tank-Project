@@ -6,8 +6,9 @@ struct BodyStepView: View {
     @Environment(ProfileStore.self) private var profile
 
     var body: some View {
-        @Bindable var profile = profile
 
+        // Bindings over @Observable environment values:
+        @Bindable var profile = profile
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Body metrics (optional)")
@@ -59,8 +60,9 @@ struct PreferencesStepView: View {
     @Environment(ProfileStore.self) private var profile
 
     var body: some View {
-        @Bindable var profile = profile
 
+        // Bindings over @Observable environment values:
+        @Bindable var profile = profile
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Preferences")
@@ -89,8 +91,9 @@ struct AccessibilityStepView: View {
     @Environment(ProfileStore.self) private var profile
 
     var body: some View {
-        @Bindable var profile = profile
 
+        // Bindings over @Observable environment values:
+        @Bindable var profile = profile
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("Accessibility")
@@ -116,6 +119,9 @@ struct SummaryStepView: View {
     let onFinish: () -> Void
 
     var body: some View {
+
+        // Bindings over @Observable environment values:
+        @Bindable var profile = profile
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("You're set!")

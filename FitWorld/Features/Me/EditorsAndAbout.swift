@@ -5,8 +5,9 @@ struct ProfileEditorView: View {
     @Environment(ProfileStore.self) private var profile
 
     var body: some View {
-        @Bindable var profile = profile
 
+        // Bindings over @Observable environment values:
+        @Bindable var profile = profile
         Form {
             Picker("Goal", selection: $profile.profile.primaryGoal) {
                 Text("None").tag(TrainingGoal?.none)
@@ -35,8 +36,9 @@ struct HeightWeightSection: View {
     @Environment(ProfileStore.self) private var profile
 
     var body: some View {
-        @Bindable var profile = profile
 
+        // Bindings over @Observable environment values:
+        @Bindable var profile = profile
         Section("Body (optional)") {
             HStack {
                 Text("Height (cm)")
@@ -62,8 +64,9 @@ struct PreferencesEditorView: View {
     @Environment(ProfileStore.self) private var profile
 
     var body: some View {
-        @Bindable var profile = profile
 
+        // Bindings over @Observable environment values:
+        @Bindable var profile = profile
         Form {
             Section("Training style") {
                 Toggle("Seated workouts", isOn: $profile.profile.prefersSeatedWorkouts)
@@ -92,6 +95,9 @@ struct PreferencesEditorView: View {
 /// Mandatory safety/about screen (§ "acceptance criteria" — safety text must ship).
 struct AboutSafetyView: View {
     var body: some View {
+
+        // Bindings over @Observable environment values:
+        @Bindable var profile = profile
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Safety first").font(.title2.bold())
