@@ -1,0 +1,60 @@
+name: FitWorld
+options:
+  bundleIdPrefix: com.medigyaan.fitworld
+  deploymentTarget:
+    iOS: "17.4"
+  createIntermediateGroups: true
+
+packages:
+  Lottie:
+    url: https://github.com/airbnb/lottie-ios.git
+    from: 4.4.0
+  KeychainAccess:
+    url: https://github.com/kishikawakatsumi/KeychainAccess.git
+    from: 4.2.2
+
+targets:
+  FitWorld:
+    type: application
+    platform: iOS
+    sources:
+      - path: FitWorld
+    resources:
+      - path: FitWorld/Resources/Seed
+        type: group
+        optional: true
+    dependencies:
+      - package: Lottie
+      - package: KeychainAccess
+    settings:
+      base:
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+        INFOPLIST_KEY_UIUserInterfaceStyle: Automatic
+        SWIFT_VERSION: "5.9"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGN_STYLE: Automatic
+  FitWorldTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: FitWorldTests
+    dependencies:
+      - target: FitWorld
+    settings:
+      base:
+        SWIFT_VERSION: "5.9"
+
+schemes:
+  FitWorld:
+    build:
+      targets:
+        FitWorld: all
+        FitWorldTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - FitWorldTests
