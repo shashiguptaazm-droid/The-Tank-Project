@@ -1,6 +1,11 @@
 import SwiftUI
 
 /// The MCQ test runner. Ports `QuizViewerActivity` / `MCQActivity` / `TestActivity`.
+///
+/// Also hosts the **single player test mode** ported from `SinglePlayer.kt`
+/// (`SinglePlayerTestModeActivity` / `SinglePlayerTestModeScreen`), which is
+/// entered by passing a ``SinglePlayerSeries``. Callers that omit it keep the
+/// original MCQ behaviour and signature.
 struct QuizView: View {
 
     let quiz: Quiz
@@ -8,6 +13,7 @@ struct QuizView: View {
     @EnvironmentObject private var session: SessionStore
     @Environment(\.api) private var api
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
 
     @StateObject private var viewModel: QuizViewModel
     @State private var isConfirmingSubmit = false
@@ -16,14 +22,16 @@ struct QuizView: View {
     @State private var isShowingJumpSheet = false
     @State private var selectedFullscreenImage: URL? = nil
 
-    init(quiz: Quiz) {
+    init(quiz: Quiz, singlePlayerSeries: SinglePlayerSeries? = nil) {
         self.quiz = quiz
-        _viewModel = StateObject(wrappedValue: QuizViewModel(quiz: quiz))
+        _viewModel = StateObject(wrappedValue: QuizViewModel(quiz: quiz, singlePlayerSeries: singlePlayerSeries))
     }
 
     var body: some View {
         Group {
-            if let result = viewModel.result {
+            if viewModel.isSinglePlayerMode {
+                singlePlayerRoot
+            } else if let result = viewModel.result {
                 QuizResultView(attempt: result) { dismiss() }
             } else {
                 content
@@ -45,7 +53,7 @@ struct QuizView: View {
             }
 
             ToolbarItemGroup(placement: .topBarTrailing) {
-                if viewModel.currentQuestion != nil {
+                if viewModel.activeQuestion != nil {
                     // Audio Reader (TTS)
                     Button {
                         viewModel.toggleAudio()
@@ -69,22 +77,24 @@ struct QuizView: View {
                         Image(systemName: "square.and.arrow.up")
                     }
 
-                    // Question Grid Jump
-                    Button {
-                        isShowingJumpSheet = true
-                    } label: {
-                        Image(systemName: "square.grid.3x3")
+                    // Question Grid Jump (MCQ pool only — single-player runs hold one question at a time)
+                    if !viewModel.isSinglePlayerMode {
+                        Button {
+                            isShowingJumpSheet = true
+                        } label: {
+                            Image(systemName: "square.grid.3x3")
+                        }
                     }
                 }
             }
         }
         .sheet(isPresented: $isShowingShareSheet) {
-            if let question = viewModel.currentQuestion {
+            if let question = viewModel.activeQuestion {
                 QuestionShareSheet(question: question, userId: session.userId)
             }
         }
         .sheet(isPresented: $isShowingAskAiSheet) {
-            if let question = viewModel.currentQuestion {
+            if let question = viewModel.activeQuestion {
                 AskAiSheet(question: question)
             }
         }
@@ -110,7 +120,14 @@ struct QuizView: View {
         .onAppear {
             RemoteLogger.log(tag: "QuizView_onAppear", message: "QuizView appeared on screen")
         }
-        .interactiveDismissDisabled(viewModel.result == nil && !viewModel.questions.isEmpty)
+        .onChange(of: scenePhase) { phase in
+            // Ports the ON_RESUME branch of SinglePlayer.kt's LifecycleEventObserver.
+            if phase == .active {
+                viewModel.registerSeriesBackgroundResume()
+            }
+        }
+        .errorAlert(message: $viewModel.seriesErrorMessage)
+        .interactiveDismissDisabled(viewModel.result == nil && !viewModel.questions.isEmpty && !viewModel.isSinglePlayerMode)
     }
 
     @ViewBuilder
@@ -162,6 +179,379 @@ struct QuizView: View {
             footer
         }
         .screenBackground()
+    }
+
+    // MARK: - Single player test mode (SinglePlayer.kt)
+
+    /// Ports the top-level `if (finished)` split of `SinglePlayerTestModeScreen`.
+    @ViewBuilder
+    private var singlePlayerRoot: some View {
+        if viewModel.isSeriesFinished {
+            SinglePlayerResultView(
+                uniqueId: viewModel.seriesUniqueId,
+                score: viewModel.seriesScore,
+                maxScore: viewModel.seriesMaxScore,
+                correctPoints: viewModel.seriesCorrectPoints,
+                wrongPoints: viewModel.seriesWrongPoints,
+                correctCount: viewModel.seriesCorrectCount,
+                wrongCount: viewModel.seriesWrongCount,
+                attemptedCount: viewModel.seriesAttemptedCount,
+                totalLoaded: viewModel.seriesQuestionIds.count,
+                reviewItems: viewModel.seriesReviewItems,
+                isRestartNoticeVisible: viewModel.seriesRestartNotice,
+                onExit: { dismiss() },
+                onRestart: { viewModel.seriesRestartNotice = true }
+            )
+        } else {
+            singlePlayerBody
+        }
+    }
+
+    private var singlePlayerBody: some View {
+        VStack(spacing: 0) {
+            singlePlayerHeader
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
+                    singlePlayerBattleSummary
+
+                    if viewModel.isSeriesPenalized && !viewModel.isSeriesAnswerLocked {
+                        singlePlayerPenaltyNotice
+                    }
+
+                    singlePlayerQuestionArea
+
+                    if viewModel.isSeriesFeedbackVisible {
+                        singlePlayerFeedbackCard
+                    }
+
+                    singlePlayerFooter
+
+                    Text(
+                        "Max score: \(viewModel.seriesMaxScore) • "
+                        + "\(viewModel.seriesCorrectPoints) correct • \(viewModel.seriesWrongPoints) wrong"
+                    )
+                    .font(AppTheme.Font.micro)
+                    .foregroundStyle(AppTheme.Palette.textSecondary)
+                    .frame(maxWidth: .infinity)
+                    .multilineTextAlignment(.center)
+                }
+                .padding(AppTheme.Spacing.lg)
+            }
+        }
+        .screenBackground()
+    }
+
+    /// Ports `TopHeader` — the three metric chips and the score meter.
+    private var singlePlayerHeader: some View {
+        VStack(spacing: AppTheme.Spacing.md) {
+            HStack(alignment: .top, spacing: AppTheme.Spacing.sm) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Single Player Test Mode")
+                        .font(AppTheme.Font.title3)
+                        .foregroundStyle(AppTheme.Palette.textPrimary)
+                    Text("Unique ID: \(viewModel.seriesUniqueId) • Same series for every user")
+                        .font(AppTheme.Font.micro)
+                        .foregroundStyle(AppTheme.Palette.textSecondary)
+                }
+                Spacer(minLength: 0)
+                Button {
+                    viewModel.finishSeriesEarly()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(AppTheme.Palette.textPrimary)
+                        .padding(AppTheme.Spacing.sm)
+                        .background(Circle().fill(AppTheme.Palette.cardBackgroundElevated))
+                }
+            }
+
+            HStack(spacing: AppTheme.Spacing.sm) {
+                singlePlayerMetricChip(title: "Progress", value: viewModel.seriesProgressText)
+                singlePlayerMetricChip(
+                    title: "Score",
+                    value: "\(viewModel.seriesScore) / \(viewModel.seriesMaxScore)"
+                )
+                singlePlayerMetricChip(title: "Total EXP", value: "⭐ \(viewModel.seriesExp)")
+            }
+
+            ProgressRow(
+                title: "Score Meter",
+                value: viewModel.seriesScoreRatio,
+                tint: AppTheme.Palette.primary,
+                caption: "\(Int(viewModel.seriesScoreRatio * 100))%"
+            )
+        }
+        .padding(.horizontal, AppTheme.Spacing.lg)
+        .padding(.vertical, AppTheme.Spacing.md)
+        .background(AppTheme.Palette.cardBackground)
+    }
+
+    /// Ports `MetricChip`.
+    private func singlePlayerMetricChip(title: String, value: String) -> some View {
+        VStack(spacing: AppTheme.Spacing.xxs) {
+            Text(title)
+                .font(AppTheme.Font.micro.weight(.semibold))
+                .foregroundStyle(AppTheme.Palette.textSecondary)
+            Text(value)
+                .font(AppTheme.Font.bodyBold)
+                .foregroundStyle(AppTheme.Palette.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, AppTheme.Spacing.sm)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .fill(AppTheme.Palette.cardBackgroundElevated)
+        )
+    }
+
+    /// Ports `BattleSummaryCard` — collapsed until tapped.
+    private var singlePlayerBattleSummary: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+            Button {
+                viewModel.toggleSeriesSummary()
+            } label: {
+                HStack {
+                    Text("Battle Summary")
+                        .font(AppTheme.Font.headline)
+                        .foregroundStyle(AppTheme.Palette.textPrimary)
+                    Spacer()
+                    Image(
+                        systemName: viewModel.isSeriesSummaryExpanded ? "chevron.up" : "chevron.down"
+                    )
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(AppTheme.Palette.textPrimary)
+                }
+            }
+            .buttonStyle(.plain)
+
+            if viewModel.isSeriesSummaryExpanded {
+                VStack(spacing: AppTheme.Spacing.sm) {
+                    HStack(spacing: AppTheme.Spacing.xs) {
+                        singlePlayerSummaryPill(
+                            title: "Loaded",
+                            value: "\(viewModel.seriesQuestionIds.count)",
+                            tint: AppTheme.Palette.info
+                        )
+                        singlePlayerSummaryPill(
+                            title: "Attempted",
+                            value: "\(viewModel.seriesAttemptedCount)",
+                            tint: AppTheme.Palette.textSecondary
+                        )
+                        singlePlayerSummaryPill(
+                            title: "Correct",
+                            value: "\(viewModel.seriesCorrectCount)",
+                            tint: AppTheme.Palette.success
+                        )
+                    }
+                    HStack(spacing: AppTheme.Spacing.xs) {
+                        singlePlayerSummaryPill(
+                            title: "Wrong",
+                            value: "\(viewModel.seriesWrongCount)",
+                            tint: AppTheme.Palette.danger
+                        )
+                        singlePlayerSummaryPill(
+                            title: "Remaining",
+                            value: "\(viewModel.seriesRemainingCount)",
+                            tint: AppTheme.Palette.textPrimary
+                        )
+                    }
+                }
+            }
+        }
+        .padding(AppTheme.Spacing.lg)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .fill(AppTheme.Palette.cardBackground)
+        )
+    }
+
+    /// Ports `SummaryPill`.
+    private func singlePlayerSummaryPill(title: String, value: String, tint: Color) -> some View {
+        HStack(spacing: AppTheme.Spacing.xxs) {
+            Text("\(title): ")
+                .font(AppTheme.Font.micro.weight(.semibold))
+            Text(value)
+                .font(AppTheme.Font.captionBold)
+        }
+        .foregroundStyle(tint)
+        .padding(.horizontal, AppTheme.Spacing.sm)
+        .padding(.vertical, AppTheme.Spacing.xs)
+        .background(Capsule().fill(tint.opacity(0.15)))
+    }
+
+    /// Ports `PenaltyNotice`.
+    private var singlePlayerPenaltyNotice: some View {
+        HStack(alignment: .top, spacing: AppTheme.Spacing.md) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 20))
+                .foregroundStyle(AppTheme.Palette.danger)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Background Penalty: -1 Point")
+                    .font(AppTheme.Font.callout.weight(.bold))
+                    .foregroundStyle(AppTheme.Palette.danger)
+                Text("Leaving the app during an active question results in a point deduction.")
+                    .font(AppTheme.Font.micro)
+                    .foregroundStyle(AppTheme.Palette.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(AppTheme.Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .fill(AppTheme.Palette.danger.opacity(0.12))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .stroke(AppTheme.Palette.danger, lineWidth: 1)
+        )
+    }
+
+    /// Ports the `LoadingCard` / `QuestionCard` branch of the runner.
+    @ViewBuilder
+    private var singlePlayerQuestionArea: some View {
+        if viewModel.isLoadingSeriesIds {
+            LoadingStateView(message: "Loading your test series…")
+                .frame(maxWidth: .infinity, minHeight: 220)
+        } else if let question = viewModel.seriesQuestion {
+            singlePlayerQuestionCard(question)
+            singlePlayerOptionsList(question)
+        } else if viewModel.seriesQuestionIds.isEmpty {
+            EmptyStateView(
+                title: "No questions found",
+                message: "This test series has no questions published yet.",
+                systemImage: "questionmark.square.dashed"
+            )
+        } else {
+            LoadingStateView(message: "Loading question…")
+                .frame(maxWidth: .infinity, minHeight: 220)
+        }
+    }
+
+    private func singlePlayerQuestionCard(_ question: Question) -> some View {
+        CardContainer {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                HStack {
+                    Text("QUESTION \(viewModel.currentIndex + 1)")
+                        .font(AppTheme.Font.captionBold)
+                        .foregroundStyle(AppTheme.Palette.primary)
+                    Spacer()
+                    Text("\(viewModel.currentIndex + 1) / \(viewModel.seriesQuestionCap)")
+                        .font(AppTheme.Font.caption.weight(.semibold))
+                        .foregroundStyle(AppTheme.Palette.textSecondary)
+                }
+
+                Text(question.text.isEmpty ? "Question" : question.text)
+                    .font(AppTheme.Font.body)
+                    .foregroundStyle(AppTheme.Palette.textPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                if let imageURL = question.imageURL {
+                    Button {
+                        selectedFullscreenImage = imageURL
+                    } label: {
+                        AsyncImage(url: imageURL) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                                    .frame(maxWidth: .infinity, minHeight: 160)
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(maxWidth: .infinity, maxHeight: 220)
+                                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+                            case .failure:
+                                Label("Image could not be loaded", systemImage: "photo.badge.exclamationmark")
+                                    .font(AppTheme.Font.caption)
+                                    .foregroundStyle(AppTheme.Palette.textSecondary)
+                                    .frame(maxWidth: .infinity, minHeight: 80)
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    private func singlePlayerOptionsList(_ question: Question) -> some View {
+        VStack(spacing: 0) {
+            ForEach(Array(question.options.enumerated()), id: \.offset) { index, option in
+                OptionRow(
+                    text: option,
+                    index: index,
+                    isSelected: viewModel.seriesDraftIndex == index,
+                    reviewState: singlePlayerReviewState(for: question, index: index)
+                ) {
+                    viewModel.selectSeriesOption(index: index)
+                }
+            }
+        }
+    }
+
+    /// Ports `QuizOption`'s four-way colour rule: green on the locked correct
+    /// option, red on a locked wrong pick, otherwise neutral.
+    private func singlePlayerReviewState(for question: Question, index: Int) -> OptionReviewState {
+        guard viewModel.isSeriesAnswerLocked else { return .neutral }
+        if index == question.correctIndex { return .correct }
+        if index == viewModel.seriesDraftIndex { return .wrong }
+        return .neutral
+    }
+
+    /// Ports `FeedbackCard`.
+    private var singlePlayerFeedbackCard: some View {
+        CardContainer {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+                Label(
+                    viewModel.seriesFeedbackTitle,
+                    systemImage: viewModel.seriesFeedbackIsCorrect ? "checkmark.circle.fill" : "xmark.circle.fill"
+                )
+                .font(AppTheme.Font.headline)
+                .foregroundStyle(
+                    viewModel.seriesFeedbackIsCorrect ? AppTheme.Palette.success : AppTheme.Palette.danger
+                )
+                Text(viewModel.seriesFeedbackText)
+                    .font(AppTheme.Font.body)
+                    .foregroundStyle(AppTheme.Palette.textPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    /// Ports the Previous / Submit-or-Next / Finish Early row.
+    private var singlePlayerFooter: some View {
+        VStack(spacing: AppTheme.Spacing.sm) {
+            HStack(spacing: AppTheme.Spacing.md) {
+                SecondaryButton(title: "Previous", systemImage: "chevron.left") {
+                    viewModel.goToPreviousSeriesQuestion()
+                }
+                .disabled(viewModel.currentIndex == 0 || viewModel.isSeriesAnswerLocked)
+                .opacity(viewModel.currentIndex == 0 || viewModel.isSeriesAnswerLocked ? 0.4 : 1)
+
+                if viewModel.seriesOffersNextButton {
+                    PrimaryButton(title: "Next") {
+                        viewModel.goToNextSeriesQuestion()
+                    }
+                } else {
+                    PrimaryButton(
+                        title: viewModel.isSeriesAnswerLocked ? "Submitted" : "Submit",
+                        isEnabled: !viewModel.isSeriesAnswerLocked && viewModel.seriesDraftIndex != nil
+                    ) {
+                        Task { await viewModel.submitSeriesAnswer() }
+                    }
+                }
+            }
+
+            TextActionButton(title: "Finish Early") {
+                viewModel.finishSeriesEarly()
+            }
+        }
     }
 
     // MARK: - Header with Gamification Badges
@@ -705,6 +1095,199 @@ struct QuizResultView: View {
                 image_url: "",
                 is_correct: ans.isCorrect ? 1 : 0
             )
+        }
+    }
+}
+
+/// Ports `ResultScreen` / `ReviewQuestionCard` from `SinglePlayer.kt`: the
+/// `score / 800` headline, the percentage ring, the collapsible review section
+/// and the two exit affordances.
+///
+/// Reached only through ``QuizView``'s single-player branch, so the existing
+/// ``QuizResultView`` and its call sites are untouched.
+struct SinglePlayerResultView: View {
+
+    let uniqueId: Int
+    let score: Int
+    let maxScore: Int
+    let correctPoints: Int
+    let wrongPoints: Int
+    let correctCount: Int
+    let wrongCount: Int
+    let attemptedCount: Int
+    let totalLoaded: Int
+    let reviewItems: [ReviewQuestionItem]
+    let isRestartNoticeVisible: Bool
+    let onExit: () -> Void
+    let onRestart: () -> Void
+
+    @State private var isShowingReview = false
+    @State private var isPresentingReview = false
+
+    /// `score.coerceAtLeast(0)` — the ring itself uses the raw, possibly negative, score.
+    private var displayScore: Int { max(0, score) }
+
+    /// `((score / maxScore) * 100).coerceIn(0f, 100f)`.
+    private var percentage: Double {
+        guard maxScore > 0 else { return 0 }
+        return min(max(Double(score) / Double(maxScore) * 100, 0), 100)
+    }
+
+    private var ringTint: Color {
+        if percentage >= 75 { return AppTheme.Palette.success }
+        if percentage >= 50 { return AppTheme.Palette.warning }
+        return AppTheme.Palette.danger
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: AppTheme.Spacing.lg) {
+                summaryCard
+
+                performanceCard
+
+                resultNotesCard
+
+                if isRestartNoticeVisible {
+                    Text("Restart by reopening this test")
+                        .font(AppTheme.Font.caption)
+                        .foregroundStyle(AppTheme.Palette.textSecondary)
+                }
+
+                PrimaryButton(title: "Exit", icon: "rectangle.portrait.and.arrow.right", action: onExit)
+                SecondaryButton(title: "Open Again", systemImage: "arrow.clockwise", action: onRestart)
+            }
+            .padding(AppTheme.Spacing.lg)
+            .padding(.bottom, AppTheme.Spacing.xxl)
+        }
+        .screenBackground()
+        .navigationBarBackButtonHidden(true)
+        .sheet(isPresented: $isPresentingReview) {
+            NavigationStack {
+                ReviewView(questions: reviewItems)
+            }
+        }
+    }
+
+    // MARK: - Cards
+
+    private var summaryCard: some View {
+        CardContainer {
+            VStack(spacing: AppTheme.Spacing.md) {
+                Text("Test Completed")
+                    .font(AppTheme.Font.title3)
+                    .foregroundStyle(AppTheme.Palette.textPrimary)
+                Text("Unique ID: \(uniqueId)")
+                    .font(AppTheme.Font.micro)
+                    .foregroundStyle(AppTheme.Palette.textSecondary)
+
+                ZStack {
+                    Circle()
+                        .stroke(AppTheme.Palette.primary.opacity(0.15), lineWidth: 10)
+                    Circle()
+                        .trim(from: 0, to: max(0.001, percentage / 100))
+                        .stroke(ringTint, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                        .rotationEffect(.degrees(-90))
+                    Text(String(format: "%.0f%%", percentage))
+                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .foregroundStyle(ringTint)
+                }
+                .frame(width: 120, height: 120)
+
+                Text("Score \(displayScore) / \(maxScore)")
+                    .font(AppTheme.Font.title2)
+                    .foregroundStyle(AppTheme.Palette.textPrimary)
+                Text("Max score is \(maxScore) • +\(correctPoints) right • \(wrongPoints) wrong")
+                    .font(AppTheme.Font.micro)
+                    .foregroundStyle(AppTheme.Palette.textSecondary)
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    private var performanceCard: some View {
+        CardContainer {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                Text("Performance")
+                    .font(AppTheme.Font.headline)
+                    .foregroundStyle(AppTheme.Palette.textPrimary)
+
+                LazyVGrid(
+                    columns: Array(repeating: GridItem(.flexible(), spacing: AppTheme.Spacing.sm), count: 2),
+                    spacing: AppTheme.Spacing.sm
+                ) {
+                    StatTile(value: "\(attemptedCount)", label: "Attempted", systemImage: "checklist", tint: AppTheme.Palette.textSecondary)
+                    StatTile(value: "\(correctCount)", label: "Correct", systemImage: "checkmark.circle.fill", tint: AppTheme.Palette.success)
+                    StatTile(value: "\(wrongCount)", label: "Wrong", systemImage: "xmark.circle.fill", tint: AppTheme.Palette.danger)
+                    StatTile(value: "\(totalLoaded)", label: "Loaded", systemImage: "tray.full", tint: AppTheme.Palette.info)
+                }
+
+                Button {
+                    isShowingReview.toggle()
+                } label: {
+                    VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
+                        Text(isShowingReview ? "Hide Review Questions" : "Show Review Questions")
+                            .font(AppTheme.Font.bodyBold)
+                            .foregroundStyle(AppTheme.Palette.primary)
+                        Text("\(reviewItems.count) Questions Attempted")
+                            .font(AppTheme.Font.caption)
+                            .foregroundStyle(AppTheme.Palette.accent)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(AppTheme.Spacing.lg)
+                    .background(
+                        RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                            .fill(AppTheme.Palette.primary.opacity(0.08))
+                    )
+                }
+                .buttonStyle(.plain)
+
+                if isShowingReview {
+                    if reviewItems.isEmpty {
+                        Text("Review data not available")
+                            .font(AppTheme.Font.callout)
+                            .foregroundStyle(AppTheme.Palette.textSecondary)
+                            .frame(maxWidth: .infinity)
+                            .padding(AppTheme.Spacing.lg)
+                            .background(
+                                RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                                    .fill(AppTheme.Palette.cardBackgroundElevated)
+                            )
+                    } else {
+                        Button {
+                            isPresentingReview = true
+                        } label: {
+                            Label("Open full review (\(reviewItems.count))", systemImage: "list.bullet.clipboard")
+                                .font(AppTheme.Font.callout.weight(.semibold))
+                                .foregroundStyle(AppTheme.Palette.textPrimary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, AppTheme.Spacing.md)
+                                .background(
+                                    RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                                        .fill(AppTheme.Palette.cardBackgroundElevated)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+    }
+
+    private var resultNotesCard: some View {
+        CardContainer {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+                Text("Result Notes")
+                    .font(AppTheme.Font.headline)
+                    .foregroundStyle(AppTheme.Palette.textPrimary)
+                Text(
+                    "Your answers were stored in review JSON for later analysis. "
+                    + "The same unique test series can be reused for all players."
+                )
+                .font(AppTheme.Font.caption)
+                .foregroundStyle(AppTheme.Palette.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 }

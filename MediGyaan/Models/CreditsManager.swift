@@ -202,7 +202,7 @@ public final class CreditsManager: ObservableObject {
         priceInr: "₹500",
         priceUsd: "",
         isSpecialOffer: true,
-        entitlementKey: Self.predictorEntitlementKey
+        entitlementKey: CreditsManager.predictorEntitlementKey
     )
 
     /// Ports Android `allPlayProductIds` — the full billing catalogue to hand to

@@ -48,8 +48,12 @@ struct Quiz: Decodable, Identifiable, Hashable {
     }
 }
 
-/// A single MCQ. Options arrive either as a `options` array or as the four
-/// `option1..option4` columns, so both shapes are accepted.
+/// A single MCQ. Options arrive either as an `options` array, as the four
+/// `option1..option4` columns, or as the bare `a`/`b`/`c`/`d` columns, so all
+/// three shapes are accepted.
+///
+/// Ports Android's `QuestionModel` (`id`, `question`, `a`, `b`, `c`, `d`,
+/// `correctAnswer`, `explanation`, `imageUrl`).
 struct Question: Decodable, Identifiable, Hashable {
     let id: Int
     let text: String
@@ -82,7 +86,7 @@ struct Question: Decodable, Identifiable, Hashable {
         let parsedDiff = container.flexString("difficulty", "level")
         difficulty = parsedDiff.isEmpty ? "Medium" : parsedDiff
 
-        let image = container.flexString("image", "image_url", "question_image", "img_url", "img")
+        let image = container.flexString("image", "image_url", "imageUrl", "question_image", "img_url", "img")
         imageURL = Question.normalizeImageURL(image)
 
         // Preferred shape: an explicit options array.
@@ -92,6 +96,15 @@ struct Question: Decodable, Identifiable, Hashable {
             parsed = ["option1", "option2", "option3", "option4", "option_a", "option_b", "option_c", "option_d"]
                 .map { container.flexString($0) }
                 .filter { !$0.isEmpty }
+        }
+        if parsed.isEmpty {
+            // `QuestionModel` keeps its four choices in bare `a`/`b`/`c`/`d` columns.
+            // Left unfiltered so an empty slot cannot shift the option indices that
+            // `correctIndex` and the submitted answer letters depend on.
+            let letterColumns = ["a", "b", "c", "d"].map { container.flexString($0) }
+            if letterColumns.contains(where: { !$0.isEmpty }) {
+                parsed = letterColumns
+            }
         }
         options = parsed
 
