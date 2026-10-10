@@ -138,7 +138,7 @@ final class PushRegistration: NSObject {
     /// Cold-start taps go through ``configure(launchOptions:)`` instead and are
     /// replayed by ``drainLaunchNotificationPayload()``.
     func handle(notificationResponse: UNNotificationResponse) {
-        let payload = response.notification.request.content.userInfo
+        let payload = notificationResponse.notification.request.content.userInfo
         RemoteLogger.log(tag: Self.logTag, message: "Notification tapped; republishing payload to the shell")
         NotificationCenter.default.post(
             name: Self.pushTappedNotification,

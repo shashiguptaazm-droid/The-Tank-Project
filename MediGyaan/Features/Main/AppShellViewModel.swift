@@ -119,7 +119,7 @@ final class AppShellViewModel: ObservableObject {
             identifier: Self.chatCategoryIdentifier,
             actions: [],
             intentIdentifiers: [],
-            options: [.badge, .sound]
+            options: UNNotificationCategoryOptions([.badge, .sound])
         )
         UNUserNotificationCenter.current().setNotificationCategories([category])
     }
