@@ -289,7 +289,7 @@ struct SubjectTestQuestionText: Equatable {
 /// One row of `bindHeroPowerKit`'s four `ImageButton`s (`SubjectTestActivity.kt:598-611`),
 /// listed in Android's slot order: `btnConfuse`, `btnShock`, `btnShield`,
 /// `btnAdrenaline`.
-private struct SubjectTestPowerSlot: Identifiable {
+fileprivate struct SubjectTestPowerSlot: Identifiable {
 
     let slot: String
     let powerName: String
@@ -420,7 +420,7 @@ final class SubjectTestViewModel: ObservableObject {
 
     /// The four powers in Android's button order (`btnConfuse`, `btnShock`,
     /// `btnShield`, `btnAdrenaline` — slot 1 through slot 4).
-    var loadout: [SubjectTestPowerSlot] {
+    fileprivate var loadout: [SubjectTestPowerSlot] {
         guard let kit = heroKit else { return [] }
         return [
             SubjectTestPowerSlot(
