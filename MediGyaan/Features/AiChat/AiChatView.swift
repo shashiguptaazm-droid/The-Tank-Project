@@ -185,9 +185,7 @@ struct AiChatView: View {
 
     /// Ports `ActivityResultContracts.OpenDocument` — the PDF / slides / Word / text
     /// / image filter both pickers launch with on Android.
-    private static let wordProcessing: UTType = UTType(
-        mimeIdentifier: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    )!
+    private static let wordProcessing: UTType = UTType(mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document") ?? UTType(filenameExtension: "docx") ?? .data
     private static let documentTypes: [UTType] = [.pdf, .presentation, wordProcessing, .plainText, .image, .data]
 
     // MARK: - Header (ChatHeader)
