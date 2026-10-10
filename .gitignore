@@ -31,3 +31,10 @@ Package.resolved
 *.p12
 *.mobileprovision
 Secrets.plist
+
+# Local agent tooling, not part of the app
+omni-code/
+__agent__/
+build.log
+archive.log
+test.log
