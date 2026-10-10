@@ -66,7 +66,7 @@ final class QuizManagerViewModel: ObservableObject {
     /// `participants_api.php` rows for the quiz whose sheet is open.
     @Published private(set) var participants: [QuizManagerParticipantRow] = []
     @Published private(set) var resultsQuizTitle: String = ""
-    @Published private(set) var isShowingResults = false
+    @Published var isShowingResults = false
     @Published private(set) var isLoadingResults = false
 
     /// `intent.getIntExtra("USER_ID", 0)`, falling back to the signed-in user.
