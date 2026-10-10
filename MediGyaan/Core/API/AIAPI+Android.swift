@@ -343,7 +343,7 @@ private enum AIAPIDirectProviderTransport {
     private static func record(
         statusCode: Int,
         request: URLRequest,
-        startTime: CFAbsoluteTimeGetCurrent,
+        startTime: CFAbsoluteTime,
         data: Data?,
         error: Error?
     ) {
