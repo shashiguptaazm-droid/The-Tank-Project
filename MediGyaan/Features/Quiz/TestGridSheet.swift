@@ -171,7 +171,7 @@ struct TestGridSheet: View {
 /// one piece of state it reads, `SharedPreferences("COMPLETED_TESTS")`. The
 /// Android keys are written by whichever activity finishes a test; on iOS the
 /// caller seeds ``completedTestIds`` and later calls ``markCompleted(at:)``.
-struct TestGridSheetModel: ObservableObject {
+final class TestGridSheetModel: ObservableObject {
 
     /// One grid row, paired with the row index the click listener receives.
     struct Entry: Identifiable {
