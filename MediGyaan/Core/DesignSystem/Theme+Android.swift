@@ -121,6 +121,11 @@ struct AndroidMaterialColors: Equatable {
     }
 }
 
+extension AndroidMaterialColors {
+    static var dark: AndroidMaterialColors { AppTheme.AndroidScheme.dark }
+    static var light: AndroidMaterialColors { AppTheme.AndroidScheme.light }
+}
+
 extension AppTheme {
 
     /// Ports the `MaterialTheme` composition from `ui/theme/Theme.kt`: the
