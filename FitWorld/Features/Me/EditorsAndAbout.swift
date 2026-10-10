@@ -93,11 +93,10 @@ struct PreferencesEditorView: View {
 }
 
 /// Mandatory safety/about screen (§ "acceptance criteria" — safety text must ship).
+/// AboutSafetyView shows only static text — no bindings required, so no
+/// @Bindable local (removing the 'local variable before declaration' error).
 struct AboutSafetyView: View {
     var body: some View {
-
-        // Bindings over @Observable environment values:
-        @Bindable var profile = profile
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Safety first").font(.title2.bold())

@@ -11,23 +11,29 @@ struct EquipmentPicker: View {
 
     var body: some View {
         FlowLayoutCompat(items: ordered) { equipment in
-            let isOn = selection.contains(equipment)
-            Button {
-                if isOn {
-                    selection.removeAll { $0 == equipment }
-                } else {
-                    selection.append(equipment)
-                }
-            } label: {
-                Text(equipment.displayName)
-                    .font(.subheadline)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(isOn ? Color.accentColor.opacity(0.2) : Color(.tertiarySystemFill))
-                    .clipShape(Capsule())
-            }
-            .buttonStyle(.plain)
+            equipmentChip(equipment)
         }
+    }
+
+    /// Extracted: ViewBuilder closures with `let` + if/else Button churn
+    /// infer '()' as the Content type under strict generics.
+    private func equipmentChip(_ equipment: Equipment) -> some View {
+        let isOn = selection.contains(equipment)
+        return Button {
+            if isOn {
+                selection.removeAll { $0 == equipment }
+            } else {
+                selection.append(equipment)
+            }
+        } label: {
+            Text(equipment.displayName)
+                .font(.subheadline)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(isOn ? Color.accentColor.opacity(0.2) : Color(.tertiarySystemFill))
+                .clipShape(Capsule())
+        }
+        .buttonStyle(.plain)
     }
 }
 

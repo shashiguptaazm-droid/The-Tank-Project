@@ -35,18 +35,18 @@ struct APIClient {
         try await request(path, method: "GET", query: query, body: nil)
     }
 
-    func post<T: Decodable, B: Encodable>(_ path: String, body: B) async throws -> T {
+    func post<T: Decodable>(_ path: String, body: some Encodable) async throws -> T {
         try await request(path, method: "POST", query: [], body: body)
     }
 
-    func put<T: Decodable, B: Encodable>(_ path: String, body: B) async throws -> T {
+    func put<T: Decodable>(_ path: String, body: some Encodable) async throws -> T {
         try await request(path, method: "PUT", query: [], body: body)
     }
 
-    private func request<T: Decodable, B: Encodable>(_ path: String,
-                                                     method: String,
-                                                     query: [URLQueryItem],
-                                                     body: B?) async throws -> T {
+    private func request<T: Decodable>(_ path: String,
+                                        method: String,
+                                        query: [URLQueryItem],
+                                        body: some Encodable?) async throws -> T {
         guard Reachability.isOnline() else { throw APIError.offline }
 
         var components = URLComponents(url: baseURL.appendingPathComponent(path),
