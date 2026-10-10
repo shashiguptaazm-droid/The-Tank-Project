@@ -168,7 +168,7 @@ struct DashboardView: View {
             .confirmationDialog(
                 promptTitle,
                 isPresented: promptBinding,
-                title: { Text(promptHeading) },
+                titleVisibility: .visible,
                 actions: { promptActions },
                 message: { Text(promptMessage) }
             )
@@ -250,8 +250,8 @@ struct DashboardView: View {
     private var promptActions: some View {
         switch prompt {
         case .some(.modeChoice):
-            Button(L10n.challengeFriends) { prompt = nil; path.append(.challengeFriends) }
-            Button("Ranked Match") { prompt = nil; path.append(.ranked) }
+            Button(L10n.challengeFriends) { prompt = nil; path.append(Destination.challengeFriends) }
+            Button("Ranked Match") { prompt = nil; path.append(Destination.ranked) }
             Button("Cancel", role: .cancel) {}
         case .some(.logout):
             Button("Logout", role: .destructive) { prompt = nil; session.signOut() }

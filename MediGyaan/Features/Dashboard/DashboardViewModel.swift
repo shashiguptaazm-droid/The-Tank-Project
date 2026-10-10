@@ -437,7 +437,7 @@ final class DashboardViewModel: ObservableObject {
             let json = try await HTTPClient.shared.postObject(form: ["user_id": String(userId)], to: .dashboard)
             let data = try JSONSerialization.data(withJSONObject: json)
             FirebaseOnlineCache.putString(
-                key: Self.statsCacheKey(userId),
+                key: Self.statsCacheKey(userId: userId),
                 response: String(decoding: data, as: UTF8.self)
             )
             return .loaded(try JSONDecoder().decode(DashboardStats.self, from: data))
@@ -720,7 +720,7 @@ final class DashboardViewModel: ObservableObject {
 
     private static func cachedStats(userId: Int) -> DashboardStats? {
         guard let body = FirebaseOnlineCache.cachedString(
-            key: statsCacheKey(userId),
+            key: statsCacheKey(userId: userId),
             maxAgeMs: FirebaseOnlineCache.TTL.dashboard
         ), let data = body.data(using: .utf8) else { return nil }
         return try? JSONDecoder().decode(DashboardStats.self, from: data)
