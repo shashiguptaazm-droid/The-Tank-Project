@@ -230,7 +230,7 @@ struct BaseScreenModifier: ViewModifier {
     let screen: String
     var style: BaseScreenStyle = .material
     var title: String?
-    var navigationBarDisplayMode: NavigationBarItem.DisplayMode = .inline
+    var navigationBarDisplayMode: NavigationBarItem.TitleDisplayMode = .inline
     /// Leave `nil` where the screen draws its own invite UI — `DashboardView`
     /// shows a banner with an Accept button rather than the Toast fallback.
     var inviteCenter: GlobalInviteCenter?
@@ -393,7 +393,7 @@ extension View {
         _ screen: String,
         style: BaseScreenStyle = .material,
         title: String? = nil,
-        navigationBarDisplayMode: NavigationBarItem.DisplayMode = .inline,
+        navigationBarDisplayMode: NavigationBarItem.TitleDisplayMode = .inline,
         invites: GlobalInviteCenter? = nil
     ) -> some View {
         modifier(

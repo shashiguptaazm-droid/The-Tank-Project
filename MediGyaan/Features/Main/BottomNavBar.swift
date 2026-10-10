@@ -35,22 +35,22 @@ import SwiftUI
 /// every Android activity back onto its owning nav item — has no SwiftUI
 /// counterpart: iOS keeps the selection inside `TabView`, and pushed screens
 /// inherit the tab they were pushed from.
-public struct BottomNavBar: View {
+ struct BottomNavBar: View {
 
     /// One `<item>` from `res/menu/bottom_nav_menu.xml`.
-    public struct Item: Identifiable, Hashable {
+     struct Item: Identifiable, Hashable {
         /// The item's position, used as `selection`.
-        public let id: Int
+         let id: Int
         /// `android:title`.
-        public let title: String
+         let title: String
         /// `android:icon`, as a ported drawable.
-        public let asset: AndroidAsset
+         let asset: AndroidAsset
         /// The `state_enabled="false"` arm of `bottom_nav_colors`. No menu item
         /// ships disabled, but hosts that gate a tab (locked, offline, or
         /// feature-flagged) can use it.
-        public var isEnabled: Bool
+         var isEnabled: Bool
 
-        public init(id: Int, title: String, asset: AndroidAsset, isEnabled: Bool = true) {
+         init(id: Int, title: String, asset: AndroidAsset, isEnabled: Bool = true) {
             self.id = id
             self.title = title
             self.asset = asset
@@ -61,7 +61,7 @@ public struct BottomNavBar: View {
     /// `res/menu/bottom_nav_menu.xml`, in declaration order. Indices match
     /// `AppTabView.Tab.allCases` so `selection` can be wired straight to a
     /// `TabView` tag.
-    public static let items: [Item] = [
+     static let items: [Item] = [
         Item(id: 0, title: "Home", asset: .ic_home),
         Item(id: 1, title: "AI Chat", asset: .ic_comment),
         Item(id: 2, title: "Search", asset: .ic_search),
@@ -85,7 +85,7 @@ public struct BottomNavBar: View {
 
     @Namespace private var indicator
 
-    public init(selection: Binding<Int>, onReselect: @escaping (Int) -> Void = { _ in }) {
+     init(selection: Binding<Int>, onReselect: @escaping (Int) -> Void = { _ in }) {
         self._selection = selection
         self.onReselect = onReselect
     }
@@ -97,7 +97,7 @@ public struct BottomNavBar: View {
         items.contains { $0.id == selection.wrappedValue } ? selection.wrappedValue : -1
     }
 
-    public var body: some View {
+     var body: some View {
         HStack(spacing: 0) {
             ForEach(BottomNavBar.items) { item in
                 button(for: item)

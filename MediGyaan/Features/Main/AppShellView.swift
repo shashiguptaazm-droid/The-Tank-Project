@@ -33,8 +33,17 @@ struct AppShellView: View {
     var body: some View {
         AppTabView()
             .screenBackground()
+            .onReceive(NotificationCenter.default.publisher(for: PushRegistration.pushTappedNotification)) { note in
+                model.handle(notificationUserInfo: note.userInfo?["payload"] as? [AnyHashable: Any])
+            }
             .task {
                 await model.bootstrap(api: api, session: session)
+                if let payload = PushRegistration.shared.drainLaunchNotificationPayload() {
+                    model.handle(notificationUserInfo: payload)
+                }
+                if let token = PushRegistration.shared.drainDeviceToken() {
+                    await model.ingest(deviceToken: token, session: session, api: api)
+                }
             }
             .onChange(of: scenePhase) { phase in
                 guard phase == .active else { return }

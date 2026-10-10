@@ -2,20 +2,31 @@ import SwiftUI
 
 /// Root navigation gate.
 ///
-/// Mirrors the Android `SplashActivity` → `LoginActivity` / `DashboardActivity`
-/// hand-off, driven by `SessionStore.isAuthenticated`.
+/// Mirrors the Android `SplashActivity` → `OnboardingActivity` /
+/// `LoginActivity` / `DashboardActivity` hand-off. The route itself is decided
+/// by ``SplashView``, which ports `SplashActivity.checkNavigationState()` and
+/// publishes the decision as a ``SplashRoute``.
 struct RootView: View {
 
     @EnvironmentObject private var session: SessionStore
     @State private var isShowingSplash = true
+    @State private var route: SplashRoute?
 
     var body: some View {
         ZStack {
             if isShowingSplash {
-                SplashView()
-                    .transition(.opacity)
+                SplashView { decided in
+                    route = decided
+                    isShowingSplash = false
+                }
+                .transition(.opacity)
+            } else if route == .onboarding || !OnboardingView.hasCompletedOnboarding {
+                OnboardingView { _ in
+                    route = .login
+                }
+                .transition(.opacity)
             } else if session.isAuthenticated {
-                AppTabView()
+                AppShellView()
                     .transition(.opacity)
             } else {
                 LoginView()
@@ -24,11 +35,7 @@ struct RootView: View {
         }
         .animation(.easeInOut(duration: 0.25), value: isShowingSplash)
         .animation(.easeInOut(duration: 0.25), value: session.isAuthenticated)
-        .task {
-            // Let the branding beat play, then route based on restored session.
-            try? await Task.sleep(nanoseconds: 1_100_000_000)
-            isShowingSplash = false
-        }
+        .animation(.easeInOut(duration: 0.25), value: route)
     }
 }
 
