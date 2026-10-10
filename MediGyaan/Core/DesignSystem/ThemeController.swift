@@ -139,18 +139,20 @@ final class ThemeController: ObservableObject {
     init(store: UserDefaults = .standard) {
         self.store = store
 
+        // No access to `mode` in here: `mode` is a `@Published` property whose
+        // accessor reads `self._mode` before two-phase initialization is
+        // complete. Read the raw persisted value directly instead.
+        mirroredLegacyFlag =
+            store.object(forKey: AppPreferences.darkMode) as? Bool ?? false
+
         if let raw = store.string(forKey: Self.storageKey),
            let persisted = ThemeMode(rawValue: raw) {
             mode = persisted
         } else if store.object(forKey: AppPreferences.darkMode) != nil {
-            // Migrate the pre-existing boolean, written by `@AppStorage` before
-            // this type existed.
             mode = store.bool(forKey: AppPreferences.darkMode) ? .dark : .light
         } else {
             mode = .light
         }
-
-        mirroredLegacyFlag = mode == .dark
 
         defaultsObserver = NotificationCenter.default.addObserver(
             forName: UserDefaults.didChangeNotification,
