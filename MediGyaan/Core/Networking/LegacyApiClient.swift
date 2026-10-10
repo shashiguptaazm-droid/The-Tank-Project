@@ -558,6 +558,10 @@ struct LegacyGatewayImageResponse: Decodable {
 
 struct LegacyGatewayImageEnvelope: Decodable {
     let data: [LegacyGatewayImageEntry]
+
+    init(from decoder: Decoder) throws {
+        data = try decoder.flexibleContainer().flexArray("data")
+    }
 }
 
 /// Ports `AiGatewayService.GatewayImageEntry`. OpenRouter returns `url` or
