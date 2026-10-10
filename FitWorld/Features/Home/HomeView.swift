@@ -33,8 +33,15 @@ struct HomeView: View {
     }
 
     private func refresh() {
-        if sessionStore == nil, let container = try? SessionStore.makeContainer() {
-            sessionStore = SessionStore(container: container)
+        // makeContainer() is @MainActor: onAppear bodies already are main-actor,
+        // so this call site is fine — guard the optional swap atomically.
+        if sessionStore == nil {
+            let container = try? SessionStore.makeContainer()
+            if let container {
+                let store = SessionStore(container: container)
+                store.prime()
+                sessionStore = store
+            }
         }
         suggestedWorkout = RecommendationEngine.suggestWorkout(
             content: content, profile: profile.profile)

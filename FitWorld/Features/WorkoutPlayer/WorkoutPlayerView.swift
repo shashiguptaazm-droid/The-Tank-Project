@@ -141,11 +141,24 @@ struct WorkoutPlayerView: View {
         session.entries.append(entry)
     }
 
+    /// Main-actor-isolated SwiftData container can't be created in a sync init;
+    /// created lazily on the main actor right before the first save.
+    private func sessionStoreRef() -> SessionStore? {
+        if sessionStoreLazy == nil, let container = try? SessionStore.makeContainer() {
+            let store = SessionStore(container: container)
+            store.prime()
+            sessionStoreLazy = store
+        }
+        return sessionStoreLazy
+    }
+
+    @State private var sessionStoreLazy: SessionStore?
+
     private func finishSession(manually: Bool) {
         session.endedAt = Date()
         // Persist BEFORE showing the feel sheet — the record must survive
         // even if the app is killed while the sheet is open (plan §8 M7 rule).
-        appModel.sessionStore?.save(session)
+        sessionStoreRef()?.save(session)
         savedToHistory = true
         showFeelPicker = true
     }
@@ -153,7 +166,7 @@ struct WorkoutPlayerView: View {
     private func dismissAfterSave() {
         guard savedToHistory else { return }
         // Feel was captured on the sheet's dismiss via the binding write.
-        appModel.sessionStore?.save(session)
+        sessionStoreRef()?.save(session)
         dismiss()
     }
 }

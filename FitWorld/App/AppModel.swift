@@ -34,7 +34,9 @@ final class AppModel {
             exercisesLoaded = true
         }
         if sessionStore == nil, let container = try? SessionStore.makeContainer() {
-            sessionStore = SessionStore(container: container)
+            let store = SessionStore(container: container)
+            store.prime()
+            sessionStore = store
         }
     }
 

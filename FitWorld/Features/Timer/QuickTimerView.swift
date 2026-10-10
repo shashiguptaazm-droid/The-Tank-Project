@@ -14,9 +14,9 @@ struct QuickTimerView: View {
                 .frame(height: 220)
 
             HStack(spacing: 12) {
-                stepper("Work", value: $workSeconds, bounds: 5...600, step: 5)
-                stepper("Rest", value: $restSeconds, bounds: 5...300, step: 5)
-                stepper("Sets", value: $sets, bounds: 1...30, step: 1)
+                workStepper
+                restStepper
+                setsStepper
             }
 
             HStack(spacing: 16) {
@@ -44,12 +44,26 @@ struct QuickTimerView: View {
         .navigationTitle("Quick timer")
     }
 
-    private func stepper(_ label: String, value: Binding<Int>,
-                         bounds: ClosedRange<Int>, step: Int) -> some View {
+    private var workStepper: some View {
         VStack {
-            Text(label).font(.caption)
-            Stepper("\(value.wrappedValue)s", value: value,
-                    in: bounds, step: step)
+            Text("Work").font(.caption)
+            Stepper("\(workSeconds)s", value: $workSeconds, in: 5...600, step: 5)
+                .font(.subheadline.monospacedDigit())
+        }
+    }
+
+    private var restStepper: some View {
+        VStack {
+            Text("Rest").font(.caption)
+            Stepper("\(restSeconds)s", value: $restSeconds, in: 5...300, step: 5)
+                .font(.subheadline.monospacedDigit())
+        }
+    }
+
+    private var setsStepper: some View {
+        VStack {
+            Text("Sets").font(.caption)
+            Stepper("\(sets)", value: $sets, in: 1...30, step: 1)
                 .font(.subheadline.monospacedDigit())
         }
     }

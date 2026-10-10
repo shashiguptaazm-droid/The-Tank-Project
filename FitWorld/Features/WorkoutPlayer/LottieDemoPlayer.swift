@@ -12,11 +12,7 @@ struct LottieDemoPlayer: View {
     var body: some View {
         Group {
             if let asset = pickAsset() {
-                LottieView(name: asset.assetID, bundle: .main)
-                    .looping()
-                    .animationSpeed(CGFloat(speed))
-                    .resizable()
-                    .scaledToFit()
+                LottieLoopPlayer(assetName: asset.assetID, speed: speed)
                     .accessibilityLabel("\(gender.displayName) demonstration, \(exercise.name)")
             } else {
                 PlaceholderDemo(gender: gender)
@@ -32,6 +28,29 @@ struct LottieDemoPlayer: View {
     }
 
     private func assetKey() -> String? { pickAsset()?.assetID }
+}
+
+/// UIViewRepresentable wrapper around LottieAnimationView with looping + speed
+/// handled inside (no fake fluent modifiers — those don't type-check).
+struct LottieLoopPlayer: UIViewRepresentable {
+    let assetName: String
+    let speed: Double
+
+    func makeUIView(context: Context) -> LottieAnimationView {
+        let v = LottieAnimationView(name: assetName, bundle: .main)
+        v.contentMode = .scaleAspectFit
+        v.animationSpeed = CGFloat(speed)
+        v.loopMode = .loop
+        v.play()
+        return v
+    }
+
+    func updateUIView(_ v: LottieAnimationView, context: Context) {
+        v.animationSpeed = CGFloat(speed)
+        if !v.isAnimationPlaying {
+            v.play()
+        }
+    }
 }
 
 /// Visible, honest placeholder that explains itself.
@@ -54,26 +73,4 @@ struct PlaceholderDemo: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Animation demo not yet available. Use the written instructions below.")
     }
-}
-
-// MARK: - Lottie wrapper convenience
-
-private struct LottieView: UIViewRepresentable {
-    let name: String
-    let bundle: Bundle
-
-    func makeUIView(context: Context) -> LottieAnimationView {
-        let v = LottieAnimationView(name: name, bundle: bundle)
-        v.contentMode = .scaleAspectFit
-        return v
-    }
-
-    func updateUIView(_ v: LottieAnimationView, context: Context) {
-        v.play()
-    }
-
-    func looping() -> Self { self }
-    func animationSpeed(_ speed: CGFloat) -> Self { self }
-    func resizable() -> Self { self }
-    func scaledToFit() -> Self { self }
 }

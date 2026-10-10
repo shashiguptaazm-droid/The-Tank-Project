@@ -19,6 +19,12 @@ final class SessionStore {
 
     init(container: ModelContainer) {
         self.container = container
+    }
+
+    /// Main-actor entry point after creating the store from a View (View
+    /// lifecycle is already main-actor, so this is safe there).
+    @MainActor
+    func prime() {
         recomputeDaysActive()
     }
 
@@ -110,6 +116,7 @@ final class SessionStore {
 
     // MARK: Derived
 
+    @MainActor
     private func recomputeDaysActive() {
         var set: Set<CalendarDay> = []
         for session in fetchAll() where session.endedAt != nil {

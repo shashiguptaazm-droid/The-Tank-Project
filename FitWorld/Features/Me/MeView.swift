@@ -17,8 +17,13 @@ struct MeView: View {
             }
             .navigationTitle("Me")
             .onAppear {
-                if sessionStore == nil, let container = try? SessionStore.makeContainer() {
-                    sessionStore = SessionStore(container: container)
+                if sessionStore == nil {
+                    let container = try? SessionStore.makeContainer()
+                    if let container {
+                        let store = SessionStore(container: container)
+                        store.prime()
+                        sessionStore = store
+                    }
                 }
             }
             .sheet(isPresented: $showSignIn) { SignInSheet() }
