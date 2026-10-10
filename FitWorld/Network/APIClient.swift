@@ -46,7 +46,7 @@ struct APIClient {
     private func request<T: Decodable>(_ path: String,
                                         method: String,
                                         query: [URLQueryItem],
-                                        body: some Encodable?) async throws -> T {
+                                        body: (any Encodable)?) async throws -> T {
         guard Reachability.isOnline() else { throw APIError.offline }
 
         var components = URLComponents(url: baseURL.appendingPathComponent(path),
