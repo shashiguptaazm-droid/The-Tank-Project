@@ -94,7 +94,7 @@ import SwiftUI
     /// and falls back to `0` when the caller's id matches nothing. Anything not
     /// in the menu renders as "nothing selected".
     private var selectedId: Int {
-        items.contains { $0.id == selection.wrappedValue } ? selection.wrappedValue : -1
+        Self.items.contains { $0.id == selection } ? selection : -1
     }
 
      var body: some View {
@@ -175,7 +175,7 @@ import SwiftUI
             return
         }
         withAnimation(.easeInOut(duration: 0.2)) {
-            selection.wrappedValue = item.id
+            selection = item.id
         }
     }
 }
