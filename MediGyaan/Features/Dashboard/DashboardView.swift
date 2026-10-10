@@ -250,8 +250,8 @@ struct DashboardView: View {
     private var promptActions: some View {
         switch prompt {
         case .some(.modeChoice):
-            Button(L10n.challengeFriends) { prompt = nil; path.append(Destination.challengeFriends) }
-            Button("Ranked Match") { prompt = nil; path.append(Destination.ranked) }
+            Button(L10n.challengeFriends) { prompt = nil; path.append(DrawerDestination.challengeFriends) }
+            Button("Ranked Match") { prompt = nil; path.append(DrawerDestination.ranked) }
             Button("Cancel", role: .cancel) {}
         case .some(.logout):
             Button("Logout", role: .destructive) { prompt = nil; session.signOut() }
