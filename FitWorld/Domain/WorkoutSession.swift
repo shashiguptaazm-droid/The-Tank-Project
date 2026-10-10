@@ -42,11 +42,12 @@ struct WorkoutSession: Identifiable, Codable, Hashable {
     var volumeKg: Double? {
         let sum = entries
             .filter(\.completed)
-            .compactMap { entry -> Double? in
+            .compactMap { (entry: SetEntry) -> Double? in
                 guard let reps = entry.reps else { return nil }
-                return reps * (entry.weightKg ?? 0)
+                // reps is Int — widen to Double explicitly (annotation noted line 47)
+                return Double(reps) * (entry.weightKg ?? 0)
             }
-            .reduce(0, +)
+            .reduce(0.0, +)
         return sum > 0 ? sum : nil
     }
 }
