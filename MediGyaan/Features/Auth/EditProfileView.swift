@@ -450,8 +450,8 @@ final class EditProfileViewModel: ObservableObject {
             apply(payload["data"] as? [String: Any] ?? [:])
             loadState = .loaded(remotePhotoURL)
         } catch {
-            loadState = .failed(LoadState.message(for: error))
-            errorMessage = LoadState.message(for: error)
+            loadState = .failed(LoadState<Never>.message(for: error))
+            errorMessage = LoadState<Never>.message(for: error)
         }
     }
 
@@ -536,7 +536,7 @@ final class EditProfileViewModel: ObservableObject {
             savedSuccessfully = true
             RemoteLogger.log(tag: "EditProfile_Saved", message: "Profile updated for userId \(userId)")
         } catch {
-            errorMessage = LoadState.message(for: error)
+            errorMessage = LoadState<Never>.message(for: error)
         }
     }
 

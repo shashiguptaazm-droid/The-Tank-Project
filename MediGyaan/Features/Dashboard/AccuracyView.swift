@@ -1,28 +1,51 @@
 import SwiftUI
 
-/// Full Accuracy & Analytics View, strictly porting Android's `AccuracyActivity.kt`.
-/// Features:
-/// - Big accuracy ring & percentage display with real-time server/local calculation
-/// - Overall stats (Correct / Attempted)
-/// - Today's stats & estimated end-of-day projection
-/// - Interactive Segment Tabs ("7 Days", "30 Days", "Topics")
-/// - Interactive Cubic Bezier Trend Chart with neon glow gradient & point markers
-/// - Topic-wise mastery breakdown list with progress bars
-/// - Refresh action connected to backend (`get_profilev1.php`)
+/// Ports `AccuracyActivity` and its layout `res/layout/activity_accuracy.xml`.
+///
+/// The screen keeps the blocks Android stacked vertically: the big accuracy
+/// figure (`R.id.txtBigAccuracy`), the stat cards (`R.id.txtOverallStats`,
+/// `txtTodayStats`, `txtPeriodStats`), the status line (`R.id.txtStatus`) and
+/// the `7 Days | 30 Days | Topics` strip (`R.id.tabLayoutAccuracy`) driving the
+/// line chart (`R.id.lineChartAccuracy`).
+///
+/// Two data sources, exactly as on Android:
+/// * the overall figures come from the network —
+///   `GET get_profilev1.php?user_id=<id>&viewer_id=<id>` — where the first row of
+///   `data.attempts` carries `total_attempted` / `correct_attempted`;
+/// * today's pair, the trend and the topic breakdown come from
+///   ``DailyStatsManager``, the iOS counterpart of the Kotlin object of the same
+///   name.
+///
+/// Android drew this screen on the Material palette; it is hosted inside the
+/// dark dashboard shell here, so the chrome uses ``AppTheme/Ink`` while the
+/// chart keeps the colours MPAndroidChart was configured with verbatim
+/// (`#00E5FF` stroke, white markers, 0…100% left axis, `bg_chart_gradient` fill).
 struct AccuracyView: View {
 
+    /// `AccuracyActivity.TAG`.
+    private static let logTag = "ACCURACY_DEBUG"
+
+    /// `Toast.LENGTH_LONG`.
+    private static let longToastDuration: Double = 3.5
+
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.api) private var api
     @EnvironmentObject private var session: SessionStore
 
-    @State private var selectedTab: Int = 0 // 0: 7 Days, 1: 30 Days, 2: Topics
-    @State private var isLoading: Bool = false
-    @State private var statusMessage: String = "Ready"
+    // MARK: - State
 
-    // Overall metrics from server & local DailyStatsManager
-    @State private var overallAccuracy: Int = 0
+    /// `AccuracyActivity.selectedTab`, driven by `setupTabs()`'s listener.
+    @State private var selectedTab: AccuracyTab = .sevenDays
+    @State private var isLoading: Bool = false
+    /// `R.id.txtStatus`.
+    @State private var statusMessage: String = "Loading..."
+    /// `R.id.txtPeriodStats` once a tab has been rendered.
+    @State private var periodStatus: String = ""
+    /// The `LineDataSet` name, surfaced through MPAndroidChart's legend.
+    @State private var chartTitle: String = ""
+
     @State private var overallAttempted: Int = 0
     @State private var overallCorrect: Int = 0
+    @State private var overallAccuracy: Int = 0
 
     @State private var todayAttempted: Int = 0
     @State private var todayCorrect: Int = 0
@@ -32,514 +55,813 @@ struct AccuracyView: View {
     @State private var estimatedCorrect: Int = 0
     @State private var estimatedAccuracy: Int = 0
 
-    // Chart Trend Points
+    /// `DailyStatsManager.getGraphData(days:)` → `(label, accuracy)` pairs.
     @State private var chartData: [(label: String, accuracy: Int)] = []
+    /// `DailyStatsManager.getTopicAccuracyList()`, already sorted by accuracy.
     @State private var topicData: [TopicAccuracyItem] = []
-    @State private var selectedDataPoint: (label: String, accuracy: Int)? = nil
+    /// `renderTopicWise()`'s attempt-weighted `overallTopicAccuracy`.
+    @State private var topicOverallAccuracy: Int = 0
+    /// The index the user last touched. MPAndroidChart only draws
+    /// `CustomMarkerView` once a value is highlighted, so nothing is preselected.
+    @State private var selectedIndex: Int?
+
+    /// The `Toast`s `AccuracyActivity` raised.
+    @State private var toast: String?
+    @State private var errorMessage: String?
 
     var body: some View {
-        ZStack {
-            AppTheme.Palette.surface.ignoresSafeArea()
+        ZStack(alignment: .top) {
+            AppTheme.Ink.background.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 headerBar
 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: AppTheme.Spacing.lg) {
-                        // Big Circular Accuracy & Summary Card
                         accuracyHeroCard
-
-                        // Today & Estimated End-of-Day Projection Card
-                        projectionCard
-
-                        // Tabs Selector: 7 Days | 30 Days | Topics
+                        overallAndTodayRow
+                        estimatedCard
                         tabSelector
-
-                        // Interactive Chart or Topic Breakdown
-                        if selectedTab == 2 {
-                            topicBreakdownSection
-                        } else {
-                            trendChartSection
-                        }
+                        trendSection
+                        topicSection
                     }
-                    .padding(.horizontal, AppTheme.Spacing.md)
-                    .padding(.bottom, 40)
+                    .padding(.horizontal, AppTheme.Spacing.lg)
+                    .padding(.bottom, AppTheme.Spacing.xxl)
                 }
             }
+
+            if let message = toast {
+                AccuracyToastBanner(text: message, seconds: Self.longToastDuration) {
+                    toast = nil
+                }
+                .padding(.horizontal, AppTheme.Spacing.lg)
+                .padding(.top, AppTheme.Spacing.sm)
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
         }
-        .navigationBarHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
+        .animation(.easeOut(duration: 0.2), value: toast)
+        .errorAlert(message: $errorMessage)
         .onAppear {
-            RemoteLogger.log(tag: "AccuracyView_Appear", message: "User opened Accuracy & Analytics")
-            loadAccuracyData()
+            RemoteLogger.log(tag: Self.logTag, message: "AccuracyActivity created")
+            renderSelectedTab()
+            loadAccuracy()
         }
     }
 
-    // MARK: - Header Bar
+    // MARK: - Header (`R.id.txtStatus`, `R.id.btnRefresh`)
 
     private var headerBar: some View {
-        HStack {
+        HStack(spacing: AppTheme.Spacing.sm) {
             Button {
                 dismiss()
             } label: {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundStyle(AppTheme.Ink.teal)
+                    .font(AppTheme.Font.callout.weight(.bold))
+                    .foregroundStyle(AppTheme.Ink.iconTint)
                     .frame(width: 44, height: 44)
-                    .background(Circle().fill(Color(hex: "#101D33")))
+                    .background(Circle().fill(AppTheme.Ink.tile))
             }
+            .buttonStyle(.plain)
 
-            Spacer()
-
-            VStack(spacing: 2) {
-                Text("ACCURACY & ANALYTICS")
-                    .font(.system(size: 13, weight: .black))
-                    .tracking(2.0)
-                    .foregroundStyle(AppTheme.Ink.gold)
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
+                Text("ACCURACY")
+                    .font(AppTheme.Font.cardTitle)
+                    .foregroundStyle(AppTheme.Ink.textPrimary)
 
                 Text(statusMessage)
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(AppTheme.Palette.textSecondary)
+                    .font(AppTheme.Font.micro)
+                    .foregroundStyle(AppTheme.Ink.textSecondary)
+                    .lineLimit(1)
             }
 
-            Spacer()
+            Spacer(minLength: 0)
 
             Button {
-                loadAccuracyData()
+                refreshTapped()
             } label: {
                 Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundStyle(AppTheme.Ink.teal)
+                    .font(AppTheme.Font.callout.weight(.bold))
+                    .foregroundStyle(AppTheme.Ink.cyan)
                     .rotationEffect(.degrees(isLoading ? 360 : 0))
-                    .animation(isLoading ? .linear(duration: 1).repeatForever(autoreverses: false) : .default, value: isLoading)
+                    .animation(
+                        isLoading
+                            ? .linear(duration: 1).repeatForever(autoreverses: false)
+                            : .default,
+                        value: isLoading
+                    )
                     .frame(width: 44, height: 44)
-                    .background(Circle().fill(Color(hex: "#101D33")))
+                    .background(Circle().fill(AppTheme.Ink.tile))
             }
+            .buttonStyle(.plain)
         }
-        .padding(.horizontal, AppTheme.Spacing.md)
-        .padding(.top, 8)
-        .padding(.bottom, 6)
+        .padding(.horizontal, AppTheme.Spacing.lg)
+        .padding(.vertical, AppTheme.Spacing.sm)
     }
 
-    // MARK: - Accuracy Hero Card
+    // MARK: - `R.id.txtBigAccuracy`
 
     private var accuracyHeroCard: some View {
-        CardContainer {
-            VStack(spacing: AppTheme.Spacing.md) {
-                ZStack {
-                    // Outer Ring
-                    Circle()
-                        .stroke(Color(hex: "#10233D"), lineWidth: 12)
-                        .frame(width: 140, height: 140)
+        VStack(spacing: AppTheme.Spacing.sm) {
+            ZStack {
+                Circle()
+                    .stroke(AppTheme.Ink.elevated, lineWidth: 12)
 
-                    // Progress Ring
-                    Circle()
-                        .trim(from: 0.0, to: CGFloat(min(max(Double(overallAccuracy) / 100.0, 0.001), 1.0)))
-                        .stroke(
-                            AngularGradient(
-                                gradient: Gradient(colors: [Color(hex: "#00E5FF"), Color(hex: "#00E676"), Color(hex: "#FFD700")]),
-                                center: .center,
-                                startAngle: .degrees(-90),
-                                endAngle: .degrees(270)
-                            ),
-                            style: StrokeStyle(lineWidth: 12, lineCap: .round)
-                        )
-                        .rotationEffect(.degrees(-90))
-                        .frame(width: 140, height: 140)
+                Circle()
+                    .trim(from: 0.0, to: CGFloat(min(max(Double(overallAccuracy) / 100.0, 0.001), 1.0)))
+                    .stroke(
+                        AngularGradient(
+                            gradient: Gradient(colors: [AppTheme.Ink.cyan, AppTheme.Palette.success, AppTheme.Ink.gold]),
+                            center: .center,
+                            startAngle: .degrees(-90),
+                            endAngle: .degrees(270)
+                        ),
+                        style: StrokeStyle(lineWidth: 12, lineCap: .round)
+                    )
+                    .rotationEffect(.degrees(-90))
 
-                    VStack(spacing: 2) {
-                        Text("\(overallAccuracy)%")
-                            .font(.system(size: 36, weight: .black, design: .rounded))
-                            .foregroundStyle(Color.white)
-
-                        Text("ACCURACY")
-                            .font(.system(size: 10, weight: .heavy))
-                            .tracking(1.5)
-                            .foregroundStyle(AppTheme.Ink.teal)
-                    }
-                }
-                .padding(.top, 6)
-
-                VStack(spacing: 4) {
-                    Text("Overall Performance")
-                        .font(AppTheme.Font.headline)
+                VStack(spacing: AppTheme.Spacing.xxs) {
+                    Text("\(overallAccuracy)%")
+                        .font(AppTheme.Font.display)
                         .foregroundStyle(Color.white)
 
-                    Text("\(overallCorrect) correct / \(overallAttempted) attempted")
-                        .font(AppTheme.Font.subheadline)
-                        .foregroundStyle(AppTheme.Palette.textSecondary)
-
-                    HStack(spacing: 6) {
-                        Image(systemName: "crown.fill")
-                            .font(.system(size: 12))
-                            .foregroundStyle(AppTheme.Ink.gold)
-                        Text(DailyStatsManager.shared.getRankBadge())
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundStyle(AppTheme.Ink.gold)
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(Capsule().fill(AppTheme.Ink.gold.opacity(0.12)))
-                    .padding(.top, 4)
+                    Text("ACCURACY")
+                        .font(AppTheme.Font.micro)
+                        .tracking(1.5)
+                        .foregroundStyle(AppTheme.Ink.cyan)
                 }
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 8)
+            .frame(width: 140, height: 140)
+            .contentShape(Circle())
+            .onTapGesture { exportDiagnosticReport() }
+
+            Text("Tap the ring for a diagnostic report")
+                .font(AppTheme.Font.micro)
+                .foregroundStyle(AppTheme.Ink.textHint)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, AppTheme.Spacing.sm)
+    }
+
+    // MARK: - `R.id.txtOverallStats` + `R.id.txtTodayStats`
+
+    private var overallAndTodayRow: some View {
+        HStack(alignment: .top, spacing: AppTheme.Spacing.sm) {
+            statCard(
+                title: "OVERALL",
+                tint: AppTheme.Ink.gold,
+                value: "Overall: \(overallCorrect) correct / \(overallAttempted) attempted"
+            )
+            statCard(
+                title: "TODAY",
+                tint: AppTheme.Ink.cyan,
+                value: "Today: \(todayCorrect) correct / \(todayAttempted) attempted • Accuracy \(todayAccuracy)%"
+            )
         }
     }
 
-    // MARK: - Projection Card
+    private func statCard(title: String, tint: Color, value: String) -> some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
+            Text(title)
+                .font(AppTheme.Font.micro)
+                .foregroundStyle(tint)
 
-    private var projectionCard: some View {
-        CardContainer {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Label("Today's Momentum", systemImage: "bolt.fill")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(AppTheme.Ink.teal)
-
-                    Spacer()
-
-                    Text("\(todayAccuracy)%")
-                        .font(.system(size: 15, weight: .black))
-                        .foregroundStyle(Color(hex: "#00E676"))
-                }
-
-                Text("\(todayCorrect) correct / \(todayAttempted) attempted today")
-                    .font(.system(size: 12))
-                    .foregroundStyle(AppTheme.Palette.textSecondary)
-
-                Divider().background(Color.white.opacity(0.1))
-
-                HStack {
-                    Label("Estimated End-of-Day", systemImage: "clock.arrow.circlepath")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(AppTheme.Ink.gold)
-
-                    Spacer()
-
-                    Text("\(estimatedAccuracy)% projected")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(AppTheme.Ink.gold)
-                }
-
-                Text("\(estimatedCorrect) correct / \(estimatedAttempted) projected questions by midnight")
-                    .font(.system(size: 11))
-                    .foregroundStyle(AppTheme.Palette.textSecondary)
-            }
+            Text(value)
+                .font(AppTheme.Font.callout)
+                .foregroundStyle(AppTheme.Ink.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
         }
-    }
-
-    // MARK: - Tab Selector
-
-    private var tabSelector: some View {
-        HStack(spacing: 8) {
-            tabButton(title: "7 Days", index: 0)
-            tabButton(title: "30 Days", index: 1)
-            tabButton(title: "Topics", index: 2)
-        }
-        .padding(4)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(AppTheme.Spacing.md)
         .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(Color(hex: "#0A172C"))
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .fill(AppTheme.Ink.surface)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .stroke(tint.opacity(0.6), lineWidth: 1)
         )
     }
 
-    private func tabButton(title: String, index: Int) -> some View {
-        let isSelected = selectedTab == index
+    // MARK: - `R.id.txtPeriodStats` (estimated end of day)
+
+    private var estimatedCard: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
+            Text("ESTIMATED END-OF-DAY")
+                .font(AppTheme.Font.micro)
+                .foregroundStyle(AppTheme.Ink.gold)
+
+            Text("Estimated end of day: \(estimatedCorrect) correct / \(estimatedAttempted) attempted • Accuracy \(estimatedAccuracy)%")
+                .font(AppTheme.Font.callout)
+                .foregroundStyle(AppTheme.Ink.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(AppTheme.Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .fill(AppTheme.Ink.surface)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .stroke(AppTheme.Ink.gold.opacity(0.6), lineWidth: 1)
+        )
+    }
+
+    // MARK: - `R.id.tabLayoutAccuracy`
+
+    private var tabSelector: some View {
+        HStack(spacing: AppTheme.Spacing.sm) {
+            ForEach(AccuracyTab.allCases) { tab in
+                tabButton(tab)
+            }
+        }
+        .padding(AppTheme.Spacing.xxs)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.field, style: .continuous)
+                .fill(AppTheme.Ink.surface)
+        )
+    }
+
+    private func tabButton(_ tab: AccuracyTab) -> some View {
+        let isSelected = selectedTab == tab
         return Button {
             withAnimation(.easeInOut(duration: 0.2)) {
-                selectedTab = index
-                refreshTabContent()
+                selectedTab = tab
+                renderSelectedTab()
             }
         } label: {
-            Text(title)
-                .font(.system(size: 13, weight: isSelected ? .bold : .medium))
-                .foregroundStyle(isSelected ? Color(hex: "#050816") : Color.white)
+            Text(tab.title)
+                .font(AppTheme.Font.callout.weight(isSelected ? .bold : .medium))
+                .foregroundStyle(isSelected ? AppTheme.Ink.background : AppTheme.Ink.textSecondary)
                 .frame(maxWidth: .infinity)
                 .frame(height: 38)
                 .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(isSelected ? Color(hex: "#00E5FF") : Color.clear)
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.option, style: .continuous)
+                        .fill(isSelected ? AppTheme.Ink.cyan : Color.clear)
                 )
         }
         .buttonStyle(.plain)
     }
 
-    // MARK: - Trend Chart Section
+    // MARK: - `R.id.lineChartAccuracy` (7 Days / 30 Days)
 
-    private var trendChartSection: some View {
-        CardContainer {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Text(selectedTab == 0 ? "7-DAY ACCURACY TREND" : "30-DAY ACCURACY TREND")
-                        .font(.system(size: 12, weight: .heavy))
-                        .foregroundStyle(AppTheme.Palette.textSecondary)
-
-                    Spacer()
-
-                    if let selected = selectedDataPoint {
-                        Text("\(selected.label): \(selected.accuracy)%")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundStyle(Color(hex: "#00E5FF"))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 2)
-                            .background(Capsule().fill(Color(hex: "#00E5FF").opacity(0.15)))
-                    }
-                }
+    @ViewBuilder
+    private var trendSection: some View {
+        if selectedTab.trendDays != nil {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+                sectionHeader(title: chartTitle, detail: periodStatus)
 
                 if chartData.isEmpty {
-                    VStack(spacing: 8) {
-                        Image(systemName: "chart.line.uptrend.xyaxis")
-                            .font(.system(size: 32))
-                            .foregroundStyle(Color.gray.opacity(0.4))
-                        Text("No history recorded yet.")
-                            .font(.system(size: 13))
-                            .foregroundStyle(AppTheme.Palette.textSecondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 180)
+                    emptyState(
+                        icon: "chart.line.uptrend.xyaxis",
+                        message: "\(selectedTab.title) • No history yet"
+                    )
                 } else {
-                    // Custom Cubic Bezier Line Chart in SwiftUI
-                    GeometryReader { geo in
-                        let width = geo.size.width
-                        let height = geo.size.height
-
-                        ZStack {
-                            // Grid Lines (0%, 25%, 50%, 75%, 100%)
-                            VStack(spacing: 0) {
-                                ForEach(0..<5) { step in
-                                    HStack {
-                                        Text("\(100 - step * 25)%")
-                                            .font(.system(size: 9))
-                                            .foregroundStyle(Color.gray.opacity(0.5))
-                                            .frame(width: 28, alignment: .leading)
-                                        Rectangle()
-                                            .fill(Color(hex: "#1A1F38"))
-                                            .frame(height: 1)
-                                    }
-                                    if step < 4 { Spacer() }
-                                }
-                            }
-
-                            // Chart Neon Area & Stroke Path
-                            let points = computePoints(in: CGSize(width: width - 32, height: height), values: chartData.map { $0.accuracy })
-
-                            // Gradient Area Fill
-                            Path { path in
-                                guard points.count > 1 else { return }
-                                path.move(to: CGPoint(x: points[0].x + 32, y: height))
-                                path.addLine(to: CGPoint(x: points[0].x + 32, y: points[0].y))
-                                for i in 1..<points.count {
-                                    let prev = points[i - 1]
-                                    let curr = points[i]
-                                    let control1 = CGPoint(x: (prev.x + curr.x) / 2 + 32, y: prev.y)
-                                    let control2 = CGPoint(x: (prev.x + curr.x) / 2 + 32, y: curr.y)
-                                    path.addCurve(to: CGPoint(x: curr.x + 32, y: curr.y), control1: control1, control2: control2)
-                                }
-                                path.addLine(to: CGPoint(x: points.last!.x + 32, y: height))
-                                path.closeSubpath()
-                            }
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color(hex: "#00E5FF").opacity(0.35), Color(hex: "#00E5FF").opacity(0.0)],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
-
-                            // Stroke Line
-                            Path { path in
-                                guard points.count > 1 else { return }
-                                path.move(to: CGPoint(x: points[0].x + 32, y: points[0].y))
-                                for i in 1..<points.count {
-                                    let prev = points[i - 1]
-                                    let curr = points[i]
-                                    let control1 = CGPoint(x: (prev.x + curr.x) / 2 + 32, y: prev.y)
-                                    let control2 = CGPoint(x: (prev.x + curr.x) / 2 + 32, y: curr.y)
-                                    path.addCurve(to: CGPoint(x: curr.x + 32, y: curr.y), control1: control1, control2: control2)
-                                }
-                            }
-                            .stroke(Color(hex: "#00E5FF"), style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
-
-                            // Data Point Circles & Tap Target
-                            ForEach(Array(points.enumerated()), id: \.offset) { idx, pt in
-                                let dataPoint = chartData[idx]
-                                Circle()
-                                    .fill(Color.white)
-                                    .frame(width: 8, height: 8)
-                                    .overlay(Circle().stroke(Color(hex: "#00E5FF"), lineWidth: 2))
-                                    .position(x: pt.x + 32, y: pt.y)
-                                    .onTapGesture {
-                                        selectedDataPoint = dataPoint
-                                    }
-                            }
-                        }
-                    }
-                    .frame(height: 200)
-
-                    // Bottom Dates Label strip
-                    HStack {
-                        Spacer().frame(width: 32)
-                        ForEach(chartData.indices, id: \.self) { idx in
-                            if chartData.count <= 7 || idx % 5 == 0 || idx == chartData.count - 1 {
-                                Text(chartData[idx].label)
-                                    .font(.system(size: 9))
-                                    .foregroundStyle(Color.gray)
-                                    .frame(maxWidth: .infinity)
-                            }
-                        }
-                    }
+                    AccuracyTrendChart(points: chartData, selectedIndex: $selectedIndex)
+                        .frame(height: 220)
+                        .padding(AppTheme.Spacing.md)
+                        .background(
+                            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                                .fill(AppTheme.Ink.surface)
+                        )
                 }
             }
         }
     }
 
-    private func computePoints(in size: CGSize, values: [Int]) -> [CGPoint] {
-        guard values.count > 1 else {
-            return values.map { _ in CGPoint(x: size.width / 2, y: size.height / 2) }
-        }
-        let stepX = size.width / CGFloat(values.count - 1)
-        return values.enumerated().map { idx, val in
-            let clampedVal = max(0, min(100, val))
-            let y = size.height - (CGFloat(clampedVal) / 100.0 * (size.height - 16)) - 8
-            return CGPoint(x: CGFloat(idx) * stepX, y: y)
-        }
-    }
+    // MARK: - `renderTopicWise()`
 
-    // MARK: - Topic Breakdown Section
-
-    private var topicBreakdownSection: some View {
-        CardContainer {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    Text("TOPIC-WISE ACCURACY")
-                        .font(.system(size: 12, weight: .heavy))
-                        .foregroundStyle(AppTheme.Palette.textSecondary)
-
-                    Spacer()
-
-                    Text("\(topicData.count) Topics")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundStyle(AppTheme.Ink.teal)
-                }
+    @ViewBuilder
+    private var topicSection: some View {
+        if selectedTab == .topics {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                sectionHeader(title: chartTitle, detail: periodStatus)
 
                 if topicData.isEmpty {
-                    VStack(spacing: 8) {
-                        Image(systemName: "books.vertical.fill")
-                            .font(.system(size: 32))
-                            .foregroundStyle(Color.gray.opacity(0.4))
-                        Text("No topic attempts recorded today.")
-                            .font(.system(size: 13))
-                            .foregroundStyle(AppTheme.Palette.textSecondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 140)
+                    emptyState(icon: "books.vertical", message: "Topics • No topic data yet")
                 } else {
                     ForEach(topicData) { item in
-                        VStack(alignment: .leading, spacing: 5) {
-                            HStack {
-                                Text(item.topic)
-                                    .font(.system(size: 13, weight: .bold))
-                                    .foregroundStyle(Color.white)
-
-                                Spacer()
-
-                                Text("\(item.correct)/\(item.attempted)")
-                                    .font(.system(size: 11))
-                                    .foregroundStyle(AppTheme.Palette.textSecondary)
-
-                                Text("•  \(item.accuracy)%")
-                                    .font(.system(size: 13, weight: .heavy))
-                                    .foregroundStyle(item.accuracy >= 60 ? Color(hex: "#00E676") : Color(hex: "#FF5252"))
-                            }
-
-                            GeometryReader { g in
-                                ZStack(alignment: .leading) {
-                                    Capsule().fill(Color(hex: "#10233D"))
-                                    Capsule().fill(item.accuracy >= 60 ? Color(hex: "#00E676") : Color(hex: "#FF5252"))
-                                        .frame(width: g.size.width * CGFloat(item.accuracy) / 100.0)
-                                }
-                            }
-                            .frame(height: 6)
-                        }
-                        .padding(.vertical, 3)
+                        topicRow(item)
                     }
+                }
+            }
+            .padding(AppTheme.Spacing.md)
+            .background(
+                RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                    .fill(AppTheme.Ink.surface)
+            )
+        }
+    }
+
+    private func topicRow(_ item: TopicAccuracyItem) -> some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+            HStack(alignment: .firstTextBaseline, spacing: AppTheme.Spacing.xs) {
+                Text(item.topic)
+                    .font(AppTheme.Font.subheadline.weight(.bold))
+                    .foregroundStyle(AppTheme.Ink.textPrimary)
+                    .lineLimit(2)
+
+                Spacer(minLength: AppTheme.Spacing.xs)
+
+                Text("\(item.correct)/\(item.attempted)")
+                    .font(AppTheme.Font.micro)
+                    .foregroundStyle(AppTheme.Ink.textSecondary)
+
+                Text("•  \(item.accuracy)%")
+                    .font(AppTheme.Font.callout.weight(.heavy))
+                    .foregroundStyle(item.accuracy >= 60 ? AppTheme.Palette.success : AppTheme.Palette.error)
+            }
+
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(AppTheme.Ink.elevated)
+                    Capsule()
+                        .fill(item.accuracy >= 60 ? AppTheme.Palette.success : AppTheme.Palette.error)
+                        .frame(width: geometry.size.width * CGFloat(item.accuracy) / 100.0)
+                }
+            }
+            .frame(height: 6)
+        }
+        .padding(.vertical, AppTheme.Spacing.xxs)
+    }
+
+    // MARK: - Shared chrome
+
+    private func sectionHeader(title: String, detail: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: AppTheme.Spacing.sm) {
+            Text(title)
+                .font(AppTheme.Font.captionBold)
+                .foregroundStyle(AppTheme.Ink.textPrimary)
+
+            Spacer(minLength: 0)
+
+            Text(detail)
+                .font(AppTheme.Font.micro)
+                .foregroundStyle(AppTheme.Ink.cyan)
+                .lineLimit(1)
+        }
+    }
+
+    private func emptyState(icon: String, message: String) -> some View {
+        VStack(spacing: AppTheme.Spacing.sm) {
+            Image(systemName: icon)
+                .font(AppTheme.Font.largeTitle)
+                .foregroundStyle(AppTheme.Ink.textHint)
+
+            Text(message)
+                .font(AppTheme.Font.callout)
+                .foregroundStyle(AppTheme.Ink.textSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 180)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .fill(AppTheme.Ink.surface)
+        )
+    }
+
+    // MARK: - Actions
+
+    /// Ports `AccuracyActivity.onCreate`'s `btnRefresh` click listener.
+    private func refreshTapped() {
+        RemoteLogger.log(tag: Self.logTag, message: "Refresh Accuracy tapped")
+        loadAccuracy()
+    }
+
+    /// Ports `AccuracyActivity.exportDiagnosticReportPdf()`, reached by tapping
+    /// `R.id.txtBigAccuracy`. Android read the cached `name` preference (default
+    /// `"Doctor"` — which is what ``SessionStore/userName`` resolves to), showed a
+    /// `Toast.LENGTH_LONG` and wrote no file; only the toast is ported.
+    private func exportDiagnosticReport() {
+        let userName = session.userName
+        RemoteLogger.log(tag: Self.logTag, message: "Diagnostic Report Generated for \(userName)")
+        toast = "Diagnostic Report Generated for \(userName) (\(overallAccuracy)%)"
+    }
+
+    /// Ports `AccuracyActivity.setupTabs()`'s `OnTabSelectedListener` →
+    /// `renderSelectedTab()`.
+    private func renderSelectedTab() {
+        if let days = selectedTab.trendDays {
+            renderTrend(days: days)
+        } else {
+            renderTopicWise()
+        }
+    }
+
+    /// Ports `AccuracyActivity.renderTrend(days:title:)`: the period line above
+    /// the chart, then `setupChart(...)`. An empty list is `clearChart()` plus the
+    /// "No history yet" line.
+    private func renderTrend(days: Int) {
+        let title = selectedTab.title
+        chartTitle = "\(title) accuracy trend"
+        let stats = DailyStatsManager.shared.getGraphData(days: days)
+
+        guard !stats.isEmpty else {
+            chartData = []
+            selectedIndex = nil
+            periodStatus = "\(title) • No history yet"
+            return
+        }
+
+        chartData = stats
+        selectedIndex = nil
+        periodStatus = "\(title) • Showing trend"
+    }
+
+    /// Ports `AccuracyActivity.renderTopicWise()`. `overallTopicAccuracy` divides
+    /// the summed `accuracy × attempted` by the total attempted, exactly as the
+    /// Kotlin expression did. Kotlin's `totalCorrect` local is dropped: it was
+    /// computed and never read.
+    private func renderTopicWise() {
+        chartTitle = "Topic-wise accuracy"
+        let items = DailyStatsManager.shared.getTopicAccuracyList()
+
+        guard !items.isEmpty else {
+            topicData = []
+            topicOverallAccuracy = 0
+            periodStatus = "Topics • No topic data yet"
+            return
+        }
+
+        topicData = items
+        let totalAttempted = items.reduce(0) { $0 + $1.attempted }
+        topicOverallAccuracy = totalAttempted > 0
+            ? items.reduce(0) { $0 + $1.accuracy * $1.attempted } / totalAttempted
+            : 0
+        periodStatus = "Topics • Overall today \(topicOverallAccuracy)%"
+    }
+
+    // MARK: - Network
+
+    /// Ports `AccuracyActivity.loadAccuracy()` plus `updateAccuracyUI(json:)`.
+    ///
+    /// The response is read as a raw dictionary rather than through
+    /// `AuthAPI.profile`, because `get_profilev1.php` wraps its payload in a
+    /// `data` envelope that `User`'s tolerant decoder does not unwrap — the same
+    /// reason `DashboardViewModel.fetchProfile` reads the dictionary by hand.
+    private func loadAccuracy() {
+        guard let userId = session.currentUser?.id, userId > 0 else {
+            statusMessage = "Invalid user"
+            isLoading = false
+            return
+        }
+
+        isLoading = true
+        statusMessage = "Loading accuracy..."
+        RemoteLogger.log(
+            tag: Self.logTag,
+            message: "API CALL: get_profilev1.php?user_id=\(userId)&viewer_id=\(userId)"
+        )
+
+        Task {
+            do {
+                let json = try await HTTPClient.shared.getObject(
+                    .profile,
+                    query: ["user_id": String(userId), "viewer_id": String(userId)]
+                )
+                let figures = AccuracyView.profileFigures(from: json)
+                await MainActor.run {
+                    overallAttempted = figures.attempted
+                    overallCorrect = figures.correct
+                    overallAccuracy = DailyStatsManager.shared.calculateAccuracy(
+                        attempted: figures.attempted,
+                        correct: figures.correct
+                    )
+                    applyLocalStats()
+                    statusMessage = "\(figures.name) • Accuracy loaded"
+                    isLoading = false
+                }
+            } catch {
+                RemoteLogger.log(tag: Self.logTag, message: "Network error: \(error.localizedDescription)")
+                await MainActor.run {
+                    statusMessage = "Network error"
+                    errorMessage = "Network error"
+                    isLoading = false
                 }
             }
         }
     }
 
-    // MARK: - Data Loading & Calculations
-
-    private func refreshTabContent() {
-        if selectedTab == 0 {
-            chartData = DailyStatsManager.shared.getGraphData(days: 7)
-            selectedDataPoint = chartData.last
-        } else if selectedTab == 1 {
-            chartData = DailyStatsManager.shared.getGraphData(days: 30)
-            selectedDataPoint = chartData.last
-        } else {
-            topicData = DailyStatsManager.shared.getTopicAccuracyList()
-        }
-    }
-
-    private func loadAccuracyData() {
-        isLoading = true
-        statusMessage = "Loading..."
-
-        // 1. Compute local DailyStatsManager figures
+    /// Ports the local half of `AccuracyActivity.updateAccuracyUI(json:)`: today's
+    /// pair, today's accuracy, and the end-of-day projection.
+    private func applyLocalStats() {
         let today = DailyStatsManager.shared.getToday()
         todayAttempted = today.attempted
         todayCorrect = today.correct
-        todayAccuracy = DailyStatsManager.shared.calculateAccuracy(attempted: todayAttempted, correct: todayCorrect)
+        todayAccuracy = DailyStatsManager.shared.calculateAccuracy(
+            attempted: today.attempted,
+            correct: today.correct
+        )
 
-        let estAtt = estimateEndOfDay(count: todayAttempted)
-        let estCorr = estimateEndOfDay(count: todayCorrect)
-        estimatedAttempted = estAtt
-        estimatedCorrect = estCorr
-        estimatedAccuracy = estAtt > 0 ? (estCorr * 100) / estAtt : 0
+        estimatedAttempted = estimateEndOfDay(count: todayAttempted)
+        estimatedCorrect = estimateEndOfDay(count: todayCorrect)
+        estimatedAccuracy = estimatedAttempted > 0
+            ? (estimatedCorrect * 100) / estimatedAttempted
+            : 0
+    }
 
-        let overall = DailyStatsManager.shared.getOverallStats()
-        overallAttempted = overall.attempted
-        overallCorrect = overall.correct
-        overallAccuracy = DailyStatsManager.shared.calculateAccuracy(attempted: overallAttempted, correct: overallCorrect)
+    /// Ports `AccuracyActivity.estimateEndOfDay(currentCount:)`: the day's total
+    /// is extrapolated from the fraction of it that has elapsed, floored at one
+    /// hour so a midnight session cannot divide by zero.
+    private func estimateEndOfDay(count: Int) -> Int {
+        guard count > 0 else { return 0 }
+        let parts = Calendar.current.dateComponents([.hour, .minute], from: Date())
+        let minutesPassed = max(60, (parts.hour ?? 0) * 60 + (parts.minute ?? 0))
+        let fractionOfDay = Float(minutesPassed) / Float(24 * 60)
+        return Int(Float(count) / fractionOfDay)
+    }
 
-        refreshTabContent()
+    /// Ports `AccuracyActivity.loadAccuracy()`'s response handling — `data` with a
+    /// root fallback, then `name` and `attempts[0].total_attempted` /
+    /// `correct_attempted`. PHP hands these back as strings, so the numbers are
+    /// coerced the way `JSONObject.optInt` coerces them.
+    private static func profileFigures(from json: [String: Any]) -> (name: String, attempted: Int, correct: Int) {
+        let payload = (json["data"] as? [String: Any]) ?? json
+        let name = (payload["name"] as? String) ?? "User"
 
-        // 2. Fetch remote accuracy profile from backend API (get_profilev1.php)
-        Task {
-            do {
-                if let user = session.currentUser {
-                    let stats = try await api.study.dashboard(userId: user.id)
-                    await MainActor.run {
-                        if stats.attempted > 0 {
-                            overallAttempted = stats.attempted
-                            overallCorrect = stats.correct
-                            overallAccuracy = Int(stats.accuracy > 1 ? stats.accuracy : stats.accuracy * 100)
-                        }
-                        isLoading = false
-                        statusMessage = "Updated"
-                    }
-                } else {
-                    await MainActor.run {
-                        isLoading = false
-                        statusMessage = "Local Data"
-                    }
-                }
-            } catch {
-                await MainActor.run {
-                    isLoading = false
-                    statusMessage = "Offline / Local"
-                }
-            }
+        var attempted = 0
+        var correct = 0
+        if let rows = payload["attempts"] as? [Any],
+           let first = rows.first as? [String: Any] {
+            attempted = intValue(first["total_attempted"])
+            correct = intValue(first["correct_attempted"])
+        }
+
+        return (name, attempted, correct)
+    }
+
+    private static func intValue(_ raw: Any?) -> Int {
+        if let value = raw as? Int { return value }
+        if let value = raw as? Double { return Int(value) }
+        if let value = raw as? String { return Int(value) ?? Int(Double(value) ?? 0) }
+        return 0
+    }
+}
+
+// MARK: - Tabs
+
+/// The three tabs `AccuracyActivity.setupTabs()` adds to
+/// `R.id.tabLayoutAccuracy`, in the order it adds them.
+private enum AccuracyTab: Int, CaseIterable, Identifiable {
+
+    case sevenDays = 0
+    case thirtyDays = 1
+    case topics = 2
+
+    var id: Int { rawValue }
+
+    /// `tab.newTab().setText(...)`.
+    var title: String {
+        switch self {
+        case .sevenDays: return "7 Days"
+        case .thirtyDays: return "30 Days"
+        case .topics: return "Topics"
         }
     }
 
-    private func estimateEndOfDay(count: Int) -> Int {
-        guard count > 0 else { return 0 }
-        let now = Calendar.current.dateComponents([.hour, .minute], from: Date())
-        let minutesPassed = max(60, (now.hour ?? 12) * 60 + (now.minute ?? 0))
-        let fraction = Float(minutesPassed) / Float(24 * 60)
-        return Int(Float(count) / fraction)
+    /// The `renderTrend(days, title:)` window; `nil` for the topic tab, which
+    /// `renderSelectedTab()` routes to `renderTopicWise()` instead.
+    var trendDays: Int? {
+        switch self {
+        case .sevenDays: return 7
+        case .thirtyDays: return 30
+        case .topics: return nil
+        }
+    }
+}
+
+// MARK: - Chart
+
+/// Ports `AccuracyActivity.setupChart(labels:values:chartTitle:)` together with
+/// `AccuracyActivity.CustomMarkerView`.
+///
+/// MPAndroidChart's configuration, one-for-one:
+/// * a `#00E5FF` 3dp cubic-bezier line over the `R.drawable.bg_chart_gradient`
+///   fill (`#0000E5FF` → `#4D00E5FF`, i.e. transparent at the baseline);
+/// * white markers with a cyan ring (`circleRadius = 5f`, `circleHoleRadius = 3f`)
+///   and the values hidden, because `CustomMarkerView` shows them instead;
+/// * an `axisLeft` pinned to 0…100 with grid lines, and a bottom x-axis whose
+///   values map back onto the label array.
+private struct AccuracyTrendChart: View {
+
+    /// `DailyStatsManager.getGraphData(days:)` output.
+    let points: [(label: String, accuracy: Int)]
+
+    /// `Highlight` — MPAndroidChart only draws the marker for a touched value.
+    @Binding var selectedIndex: Int?
+
+    /// Room for the `axisLeft` percentage labels.
+    private static let gutter: CGFloat = 32
+
+    var body: some View {
+        GeometryReader { geometry in
+            let plot = CGSize(
+                width: max(1, geometry.size.width - Self.gutter),
+                height: max(1, geometry.size.height)
+            )
+            let coords = plotPoints(in: plot)
+
+            HStack(spacing: 0) {
+                gridLabels(height: plot.height)
+
+                ZStack(alignment: .topLeading) {
+                    gridLines(height: plot.height)
+                    areaPath(coords, height: plot.height)
+                    strokePath(coords)
+                    markers(coords)
+                }
+                .frame(width: plot.width, height: plot.height, alignment: .topLeading)
+            }
+            .contentShape(Rectangle())
+            .gesture(dragGesture(stepX: plot.width))
+        }
+    }
+
+    // MARK: - Axes
+
+    /// `axisLeft.valueFormatter` — `"${value.toInt()}%"` at the 0/25/50/75/100
+    /// ticks MPAndroidChart drew for the pinned 0…100 range.
+    private func gridLabels(height: CGFloat) -> some View {
+        VStack(spacing: 0) {
+            ForEach(0..<5, id: \.self) { step in
+                Text("\(100 - step * 25)%")
+                    .font(AppTheme.Font.micro)
+                    .foregroundStyle(AppTheme.Ink.textHint)
+                    .frame(width: Self.gutter - 4, height: height / 5, alignment: .trailing)
+            }
+        }
+        .frame(width: Self.gutter, height: height, alignment: .top)
+    }
+
+    /// `axisLeft.setDrawGridLines(true)`.
+    private func gridLines(height: CGFloat) -> some View {
+        VStack(spacing: 0) {
+            ForEach(0..<5, id: \.self) { step in
+                Rectangle()
+                    .fill(AppTheme.Ink.slate.opacity(0.35))
+                    .frame(height: 1)
+                if step < 4 {
+                    Spacer(minLength: 0)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: height, alignment: .top)
+    }
+
+    /// `setDrawFilled(true)` with `R.drawable.bg_chart_gradient` beneath the line.
+    private func areaPath(_ coords: [CGPoint], height: CGFloat) -> some View {
+        Path { path in
+            guard let first = coords.first, let last = coords.last else { return }
+            path.move(to: CGPoint(x: first.x, y: height))
+            path.addLine(to: CGPoint(x: first.x, y: first.y))
+            if coords.count > 1 {
+                for index in 1..<coords.count {
+                    let previous = coords[index - 1]
+                    let current = coords[index]
+                    path.addCurve(
+                        to: current,
+                        control1: CGPoint(x: (previous.x + current.x) / 2, y: previous.y),
+                        control2: CGPoint(x: (previous.x + current.x) / 2, y: current.y)
+                    )
+                }
+            }
+            path.addLine(to: CGPoint(x: last.x, y: height))
+            path.closeSubpath()
+        }
+        .fill(
+            LinearGradient(
+                colors: [AppTheme.Ink.cyan.opacity(0.30), AppTheme.Ink.cyan.opacity(0)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
+    }
+
+    /// `lineWidth = 3f`, `mode = CUBIC_BEZIER`, `color = #00E5FF`.
+    private func strokePath(_ coords: [CGPoint]) -> some View {
+        Path { path in
+            guard let first = coords.first else { return }
+            path.move(to: first)
+            guard coords.count > 1 else { return }
+            for index in 1..<coords.count {
+                let previous = coords[index - 1]
+                let current = coords[index]
+                path.addCurve(
+                    to: current,
+                    control1: CGPoint(x: (previous.x + current.x) / 2, y: previous.y),
+                    control2: CGPoint(x: (previous.x + current.x) / 2, y: current.y)
+                )
+            }
+        }
+        .stroke(
+            AppTheme.Ink.cyan,
+            style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
+        )
+    }
+
+    /// `setCircleColor(Color.WHITE)`, `circleRadius = 5f`, `circleHoleRadius = 3f`,
+    /// plus the bubble `CustomMarkerView` floated above the highlighted point
+    /// (`getOffset()` returns `(-(width / 2), -height)`).
+    private func markers(_ coords: [CGPoint]) -> some View {
+        ForEach(Array(coords.enumerated()), id: \.offset) { index, point in
+            Circle()
+                .fill(Color.white)
+                .frame(width: 6, height: 6)
+                .overlay(
+                    Circle()
+                        .stroke(AppTheme.Ink.cyan, lineWidth: 2)
+                        .frame(width: 10, height: 10)
+                )
+                .position(point)
+                .overlay(alignment: .top) {
+                    if selectedIndex == index {
+                        Text("\(points[index].accuracy)%")
+                            .font(AppTheme.Font.caption2)
+                            .foregroundStyle(Color.white)
+                            .padding(.horizontal, AppTheme.Spacing.sm)
+                            .padding(.vertical, AppTheme.Spacing.xxs)
+                            .background(
+                                RoundedRectangle(cornerRadius: AppTheme.Radius.option, style: .continuous)
+                                    .fill(AppTheme.Ink.elevated)
+                            )
+                            .offset(y: -8)
+                            .fixedSize()
+                    }
+                }
+        }
+    }
+
+    /// Stands in for MPAndroidChart's pinch-zoom: the nearest x wins, which is
+    /// what its highlight indicator did on tap or drag.
+    private func dragGesture(stepX: CGFloat) -> some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                guard !points.isEmpty else {
+                    selectedIndex = nil
+                    return
+                }
+                guard points.count > 1, stepX > 0 else {
+                    selectedIndex = 0
+                    return
+                }
+                let index = Int(((value.location.x - Self.gutter) / stepX).rounded())
+                selectedIndex = min(max(index, 0), points.count - 1)
+            }
+    }
+
+    /// Maps each datum onto the plot box: x is the entry index (MPAndroidChart's
+    /// `xAxis.granularity = 1f`), y is the accuracy on the pinned 0…100 axis.
+    private func plotPoints(in size: CGSize) -> [CGPoint] {
+        guard points.count > 1 else {
+            return points.map { _ in CGPoint(x: size.width / 2, y: size.height / 2) }
+        }
+        let stepX = size.width / CGFloat(points.count - 1)
+        return points.enumerated().map { index, point in
+            let clamped = max(0, min(100, point.accuracy))
+            let y = size.height - (CGFloat(clamped) / 100 * (size.height - 16)) - 8
+            return CGPoint(x: CGFloat(index) * stepX, y: y)
+        }
+    }
+}
+
+// MARK: - Toast
+
+/// The stand-in for `Toast.makeText(this, …, duration).show()`, which iOS has no
+/// equivalent of. `seconds` follows `Toast.LENGTH_SHORT` (2s) and
+/// `Toast.LENGTH_LONG` (3.5s).
+private struct AccuracyToastBanner: View {
+
+    let text: String
+    let seconds: Double
+    var onDismiss: (() -> Void)?
+
+    var body: some View {
+        HStack(spacing: AppTheme.Spacing.sm) {
+            Image(systemName: "doc.text.fill")
+                .font(AppTheme.Font.callout)
+                .foregroundStyle(AppTheme.Ink.cyan)
+
+            Text(text)
+                .font(AppTheme.Font.callout)
+                .foregroundStyle(AppTheme.Ink.textPrimary)
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
+
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, AppTheme.Spacing.lg)
+        .padding(.vertical, AppTheme.Spacing.md)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.materialCard, style: .continuous)
+                .fill(AppTheme.Ink.elevated)
+        )
+        .shadow(color: .black.opacity(0.3), radius: AppTheme.Elevation.card, y: 2)
+        .task(id: text) {
+            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+            onDismiss?()
+        }
     }
 }

@@ -453,7 +453,7 @@ final class MCQViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegat
             topicsList = deduped
             topicsState = .loaded(deduped)
         } catch {
-            topicsState = .failed(LoadState.message(for: error))
+            topicsState = .failed(LoadState<Never>.message(for: error))
         }
     }
 
@@ -521,7 +521,7 @@ final class MCQViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegat
             }
             display(question)
         } catch {
-            let message = LoadState.message(for: error)
+            let message = LoadState<Never>.message(for: error)
             state = .failed(message)
             toastMessage = "Network error: \(message)"
         }
@@ -623,7 +623,7 @@ final class MCQViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegat
             )
         } catch {
             isSubmitting = false
-            toastMessage = "Network error: \(LoadState.message(for: error))"
+            toastMessage = "Network error: \(LoadState<Never>.message(for: error))"
         }
     }
 

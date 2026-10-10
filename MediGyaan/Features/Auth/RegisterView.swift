@@ -678,7 +678,7 @@ private final class RegisterViewModel: ObservableObject {
             await completeRegistration(userId: userId, api: api, session: session)
             return true
         } catch {
-            let message = LoadState.message(for: error)
+            let message = LoadState<Never>.message(for: error)
             verification = .failed(message)
             errorMessage = message
             return false
