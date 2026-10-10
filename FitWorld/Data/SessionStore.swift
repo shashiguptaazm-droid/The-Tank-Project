@@ -10,12 +10,12 @@ import SwiftData
 @MainActor @Observable
 final class SessionStore {
     static func makeContainer() throws -> ModelContainer {
-        // Explicit typing: SwiftData's Schema init is variadic and its
-        // ModelContainer(for:) overload set doesn't infer cleanly un-annotated.
-        let schema: Schema = Schema([WorkoutSessionRecord.self])
-        let config: ModelConfiguration = ModelConfiguration(schema: schema,
-                                                            isStoredInMemoryOnly: false)
-        let container: ModelContainer = try ModelContainer(for: config)
+        // SwiftData's ModelContainer(for:) 'no exact matches' with a
+        // schema-d ModelConfiguration on strict concurrency. Use the plain
+        // configuration + [[Model]] static creator instead — unambiguous.
+        let config: ModelConfiguration = ModelConfiguration(isStoredInMemoryOnly: false)
+        let container: ModelContainer = try ModelContainer(
+            for: WorkoutSessionRecord.self, configurations: [config])
         return container
     }
 
