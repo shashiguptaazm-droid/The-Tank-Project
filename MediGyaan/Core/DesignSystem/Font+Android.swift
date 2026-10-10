@@ -50,9 +50,11 @@ extension AppTheme.Font {
                 self.tracking = tracking
             }
 
-            /// The `Font` half of the style, tracking already applied.
+            /// The `Font` half of the style. Letter spacing is not part of
+            /// `Font` in SwiftUI — it is a `View` modifier, so `tracking` is
+            /// applied by ``SwiftUI/View/androidMaterialType(_:)`` instead.
             var font: SwiftUI.Font {
-                SwiftUI.Font.system(size: size, weight: weight, design: .default).tracking(tracking)
+                SwiftUI.Font.system(size: size, weight: weight, design: .default)
             }
 
             /// Extra leading SwiftUI needs to reach Android's `lineHeight`.
@@ -128,9 +130,12 @@ extension View {
     /// `lineHeight` that `SwiftUI.Font` cannot express on its own.
     ///
     /// Android resolves its styles through `MaterialTheme.typography`; on iOS the
-    /// equivalent is `.font(style.font)` plus the token's `lineSpacing`.
+    /// equivalent is `.font(style.font)` plus the token's `lineSpacing` and
+    /// `tracking`, which SwiftUI exposes as `View` modifiers rather than
+    /// `Font` members.
     func androidMaterialType(_ style: AppTheme.Font.Android.TextStyleToken) -> some View {
         font(style.font)
             .lineSpacing(style.lineSpacing)
+            .tracking(style.tracking)
     }
 }

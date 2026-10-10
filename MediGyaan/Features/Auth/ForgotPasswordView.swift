@@ -351,7 +351,7 @@ final class ForgotPasswordViewModel: ObservableObject {
         errorMessage = nil
 
         let identifier = mobile.trimmingCharacters(in: .whitespaces)
-        guard isValidIndianMobile(identifier) else {
+        guard Self.isValidIndianMobile(identifier) else {
             errorMessage = "Enter valid 10-digit Indian mobile number"
             return
         }
