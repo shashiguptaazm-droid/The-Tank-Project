@@ -4,6 +4,10 @@ options:
   deploymentTarget:
     iOS: "17.4"
   createIntermediateGroups: true
+  # Generate Info.plist files automatically for every target: XcodeGen writes
+  # them from the INFOPLIST_KEY_* build settings below. Explicitly required —
+  # the first CI run failed with "target does not have an Info.plist file".
+  generateInfoPlistFolder: true
 
 packages:
   Lottie:
@@ -28,13 +32,22 @@ targets:
       - package: KeychainAccess
     settings:
       base:
+        # Info.plist generation for the app target
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.medigyaan.fitworld.app
+        SWIFT_VERSION: "5.9"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGNING_ALLOWED: NO
+        # App-facing Info keys (emitted into the generated plist)
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
         INFOPLIST_KEY_UIUserInterfaceStyle: Automatic
-        SWIFT_VERSION: "5.9"
-        TARGETED_DEVICE_FAMILY: "1,2"
-        CODE_SIGN_STYLE: Automatic
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+
   FitWorldTests:
     type: bundle.unit-test
     platform: iOS
@@ -44,7 +57,13 @@ targets:
       - target: FitWorld
     settings:
       base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.medigyaan.fitworld.tests
         SWIFT_VERSION: "5.9"
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGNING_ALLOWED: NO
 
 schemes:
   FitWorld:
