@@ -420,7 +420,7 @@ final class SubjectTestViewModel: ObservableObject {
 
     /// The four powers in Android's button order (`btnConfuse`, `btnShock`,
     /// `btnShield`, `btnAdrenaline` — slot 1 through slot 4).
-    var loadout: [SubjectTestPowerSlot] {
+    private var loadout: [SubjectTestPowerSlot] {
         guard let kit = heroKit else { return [] }
         return [
             SubjectTestPowerSlot(

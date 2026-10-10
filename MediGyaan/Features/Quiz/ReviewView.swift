@@ -1,25 +1,33 @@
 import SwiftUI
 
-/// Review question data model mirroring `ReviewQuestionModel` in Android `ReviewActivity.kt`
-public struct ReviewQuestionItem: Identifiable, Codable, Hashable {
-    public var id: Int { question_id }
-    public let question_id: Int
-    public let question: String
-    public let option_a: String
-    public let option_b: String
-    public let option_c: String
-    public let option_d: String
-    public let option_e: String
-    public let selected_option: String
-    public let correct_option: String
-    public let selected_answer_text: String
-    public let correct_answer_text: String
-    public let score_change: Int
-    public let explanation: String
-    public let image_url: String
-    public let is_correct: Int
+/// One row of the `REVIEW_JSON` array, and of the review list rendered by
+/// ``ReviewView``.
+///
+/// Ports `ReviewQuestionModel` from Android `ReviewActivity.kt`. Every field
+/// carries a default because Gson instantiated the data class from a sparse map
+/// — a row without `explanation` or `image_url` still decoded on Android, and
+/// `Codable`'s synthesised decoding drops every key the payload omits here too.
+struct ReviewQuestionItem: Identifiable, Codable, Hashable {
 
-    public init(
+    var id: Int { question_id }
+
+    let question_id: Int
+    let question: String
+    let option_a: String
+    let option_b: String
+    let option_c: String
+    let option_d: String
+    let option_e: String
+    let selected_option: String
+    let correct_option: String
+    let selected_answer_text: String
+    let correct_answer_text: String
+    let score_change: Int
+    let explanation: String
+    let image_url: String
+    let is_correct: Int
+
+    init(
         question_id: Int = 0,
         question: String = "",
         option_a: String = "",
@@ -52,43 +60,143 @@ public struct ReviewQuestionItem: Identifiable, Codable, Hashable {
         self.image_url = image_url
         self.is_correct = is_correct
     }
+
+    // MARK: - Derived display state
+
+    /// Ports `val isCorrect = model.is_correct == 1` from `ReviewQuestionCard`.
+    var isCorrect: Bool { is_correct == 1 }
+
+    /// Ports the header `Text` in `ReviewQuestionCard`: `"Correct Answer"` when
+    /// the pick matched, `"Wrong Answer"` otherwise.
+    var verdictTitle: String { isCorrect ? "Correct Answer" : "Wrong Answer" }
+
+    /// Ports the `optionsList` of `ReviewQuestionCard`: A..E, keeping only the
+    /// non-blank entries the Kotlin `if (optionText.isNotBlank())` guard kept.
+    var optionPairs: [ReviewOption] {
+        [
+            ReviewOption(key: "A", text: option_a),
+            ReviewOption(key: "B", text: option_b),
+            ReviewOption(key: "C", text: option_c),
+            ReviewOption(key: "D", text: option_d),
+            ReviewOption(key: "E", text: option_e)
+        ]
+        .filter { !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+    }
+
+    /// Ports the `options` list the Ask AI button built in `ReviewQuestionCard`.
+    /// Note the deliberate A..D window: `option_e` was never offered to the
+    /// tutor even though it is drawn in the option list.
+    var askAIOptions: [String] {
+        [
+            ReviewOption(key: "A", text: option_a),
+            ReviewOption(key: "B", text: option_b),
+            ReviewOption(key: "C", text: option_c),
+            ReviewOption(key: "D", text: option_d)
+        ]
+        .filter { !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        .map { "\($0.key). \($0.text)" }
+    }
+
+    /// Ports the `"Your Answer"` `ReviewAnswerBox` line: `"Not Attempted"` when
+    /// nothing was selected, otherwise `"<letter>. <text>"`.
+    var yourAnswerLine: String {
+        selected_option.isEmpty ? "Not Attempted" : "\(selected_option). \(selected_answer_text)"
+    }
+
+    /// Ports the `"Correct Answer"` `ReviewAnswerBox` line.
+    var correctAnswerLine: String {
+        "\(correct_option). \(correct_answer_text)"
+    }
+
+    /// Ports the `"Score: ..."` line, which Kotlin only signs when the value is
+    /// non-negative — so a `0` reads `+0`.
+    var scoreLine: String {
+        score_change >= 0 ? "Score: +\(score_change)" : "Score: \(score_change)"
+    }
+
+    /// Ports the `if (model.image_url.isNotEmpty() && model.image_url != "null")`
+    /// guard plus the `https://medigyaan.com/Neurons/` prefix Coil was handed
+    /// for a relative path.
+    var resolvedImageURL: URL? {
+        let trimmed = image_url.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, trimmed != "null" else { return nil }
+        if trimmed.hasPrefix("http") { return URL(string: trimmed) }
+        return URL(string: "https://medigyaan.com/Neurons/\(trimmed)")
+    }
+
+    /// Ports one `"A" to model.option_a` pair of `optionsList`.
+    struct ReviewOption: Identifiable, Hashable {
+        let key: String
+        let text: String
+        var id: String { key }
+    }
 }
 
-/// Detailed performance breakdown and answer analysis.
-/// 1:1 port of Android `ReviewActivity.kt` and `ReviewAdapter.kt`.
-public struct ReviewView: View {
+/// The post-attempt answer review.
+///
+/// Ports `ReviewScreen` from Android `ReviewActivity.kt` — the header card with
+/// the correct / wrong / tallies and the accuracy bar, the per-question answer
+/// analysis and the "Ask AI Medical Tutor" handoff. Android received its rows as
+/// the `REVIEW_JSON` intent extra; iOS callers pass either the raw string or the
+/// decoded array.
+struct ReviewView: View {
 
-    public let questions: [ReviewQuestionItem]
-    @Environment(\.dismiss) private var dismiss
+    let questions: [ReviewQuestionItem]
 
-    @State private var filter: FilterMode = .all
-    @State private var expandedQuestionIds: Set<Int> = []
-
-    public enum FilterMode: String, CaseIterable {
+    /// Correct-only, wrong-only and unfiltered views of the review list. An
+    /// iOS addition — `ReviewScreen` had no filter, it rendered every row.
+    enum FilterMode: String, CaseIterable {
         case all = "All"
         case correct = "Correct"
         case wrong = "Incorrect"
     }
 
-    public init(questions: [ReviewQuestionItem]) {
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var filter: FilterMode = .all
+    /// The `var expanded by remember { mutableStateOf(false) }` of
+    /// `ReviewQuestionCard`, hoisted so one answer stays open as the list scrolls.
+    @State private var expandedQuestionIds: Set<Int> = []
+    /// The row whose "Ask AI" button was last tapped.
+    @State private var askAIItem: ReviewQuestionItem?
+    @State private var errorMessage: String?
+
+    init(questions: [ReviewQuestionItem]) {
         self.questions = questions
+        _errorMessage = State(initialValue: nil)
     }
 
-    public init(reviewJson: String) {
-        guard let data = reviewJson.data(using: .utf8),
+    /// Ports `ReviewActivity.onCreate`'s
+    /// `intent.getStringExtra("REVIEW_JSON") ?: "[]"` followed by the
+    /// `try { Gson().fromJson(...) } catch { emptyList() }` block. A malformed
+    /// payload still renders the empty state; it additionally surfaces an alert
+    /// where Android only printed a stack trace.
+    init(reviewJson: String) {
+        let trimmed = reviewJson.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty,
+              let data = trimmed.data(using: .utf8),
               let decoded = try? JSONDecoder().decode([ReviewQuestionItem].self, from: data) else {
             self.questions = []
+            _errorMessage = State(
+                initialValue: trimmed.isEmpty ? nil : "Review data could not be read."
+            )
             return
         }
         self.questions = decoded
+        _errorMessage = State(initialValue: nil)
     }
 
+    // MARK: - Derived counts
+
     private var totalQuestions: Int { questions.count }
-    private var correctCount: Int { questions.filter { $0.is_correct == 1 }.count }
+    private var correctCount: Int { questions.filter(\.isCorrect).count }
     private var wrongCount: Int { totalQuestions - correctCount }
+
+    /// Ports `(correctAnswers / totalQuestions * 100).toInt()`, guarding the
+    /// divide-by-zero with the Kotlin `if (totalQuestions > 0)` branch.
     private var accuracy: Int {
         guard totalQuestions > 0 else { return 0 }
-        return Int((Double(correctCount) / Double(totalQuestions)) * 100)
+        return Int(Double(correctCount) / Double(totalQuestions) * 100)
     }
 
     private var filteredQuestions: [ReviewQuestionItem] {
@@ -96,19 +204,23 @@ public struct ReviewView: View {
         case .all:
             return questions
         case .correct:
-            return questions.filter { $0.is_correct == 1 }
+            return questions.filter(\.isCorrect)
         case .wrong:
-            return questions.filter { $0.is_correct != 1 }
+            return questions.filter { !$0.isCorrect }
         }
     }
 
-    public var body: some View {
+    // MARK: - Body
+
+    var body: some View {
         ScrollView {
-            VStack(spacing: AppTheme.Spacing.md) {
+            VStack(spacing: AppTheme.Spacing.lg) {
                 summaryHeader
                 filterChips
 
-                if filteredQuestions.isEmpty {
+                if questions.isEmpty {
+                    noReviewDataState
+                } else if filteredQuestions.isEmpty {
                     emptyState
                 } else {
                     LazyVStack(spacing: AppTheme.Spacing.md) {
@@ -118,10 +230,7 @@ public struct ReviewView: View {
                     }
                 }
             }
-            .padding(AppTheme.Spacing.md)
-        .onAppear {
-            RemoteLogger.log(tag: "ReviewView_Open", message: "User opened Exam Question Review screen")
-        }
+            .padding(AppTheme.Spacing.lg)
         }
         .screenBackground()
         .navigationTitle("Review Answers")
@@ -131,283 +240,412 @@ public struct ReviewView: View {
                 Button("Done") { dismiss() }
             }
         }
+        .sheet(item: $askAIItem) { item in
+            if let question = askAIQuestion(for: item) {
+                AskAiSheet(question: question)
+            } else {
+                NavigationStack {
+                    Text("This question cannot be opened in the AI tutor.")
+                        .font(AppTheme.Font.callout)
+                        .foregroundStyle(AppTheme.Palette.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .padding(AppTheme.Spacing.xl)
+                }
+            }
+        }
+        .errorAlert(message: $errorMessage)
+        .onAppear {
+            RemoteLogger.log(tag: "ReviewView_Open", message: "User opened Exam Question Review screen")
+        }
     }
 
-    // MARK: - Summary Header
+    // MARK: - Summary header
+
+    /// Ports the header `Card` of `ReviewScreen`: the title block, the three
+    /// `SummaryMetricCard` tiles and the `Accuracy` progress card.
     private var summaryHeader: some View {
         CardContainer {
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Performance Breakdown")
-                            .font(AppTheme.Font.headline)
-                            .foregroundStyle(Color.white)
-                        Text("Detailed accuracy & rationales")
-                            .font(AppTheme.Font.caption)
-                            .foregroundStyle(AppTheme.Palette.textMuted)
-                    }
-                    Spacer()
-                    Text("\(accuracy)%")
-                        .font(.system(size: 26, weight: .bold, design: .rounded))
-                        .foregroundStyle(accuracy >= 60 ? AppTheme.Palette.success : AppTheme.Palette.warning)
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
+                    Text("Review Answers")
+                        .font(AppTheme.Font.title)
+                        .foregroundStyle(AppTheme.Palette.textPrimary)
+                    Text("Detailed performance analysis")
+                        .font(AppTheme.Font.caption)
+                        .foregroundStyle(AppTheme.Palette.textMuted)
                 }
 
-                // Progress Bar
-                GeometryReader { geo in
-                    ZStack(alignment: .leading) {
-                        Capsule()
-                            .fill(Color(white: 0.2))
-                        Capsule()
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color(hex: "06B6D4"), Color(hex: "3B82F6")],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .frame(width: geo.size.width * CGFloat(Double(accuracy) / 100.0))
-                    }
-                }
-                .frame(height: 8)
-                .padding(.vertical, 4)
+                ProgressRow(
+                    title: "Accuracy",
+                    value: Double(accuracy) / 100.0,
+                    tint: AppTheme.Palette.info,
+                    caption: "\(accuracy)%"
+                )
 
-                // 3 Metric Tiles
                 HStack(spacing: AppTheme.Spacing.sm) {
-                    metricTile(title: "Correct", count: correctCount, color: AppTheme.Palette.success)
-                    metricTile(title: "Wrong", count: wrongCount, color: AppTheme.Palette.error)
-                    metricTile(title: "Total", count: totalQuestions, color: AppTheme.Palette.primary)
+                    metricTile(title: "Correct", count: correctCount, tint: AppTheme.Palette.success)
+                    metricTile(title: "Wrong", count: wrongCount, tint: AppTheme.Palette.error)
+                    metricTile(title: "Total", count: totalQuestions, tint: AppTheme.Palette.primary)
                 }
             }
         }
     }
 
-    private func metricTile(title: String, count: Int, color: Color) -> some View {
-        VStack(spacing: 2) {
+    /// Ports `SummaryMetricCard`: the tallied value over its label, tinted per
+    /// outcome. Android filled the tile with a flat literal per role; here the
+    /// role colour is the theme token.
+    private func metricTile(title: String, count: Int, tint: Color) -> some View {
+        VStack(spacing: AppTheme.Spacing.xxs) {
             Text("\(count)")
-                .font(.system(size: 20, weight: .black))
-                .foregroundStyle(Color.white)
+                .font(AppTheme.Font.title2)
+                .foregroundStyle(AppTheme.Palette.textPrimary)
             Text(title)
-                .font(AppTheme.Font.caption2)
-                .foregroundStyle(Color.white.opacity(0.8))
+                .font(AppTheme.Font.micro)
+                .foregroundStyle(AppTheme.Palette.textSecondary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 8)
+        .padding(.vertical, AppTheme.Spacing.md)
         .background(
-            RoundedRectangle(cornerRadius: AppTheme.Radius.sm)
-                .fill(color.opacity(0.35))
+            RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
+                .fill(tint.opacity(0.18))
                 .overlay(
-                    RoundedRectangle(cornerRadius: AppTheme.Radius.sm)
-                        .stroke(color.opacity(0.6), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
+                        .stroke(tint.opacity(0.55), lineWidth: 1)
                 )
         )
     }
 
     // MARK: - Filters
+
     private var filterChips: some View {
         HStack(spacing: AppTheme.Spacing.sm) {
             ForEach(FilterMode.allCases, id: \.self) { mode in
                 let isSelected = filter == mode
                 Button {
-                    filter == mode ? () : (filter = mode)
+                    if filter != mode { filter = mode }
                 } label: {
                     Text(mode.rawValue)
                         .font(AppTheme.Font.caption.weight(.semibold))
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 7)
+                        .padding(.horizontal, AppTheme.Spacing.md)
+                        .padding(.vertical, AppTheme.Spacing.sm)
                         .background(
-                            Capsule().fill(isSelected ? AppTheme.Palette.primary : AppTheme.Palette.cardBackgroundElevated)
+                            Capsule().fill(
+                                isSelected
+                                    ? AppTheme.Palette.primary
+                                    : AppTheme.Palette.cardBackgroundElevated
+                            )
                         )
-                        .foregroundStyle(isSelected ? Color.white : AppTheme.Palette.textSecondary)
+                        .foregroundStyle(
+                            isSelected ? AppTheme.Palette.onPrimary : AppTheme.Palette.textSecondary
+                        )
                 }
+                .buttonStyle(.plain)
             }
-            Spacer()
+            Spacer(minLength: 0)
         }
     }
 
-    // MARK: - Question Card
+    // MARK: - Question card
+
+    /// Ports `ReviewQuestionCard` from `ReviewActivity.kt`: the verdict header,
+    /// the stem, the optional clinical image and the two answer boxes are always
+    /// visible; the option list, explanation and Ask AI button sit inside the
+    /// `AnimatedVisibility(visible = expanded)` block.
     private func questionCard(index: Int, item: ReviewQuestionItem) -> some View {
-        let isCorrect = item.is_correct == 1
         let isExpanded = expandedQuestionIds.contains(item.id)
 
         return CardContainer {
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-                // Header row
-                HStack(alignment: .center, spacing: AppTheme.Spacing.sm) {
-                    ZStack {
-                        Circle()
-                            .fill(isCorrect ? AppTheme.Palette.success : AppTheme.Palette.error)
-                            .frame(width: 28, height: 28)
-                        Text("\(index)")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(Color.white)
-                    }
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                questionHeader(index: index, item: item, isExpanded: isExpanded)
 
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(isCorrect ? "Correct" : "Incorrect")
-                            .font(AppTheme.Font.callout.weight(.bold))
-                            .foregroundStyle(isCorrect ? AppTheme.Palette.success : AppTheme.Palette.error)
-                        if item.score_change != 0 {
-                            Text("\(item.score_change > 0 ? "+" : "")\(item.score_change) pts")
-                                .font(AppTheme.Font.caption2)
-                                .foregroundStyle(AppTheme.Palette.textMuted)
-                        }
-                    }
-
-                    Spacer()
-
-                    Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(isCorrect ? AppTheme.Palette.success : AppTheme.Palette.error)
-                }
-
-                // Question text
                 Text(item.question)
-                    .font(AppTheme.Font.body.weight(.medium))
+                    .font(AppTheme.Font.body.weight(.bold))
                     .foregroundStyle(AppTheme.Palette.textPrimary)
-                    .padding(.top, 4)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                // Optional clinical image
-                if !item.image_url.isEmpty {
-                    AsyncImage(url: URL(string: item.image_url.hasPrefix("http") ? item.image_url : "https://medigyaan.com/Neurons/\(item.image_url)")) { phase in
-                        switch phase {
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .scaledToFit()
-                                .frame(maxHeight: 180)
-                                .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
-                        case .failure:
-                            EmptyView()
-                        default:
-                            ProgressView()
-                                .frame(height: 100)
-                        }
-                    }
-                }
+                questionImage(for: item)
 
-                // Options list
-                VStack(spacing: 6) {
-                    optionRow(label: "A", text: item.option_a, item: item)
-                    optionRow(label: "B", text: item.option_b, item: item)
-                    optionRow(label: "C", text: item.option_c, item: item)
-                    optionRow(label: "D", text: item.option_d, item: item)
-                    if !item.option_e.isEmpty {
-                        optionRow(label: "E", text: item.option_e, item: item)
-                    }
-                }
-                .padding(.top, 4)
+                answerBox(
+                    title: "Your Answer",
+                    answer: item.yourAnswerLine,
+                    tint: item.isCorrect ? AppTheme.Palette.success : AppTheme.Palette.danger
+                )
 
-                // Explanation / Rationale section
-                if !item.explanation.isEmpty {
-                    Divider()
-                        .padding(.vertical, 4)
+                answerBox(
+                    title: "Correct Answer",
+                    answer: item.correctAnswerLine,
+                    tint: AppTheme.Palette.success
+                )
 
-                    Button {
-                        if isExpanded {
-                            expandedQuestionIds.remove(item.id)
-                        } else {
-                            expandedQuestionIds.insert(item.id)
-                        }
-                    } label: {
-                        HStack {
-                            Image(systemName: "lightbulb.fill")
-                                .foregroundStyle(AppTheme.Palette.accent)
-                            Text("Clinical Explanation")
-                                .font(AppTheme.Font.caption.weight(.semibold))
-                                .foregroundStyle(AppTheme.Palette.accent)
-                            Spacer()
-                            Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                                .font(.caption)
-                                .foregroundStyle(AppTheme.Palette.textMuted)
-                        }
-                    }
-
-                    if isExpanded {
-                        Text(item.explanation)
-                            .font(AppTheme.Font.caption)
-                            .foregroundStyle(AppTheme.Palette.textSecondary)
-                            .padding(AppTheme.Spacing.sm)
-                            .background(
-                                RoundedRectangle(cornerRadius: AppTheme.Radius.sm)
-                                    .fill(Color.white.opacity(0.04))
-                            )
-                            .transition(.opacity.combined(with: .move(edge: .top)))
-                    }
+                if isExpanded {
+                    expandedSection(for: item)
                 }
             }
         }
     }
 
-    private func optionRow(label: String, text: String, item: ReviewQuestionItem) -> some View {
-        guard !text.isEmpty else { return AnyView(EmptyView()) }
+    /// Ports the header `Row` of `ReviewQuestionCard`: the index badge, the
+    /// verdict with its score delta, and the chevron that drives `expanded`.
+    private func questionHeader(index: Int, item: ReviewQuestionItem, isExpanded: Bool) -> some View {
+        let tint = item.isCorrect ? AppTheme.Palette.success : AppTheme.Palette.danger
 
-        let normalizedCorrect = item.correct_option.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        let normalizedUser = item.selected_option.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        return HStack(alignment: .center, spacing: AppTheme.Spacing.md) {
+            Text("\(index)")
+                .font(AppTheme.Font.callout.weight(.bold))
+                .foregroundStyle(AppTheme.Palette.textPrimary)
+                .frame(width: 42, height: 42)
+                .background(
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
+                        .fill(tint)
+                )
 
-        let isTargetCorrect = (normalizedCorrect == label)
-        let isUserChoice = (normalizedUser == label)
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
+                Text(item.verdictTitle)
+                    .font(AppTheme.Font.callout.weight(.bold))
+                    .foregroundStyle(tint)
+                Text(item.scoreLine)
+                    .font(AppTheme.Font.caption2)
+                    .foregroundStyle(AppTheme.Palette.textMuted)
+            }
 
-        var borderCol: Color = Color.clear
-        var bgCol: Color = Color.white.opacity(0.03)
+            Spacer(minLength: 0)
 
-        if isTargetCorrect {
-            borderCol = AppTheme.Palette.success
-            bgCol = AppTheme.Palette.success.opacity(0.15)
-        } else if isUserChoice && !isTargetCorrect {
-            borderCol = AppTheme.Palette.error
-            bgCol = AppTheme.Palette.error.opacity(0.15)
-        }
-
-        return AnyView(
-            HStack(spacing: AppTheme.Spacing.sm) {
-                Text(label)
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(isTargetCorrect ? AppTheme.Palette.success : (isUserChoice ? AppTheme.Palette.error : AppTheme.Palette.textSecondary))
-                    .frame(width: 24, height: 24)
-                    .background(
-                        Circle().fill(Color.white.opacity(0.08))
-                    )
-
-                Text(text)
-                    .font(AppTheme.Font.caption)
+            Button {
+                toggleExpansion(for: item)
+            } label: {
+                Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                    .font(AppTheme.Font.callout.weight(.bold))
                     .foregroundStyle(AppTheme.Palette.textPrimary)
+                    .frame(width: 32, height: 32)
+                    .background(Circle().fill(AppTheme.Palette.cardBackgroundElevated))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(isExpanded ? "Collapse options" : "Expand options")
+        }
+    }
 
-                Spacer()
-
-                if isTargetCorrect {
-                    Image(systemName: "checkmark")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(AppTheme.Palette.success)
-                } else if isUserChoice {
-                    Image(systemName: "xmark")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(AppTheme.Palette.error)
+    /// Ports the `AsyncImage` block of `ReviewQuestionCard`. Coil's crossfade
+    /// and `ContentScale.Crop` become SwiftUI's built-in `AsyncImage` plus
+    /// `scaledToFill`; the fixed height is kept so a tall figure cannot push the
+    /// answer boxes off screen.
+    @ViewBuilder
+    private func questionImage(for item: ReviewQuestionItem) -> some View {
+        if let url = item.resolvedImageURL {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 200)
+                        .clipped()
+                        .clipShape(
+                            RoundedRectangle(cornerRadius: AppTheme.Radius.lg, style: .continuous)
+                        )
+                case .failure:
+                    EmptyView()
+                default:
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 200)
                 }
             }
-            .padding(.horizontal, AppTheme.Spacing.sm)
-            .padding(.vertical, 8)
-            .background(
-                RoundedRectangle(cornerRadius: AppTheme.Radius.sm)
-                    .fill(bgCol)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: AppTheme.Radius.sm)
-                            .stroke(borderCol, lineWidth: borderCol == .clear ? 0 : 1.5)
-                    )
-            )
+        }
+    }
+
+    /// Ports `ReviewAnswerBox`: a rounded block with a translucent caption above
+    /// the semi-bold answer line, whose height follows the text
+    /// (`overflow = TextOverflow.Visible`).
+    private func answerBox(title: String, answer: String, tint: Color) -> some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+            Text(title)
+                .font(AppTheme.Font.caption2.weight(.bold))
+                .foregroundStyle(AppTheme.Palette.textPrimary.opacity(0.7))
+            Text(answer)
+                .font(AppTheme.Font.callout.weight(.semibold))
+                .foregroundStyle(AppTheme.Palette.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(AppTheme.Spacing.md)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.materialCard, style: .continuous)
+                .fill(tint.opacity(0.22))
         )
     }
 
+    /// Ports the `AnimatedVisibility(visible = expanded)` block: "All Options",
+    /// the explanation card and the Ask AI button.
+    private func expandedSection(for item: ReviewQuestionItem) -> some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+            Text("All Options")
+                .font(AppTheme.Font.callout.weight(.bold))
+                .foregroundStyle(AppTheme.Palette.textPrimary)
+
+            VStack(spacing: AppTheme.Spacing.xs) {
+                ForEach(item.optionPairs) { option in
+                    optionRow(option: option, item: item)
+                }
+            }
+
+            if !item.explanation.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                explanationCard(item.explanation)
+            }
+
+            askAIButton(for: item)
+        }
+        .transition(.opacity.combined(with: .move(edge: .top)))
+    }
+
+    /// Ports the per-option `Row` of `ReviewQuestionCard`. The correct key wins
+    /// first; a selected key that is not the correct one is marked wrong;
+    /// everything else stays neutral.
+    @ViewBuilder
+    private func optionRow(option: ReviewQuestionItem.ReviewOption, item: ReviewQuestionItem) -> some View {
+        let correctKey = item.correct_option.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        let selectedKey = item.selected_option.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        let isCorrectOption = option.key == correctKey
+        let isPickedWrong = option.key == selectedKey && option.key != correctKey
+        let tint = isCorrectOption
+            ? AppTheme.Palette.success
+            : (isPickedWrong ? AppTheme.Palette.danger : AppTheme.Palette.cardBackgroundElevated)
+
+        HStack(alignment: .center, spacing: AppTheme.Spacing.md) {
+            Text(option.key)
+                .font(AppTheme.Font.caption.weight(.bold))
+                .foregroundStyle(AppTheme.Palette.textPrimary)
+                .frame(width: 30, height: 30)
+                .background(Circle().fill(AppTheme.Palette.textPrimary.opacity(0.12)))
+
+            Text(option.text)
+                .font(AppTheme.Font.callout)
+                .foregroundStyle(AppTheme.Palette.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer(minLength: 0)
+
+            if isCorrectOption {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(AppTheme.Palette.success)
+            } else if isPickedWrong {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(AppTheme.Palette.warning)
+            }
+        }
+        .padding(AppTheme.Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .fill(tint.opacity(0.35))
+        )
+        .animation(.spring(response: 0.35, dampingFraction: 0.6), value: tint)
+    }
+
+    /// Ports the `Explanation` card nested inside the expanded section.
+    private func explanationCard(_ explanation: String) -> some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+            Text("Explanation")
+                .font(AppTheme.Font.callout.weight(.bold))
+                .foregroundStyle(AppTheme.Palette.textPrimary)
+            Text(explanation)
+                .font(AppTheme.Font.callout)
+                .foregroundStyle(AppTheme.Palette.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(AppTheme.Spacing.lg)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.materialCard, style: .continuous)
+                .fill(AppTheme.Palette.cardBackgroundElevated)
+        )
+    }
+
+    /// Ports the "💬 Ask AI Medical Tutor" `Button`. Android handed
+    /// `AiChatDialogHelper.openAskAiDialog` the question id, stem, A..D options,
+    /// the resolved correct answer and the explanation; iOS opens the ported
+    /// ``AskAiSheet``. The empty-stem guard is the same Toast Kotlin raised
+    /// ("No question available"), surfaced here as an alert.
+    private func askAIButton(for item: ReviewQuestionItem) -> some View {
+        Button {
+            guard !item.question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                errorMessage = "No question available"
+                return
+            }
+            askAIItem = item
+        } label: {
+            Text("💬 Ask AI Medical Tutor")
+                .font(AppTheme.Font.callout.weight(.bold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, AppTheme.Spacing.md)
+                .background(
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.option, style: .continuous)
+                        .fill(AppTheme.Palette.primary)
+                )
+                .foregroundStyle(AppTheme.Palette.onPrimary)
+        }
+        .buttonStyle(.plain)
+    }
+
+    /// Ports the `AiChatDialogHelper.openAskAiDialog(questionId, question,
+    /// options, correctAnswer, explanation)` payload. ``AskAiSheet`` takes a
+    /// ``Question``, so the flat review row is re-shaped into the backend's
+    /// question payload — including Android's A..D-only option list — and run
+    /// through ``Question``'s own lenient decoder.
+    private func askAIQuestion(for item: ReviewQuestionItem) -> Question? {
+        var payload: [String: Any] = [
+            "question_id": item.question_id,
+            "question": item.question,
+            "options": item.askAIOptions,
+            "correct_option": item.correct_option,
+            "explanation": item.explanation.isEmpty ? item.correct_answer_text : item.explanation
+        ]
+        if let imageURL = item.resolvedImageURL, let absolute = imageURL.absoluteString {
+            payload["image_url"] = absolute
+        }
+        guard let data = try? JSONSerialization.data(withJSONObject: payload) else { return nil }
+        return try? JSONDecoder().decode(Question.self, from: data)
+    }
+
+    // MARK: - State
+
+    private func toggleExpansion(for item: ReviewQuestionItem) {
+        if expandedQuestionIds.contains(item.id) {
+            expandedQuestionIds.remove(item.id)
+        } else {
+            expandedQuestionIds.insert(item.id)
+        }
+    }
+
+    // MARK: - Empty states
+
+    /// Ports the `if (reviewList.isEmpty())` branch of `ReviewScreen`.
+    private var noReviewDataState: some View {
+        CardContainer {
+            VStack(spacing: AppTheme.Spacing.sm) {
+                Text("No Review Data Found")
+                    .font(AppTheme.Font.title3)
+                    .foregroundStyle(AppTheme.Palette.textPrimary)
+                Text("Questions you attempt will appear here.")
+                    .font(AppTheme.Font.caption)
+                    .foregroundStyle(AppTheme.Palette.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(AppTheme.Spacing.xxl)
+        }
+    }
+
+    /// Reached only when the filter hides every row — an iOS addition.
     private var emptyState: some View {
         VStack(spacing: AppTheme.Spacing.sm) {
-            Image(systemName: "checkmark.seal")
-                .font(.system(size: 48))
+            Image(systemName: "line.3.horizontal.decrease.circle")
+                .font(.system(size: 34))
                 .foregroundStyle(AppTheme.Palette.textMuted)
-                .padding(.top, 40)
+                .padding(.top, AppTheme.Spacing.xxl)
             Text("No questions in this filter")
                 .font(AppTheme.Font.headline)
                 .foregroundStyle(AppTheme.Palette.textPrimary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 30)
+        .padding(.vertical, AppTheme.Spacing.xxl)
     }
 }
