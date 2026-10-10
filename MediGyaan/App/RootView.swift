@@ -21,7 +21,7 @@ struct RootView: View {
                 }
                 .transition(.opacity)
             } else if route == .onboarding || !OnboardingView.hasCompletedOnboarding {
-                OnboardingView { _ in
+                OnboardingView {
                     route = .login
                 }
                 .transition(.opacity)

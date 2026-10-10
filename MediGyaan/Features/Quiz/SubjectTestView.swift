@@ -420,7 +420,7 @@ final class SubjectTestViewModel: ObservableObject {
 
     /// The four powers in Android's button order (`btnConfuse`, `btnShock`,
     /// `btnShield`, `btnAdrenaline` — slot 1 through slot 4).
-    private var loadout: [SubjectTestPowerSlot] {
+    var loadout: [SubjectTestPowerSlot] {
         guard let kit = heroKit else { return [] }
         return [
             SubjectTestPowerSlot(
@@ -798,7 +798,7 @@ struct SubjectTestView: View {
 
     init(launch: SubjectTestSession = SubjectTestSession()) {
         self.launch = launch
-        _viewModel = StateObject(wrappedValue: SubjectTestViewModel(session: launch))
+        _viewModel = StateObject(wrappedValue: SubjectTestViewModel(launch: launch))
     }
 
     var body: some View {

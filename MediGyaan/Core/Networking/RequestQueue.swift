@@ -105,9 +105,9 @@ final class RequestQueue {
         /// The `URLSessionTask` priority value this level corresponds to.
         var sessionPriority: Float {
             switch self {
-            case .highest, .high: return URLSessionTask.priorityHigh
-            case .normal: return URLSessionTask.priorityDefault
-            case .low, .lowest: return URLSessionTask.priorityLow
+            case .highest, .high: return URLSessionTask.highPriority
+            case .normal: return URLSessionTask.defaultPriority
+            case .low, .lowest: return URLSessionTask.lowPriority
             }
         }
     }
@@ -200,7 +200,7 @@ final class RequestQueue {
         token.attach { work.cancel() }
 
         return try await withTaskCancellationHandler {
-            try await work.value()
+            try await work.value
         } onCancel: {
             token.cancel()
         }

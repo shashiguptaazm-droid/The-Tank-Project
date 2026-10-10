@@ -540,7 +540,9 @@ private struct SplashMatrixOverlay: View {
     }
 
     private func glyph(column: Int, row: Int) -> String {
-        let seed = column * 7 + row * 13 + Int(progress * Self.columnCount * Self.rowCount * 0.05)
+        let base = column * 7 + row * 13
+        let offset = Int(Double(progress) * Double(Self.columnCount * Self.rowCount) * 0.05)
+        let seed = base + offset
         let index = abs(seed) % Self.glyphs.count
         return String(Self.glyphs[index])
     }
@@ -822,7 +824,7 @@ struct SplashView: View {
 
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 800_000_000)
-            UIImpactFeedbackGenerator(style: .keyboard).impactOccurred()
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
         }
 
         withAnimation(.easeOut(duration: 0.8).delay(0.2)) { isTitleVisible = true }

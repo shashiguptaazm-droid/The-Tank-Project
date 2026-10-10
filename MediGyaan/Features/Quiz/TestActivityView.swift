@@ -695,7 +695,7 @@ final class TestActivityViewModel: ObservableObject {
         }
         intelCharges -= 1
         if isChallenge {
-            applyDamageToOpponent(Self.intelDamage)
+            applyDamage(toOpponent: Self.intelDamage)
             showFloating("INTEL STRIKE: \(Self.intelDamage) DMG", color: AppTheme.Palette.accent)
             combatTicker = "👁️ Optical Intel scan locked onto rival (\(opponentName)) dealing \(Self.intelDamage) DMG!"
         } else {

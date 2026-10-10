@@ -326,12 +326,13 @@ private enum RegisterCollegeDirectory {
     /// or on any of its words starting with the query; at most 20 rows.
     static func matches(query: String) -> [String] {
         let needle = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard needle.count >= 3 else { return [] }
+        let lowerNeedle = needle.lowercased()
         return Array(index.filter { college in
-            if college.range(of: needle, options: [.caseInsensitive]) != nil { return true }
-            return college
+            let lowerCollege = college.lowercased()
+            if lowerCollege.contains(lowerNeedle) { return true }
+            return lowerCollege
                 .split(separator: " ")
-                .contains { $0.hasPrefix(needle, options: [.caseInsensitive]) }
+                .contains { $0.hasPrefix(lowerNeedle) }
         }.prefix(20))
     }
 

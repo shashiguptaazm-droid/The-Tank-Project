@@ -598,8 +598,8 @@ struct ReviewView: View {
             "correct_option": item.correct_option,
             "explanation": item.explanation.isEmpty ? item.correct_answer_text : item.explanation
         ]
-        if let imageURL = item.resolvedImageURL, let absolute = imageURL.absoluteString {
-            payload["image_url"] = absolute
+        if let imageURL = item.resolvedImageURL {
+            payload["image_url"] = imageURL.absoluteString
         }
         guard let data = try? JSONSerialization.data(withJSONObject: payload) else { return nil }
         return try? JSONDecoder().decode(Question.self, from: data)
