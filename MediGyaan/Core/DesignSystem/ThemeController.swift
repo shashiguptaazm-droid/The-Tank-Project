@@ -154,8 +154,12 @@ final class ThemeController: ObservableObject {
             mode = .light
         }
 
-        self.defaultsObserver = nil
+        // Observer registration is deferred so the capturing closure is
+        // created only after all stored properties are initialized.
+        setupDefaultsObserver()
+    }
 
+    private func setupDefaultsObserver() {
         defaultsObserver = NotificationCenter.default.addObserver(
             forName: UserDefaults.didChangeNotification,
             object: store,
