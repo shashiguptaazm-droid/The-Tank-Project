@@ -1,4 +1,5 @@
 import Foundation
+import CoreFoundation
 
 // MARK: - Direct provider chat completion
 //
