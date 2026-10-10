@@ -10,12 +10,13 @@ import SwiftData
 @MainActor @Observable
 final class SessionStore {
     static func makeContainer() throws -> ModelContainer {
-        // SwiftData's ModelContainer(for:) 'no exact matches' with a
-        // schema-d ModelConfiguration on strict concurrency. Use the plain
-        // configuration + [[Model]] static creator instead — unambiguous.
-        let config: ModelConfiguration = ModelConfiguration(isStoredInMemoryOnly: false)
-        let container: ModelContainer = try ModelContainer(
-            for: WorkoutSessionRecord.self, configurations: [config])
+        // SwiftData: ModelConfiguration(schema:…) + ModelContainer(for: config)
+        // is the unambiguous typed init path. Schemas are embedded in the config
+        // here so the variadic/array-switching inits don't get involved.
+        let schema: Schema = Schema([WorkoutSessionRecord.self])
+        let config: ModelConfiguration = ModelConfiguration(schema: schema,
+                                                            isStoredInMemoryOnly: false)
+        let container: ModelContainer = try ModelContainer(for: config)
         return container
     }
 
@@ -72,13 +73,13 @@ final class SessionStore {
         return records.compactMap { $0.toSession() }
     }
 
-    func sessions(in interval: Interval) -> [WorkoutSession] {
-        fetchAll().filter { $0.startedAt >= interval.start && $0.startedAt <= interval.end }
-    }
-
     struct Interval {
         let start: Date
         let end: Date
+    }
+
+    func sessions(in interval: Interval) -> [WorkoutSession] {
+        fetchAll().filter { $0.startedAt >= interval.start && $0.startedAt <= interval.end }
     }
 
     // MARK: Writes
