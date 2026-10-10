@@ -65,9 +65,9 @@ private struct CallRoomContent: View {
             case let .ended(reason):
                 endedView(reason: reason)
             }
+        }
         .onAppear {
             RemoteLogger.log(tag: "CallView_Active", message: "Active call screen appeared")
-        }
         }
         .preferredColorScheme(.dark)
         .onChange(of: model.phase) { phase in
