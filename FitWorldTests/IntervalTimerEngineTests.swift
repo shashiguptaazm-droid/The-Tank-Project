@@ -19,8 +19,9 @@ final class IntervalTimerEngineTests: XCTestCase {
         let expected = 5 - 2
         let afterTwoSeconds = expectation(description: "after 2 s")
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            XCTAssertEqual(engine.snapshot.secondsRemaining, expected,
-                           accuracy: 1, "Countdown must be wall-clock anchored")
+            // XCTest's accuracy assertion is FloatingPoint-only; compare as Double.
+            XCTAssertEqual(Double(engine.snapshot.secondsRemaining), Double(expected),
+                           accuracy: 1.0, "Countdown must be wall-clock anchored")
             engine.stop()
             afterTwoSeconds.fulfill()
         }
