@@ -41,12 +41,14 @@ struct ProgramDetailView: View {
     @Environment(ContentStore.self) private var content
     let program: Program
 
+    private func weekTitle(_ week: Program.ProgramWeek) -> String {
+        week.isDeload ? "Week \(week.weekIndex) (deload)" : "Week \(week.weekIndex)"
+    }
+
     var body: some View {
         List {
             ForEach(program.weeks, id: \.weekIndex) { week in
-                Section(week.isDeload
-                        ? "Week \(week.weekIndex) (deload)"
-                        : "Week \(week.weekIndex)") {
+                Section(weekTitle(week)) {
                     ForEach(week.days) { day in
                         HStack {
                             Text("Day \(day.dayIndex)")

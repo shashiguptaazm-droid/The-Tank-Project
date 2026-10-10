@@ -27,7 +27,9 @@ final class AppModel {
     private(set) var sessionStore: SessionStore?
 
     /// Called once from the root view's .task (main actor): load bundled seed
-    /// content and create the SwiftData session container.
+    /// content and create the SwiftData session container. SessionStore is
+    /// @MainActor, so bootstrap itself must be main-actor isolated.
+    @MainActor
     func bootstrap() {
         if !exercisesLoaded {
             try? contentStore.loadBundledContent()
@@ -38,7 +40,7 @@ final class AppModel {
         }
     }
 
-    private var exercisesLoaded = false
+    @ObservationIgnored private var exercisesLoaded = false
 
     func completeOnboarding() {
         profileStore.markOnboardingComplete()

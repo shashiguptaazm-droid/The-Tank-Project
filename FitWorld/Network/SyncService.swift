@@ -41,6 +41,8 @@ final class SyncService {
     }
 
     /// Push unsynced local sessions then pull anything newer than lastSync.
+    /// SessionStore (provider) is @MainActor — hop on the main actor first.
+    @MainActor
     func syncNow() async {
         guard !isSyncing else { return }
         guard let store = sessionStoreProvider() else { return }
@@ -48,7 +50,7 @@ final class SyncService {
         defer { isSyncing = false }
 
         do {
-            let local = await MainActor.run { store.fetchAll() }
+            let local = store.fetchAll()
             let outgoing = local.compactMap { session -> SyncSessionDTO? in
                 guard session.endedAt != nil else { return nil } // never push partials
                 return SyncSessionDTO(id: session.id,
@@ -76,7 +78,7 @@ final class SyncService {
                                             endedAt: dto.endedAt,
                                             entries: dto.entries,
                                             feel: dto.feel)
-                await MainActor.run { store.save(domain) } // SessionStore is @MainActor
+                store.save(domain)
             }
             lastSyncAt = Date()
             lastError = nil

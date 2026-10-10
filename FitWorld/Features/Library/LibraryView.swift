@@ -51,10 +51,15 @@ struct LibraryView: View {
 
     private var matchingSearch: Bool { !filter.searchText.isEmpty }
 
+    private var sectionTitle: String {
+        let results = content.filteredExercises(filter)
+        return (matchingSearch || !filter.isEmpty) ? "Results (\(results.count))" : "Popular"
+    }
+
     @ViewBuilder
     private var resultsSection: some View {
         let results = content.filteredExercises(filter)
-        Section(matchingSearch || !filter.isEmpty ? "Results (\(results.count))" : "Popular") {
+        Section(sectionTitle) {
             if results.isEmpty {
                 Text(matchingSearch ? "No matches. Try another term." : "Start typing to search the library.")
                     .foregroundStyle(.secondary)
