@@ -141,13 +141,11 @@ struct WorkoutPlayerView: View {
         session.entries.append(entry)
     }
 
-    /// Main-actor-isolated SwiftData container can't be created in a sync init;
-    /// created lazily on the main actor right before the first save.
+    /// SwiftData container is main-actor only; created lazily right before the
+    /// first save. All view lifecycle paths that call this are main-actor.
     private func sessionStoreRef() -> SessionStore? {
         if sessionStoreLazy == nil, let container = try? SessionStore.makeContainer() {
-            let store = SessionStore(container: container)
-            store.prime()
-            sessionStoreLazy = store
+            sessionStoreLazy = SessionStore(container: container)
         }
         return sessionStoreLazy
     }

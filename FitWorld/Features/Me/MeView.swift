@@ -17,12 +17,11 @@ struct MeView: View {
             }
             .navigationTitle("Me")
             .onAppear {
+                // SessionStore is @MainActor; onAppear is already main-actor.
                 if sessionStore == nil {
                     let container = try? SessionStore.makeContainer()
                     if let container {
-                        let store = SessionStore(container: container)
-                        store.prime()
-                        sessionStore = store
+                        sessionStore = SessionStore(container: container)
                     }
                 }
             }
@@ -38,27 +37,38 @@ struct MeView: View {
             if let store = sessionStore {
                 LabeledContent("Current streak",
                                value: "\(store.currentStreak) days")
-                let sessions = store.fetchAll()
-                if sessions.isEmpty {
-                    Text("Completed workouts will appear here.")
-                        .foregroundStyle(.secondary)
-                } else {
-                    ForEach(sessions.prefix(10)) { session in
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(session.workoutName).font(.subheadline)
-                            HStack {
-                                Text(session.startedAt, style: .date)
-                                if let d = session.duration {
-                                    Text("· \(Int(d / 60)) min")
-                                }
-                                Text("· \(session.completedSets) sets")
-                            }
-                            .font(.caption).foregroundStyle(.secondary)
+                historyRows(store: store)
+            } else {
+                Text("Loading history…")
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    /// Extracted so the if-let/else structure above stays a plain @ViewBuilder;
+    /// mixing `let` statements between rows inside a Section is what trips
+    /// "type '()' cannot conform to 'View'" in Swift 6 strict view building.
+    @ViewBuilder
+    private func historyRows(store: SessionStore) -> some View {
+        let sessions = store.fetchAll()
+        if sessions.isEmpty {
+            Text("Completed workouts will appear here.")
+                .foregroundStyle(.secondary)
+        } else {
+            ForEach(sessions.prefix(10)) { session in
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(session.workoutName).font(.subheadline)
+                    HStack {
+                        Text(session.startedAt, style: .date)
+                        if let d = session.duration {
+                            Text("· \(Int(d / 60)) min")
                         }
+                        Text("· \(session.completedSets) sets")
                     }
-                    NavigationLink("See all") { HistoryDetailView(store: store) }
+                    .font(.caption).foregroundStyle(.secondary)
                 }
             }
+            NavigationLink("See all") { HistoryDetailView(store: store) }
         }
     }
 

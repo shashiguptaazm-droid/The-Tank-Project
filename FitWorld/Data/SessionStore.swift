@@ -4,9 +4,11 @@ import SwiftData
 
 /// Persists executed workouts locally. Writes complete before any network
 /// activity is attempted — losing a workout to a network error is a bug (§22).
-@Observable
+/// Whole class is main-actor-isolated: SwiftData containers/contexts are
+/// main-actor-only in Swift 6 concurrency, and every UI caller is on the main
+/// actor anyway (View lifecycle, sheet dismissals, subscriptions).
+@MainActor @Observable
 final class SessionStore {
-    @MainActor
     static func makeContainer() throws -> ModelContainer {
         let schema = Schema([WorkoutSessionRecord.self])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
@@ -19,12 +21,6 @@ final class SessionStore {
 
     init(container: ModelContainer) {
         self.container = container
-    }
-
-    /// Main-actor entry point after creating the store from a View (View
-    /// lifecycle is already main-actor, so this is safe there).
-    @MainActor
-    func prime() {
         recomputeDaysActive()
     }
 
@@ -64,7 +60,6 @@ final class SessionStore {
 
     // MARK: Queries
 
-    @MainActor
     func fetchAll() -> [WorkoutSession] {
         let context = container.mainContext
         let descriptor = FetchDescriptor<WorkoutSessionRecord>(
@@ -73,7 +68,6 @@ final class SessionStore {
         return records.compactMap { $0.toSession() }
     }
 
-    @MainActor
     func sessions(in interval: Interval) -> [WorkoutSession] {
         fetchAll().filter { $0.startedAt >= interval.start && $0.startedAt <= interval.end }
     }
@@ -85,7 +79,6 @@ final class SessionStore {
 
     // MARK: Writes
 
-    @MainActor
     func save(_ session: WorkoutSession) {
         let context = container.mainContext
         let existing = try? context.fetch(descriptor(for: session.id)).first
@@ -104,7 +97,6 @@ final class SessionStore {
         FetchDescriptor(predicate: #Predicate { $0.sessionID == id })
     }
 
-    @MainActor
     func delete(sessionID: UUID) {
         let context = container.mainContext
         if let record = try? context.fetch(descriptor(for: sessionID)).first {
@@ -116,7 +108,6 @@ final class SessionStore {
 
     // MARK: Derived
 
-    @MainActor
     private func recomputeDaysActive() {
         var set: Set<CalendarDay> = []
         for session in fetchAll() where session.endedAt != nil {

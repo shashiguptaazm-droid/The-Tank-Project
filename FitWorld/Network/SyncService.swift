@@ -59,8 +59,11 @@ final class SyncService {
                                       feel: session.feel)
             }
             if !outgoing.isEmpty {
-                let _: SyncPushResponse = try await apiClient.post(
-                    "api/v1/sync/sessions", body: outgoing)
+                // Annotate the body's generic type explicitly at the call site:
+                // `let _: … = post(body:)` makes Swift fail to infer B.
+                let response: SyncPushResponse = try await apiClient.post(
+                    "api/v1/sync/sessions", body: outgoing as [SyncSessionDTO])
+                _ = response
             }
 
             let since = lastSyncAt.map { [URLQueryItem(name: "since", value: ISO8601DateFormatter().string(from: $0))] } ?? []
@@ -73,7 +76,7 @@ final class SyncService {
                                             endedAt: dto.endedAt,
                                             entries: dto.entries,
                                             feel: dto.feel)
-                await MainActor.run { store.save(domain) }
+                await MainActor.run { store.save(domain) } // SessionStore is @MainActor
             }
             lastSyncAt = Date()
             lastError = nil
