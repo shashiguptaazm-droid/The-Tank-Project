@@ -426,7 +426,7 @@ enum AiChatIntentDetector {
         let mentionsChapter = matches(#"\b(chapter|chapter's|write|generate|draft|compose)\b"#, in: lower)
         guard mentionsChapter else { return nil }
         guard pdfContext != nil else { return nil }
-        let catalog = AiChatChapterCatalog.headings
+        let catalog = AiChatChapterCatalog.orderedNames
         for name in catalog where lower.contains(name) {
             return name
         }
@@ -449,7 +449,7 @@ enum AiChatIntentDetector {
     }
 
     /// Ports `bestPostsKeyword` — meaningful topic tokens for the community-posts search.
-    static func bestPostsKeyword(aiKeyword: String?, userText: String) -> String? {
+    static func bestPostsKeyword(_ aiKeyword: String?, userText: String) -> String? {
         let fromAi = (aiKeyword ?? "").components(separatedBy: #"\s+"#).map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
         var seen = Set<String>()
         let tokens = (fromAi + fallbackKeywords(userText)).filter { token in
@@ -744,7 +744,7 @@ enum AiChatBackend {
 
     private static func getJSON(_ target: URL, timeoutSession: URLSession = session) async -> [String: Any]? {
         var request = URLRequest(url: target)
-        request.timeoutInterval = timeoutSession.timeoutIntervalForRequest
+        request.timeoutInterval = timeoutSession.configuration.timeoutIntervalForRequest
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue(APIConfig.appSignature, forHTTPHeaderField: "X-App-Signature")
         request.setValue(APIConfig.userAgent, forHTTPHeaderField: "User-Agent")
@@ -1875,8 +1875,8 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
             AiChatMessage(
                 role: turn.isUser ? .user : .assistant,
                 text: turn.content,
-                feedback: turn.feedback,
-                responseTimeMs: turn.responseTimeMs > 0 ? turn.responseTimeMs : nil
+                responseTimeMs: turn.responseTimeMs > 0 ? turn.responseTimeMs : nil,
+                feedback: turn.feedback
             )
         }
         if !session.pdfPreview.isEmpty {
@@ -1940,8 +1940,8 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
             AiChatMessage(
                 role: turn.isUser ? .user : .assistant,
                 text: turn.content,
-                feedback: turn.feedback,
-                responseTimeMs: turn.responseTimeMs > 0 ? turn.responseTimeMs : nil
+                responseTimeMs: turn.responseTimeMs > 0 ? turn.responseTimeMs : nil,
+                feedback: turn.feedback
             )
         }
         pdfContext = session.pdfPreview.isEmpty
