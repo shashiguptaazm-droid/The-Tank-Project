@@ -360,16 +360,19 @@ final class HTTPClient {
     }
 
     private func decodeObject(_ data: Data) throws -> [String: Any] {
-        guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            let snippet = String(data: data.prefix(500), encoding: .utf8) ?? "<binary data>"
-            RemoteLogger.log(
-                tag: "DECODING_ERROR",
-                message: "Response was not a JSON dictionary",
-                metadata: ["dataSnippet": snippet]
-            )
-            throw APIError.decoding(underlying: "Response was not a JSON object")
+        if let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            return object
         }
-        return object
+        if let array = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] {
+            return ["data": array, "items": array, "reels": array, "posts": array, "videos": array]
+        }
+        let snippet = String(data: data.prefix(500), encoding: .utf8) ?? "<binary data>"
+        RemoteLogger.log(
+            tag: "DECODING_ERROR",
+            message: "Response was not a JSON dictionary",
+            metadata: ["dataSnippet": snippet]
+        )
+        throw APIError.decoding(underlying: "Response was not a JSON object")
     }
 
     static func formEncode(_ fields: [String: String]) -> Data {

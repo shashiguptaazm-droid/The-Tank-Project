@@ -358,7 +358,7 @@ struct ReferralAPI {
     func apply(code: String, userId: Int) async throws -> Acknowledgment {
         try await client.post(
             form: ["action": "apply", "referral_code": code, "user_id": String(userId)],
-            to: .referral,
+            to: .referralApi,
             as: Acknowledgment.self
         )
     }
