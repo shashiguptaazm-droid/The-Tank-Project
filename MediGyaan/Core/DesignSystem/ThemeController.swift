@@ -134,7 +134,7 @@ final class ThemeController: ObservableObject {
     /// originated here is not mistaken for one that came from a view.
     private var mirroredLegacyFlag: Bool
 
-    private let defaultsObserver: NSObjectProtocol?
+    private var defaultsObserver: NSObjectProtocol?
 
     init(store: UserDefaults = .standard) {
         self.store = store
@@ -153,6 +153,8 @@ final class ThemeController: ObservableObject {
         } else {
             mode = .light
         }
+
+        self.defaultsObserver = nil
 
         defaultsObserver = NotificationCenter.default.addObserver(
             forName: UserDefaults.didChangeNotification,
