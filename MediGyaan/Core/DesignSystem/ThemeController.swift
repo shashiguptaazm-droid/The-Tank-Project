@@ -134,28 +134,25 @@ final class ThemeController: ObservableObject {
     /// originated here is not mistaken for one that came from a view.
     private var mirroredLegacyFlag: Bool
 
-    private var defaultsObserver: NSObjectProtocol?
+    private let defaultsObserver: NSObjectProtocol?
 
     init(store: UserDefaults = .standard) {
         self.store = store
 
-        let initialMode: ThemeMode
         if let raw = store.string(forKey: Self.storageKey),
            let persisted = ThemeMode(rawValue: raw) {
-            initialMode = persisted
+            mode = persisted
         } else if store.object(forKey: AppPreferences.darkMode) != nil {
             // Migrate the pre-existing boolean, written by `@AppStorage` before
             // this type existed.
-            initialMode = store.bool(forKey: AppPreferences.darkMode) ? .dark : .light
+            mode = store.bool(forKey: AppPreferences.darkMode) ? .dark : .light
         } else {
-            initialMode = .light
+            mode = .light
         }
 
-        self.mode = initialMode
-        self.mirroredLegacyFlag = initialMode == .dark
-        self.defaultsObserver = nil
+        mirroredLegacyFlag = mode == .dark
 
-        self.defaultsObserver = NotificationCenter.default.addObserver(
+        defaultsObserver = NotificationCenter.default.addObserver(
             forName: UserDefaults.didChangeNotification,
             object: store,
             queue: .main
