@@ -50,6 +50,9 @@ struct SettingsView: View {
                     isConfirmingSignOut = true
                 }
             }
+        .onAppear {
+            RemoteLogger.log(tag: "SettingsView_Open", message: "User opened Application Settings")
+        }
         }
         .navigationTitle("Settings")
         .toolbar(.visible, for: .navigationBar)

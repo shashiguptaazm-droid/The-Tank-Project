@@ -103,6 +103,9 @@ struct GoalSelectionView: View {
                 }
             }
             .padding(AppTheme.Spacing.md)
+        .onAppear {
+            RemoteLogger.log(tag: "GoalSelection_Appear", message: "Exam Goal Selection screen viewed")
+        }
         }
         .screenBackground()
         .navigationTitle("Goal Preference")

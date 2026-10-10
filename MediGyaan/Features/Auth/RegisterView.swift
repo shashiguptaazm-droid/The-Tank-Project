@@ -81,6 +81,9 @@ struct RegisterView: View {
                 }
             }
             .padding(AppTheme.Spacing.lg)
+        .onAppear {
+            RemoteLogger.log(tag: "RegisterView_Open", message: "User navigated to Registration screen")
+        }
         }
         .screenBackground()
         .navigationTitle("Register")

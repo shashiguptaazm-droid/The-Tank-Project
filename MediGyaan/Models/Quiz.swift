@@ -277,11 +277,15 @@ struct QuizAttempt: Codable, Identifiable, Hashable {
         [
             "user_id": String(userId),
             "quiz_id": String(quizId),
+            "score": String(correct * 10),
+            "total_questions": String(attempted),
             "attempted": String(attempted),
             "correct": String(correct),
             "wrong": String(wrong),
             "accuracy": String(format: "%.2f", accuracy * 100),
             "duration": String(durationSeconds),
+            "hp": "100",
+            "is_win": accuracy >= 0.5 ? "1" : "0",
             "mode": mode,
             "answers_json": (try? JSONEncoder().encode(answers))
                 .flatMap { String(data: $0, encoding: .utf8) } ?? "[]",

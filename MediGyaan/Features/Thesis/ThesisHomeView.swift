@@ -265,6 +265,7 @@ struct ThesisChapterView: View {
         .navigationBarTitleDisplayMode(.inline)
         .errorAlert(message: $errorMessage)
         .onAppear {
+            RemoteLogger.log(tag: "ThesisHome_Open", message: "Thesis & Research Home screen opened")
             guard !didPrefill else { return }
             didPrefill = true
             content = chapter.content

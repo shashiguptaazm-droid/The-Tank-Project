@@ -119,6 +119,9 @@ public struct ReviewView: View {
                 }
             }
             .padding(AppTheme.Spacing.md)
+        .onAppear {
+            RemoteLogger.log(tag: "ReviewView_Open", message: "User opened Exam Question Review screen")
+        }
         }
         .screenBackground()
         .navigationTitle("Review Answers")

@@ -54,6 +54,7 @@ struct WidgetSettingsView: View {
         .navigationTitle("Widget Customization")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
+            RemoteLogger.log(tag: "WidgetSettings_Open", message: "Widget Settings configuration opened")
             examName = widgetManager.examName
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd"

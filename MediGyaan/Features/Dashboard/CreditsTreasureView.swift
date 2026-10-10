@@ -59,6 +59,7 @@ struct CreditsTreasureView: View {
         .navigationTitle("Treasury & Store")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
+            RemoteLogger.log(tag: "CreditsTreasure_Appear", message: "User opened Credits & Treasure vault")
             remainingSeconds = credits.dailyChestRemainingSeconds
         }
         .onReceive(timer) { _ in

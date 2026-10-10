@@ -122,6 +122,7 @@ struct IncomingCallView: View {
             }
         }
         .onAppear {
+            RemoteLogger.log(tag: "IncomingCall_Ring", message: "Incoming Call alert screen appeared")
             pulseScale = 1.2
             CallRingtoneManager.shared.startRinging()
         }

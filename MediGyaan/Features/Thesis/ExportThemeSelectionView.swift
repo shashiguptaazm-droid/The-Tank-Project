@@ -41,6 +41,9 @@ struct ExportThemeSelectionView: View {
                 themesList
             }
             .padding(AppTheme.Spacing.md)
+        .onAppear {
+            RemoteLogger.log(tag: "ExportTheme_Appear", message: "Thesis Export Theme selection opened")
+        }
         }
         .screenBackground()
         .navigationTitle("Thesis Export Themes")

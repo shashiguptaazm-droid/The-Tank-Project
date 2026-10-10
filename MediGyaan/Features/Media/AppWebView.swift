@@ -45,6 +45,9 @@ public struct WebBrowserSheet: View {
                         Button("Done") { dismiss() }
                     }
                 }
+        .onAppear {
+            RemoteLogger.log(tag: "AppWebView_Open", message: "User opened internal Web Browser view")
+        }
         }
     }
 }

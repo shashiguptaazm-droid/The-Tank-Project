@@ -38,6 +38,9 @@ struct PosterStudioView: View {
             .onChange(of: selectedItem) { _ in
                 Task { await loadImage() }
             }
+        .onAppear {
+            RemoteLogger.log(tag: "PosterStudio_Open", message: "Medical Poster Studio workspace opened")
+        }
         }
     }
 

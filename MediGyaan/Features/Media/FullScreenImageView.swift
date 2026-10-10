@@ -119,6 +119,9 @@ struct FullScreenImageView: View {
 
                 Spacer()
             }
+        .onAppear {
+            RemoteLogger.log(tag: "FullScreenImage_Open", message: "Full screen medical image preview opened")
+        }
         }
     }
 }

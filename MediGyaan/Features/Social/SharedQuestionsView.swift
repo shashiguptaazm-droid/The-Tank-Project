@@ -50,6 +50,9 @@ struct SharedQuestionsView: View {
             .task {
                 await load()
             }
+        .onAppear {
+            RemoteLogger.log(tag: "SharedQuestions_Open", message: "User opened Shared Questions view")
+        }
         }
     }
 

@@ -34,6 +34,7 @@ struct ThreeDModelWebView: UIViewRepresentable {
         )
 
         webView.loadHTMLString(html, baseURL: Bundle.main.bundleURL)
+        RemoteLogger.log(tag: "ThreeDModelWebView_Load", message: "Loading 3D model: \(modelName)")
         return webView
     }
 

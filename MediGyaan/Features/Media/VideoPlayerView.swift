@@ -44,6 +44,7 @@ struct VideoPlayerView: View {
             }
         }
         .onAppear {
+            RemoteLogger.log(tag: "VideoPlayer_Open", message: "Clinical Video Player opened")
             setupPlayer()
         }
         .onDisappear {

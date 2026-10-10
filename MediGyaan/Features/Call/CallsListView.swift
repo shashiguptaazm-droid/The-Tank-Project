@@ -61,6 +61,7 @@ struct CallsListView: View {
         }
         .navigationBarHidden(true)
         .onAppear {
+            RemoteLogger.log(tag: "CallsList_Open", message: "User opened Call Log History")
             loadCalls()
         }
         .sheet(item: $inspectingCall) { callItem in

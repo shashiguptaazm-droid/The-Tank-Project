@@ -113,6 +113,9 @@ struct HelpSupportView: View {
                 }
             }
             .padding(AppTheme.Spacing.md)
+        .onAppear {
+            RemoteLogger.log(tag: "HelpSupport_Appear", message: "User opened Help & Support screen")
+        }
         }
         .screenBackground()
         .navigationTitle("Help & Support")

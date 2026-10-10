@@ -69,6 +69,7 @@ struct AccuracyView: View {
         }
         .navigationBarHidden(true)
         .onAppear {
+            RemoteLogger.log(tag: "AccuracyView_Appear", message: "User opened Accuracy & Analytics")
             loadAccuracyData()
         }
     }

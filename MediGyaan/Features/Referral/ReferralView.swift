@@ -29,6 +29,9 @@ struct ReferralView: View {
                 }
             }
             .padding(AppTheme.Spacing.md)
+        .onAppear {
+            RemoteLogger.log(tag: "ReferralView_Open", message: "User opened Referral Rewards screen")
+        }
         }
         .screenBackground()
         .navigationTitle("Refer & earn")

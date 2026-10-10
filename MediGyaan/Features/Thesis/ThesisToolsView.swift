@@ -33,6 +33,9 @@ struct ReferenceLibraryView: View {
                     }
                 }
             }
+        .onAppear {
+            RemoteLogger.log(tag: "ThesisTools_Open", message: "Thesis Tools workspace opened")
+        }
         }
         .screenBackground()
         .navigationTitle("References")

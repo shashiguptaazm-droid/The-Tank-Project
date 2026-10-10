@@ -74,6 +74,9 @@ struct NetworkInspectorView: View {
                     }
                 }
             }
+        .onAppear {
+            RemoteLogger.log(tag: "NetworkInspector_Open", message: "User opened Network Inspector telemetry")
+        }
         }
         .searchable(text: $filter, prompt: "Filter by path or status")
         .navigationTitle("Network Inspector")

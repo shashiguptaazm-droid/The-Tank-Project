@@ -40,6 +40,9 @@ struct ForgotPasswordView: View {
                 }
             }
             .padding(AppTheme.Spacing.lg)
+        .onAppear {
+            RemoteLogger.log(tag: "ForgotPassword_Appear", message: "User opened Forgot Password recovery screen")
+        }
         }
         .screenBackground()
         .navigationTitle("Reset password")

@@ -108,6 +108,9 @@ struct ChallengeInvitationView: View {
                 .padding(.horizontal, AppTheme.Spacing.lg)
                 .padding(.bottom, AppTheme.Spacing.lg)
             }
+        .onAppear {
+            RemoteLogger.log(tag: "ChallengeInvitation_Appear", message: "Challenge invitation screen viewed")
+        }
         }
         .errorAlert(message: $errorMessage)
     }
