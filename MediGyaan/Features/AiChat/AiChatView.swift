@@ -106,6 +106,11 @@ struct AiChatView: View {
         let transcript: String
     }
 
+    private struct ExportItem: Identifiable {
+        var id: URL { url }
+        let url: URL
+    }
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -152,6 +157,22 @@ struct AiChatView: View {
             }
             .sheet(item: $sharePayload) { payload in
                 shareSheet(payload)
+            }
+            .sheet(item: Binding(
+                get: { viewModel.exportUrlToShare.map { ExportItem(url: $0) } },
+                set: { if $0 == nil { viewModel.exportUrlToShare = nil } }
+            )) { item in
+                ShareSheet(activityItems: [item.url])
+            }
+            .sheet(isPresented: $viewModel.isVariablesModalPresented) {
+                if let pdfContext = viewModel.pdfContext {
+                    VariablesEditorSheet(
+                        variables: pdfContext.variables,
+                        onUpdate: { name, val in viewModel.updateVariable(name: name, value: val) },
+                        onAdd: { name, val in viewModel.addVariable(name: name, value: val) },
+                        onDismiss: { viewModel.isVariablesModalPresented = false }
+                    )
+                }
             }
             .fileImporter(
                 isPresented: $isShowingDocPicker,
@@ -350,6 +371,18 @@ struct AiChatView: View {
                     .font(AiChatPalette.Monospace.label)
                     .foregroundStyle(Color.white)
                 Spacer()
+                if let count = viewModel.pdfContext?.variables.count, count > 0 {
+                    Button {
+                        viewModel.isVariablesModalPresented = true
+                    } label: {
+                        Text("📝 \(count) Vars")
+                            .font(AiChatPalette.Monospace.eyebrow)
+                            .foregroundStyle(AppTheme.Ink.cyan)
+                            .padding(.horizontal, AppTheme.Spacing.xs)
+                            .padding(.vertical, 2)
+                            .background(Capsule().fill(AppTheme.Ink.cyan.opacity(0.18)))
+                    }
+                }
                 Text(viewModel.workspace.currentSection.uppercased())
                     .font(AiChatPalette.Monospace.eyebrow)
                     .foregroundStyle(AppTheme.Palette.secondary)
@@ -650,6 +683,27 @@ struct AiChatView: View {
                                 .font(AppTheme.Font.caption2)
                                 .foregroundStyle(AppTheme.Ink.textHint)
                         }
+                        Menu {
+                            Button {
+                                viewModel.exportMessage(message: message, format: .pdf)
+                            } label: {
+                                Label("Export as PDF", systemImage: "doc.richtext")
+                            }
+                            Button {
+                                viewModel.exportMessage(message: message, format: .docx)
+                            } label: {
+                                Label("Export as Word (.docx)", systemImage: "doc.text")
+                            }
+                            Button {
+                                viewModel.exportMessage(message: message, format: .pptx)
+                            } label: {
+                                Label("Export as PowerPoint (.pptx)", systemImage: "rectangle.inset.filled.and.person.filled")
+                            }
+                        } label: {
+                            Image(systemName: "arrow.down.doc")
+                                .font(AppTheme.Font.caption2)
+                                .foregroundStyle(AppTheme.Ink.textHint)
+                        }
                         Spacer()
                         if let milliseconds = message.responseTimeMs {
                             Text("⚡ \(milliseconds)ms")
@@ -691,6 +745,21 @@ struct AiChatView: View {
             }
             if let chapter = message.chapterCard {
                 chapterCard(chapter)
+            }
+            if let chapterDetails = message.chapterDetails {
+                chapterGenCard(chapterDetails)
+            }
+            if let citation = message.citationCard {
+                citationValidationCard(citation, message: message)
+            }
+            if let poster = message.posterCard {
+                posterGenCard(poster)
+            }
+            if let similar = message.similarArticlesCard {
+                similarArticlesCard(similar)
+            }
+            if let pdfAbstracts = message.pdfAbstractsCard {
+                pdfAbstractsCard(pdfAbstracts)
             }
             if !message.relatedQuestions.isEmpty {
                 relatedQuestionsCard(message.relatedQuestions)
@@ -941,6 +1010,706 @@ struct AiChatView: View {
                             .foregroundStyle(AppTheme.Ink.iconTint)
                     }
                 }
+            }
+        }
+        .padding(AppTheme.Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .fill(AiChatPalette.card)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                        .stroke(AiChatPalette.cardStroke, lineWidth: 1)
+                )
+        )
+        .padding(.leading, 40)
+    }
+
+    // MARK: - Chapter Generator Card (Full Schema)
+
+    private func chapterGenCard(_ chapter: ChatChapterJson) -> some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+            HStack(spacing: AppTheme.Spacing.sm) {
+                Text("📚").font(AppTheme.Font.title3)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(chapter.chapterName.isEmpty ? "Thesis Chapter" : chapter.chapterName)
+                        .font(AppTheme.Font.callout)
+                        .fontWeight(.bold)
+                        .foregroundStyle(Color.white)
+                    Text("\(chapter.sections.count) Sections · \(chapter.tables.count) Tables · \(chapter.charts.count) Charts · \(chapter.references.count) Refs")
+                        .font(AppTheme.Font.micro)
+                        .foregroundStyle(AppTheme.Ink.cyan)
+                }
+                Spacer()
+                Button {
+                    withAnimation { isChapterExpanded.toggle() }
+                } label: {
+                    Image(systemName: isChapterExpanded ? "chevron.up" : "chevron.down")
+                        .font(AppTheme.Font.caption)
+                        .foregroundStyle(AppTheme.Ink.textHint)
+                }
+            }
+
+            if isChapterExpanded {
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                    ForEach(chapter.sections) { section in
+                        chapterSectionBlock(section)
+                    }
+
+                    ForEach(chapter.tables) { table in
+                        chapterTableBlock(table)
+                    }
+
+                    ForEach(chapter.figures) { figure in
+                        chapterFigureBlock(figure)
+                    }
+
+                    ForEach(chapter.charts) { chart in
+                        chapterChartBlock(chart)
+                    }
+
+                    if !chapter.abbreviations.isEmpty {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Abbreviations")
+                                .font(AiChatPalette.Monospace.eyebrow)
+                                .foregroundStyle(AppTheme.Ink.cyan)
+                            ForEach(chapter.abbreviations) { ab in
+                                Text("\(ab.short) = \(ab.full)")
+                                    .font(AppTheme.Font.caption2)
+                                    .foregroundStyle(AppTheme.Ink.textSecondary)
+                            }
+                        }
+                        .padding(8)
+                        .background(AiChatPalette.row)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+
+                    if !chapter.references.isEmpty {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("References (\(chapter.references.count))")
+                                .font(AiChatPalette.Monospace.eyebrow)
+                                .foregroundStyle(AppTheme.Ink.cyan)
+                            ForEach(Array(chapter.references.enumerated()), id: \.offset) { i, r in
+                                Text("\(i + 1). \(r.referenceText.isEmpty ? r.citation : r.referenceText)")
+                                    .font(AppTheme.Font.micro)
+                                    .foregroundStyle(AppTheme.Ink.textHint)
+                            }
+                        }
+                        .padding(8)
+                        .background(AiChatPalette.row)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+
+                    // Chapter Export Action Row
+                    HStack(spacing: 12) {
+                        Button {
+                            viewModel.exportChapter(chapter: chapter, format: .pdf)
+                        } label: {
+                            Label("PDF", systemImage: "arrow.down.doc")
+                                .font(AppTheme.Font.caption2)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(AiChatPalette.chip)
+                                .clipShape(Capsule())
+                                .foregroundStyle(AppTheme.Ink.cyan)
+                        }
+
+                        Button {
+                            viewModel.exportChapter(chapter: chapter, format: .docx)
+                        } label: {
+                            Label("Word", systemImage: "doc.text")
+                                .font(AppTheme.Font.caption2)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(AiChatPalette.chip)
+                                .clipShape(Capsule())
+                                .foregroundStyle(AppTheme.Ink.cyan)
+                        }
+
+                        Button {
+                            viewModel.exportChapter(chapter: chapter, format: .pptx)
+                        } label: {
+                            Label("PowerPoint", systemImage: "rectangle.inset.filled.and.person.filled")
+                                .font(AppTheme.Font.caption2)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(AiChatPalette.chip)
+                                .clipShape(Capsule())
+                                .foregroundStyle(AppTheme.Ink.cyan)
+                        }
+                    }
+                    .padding(.top, 4)
+                }
+            }
+        }
+        .padding(AppTheme.Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .fill(AiChatPalette.card)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                        .stroke(AiChatPalette.cardStroke, lineWidth: 1)
+                )
+        )
+        .padding(.leading, 40)
+    }
+
+    private func chapterSectionBlock(_ section: ChatSectionJson) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            if !section.heading.isEmpty {
+                Text(section.heading)
+                    .font(AppTheme.Font.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(AppTheme.Palette.primary)
+            }
+            if !section.content.isEmpty {
+                Text(section.content)
+                    .font(AppTheme.Font.caption)
+                    .foregroundStyle(AppTheme.Ink.textPrimary)
+                    .lineSpacing(2)
+            }
+            ForEach(section.paragraphs, id: \.self) { p in
+                Text(p)
+                    .font(AppTheme.Font.caption)
+                    .foregroundStyle(AppTheme.Ink.textSecondary)
+                    .lineSpacing(2)
+            }
+            ForEach(section.bullets, id: \.self) { b in
+                HStack(alignment: .top, spacing: 4) {
+                    Text("•").foregroundStyle(AppTheme.Palette.primary)
+                    Text(b)
+                        .font(AppTheme.Font.caption)
+                        .foregroundStyle(AppTheme.Ink.textSecondary)
+                }
+            }
+            ForEach(Array(section.numberedPoints.enumerated()), id: \.offset) { i, p in
+                HStack(alignment: .top, spacing: 4) {
+                    Text("\(i + 1).").foregroundStyle(AppTheme.Palette.primary)
+                    Text(p)
+                        .font(AppTheme.Font.caption)
+                        .foregroundStyle(AppTheme.Ink.textSecondary)
+                }
+            }
+            ForEach(section.subsections) { sub in
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(sub.heading)
+                        .font(AppTheme.Font.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Color.white)
+                    Text(sub.content)
+                        .font(AppTheme.Font.caption2)
+                        .foregroundStyle(AppTheme.Ink.textSecondary)
+                }
+                .padding(.leading, 8)
+            }
+            if let t = section.table {
+                chapterTableBlock(t)
+            }
+            ForEach(section.figures) { f in
+                chapterFigureBlock(f)
+            }
+        }
+        .padding(8)
+        .background(AiChatPalette.row)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func chapterTableBlock(_ table: ChatTableJson) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("📊 \(table.tableNumber.isEmpty ? "Table" : "Table " + table.tableNumber): \(table.title)")
+                .font(AppTheme.Font.caption)
+                .fontWeight(.bold)
+                .foregroundStyle(Color.white)
+
+            if !table.headers.isEmpty {
+                HStack(spacing: 4) {
+                    ForEach(table.headers, id: \.self) { h in
+                        Text(h)
+                            .font(AppTheme.Font.micro)
+                            .fontWeight(.bold)
+                            .foregroundStyle(AppTheme.Ink.cyan)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .padding(.vertical, 2)
+            }
+
+            ForEach(Array(table.rows.prefix(15).enumerated()), id: \.offset) { _, row in
+                HStack(spacing: 4) {
+                    ForEach(Array(row.enumerated()), id: \.offset) { _, cell in
+                        Text(cell)
+                            .font(AppTheme.Font.micro)
+                            .foregroundStyle(AppTheme.Ink.textPrimary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .padding(.vertical, 2)
+                Divider().background(AiChatPalette.divider)
+            }
+
+            if !table.footnote.isEmpty {
+                Text(table.footnote)
+                    .font(AppTheme.Font.micro)
+                    .foregroundStyle(AppTheme.Ink.textHint)
+            }
+        }
+        .padding(8)
+        .background(AiChatPalette.card)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func chapterFigureBlock(_ figure: ChatFigureJson) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text("🖼️ Figure \(figure.figureNumber): \(figure.title)")
+                .font(AppTheme.Font.caption)
+                .fontWeight(.bold)
+                .foregroundStyle(Color.white)
+            if !figure.caption.isEmpty {
+                Text(figure.caption)
+                    .font(AppTheme.Font.caption2)
+                    .foregroundStyle(AppTheme.Ink.textSecondary)
+            }
+            if !figure.imageSearchQuery.isEmpty {
+                Text("Search: \(figure.imageSearchQuery)")
+                    .font(AppTheme.Font.micro)
+                    .foregroundStyle(AppTheme.Ink.cyan)
+            }
+        }
+        .padding(8)
+        .background(AiChatPalette.row)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func chapterChartBlock(_ chart: ChatChartJson) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("📈 \(chart.title.isEmpty ? "Chart" : chart.title)")
+                .font(AppTheme.Font.caption)
+                .fontWeight(.bold)
+                .foregroundStyle(Color.white)
+
+            let labels = chart.data.isEmpty ? chart.labels : chart.data.map { $0.label }
+            let values = chart.data.isEmpty ? chart.values : chart.data.map { $0.value }
+            miniChart(type: chart.type, labels: labels, values: values)
+        }
+        .padding(8)
+        .background(AiChatPalette.row)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func miniChart(type: String, labels: [String], values: [Double]) -> some View {
+        let nums = values.filter { !$0.isNaN && $0 > 0 }
+        let maxV = max(nums.max() ?? 1.0, 0.0001)
+        let total = max(nums.reduce(0, +), 1.0)
+        let t = type.lowercased()
+        let chartColors: [Color] = [
+            AppTheme.Palette.primary,
+            AppTheme.Ink.cyan,
+            AppTheme.Palette.secondary,
+            AppTheme.Ink.teal,
+            Color.orange,
+            Color.pink
+        ]
+
+        return VStack(alignment: .leading, spacing: 6) {
+            if t.contains("pie") || t.contains("doughnut") {
+                HStack(spacing: 16) {
+                    Canvas { context, size in
+                        let center = CGPoint(x: size.width / 2, y: size.height / 2)
+                        let radius = min(size.width, size.height) / 2
+                        var startAngle = Angle(degrees: -90)
+                        for (i, val) in nums.enumerated() {
+                            let sweep = Angle(degrees: (val / total) * 360)
+                            let endAngle = startAngle + sweep
+                            var path = Path()
+                            path.move(to: center)
+                            path.addArc(center: center, radius: radius, startAngle: startAngle, endAngle: endAngle, clockwise: false)
+                            context.fill(path, with: .color(chartColors[i % chartColors.count]))
+                            startAngle = endAngle
+                        }
+                    }
+                    .frame(width: 80, height: 80)
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        ForEach(Array(labels.prefix(4).enumerated()), id: \.offset) { i, label in
+                            HStack(spacing: 6) {
+                                Circle().fill(chartColors[i % chartColors.count]).frame(width: 8, height: 8)
+                                Text(label)
+                                    .font(AppTheme.Font.micro)
+                                    .foregroundStyle(AppTheme.Ink.textSecondary)
+                                    .lineLimit(1)
+                            }
+                        }
+                    }
+                }
+            } else if t.contains("line") {
+                Canvas { context, size in
+                    guard nums.count > 1 else { return }
+                    let stepX = size.width / CGFloat(nums.count - 1)
+                    var path = Path()
+                    let points: [CGPoint] = nums.enumerated().map { i, val in
+                        let x = CGFloat(i) * stepX
+                        let y = size.height - CGFloat(val / maxV) * (size.height * 0.85) - 4
+                        return CGPoint(x: x, y: y)
+                    }
+                    path.move(to: points[0])
+                    for pt in points.dropFirst() {
+                        path.addLine(to: pt)
+                    }
+                    context.stroke(path, with: .color(chartColors[0]), lineWidth: 2.5)
+                    for pt in points {
+                        let rect = CGRect(x: pt.x - 3, y: pt.y - 3, width: 6, height: 6)
+                        context.fill(Path(ellipseIn: rect), with: .color(chartColors[1]))
+                    }
+                }
+                .frame(height: 70)
+            } else {
+                Canvas { context, size in
+                    guard !nums.isEmpty else { return }
+                    let barWidth = size.width / CGFloat(nums.count)
+                    for (i, val) in nums.enumerated() {
+                        let h = CGFloat(val / maxV) * (size.height * 0.88)
+                        let x = CGFloat(i) * barWidth + (barWidth * 0.15)
+                        let y = size.height - h
+                        let w = barWidth * 0.70
+                        let rect = CGRect(x: x, y: y, width: w, height: h)
+                        context.fill(Path(roundedRect: rect, cornerRadius: 3), with: .color(chartColors[i % chartColors.count]))
+                    }
+                }
+                .frame(height: 70)
+
+                if !labels.isEmpty {
+                    HStack {
+                        ForEach(Array(labels.prefix(nums.count).enumerated()), id: \.offset) { _, label in
+                            Text(label)
+                                .font(AppTheme.Font.micro)
+                                .foregroundStyle(AppTheme.Ink.textHint)
+                                .frame(maxWidth: .infinity)
+                                .lineLimit(1)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - PubMed Citation Validation Card
+
+    private func citationValidationCard(_ state: CitationValidationState, message: AiChatMessage) -> some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+            HStack(spacing: AppTheme.Spacing.xs) {
+                Image(systemName: "checkmark.shield.fill")
+                    .foregroundStyle(AppTheme.Ink.cyan)
+                Text("PubMed Verification")
+                    .font(AppTheme.Font.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(Color.white)
+                Spacer()
+                if state.running {
+                    ProgressView().scaleEffect(0.8)
+                }
+            }
+
+            if state.running && state.results == nil {
+                HStack(spacing: 8) {
+                    ProgressView()
+                    Text(state.note.isEmpty ? "Checking references against NCBI…" : state.note)
+                        .font(AppTheme.Font.caption)
+                        .foregroundStyle(AppTheme.Ink.textSecondary)
+                }
+                if state.total > 0 {
+                    ProgressView(value: Double(state.current), total: Double(state.total))
+                        .tint(AppTheme.Ink.cyan)
+                }
+            } else if let results = state.results {
+                let verifiedCount = results.filter { $0.found }.count
+                let failedCount = results.count - verifiedCount
+                Text(verifiedCount == results.count ? "✅ All \(verifiedCount) references verified" : "Verification finished: \(verifiedCount) verified, \(failedCount) not found")
+                    .font(AppTheme.Font.caption)
+                    .fontWeight(.bold)
+                    .foregroundStyle(verifiedCount == results.count ? AppTheme.Ink.success : Color.orange)
+
+                ForEach(results) { r in
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: r.found ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                            .font(AppTheme.Font.caption)
+                            .foregroundStyle(r.found ? AppTheme.Ink.success : AppTheme.Palette.error)
+                            .padding(.top, 2)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(r.originalText.prefix(120).description)
+                                .font(AppTheme.Font.caption2)
+                                .foregroundStyle(AppTheme.Ink.textPrimary)
+
+                            if r.found {
+                                if let url = URL(string: "https://pubmed.ncbi.nlm.nih.gov/\(r.pmid)/"), !r.pmid.isEmpty {
+                                    Link("🔗 PMID: \(r.pmid) ↗", destination: url)
+                                        .font(AppTheme.Font.micro)
+                                        .foregroundStyle(AppTheme.Ink.cyan)
+                                } else {
+                                    Text("✅ Verified")
+                                        .font(AppTheme.Font.micro)
+                                        .foregroundStyle(AppTheme.Ink.success)
+                                }
+                            } else {
+                                Text("❌ Not found — verify spelling")
+                                    .font(AppTheme.Font.micro)
+                                    .foregroundStyle(AppTheme.Palette.error)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+
+                // Action Row
+                let exportText = "PubMed Verification Results:\n" + results.enumerated().map { i, r in
+                    "\(i + 1). \(r.originalText) -> \(r.found ? "Verified (PMID: " + r.pmid + ")" : "Not Found")"
+                }.joined(separator: "\n")
+
+                HStack(spacing: 12) {
+                    Button {
+                        UIPasteboard.general.string = exportText
+                        viewModel.showToast("Copied validation results 📋")
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                            .font(AppTheme.Font.caption2)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(AiChatPalette.chip)
+                            .clipShape(Capsule())
+                            .foregroundStyle(AppTheme.Ink.cyan)
+                    }
+
+                    Button {
+                        viewModel.exportText(title: "PubMed Verification", text: exportText, format: .pdf)
+                    } label: {
+                        Label("Export PDF", systemImage: "arrow.down.doc")
+                            .font(AppTheme.Font.caption2)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(AiChatPalette.chip)
+                            .clipShape(Capsule())
+                            .foregroundStyle(AppTheme.Ink.cyan)
+                    }
+                }
+                .padding(.top, 4)
+            }
+        }
+        .padding(AppTheme.Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .fill(AiChatPalette.card)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                        .stroke(AiChatPalette.cardStroke, lineWidth: 1)
+                )
+        )
+        .padding(.leading, 40)
+    }
+
+    // MARK: - AI Poster Generation Card
+
+    private func posterGenCard(_ state: PosterGenState) -> some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+            HStack(spacing: AppTheme.Spacing.xs) {
+                Image(systemName: "photo.artframe")
+                    .foregroundStyle(AppTheme.Ink.cyan)
+                Text("AI Research Poster")
+                    .font(AppTheme.Font.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(Color.white)
+                Spacer()
+                if state.phase == 1 || state.phase == 2 {
+                    ProgressView().scaleEffect(0.8)
+                }
+            }
+
+            if state.phase == 1 || state.phase == 2 {
+                HStack(spacing: 8) {
+                    ProgressView()
+                    Text(state.note.isEmpty ? "Synthesizing poster layout from abstract…" : state.note)
+                        .font(AppTheme.Font.caption)
+                        .foregroundStyle(AppTheme.Ink.textSecondary)
+                }
+            } else if let d = state.data {
+                VStack(alignment: .leading, spacing: 6) {
+                    if !d.title.isEmpty {
+                        Text(d.title)
+                            .font(AppTheme.Font.headline)
+                            .fontWeight(.bold)
+                            .foregroundStyle(Color.white)
+                    }
+                    if !d.subtitle.isEmpty {
+                        Text(d.subtitle)
+                            .font(AppTheme.Font.caption2)
+                            .foregroundStyle(AppTheme.Ink.cyan)
+                    }
+
+                    Divider().background(AiChatPalette.divider)
+
+                    ForEach(d.sections) { s in
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(s.heading)
+                                .font(AiChatPalette.Monospace.eyebrow)
+                                .foregroundStyle(AppTheme.Palette.primary)
+                            Text(s.body)
+                                .font(AppTheme.Font.caption)
+                                .foregroundStyle(AppTheme.Ink.textPrimary)
+                                .lineSpacing(2)
+                        }
+                        .padding(.vertical, 2)
+                    }
+
+                    // Action buttons
+                    let posterExport = "Research Poster: \(d.title)\n\n" + d.sections.map { "[\($0.heading)]\n\($0.body)" }.joined(separator: "\n\n")
+
+                    HStack(spacing: 12) {
+                        Button {
+                            UIPasteboard.general.string = posterExport
+                            viewModel.showToast("Saved poster text to clipboard 📋")
+                        } label: {
+                            Label("Copy", systemImage: "doc.on.doc")
+                                .font(AppTheme.Font.caption2)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(AiChatPalette.chip)
+                                .clipShape(Capsule())
+                                .foregroundStyle(AppTheme.Ink.cyan)
+                        }
+
+                        Button {
+                            viewModel.exportText(title: d.title, text: posterExport, format: .pdf)
+                        } label: {
+                            Label("Export PDF", systemImage: "arrow.down.doc")
+                                .font(AppTheme.Font.caption2)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(AiChatPalette.chip)
+                                .clipShape(Capsule())
+                                .foregroundStyle(AppTheme.Ink.cyan)
+                        }
+                    }
+                    .padding(.top, 4)
+                }
+            }
+        }
+        .padding(AppTheme.Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .fill(AiChatPalette.card)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                        .stroke(AiChatPalette.cardStroke, lineWidth: 1)
+                )
+        )
+        .padding(.leading, 40)
+    }
+
+    // MARK: - Similar PubMed Articles Card
+
+    private func similarArticlesCard(_ state: SimilarArticlesState) -> some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+            HStack(spacing: AppTheme.Spacing.xs) {
+                Image(systemName: "magnifyingglass.circle.fill")
+                    .foregroundStyle(AppTheme.Ink.cyan)
+                Text("Similar PubMed Articles (\(state.entries.count))")
+                    .font(AppTheme.Font.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(Color.white)
+            }
+
+            if !state.note.isEmpty {
+                Text(state.note)
+                    .font(AppTheme.Font.caption2)
+                    .foregroundStyle(AppTheme.Ink.textHint)
+            }
+
+            ForEach(state.entries) { entry in
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(entry.citationLabel.isEmpty ? "[S]" : entry.citationLabel)
+                            .font(AiChatPalette.Monospace.eyebrow)
+                            .foregroundStyle(AppTheme.Ink.cyan)
+                        Text(entry.title)
+                            .font(AppTheme.Font.caption)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Color.white)
+                            .lineLimit(2)
+                    }
+
+                    if !entry.citation.isEmpty {
+                        Text(entry.citation)
+                            .font(AppTheme.Font.micro)
+                            .foregroundStyle(AppTheme.Ink.textSecondary)
+                    }
+
+                    if let url = URL(string: "https://pubmed.ncbi.nlm.nih.gov/\(entry.pmid)/"), !entry.pmid.isEmpty {
+                        Link("🔗 Open on PubMed (PMID: \(entry.pmid)) ↗", destination: url)
+                            .font(AppTheme.Font.micro)
+                            .foregroundStyle(AppTheme.Ink.cyan)
+                    }
+                }
+                .padding(8)
+                .background(AiChatPalette.row)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+        }
+        .padding(AppTheme.Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                .fill(AiChatPalette.card)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.card, style: .continuous)
+                        .stroke(AiChatPalette.cardStroke, lineWidth: 1)
+                )
+        )
+        .padding(.leading, 40)
+    }
+
+    // MARK: - PDF Abstracts & Variables Card
+
+    private func pdfAbstractsCard(_ state: PdfAbstractsState) -> some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+            HStack(spacing: AppTheme.Spacing.xs) {
+                Image(systemName: "doc.badge.gearshape.fill")
+                    .foregroundStyle(AppTheme.Ink.cyan)
+                Text("Extracted PDF Evidence & Variables")
+                    .font(AppTheme.Font.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(Color.white)
+                Spacer()
+                Button {
+                    viewModel.isVariablesModalPresented = true
+                } label: {
+                    Text("Variables 📝")
+                        .font(AppTheme.Font.caption2)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(AiChatPalette.chip)
+                        .clipShape(Capsule())
+                        .foregroundStyle(AppTheme.Ink.cyan)
+                }
+            }
+
+            if !state.note.isEmpty {
+                Text(state.note)
+                    .font(AppTheme.Font.caption2)
+                    .foregroundStyle(AppTheme.Ink.textHint)
+            }
+
+            ForEach(state.entries) { entry in
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(entry.title.isEmpty ? entry.citation : entry.title)
+                        .font(AppTheme.Font.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Color.white)
+                    if !entry.compactedText.isEmpty {
+                        Text(entry.compactedText)
+                            .font(AppTheme.Font.micro)
+                            .foregroundStyle(AppTheme.Ink.textSecondary)
+                    }
+                }
+                .padding(8)
+                .background(AiChatPalette.row)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
             }
         }
         .padding(AppTheme.Spacing.md)
@@ -1219,12 +1988,23 @@ struct AiChatView: View {
                     .padding(.vertical, AppTheme.Spacing.xs)
 
                 Button {
-                    viewModel.showToast("Voice input is not available on this device 🎙️")
+                    viewModel.toggleVoiceRecording()
                 } label: {
-                    Image(systemName: "mic.fill")
-                        .font(AppTheme.Font.callout)
-                        .foregroundStyle(AppTheme.Ink.textHint)
-                        .frame(width: 30, height: 30)
+                    ZStack {
+                        if viewModel.isListening {
+                            Circle()
+                                .fill(Color.red.opacity(0.3))
+                                .frame(width: 30, height: 30)
+                            Image(systemName: "mic.fill")
+                                .font(AppTheme.Font.callout)
+                                .foregroundStyle(Color.red)
+                        } else {
+                            Image(systemName: "mic.fill")
+                                .font(AppTheme.Font.callout)
+                                .foregroundStyle(AppTheme.Ink.textHint)
+                                .frame(width: 30, height: 30)
+                        }
+                    }
                 }
                 .disabled(viewModel.isLoading)
             }
@@ -1415,3 +2195,181 @@ struct AiChatView: View {
         .environmentObject(SessionStore())
         .environment(\.api, .live)
 }
+
+// MARK: - Variables Editor Bottom Sheet (Ports VariablesEditorBottomSheet from Android)
+
+struct VariablesEditorSheet: View {
+    let variables: [AiChatVariable]
+    let onUpdate: (String, String) -> Void
+    let onAdd: (String, String) -> Void
+    let onDismiss: () -> Void
+
+    @State private var searchQuery: String = ""
+    @State private var selectedCategory: String = "All"
+    @State private var showAddForm: Bool = false
+    @State private var newName: String = ""
+    @State private var newValue: String = ""
+
+    let categories = ["All", "Core 52 Schema", "Compacted Abstracts", "References"]
+
+    var filteredVariables: [AiChatVariable] {
+        variables.filter { v in
+            let n = v.name
+            let matchesCat: Bool
+            switch selectedCategory {
+            case "Core 52 Schema":
+                matchesCat = !n.contains("Compacted_") && !n.contains("Pubmed_") && !n.contains("Similar_")
+            case "Compacted Abstracts":
+                matchesCat = n.contains("Compacted_") || n.contains("Pubmed_") || n.contains("Similar_")
+            case "References":
+                matchesCat = n.localizedCaseInsensitiveContains("reference") || n.localizedCaseInsensitiveContains("vancouver") || n.localizedCaseInsensitiveContains("citation")
+            default:
+                matchesCat = true
+            }
+            let q = searchQuery.trimmingCharacters(in: .whitespaces).lowercased()
+            let matchesQuery = q.isEmpty || n.lowercased().contains(q) || v.value.lowercased().contains(q)
+            return matchesCat && matchesQuery
+        }
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                // Header & Add trigger
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Thesis & PubMed Variables (\(variables.count))")
+                            .font(AppTheme.Font.title3)
+                            .fontWeight(.bold)
+                            .foregroundStyle(Color.white)
+                        Text("Core 52 schema, Vancouver citations & compacted abstracts")
+                            .font(AppTheme.Font.caption2)
+                            .foregroundStyle(AppTheme.Ink.textHint)
+                    }
+                    Spacer()
+                    Button {
+                        withAnimation { showAddForm.toggle() }
+                    } label: {
+                        Text(showAddForm ? "Cancel" : "+ Add")
+                            .font(AppTheme.Font.caption)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(AppTheme.Palette.primary)
+                            .foregroundStyle(Color.white)
+                            .clipShape(Capsule())
+                    }
+                }
+                .padding()
+
+                // Add Form
+                if showAddForm {
+                    VStack(alignment: .leading, spacing: 8) {
+                        TextField("Variable Name (e.g. Title, Methodology, Sample_Size)", text: $newName)
+                            .textFieldStyle(.plain)
+                            .padding(8)
+                            .background(AiChatPalette.bubble)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(AiChatPalette.cardStroke, lineWidth: 1))
+                            .foregroundStyle(Color.white)
+
+                        TextField("Variable Value...", text: $newValue)
+                            .textFieldStyle(.plain)
+                            .padding(8)
+                            .background(AiChatPalette.bubble)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(AiChatPalette.cardStroke, lineWidth: 1))
+                            .foregroundStyle(Color.white)
+
+                        Button("Save Variable") {
+                            guard !newName.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+                            onAdd(newName.trimmingCharacters(in: .whitespaces), newValue.trimmingCharacters(in: .whitespaces))
+                            newName = ""
+                            newValue = ""
+                            showAddForm = false
+                        }
+                        .font(AppTheme.Font.caption)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 6)
+                        .background(AppTheme.Ink.cyan)
+                        .foregroundStyle(Color.black)
+                        .clipShape(Capsule())
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 8)
+                }
+
+                // Category chips
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(categories, id: \.self) { cat in
+                            Button {
+                                selectedCategory = cat
+                            } label: {
+                                Text(cat)
+                                    .font(AppTheme.Font.caption2)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(selectedCategory == cat ? AppTheme.Palette.primary : AiChatPalette.chip)
+                                    .foregroundStyle(selectedCategory == cat ? Color.white : AppTheme.Ink.textSecondary)
+                                    .clipShape(Capsule())
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 6)
+                }
+
+                // Search Box
+                HStack {
+                    Image(systemName: "magnifyingglass").foregroundStyle(AppTheme.Ink.textHint)
+                    TextField("Search variables...", text: $searchQuery)
+                        .textFieldStyle(.plain)
+                        .foregroundStyle(Color.white)
+                }
+                .padding(8)
+                .background(AiChatPalette.chip)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .padding(.horizontal)
+                .padding(.vertical, 4)
+
+                // List
+                List {
+                    ForEach(filteredVariables, id: \.name) { v in
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(v.name)
+                                .font(AiChatPalette.Monospace.eyebrow)
+                                .foregroundStyle(AppTheme.Ink.cyan)
+                            Text(v.value)
+                                .font(AppTheme.Font.body)
+                                .foregroundStyle(AppTheme.Ink.textPrimary)
+                        }
+                        .padding(.vertical, 4)
+                        .listRowBackground(AiChatPalette.card)
+                    }
+                }
+                .listStyle(.plain)
+            }
+            .background(AiChatPalette.canvas.ignoresSafeArea())
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done", action: onDismiss)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Share Sheet (UIActivityViewController)
+
+struct ShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    let applicationActivities: [UIActivity]? = nil
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: applicationActivities)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+

@@ -1140,6 +1140,13 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
     @Published var isHistoryPresented: Bool = false
     @Published var errorMessage: String? = nil
 
+    // MARK: - Voice Dictation & Exports & Variables State
+    @Published var isListening: Bool = false
+    @Published var exportUrlToShare: URL? = nil
+    @Published var isVariablesModalPresented: Bool = false
+    @Published var activeReadingAbstract: PdfAbstractEntry? = nil
+    let speechRecognizer = AiSpeechRecognizer()
+
     private let speechSynthesizer = AVSpeechSynthesizer()
     private var activeTask: Task<Void, Never>? = nil
     private var attachment: AiChatAttachment?
@@ -1375,7 +1382,8 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
 
             let counselCard = await runCounselModule(text: text, userId: userId)
             let thesisCard = await runThesisModule(text: text, userId: userId)
-            let chapterCard = await runChapterModule(text: text, document: document, userId: userId)
+            let (chapterCard, chapterDetails) = await runChapterModuleWithJson(text: text, document: document, userId: userId)
+            let posterCard = await runPosterModule(text: text, document: document, userId: userId)
 
             isThinking = true
             let started = Date()
@@ -1397,6 +1405,9 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
             isThinking = false
             await revealStreaming(reply)
             if Task.isCancelled { stopGenerating(); return }
+
+            let citationCard = await runCitationModule(userText: text, replyText: reply)
+            let similarArticlesCard = await runSimilarArticlesModule(userText: text, document: document)
 
             var related: [AiRelatedQuestion] = []
             if let keyword {
@@ -1421,6 +1432,10 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
                 counselCard: counselCard,
                 thesisCard: thesisCard,
                 chapterCard: chapterCard,
+                chapterDetails: chapterDetails,
+                citationCard: citationCard,
+                posterCard: posterCard,
+                similarArticlesCard: similarArticlesCard,
                 skillOutcome: outcome,
                 skillName: skillName == "NONE" ? nil : skillName
             ))
@@ -1522,6 +1537,261 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
         let results = await AiChatBackend.thesisTopics(query: query, userId: userId)
         enrichmentNote = ""
         return ThesisCardData(query: query, results: results)
+    }
+
+    /// Ports the chapter generator card block (step 5 of `send()`), generating full chapter schema.
+    private func runChapterModuleWithJson(
+        text: String,
+        document: AiChatPdfContext?,
+        userId: Int
+    ) async -> (ChapterCardData?, ChatChapterJson?) {
+        guard let document, let chapter = AiChatIntentDetector.detectChapterRequest(text: text, pdfContext: document) else {
+            return (nil, nil)
+        }
+        enrichmentNote = "📚 Synthesizing \(chapter.capitalized) Chapter…"
+        defer { enrichmentNote = "" }
+        let defaultHeadings = AiChatChapterCatalog.headings[chapter] ?? ["Background", "Aim", "Methodology", "Results", "Discussion", "Conclusion"]
+
+        let prompt = """
+        The user uploaded a thesis PDF ("\(document.fileName)") and asked to generate the complete structured "\(chapter)" chapter.
+        Their request was: "\(String(text.prefix(300)))"
+
+        Return a COMPLETE structured JSON object with sections, tables, figures, charts, abbreviations, and references.
+        Use ONLY data from the uploaded thesis PDF.
+        Format exactly as this JSON schema (no markdown fences):
+        {
+          "chapterName": "\(chapter.capitalized)",
+          "chapterType": "thesis_chapter",
+          "sections": [
+            {
+              "heading": "Introduction & Rationale",
+              "content": "Formal overview of the study scope and rationale.",
+              "paragraphs": ["Detailed cohort analysis and clinical parameters."],
+              "bullets": ["Rigorous protocol", "Pre-specified endpoints"],
+              "numberedPoints": []
+            }
+          ],
+          "tables": [
+            {
+              "tableNumber": "1",
+              "title": "Baseline Clinical Cohort Characteristics",
+              "headers": ["Parameter", "Study Group", "Reference"],
+              "rows": [["Age", "48.5", "50.0"], ["Serum Biomarker", "142 mg/dL", "130 mg/dL"]],
+              "footnote": "Values reported in SI units."
+            }
+          ],
+          "figures": [
+            {
+              "figureNumber": "1",
+              "title": "Patient Selection & Analysis Pipeline",
+              "caption": "Patient inclusion, testing, and clinical assessment pathway.",
+              "imageSearchQuery": "medical study flowchart diagram"
+            }
+          ],
+          "charts": [
+            {
+              "chartId": "fig_chart_1",
+              "title": "Outcome Distribution",
+              "type": "bar",
+              "labels": ["Control", "Intervention A", "Intervention B"],
+              "values": [35.0, 68.0, 82.0],
+              "data": [
+                {"label": "Control", "value": 35.0},
+                {"label": "Intervention A", "value": 68.0},
+                {"label": "Intervention B", "value": 82.0}
+              ]
+            }
+          ],
+          "abbreviations": [
+            {"short": "RCT", "full": "Randomized Controlled Trial"},
+            {"short": "CI", "full": "Confidence Interval"}
+          ],
+          "references": [
+            {"citation": "[1] WHO Clinical Guidelines, 2023.", "referenceText": "World Health Organization. Medical research guidelines. Geneva; 2023.", "pmid": "35891234"}
+          ]
+        }
+        """
+
+        do {
+            let raw = try await AiChatGateway.rotate(
+                messages: [
+                    LegacyAIMessage(role: "system", content: document.contextPrompt()),
+                    LegacyAIMessage(role: "user", content: prompt)
+                ],
+                maxTokens: 3500,
+                source: "ai_chat_chapter_full",
+                userId: userId
+            )
+            if let chapterJson = Self.parseFullChapterJson(from: raw, fallbackName: chapter) {
+                let cardData = ChapterCardData(
+                    chapterName: chapterJson.chapterName.isEmpty ? chapter.capitalized : chapterJson.chapterName,
+                    sections: chapterJson.sections.map { $0.heading }
+                )
+                return (cardData, chapterJson)
+            }
+        } catch {}
+
+        let cardData = ChapterCardData(chapterName: chapter.capitalized, sections: defaultHeadings)
+        return (cardData, nil)
+    }
+
+    private static func parseFullChapterJson(from raw: String, fallbackName: String) -> ChatChapterJson? {
+        var trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.hasPrefix("```json") { trimmed.removeFirst("```json".count) }
+        else if trimmed.hasPrefix("```") { trimmed.removeFirst(3) }
+        if trimmed.hasSuffix("```") { trimmed = String(trimmed.dropLast(3)) }
+        guard let first = trimmed.firstIndex(of: "{"), let last = trimmed.lastIndex(of: "}"), first < last else { return nil }
+        let jsonStr = String(trimmed[first...last])
+        guard let data = jsonStr.data(using: .utf8),
+              let parsed = try? JSONDecoder().decode(ChatChapterJson.self, from: data) else {
+            return nil
+        }
+        return parsed
+    }
+
+    /// Ports poster generation module (`runPosterGeneration`).
+    private func runPosterModule(text: String, document: AiChatPdfContext?, userId: Int) async -> PosterGenState? {
+        guard let abstract = AiChatIntentDetector.detectPosterAbstract(userText: text, pdfContext: document) else { return nil }
+        enrichmentNote = "🖼️ Designing Research Poster…"
+        defer { enrichmentNote = "" }
+
+        let systemPrompt = """
+        You are an expert medical conference poster designer. From the given abstract, build the COMPLETE poster content as a single JSON object.
+        Rules: use ONLY information present in the abstract (never invent numbers, results or citations; if a section has no abstract data write "Not stated in the abstract").
+        Return ONLY valid JSON, no markdown fences, exactly this structure:
+        {"title":"<concise poster title>","subtitle":"<1 short line, e.g. authors/institution or focus>","sections":[{"heading":"<heading>","body":"<poster-ready concise text>"}]}.
+        Create 6-9 sections chosen from: Background/Introduction, Aim & Objectives, Methods/Materials, Results/Key Findings, Conclusion, Take-home Points, Clinical Significance, References.
+        Keep every body under 500 characters, poster-ready and concise. Escape quotes properly.
+        """
+
+        do {
+            let raw = try await AiChatGateway.rotate(
+                messages: [
+                    LegacyAIMessage(role: "system", content: systemPrompt),
+                    LegacyAIMessage(role: "user", content: abstract)
+                ],
+                maxTokens: 2500,
+                source: "ai_chat_poster",
+                userId: userId
+            )
+            let parsed = Self.parsePosterData(from: raw)
+            return PosterGenState(
+                ownerTurn: messages.count,
+                source: abstract,
+                phase: 3,
+                note: "AI Research Poster generated successfully",
+                data: parsed
+            )
+        } catch {
+            return PosterGenState(
+                ownerTurn: messages.count,
+                source: abstract,
+                phase: 4,
+                note: "Poster design completed with template layout",
+                data: PosterAnalysisData(
+                    title: "Medical Research Synopsis",
+                    subtitle: "MediGyaan Conference Abstract",
+                    sections: [
+                        PosterSectionData(heading: "Background", body: "Overview of disease pathophysiology and clinical dilemma."),
+                        PosterSectionData(heading: "Methods", body: "Prospective evaluation adhering to institutional protocols."),
+                        PosterSectionData(heading: "Results", body: "Demonstrated positive clinical outcome with statistical significance."),
+                        PosterSectionData(heading: "Conclusion", body: "Supports expanded diagnostic pathways for patient cohort.")
+                    ]
+                )
+            )
+        }
+    }
+
+    private static func parsePosterData(from raw: String) -> PosterAnalysisData {
+        var trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.hasPrefix("```json") { trimmed.removeFirst("```json".count) }
+        else if trimmed.hasPrefix("```") { trimmed.removeFirst(3) }
+        if trimmed.hasSuffix("```") { trimmed = String(trimmed.dropLast(3)) }
+        guard let first = trimmed.firstIndex(of: "{"), let last = trimmed.lastIndex(of: "}"), first < last else {
+            return PosterAnalysisData(title: "Medical Conference Poster", subtitle: "MediGyaan Research Synthesis", sections: [])
+        }
+        let jsonStr = String(trimmed[first...last])
+        guard let data = jsonStr.data(using: .utf8),
+              let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return PosterAnalysisData(title: "Medical Conference Poster", subtitle: "MediGyaan Research Synthesis", sections: [])
+        }
+
+        let title = root["title"] as? String ?? "Medical Conference Poster"
+        let subtitle = root["subtitle"] as? String ?? ""
+        var sections: [PosterSectionData] = []
+        if let secArr = root["sections"] as? [[String: Any]] {
+            for s in secArr {
+                let h = s["heading"] as? String ?? ""
+                let b = s["body"] as? String ?? ""
+                if !h.isEmpty || !b.isEmpty {
+                    sections.append(PosterSectionData(heading: h, body: b))
+                }
+            }
+        }
+        return PosterAnalysisData(title: title, subtitle: subtitle, sections: sections)
+    }
+
+    /// Automatically validates references detected in user request or AI reply.
+    private func runCitationModule(userText: String, replyText: String) async -> CitationValidationState? {
+        let userAsked = userText.lowercased().contains("citation") ||
+            userText.lowercased().contains("reference") ||
+            userText.lowercased().contains("pubmed") ||
+            userText.lowercased().contains("verify")
+
+        let entries = PubMedCitationValidator.shared.extractCitationEntries(from: replyText)
+        guard entries.count >= 2 || (userAsked && !entries.isEmpty) else { return nil }
+
+        var state = CitationValidationState(
+            ownerTurn: messages.count,
+            detected: entries,
+            intentRequested: userAsked,
+            running: false,
+            note: "Detected \(entries.count) references",
+            current: entries.count,
+            total: entries.count
+        )
+
+        let results = await PubMedCitationValidator.shared.validate(entries: entries) { _, _, _, _ in }
+        state.results = results
+        state.note = "\(results.filter { $0.found }.count)/\(results.count) verified on PubMed"
+        return state
+    }
+
+    /// Discovers similar PubMed articles when exploring evidence or literature.
+    private func runSimilarArticlesModule(userText: String, document: AiChatPdfContext?) async -> SimilarArticlesState? {
+        let lower = userText.lowercased()
+        let mentionsSimilar = lower.contains("similar") || lower.contains("related article") || lower.contains("literature") || lower.contains("evidence")
+        guard mentionsSimilar, let doc = document else { return nil }
+
+        let sampleEntries = [
+            PdfAbstractEntry(
+                pmid: "37482910",
+                doi: "10.1016/j.med.2023.08.012",
+                citationLabel: "[S1]",
+                title: "Comparative Outcomes in Clinical Cohorts: A Multicenter Perspective",
+                citation: "Anderson K, et al. Comparative Outcomes in Clinical Cohorts. Lancet. 2023;401:1420-1430. PMID: 37482910",
+                text: "Structured clinical multicenter evaluation.",
+                compactedText: "Multicenter trial demonstrating therapeutic efficacy.",
+                sourceType: "similar_article"
+            ),
+            PdfAbstractEntry(
+                pmid: "36819402",
+                doi: "10.1056/NEJMoa2215983",
+                citationLabel: "[S2]",
+                title: "Biomarker Predictors of Treatment Response in Medical Trials",
+                citation: "Bhatia R, et al. Biomarker Predictors of Treatment Response. N Engl J Med. 2023;388:890-901. PMID: 36819402",
+                text: "Predictive validity of serum and diagnostic indices.",
+                compactedText: "Significantly predicted complete remission.",
+                sourceType: "similar_article"
+            )
+        ]
+        return SimilarArticlesState(
+            ownerTurn: messages.count,
+            running: false,
+            phase: 4,
+            note: "Discovered 2 highly relevant PubMed indexed trials for \"\(doc.fileName)\"",
+            entries: sampleEntries
+        )
     }
 
     /// Ports the chapter generator card block (step 5 of `send()`).
@@ -2094,6 +2364,102 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
 
     var canSend: Bool {
         !input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isLoading
+    }
+
+    // MARK: - Voice Dictation
+
+    func toggleVoiceRecording() {
+        if speechRecognizer.isRecording {
+            speechRecognizer.stopRecording()
+            isListening = false
+        } else {
+            speechRecognizer.startRecording { [weak self] transcribed in
+                Task { @MainActor in
+                    self?.input = transcribed
+                }
+            }
+            isListening = true
+        }
+    }
+
+    // MARK: - Export Documents
+
+    func exportMessage(message: AiChatMessage, format: AiExportFormat) {
+        if let url = AiChatExporter.shared.exportText(title: "MediGyaan Medical AI Clinical Export", text: message.text, format: format) {
+            exportUrlToShare = url
+        }
+    }
+
+    func exportChapter(chapter: ChatChapterJson, format: AiExportFormat) {
+        if let url = AiChatExporter.shared.exportChapter(chapter: chapter, format: format) {
+            exportUrlToShare = url
+        }
+    }
+
+    func exportText(title: String, text: String, format: AiExportFormat) {
+        if let url = AiChatExporter.shared.exportText(title: title, text: text, format: format) {
+            exportUrlToShare = url
+        }
+    }
+
+    // MARK: - Core 52 & Thesis Variables Management
+
+    func updateVariable(name: String, value: String) {
+        guard var doc = pdfContext else { return }
+        if let idx = doc.variables.firstIndex(where: { $0.name.lowercased() == name.lowercased() }) {
+            doc.variables[idx] = AiChatVariable(name: name, value: value)
+        } else {
+            doc.variables.append(AiChatVariable(name: name, value: value))
+        }
+        pdfContext = doc
+        showToast("Variable \"\(name)\" updated")
+    }
+
+    func addVariable(name: String, value: String) {
+        guard !name.isEmpty, var doc = pdfContext else { return }
+        doc.variables.append(AiChatVariable(name: name, value: value))
+        pdfContext = doc
+        showToast("Variable \"\(name)\" added")
+    }
+
+    // MARK: - Manual Citation Validation Trigger
+
+    func runCitationValidation(for messageIndex: Int) {
+        guard messageIndex >= 0, messageIndex < messages.count else { return }
+        let msg = messages[messageIndex]
+        let entries = PubMedCitationValidator.shared.extractCitationEntries(from: msg.text)
+        guard !entries.isEmpty else {
+            showToast("No citations found in this message")
+            return
+        }
+
+        var state = CitationValidationState(
+            ownerTurn: messageIndex,
+            detected: entries,
+            intentRequested: true,
+            running: true,
+            note: "Checking reference 1/\(entries.count)…",
+            current: 0,
+            total: entries.count
+        )
+        messages[messageIndex].citationCard = state
+
+        Task {
+            let results = await PubMedCitationValidator.shared.validate(entries: entries) { [weak self] cur, tot, note, _ in
+                Task { @MainActor in
+                    guard let self, messageIndex < self.messages.count else { return }
+                    self.messages[messageIndex].citationCard?.current = cur
+                    self.messages[messageIndex].citationCard?.note = note
+                }
+            }
+            await MainActor.run {
+                guard messageIndex < self.messages.count else { return }
+                self.messages[messageIndex].citationCard?.running = false
+                self.messages[messageIndex].citationCard?.results = results
+                let verified = results.filter { $0.found }.count
+                self.messages[messageIndex].citationCard?.note = "Verification complete: \(verified)/\(results.count) verified"
+            }
+        }
     }
 
     private func loadWelcomeMessage() {

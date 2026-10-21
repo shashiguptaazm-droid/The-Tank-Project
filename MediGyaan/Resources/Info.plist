@@ -64,6 +64,8 @@
 	<string>MediGyaan needs camera access for video calls and capturing study material.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>MediGyaan needs microphone access for live challenge and video calls.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>MediGyaan uses speech recognition for live voice dictation with the Medical AI Assistant.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Used to keep your study analytics accurate across devices.</string>
 	<!-- `audio` keeps an active call alive when the app is backgrounded or the
