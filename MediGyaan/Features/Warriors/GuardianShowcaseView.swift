@@ -23,7 +23,9 @@ struct GuardianShowcaseView: View {
     @State private var showingArmory: Bool = false
     @State private var is3DViewMode: Bool = true
     @State private var isAutoRotating: Bool = true
+    @State private var isFullscreen3D: Bool = false
     @State private var showEquippedToast: Bool = false
+    @State private var creditsBalance: Int = CreditsManager.shared.credits
 
     private var allWarriors: [Warrior] {
         Warrior.allWarriors
@@ -135,6 +137,67 @@ struct GuardianShowcaseView: View {
                 EquipmentCatalogView()
             }
         }
+        .fullScreenCover(isPresented: $isFullscreen3D) {
+            ZStack {
+                Color.black.ignoresSafeArea()
+
+                DotaHeroShowcaseWebView(
+                    avatarIndex: GuardianRegistry.avatarIndex(for: currentWarrior.id),
+                    autoRotate: isAutoRotating
+                )
+                .ignoresSafeArea()
+
+                VStack {
+                    HStack {
+                        Button {
+                            isFullscreen3D = false
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 28))
+                                .foregroundStyle(Color.white.opacity(0.85))
+                        }
+                        .padding(.leading, 16)
+                        .padding(.top, 16)
+
+                        Spacer()
+
+                        VStack(spacing: 2) {
+                            Text(currentWarrior.name.uppercased())
+                                .font(.system(size: 15, weight: .black))
+                                .foregroundStyle(currentWarrior.glowColor)
+                            Text(currentWarrior.title)
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundStyle(Color.white.opacity(0.75))
+                        }
+                        .padding(.top, 16)
+
+                        Spacer()
+
+                        Button {
+                            isAutoRotating.toggle()
+                        } label: {
+                            Image(systemName: isAutoRotating ? "arrow.triangle.2.circlepath.circle.fill" : "arrow.triangle.2.circlepath.circle")
+                                .font(.system(size: 26))
+                                .foregroundStyle(isAutoRotating ? Color.yellow : Color.gray)
+                        }
+                        .padding(.trailing, 16)
+                        .padding(.top, 16)
+                    }
+
+                    Spacer()
+
+                    HStack {
+                        Text("360° INSPECT • PINCH ZOOM • 3D DIORAMA MESHES")
+                            .font(.system(size: 10, weight: .bold, design: .monospaced))
+                            .foregroundStyle(Color.white.opacity(0.75))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 6)
+                            .background(Capsule().fill(Color.black.opacity(0.75)))
+                    }
+                    .padding(.bottom, 28)
+                }
+            }
+        }
     }
 
     // MARK: - Header Bar
@@ -167,8 +230,19 @@ struct GuardianShowcaseView: View {
 
             Spacer()
 
-            // Armory & Quick Cycle Buttons
+            // Armory & Treasury & Quick Cycle Buttons
             HStack(spacing: 6) {
+                HStack(spacing: 4) {
+                    Text("🪙")
+                    Text("\(creditsBalance)")
+                        .font(.system(size: 10, weight: .black, design: .monospaced))
+                        .foregroundStyle(Color.yellow)
+                }
+                .padding(.horizontal, 7)
+                .padding(.vertical, 5)
+                .background(Capsule().fill(Color.yellow.opacity(0.12)))
+                .overlay(Capsule().stroke(Color.yellow.opacity(0.3), lineWidth: 1))
+
                 Button {
                     showingArmory = true
                     RemoteLogger.log(tag: "Showcase_Open_Armory", message: "User opened 3D Equipment Armory from Guardian Showcase")
@@ -339,34 +413,46 @@ struct GuardianShowcaseView: View {
                 .padding(.top, 14)
 
                 // 3D Model Viewport OR 2D Avatar Graphic
-                if is3DViewMode, let glb = currentWarrior.glbModelName {
+                if is3DViewMode {
+                    let avatarIdx = GuardianRegistry.avatarIndex(for: currentWarrior.id)
                     ZStack {
-                        ThreeDModelWebView(
-                            modelName: glb,
-                            glowColorHex: currentWarrior.glowColorHex,
-                            autoRotate: isAutoRotating,
-                            cameraDistance: 3.2,
-                            cameraHeight: 1.1
+                        DotaHeroShowcaseWebView(
+                            avatarIndex: avatarIdx,
+                            autoRotate: isAutoRotating
                         )
-                        .frame(height: 200)
+                        .frame(height: 230)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
 
-                        // Interaction hint overlay
+                        // Interaction hint overlay & Fullscreen toggle
                         VStack {
+                            HStack {
+                                Spacer()
+                                Button {
+                                    isFullscreen3D = true
+                                } label: {
+                                    Image(systemName: "arrow.up.left.and.arrow.down.right")
+                                        .font(.system(size: 11, weight: .bold))
+                                        .foregroundStyle(Color.white)
+                                        .padding(6)
+                                        .background(Circle().fill(Color.black.opacity(0.65)))
+                                        .overlay(Circle().stroke(Color.white.opacity(0.2), lineWidth: 1))
+                                }
+                                .padding(8)
+                            }
                             Spacer()
                             HStack(spacing: 6) {
                                 Circle().fill(currentWarrior.glowColor).frame(width: 5, height: 5)
-                                Text("360° INSPECT • DRAG TO ROTATE • PINCH TO ZOOM")
-                                    .font(.system(size: 9, weight: .bold, design: .monospaced))
+                                Text("360° INSPECT • 19 3D GLB MODELS & MESHES ACTIVE")
+                                    .font(.system(size: 8.5, weight: .bold, design: .monospaced))
                                     .foregroundStyle(AppTheme.Palette.textMuted)
                             }
                             .padding(.horizontal, 10)
                             .padding(.vertical, 3)
-                            .background(Capsule().fill(Color(hex: "#050914").opacity(0.75)))
+                            .background(Capsule().fill(Color(hex: "#050914").opacity(0.8)))
                             .padding(.bottom, 4)
                         }
                     }
-                    .frame(height: 200)
+                    .frame(height: 230)
                 } else {
                     // Avatar Graphic with Pedestal Glow
                     ZStack {
@@ -408,7 +494,7 @@ struct GuardianShowcaseView: View {
                 .padding(.bottom, 14)
             }
         }
-        .frame(height: 310)
+        .frame(height: 340)
     }
 
     private func attributeBadge(label: String, value: Int, color: Color) -> some View {
@@ -662,6 +748,22 @@ struct GuardianShowcaseView: View {
                                             .scaledToFit()
                                             .frame(width: 46, height: 46)
                                             .clipShape(Circle())
+
+                                        if warrior.id <= 19 {
+                                            VStack {
+                                                HStack {
+                                                    Text("3D")
+                                                        .font(.system(size: 7, weight: .black))
+                                                        .foregroundStyle(Color.black)
+                                                        .padding(.horizontal, 4)
+                                                        .padding(.vertical, 1)
+                                                        .background(Capsule().fill(Color.yellow))
+                                                    Spacer()
+                                                }
+                                                Spacer()
+                                            }
+                                            .frame(width: 58, height: 58)
+                                        }
 
                                         if isEquipped {
                                             VStack {

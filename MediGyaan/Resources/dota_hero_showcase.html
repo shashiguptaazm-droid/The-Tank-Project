@@ -1,0 +1,2272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Curia Arcana 3D Hero Inspector</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    body, html { width: 100%; height: 100%; overflow: hidden; background: transparent !important; background-color: transparent !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    #backdrop-container {
+      display: none;
+    }
+    #backdrop-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: opacity 0.5s ease-in-out;
+      opacity: 0.85;
+    }
+    #backdrop-vignette {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 45%, rgba(3, 7, 18, 0.15) 0%, rgba(3, 7, 18, 0.55) 60%, rgba(3, 7, 18, 0.95) 100%);
+      pointer-events: none;
+    }
+    #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 2; }
+    #ui-overlay { position: absolute; top: 80px; right: 14px; pointer-events: none; display: flex; justify-content: flex-end; align-items: center; z-index: 10; }
+    .hero-badge { display: none; }
+      background: linear-gradient(135deg, rgba(13, 22, 38, 0.92) 0%, rgba(5, 8, 22, 0.96) 100%);
+      border: 1px solid rgba(255, 215, 0, 0.45);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 9px 16px;
+      color: #ffffff;
+      backdrop-filter: blur(8px);
+    }
+    .hero-title { font-size: 15px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; color: #ffd700; text-shadow: 0 2px 8px rgba(255, 215, 0, 0.3); }
+    .hero-category { font-size: 10.5px; font-weight: 700; letter-spacing: 1.0px; text-transform: uppercase; color: #00e5ff; margin-top: 3px; display: flex; align-items: center; gap: 5px; }
+    .category-dot { width: 6px; height: 6px; border-radius: 50%; background: #00e5ff; box-shadow: 0 0 6px currentColor; }
+    .rotate-hint {
+      background: rgba(8, 14, 28, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      border-radius: 20px;
+      padding: 7px 14px;
+      color: #94a3b8;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .rotate-icon {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #00e5ff;
+      box-shadow: 0 0 10px #00e5ff;
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 0.6; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+    .hero-loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 40%, rgba(13, 27, 42, 0.94), rgba(3, 7, 18, 0.98));
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .hero-loading-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .loading-content {
+      width: 82%;
+      max-width: 320px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .loading-subject-tag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: #00e5ff;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .loading-hero-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #f3f4f6;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+    }
+    .loading-spinner-wrap {
+      margin-bottom: 20px;
+    }
+    .loading-pulse-crystal {
+      width: 34px;
+      height: 34px;
+      border: 3px solid rgba(255, 255, 255, 0.15);
+      border-top-color: #00e5ff;
+      border-radius: 50%;
+      animation: spinLoader 0.9s infinite linear;
+      box-shadow: 0 0 16px rgba(0, 229, 255, 0.4);
+    }
+    @keyframes spinLoader {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .loading-bar-track {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .loading-bar-inner {
+      width: 30%;
+      height: 100%;
+      background: linear-gradient(90deg, #00e5ff, #ffd700);
+      border-radius: 2px;
+      animation: loadingTrack 1.4s infinite ease-in-out;
+    }
+    @keyframes loadingTrack {
+      0% { transform: translateX(-100%); width: 20%; }
+      50% { width: 60%; }
+      100% { transform: translateX(300%); width: 30%; }
+    }
+    .loading-mnemonic-text {
+      font-size: 11px;
+      color: #94a3b8;
+      font-style: italic;
+      line-height: 1.4;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+  </style>
+  <script src="js/three.min.js"></script>
+  <script>if (typeof THREE === 'undefined') document.write('<script src="three.min.js"><\\/script>')</script>
+  <script src="js/OrbitControls.js"></script>
+  <script>if (typeof THREE !== 'undefined' && !THREE.OrbitControls) document.write('<script src="OrbitControls.js"><\\/script>')</script>
+  <script src="js/GLTFLoader.js"></script>
+  <script>if (typeof THREE !== 'undefined' && !THREE.GLTFLoader) document.write('<script src="GLTFLoader.js"><\\/script>')</script>
+</head>
+<body>
+  <div id="backdrop-container">
+    <div id="backdrop-img"></div>
+    <div id="backdrop-vignette"></div>
+  </div>
+  <div id="canvas-container"></div>
+  <div id="ui-overlay">
+    <div class="hero-badge">
+      <div id="hero-name" class="hero-title">Grand Inquisitor Scorpio</div>
+      <div id="hero-sub" class="hero-category">
+        <span class="category-dot" id="category-dot"></span>
+        <span id="hero-sub-text">The Scorpion • Elimination</span>
+      </div>
+    </div>
+    <div class="rotate-hint">
+      <span class="rotate-icon"></span>
+      <span>360° INSPECT</span>
+    </div>
+  </div>
+
+  <!-- Hero-Specific Thematic Loading Screen -->
+  <div id="hero-loading-screen" class="hero-loading-overlay">
+    <div class="loading-content">
+      <div id="loading-subject" class="loading-subject-tag">ANATOMY • GROSS &amp; NEURO</div>
+      <div id="loading-title" class="loading-hero-title">Skeletal Guardian • Axiom</div>
+      <div class="loading-spinner-wrap">
+        <div id="loading-spinner" class="loading-pulse-crystal"></div>
+      </div>
+      <div class="loading-bar-track">
+        <div id="loading-bar-fill" class="loading-bar-inner"></div>
+      </div>
+      <div id="loading-mnemonic" class="loading-mnemonic-text">
+        Loading clinical 3D assets...
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.onerror = function(msg, url, line, col, error) {
+      console.error('JS GLOBAL ERROR: ' + msg + ' at ' + url + ':' + line + (col ? ':' + col : ''));
+      return false;
+    };
+    console.log('dota_hero_showcase.html script starting');
+
+    // Utility: Hex string to RGBA helper
+    function hexToRgba(hexStr, alpha) {
+      let c = hexStr.replace('#', '');
+      if (c.length === 3) c = c.split('').map(x => x + x).join('');
+      const num = parseInt(c, 16);
+      const r = (num >> 16) & 255;
+      const g = (num >> 8) & 255;
+      const b = num & 255;
+      return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+    }
+
+    // Procedural sigil texture generator for the back of the medallion
+    function createSigilCanvasTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      // Dark celestial backdrop
+      const bgGrad = ctx.createRadialGradient(256, 256, 40, 256, 256, 256);
+      bgGrad.addColorStop(0, '#10162a');
+      bgGrad.addColorStop(0.7, '#070b16');
+      bgGrad.addColorStop(1, '#02040a');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, 512, 512);
+
+      // Gold astrological rings
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(256, 256, 230, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(256, 256, 210, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(256, 256, 170, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Constellation star points
+      ctx.fillStyle = '#ffd700';
+      const numPoints = 12;
+      for (let i = 0; i < numPoints; i++) {
+        const angle = (Math.PI * 2 / numPoints) * i;
+        const x = 256 + Math.cos(angle) * 190;
+        const y = 256 + Math.sin(angle) * 190;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Radiating lines
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.35)';
+        ctx.beginPath();
+        ctx.moveTo(256, 256);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      }
+
+      // Central octagram
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 3;
+      for (let k = 0; k < 2; k++) {
+        const offset = (Math.PI / 4) * k;
+        ctx.beginPath();
+        for (let i = 0; i < 4; i++) {
+          const a = offset + (Math.PI / 2) * i;
+          const px = 256 + Math.cos(a) * 110;
+          const py = 256 + Math.sin(a) * 110;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      }
+
+      // Core seal text
+      ctx.fillStyle = '#fde047';
+      ctx.font = 'bold 24px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('CURIA ARCANA', 256, 256);
+
+      ctx.font = '14px sans-serif';
+      ctx.fillStyle = 'rgba(253, 224, 71, 0.7)';
+      ctx.fillText('• NOCTIS DOMINUS •', 256, 285);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      return texture;
+    }
+
+    // Procedural runic ring for pedestal
+    function createRunicRingTexture(accentHex) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 1024;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, 1024, 1024);
+
+      const c = '#' + accentHex.toString(16).padStart(6, '0');
+      ctx.strokeStyle = c;
+      ctx.shadowColor = c;
+      ctx.shadowBlur = 12;
+
+      // Outer & inner boundary
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.arc(512, 512, 480, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(512, 512, 430, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(512, 512, 320, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Mystic glyph symbols
+      const runes = ['᚛', '᚜', 'ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ', 'ᛁ', 'ᛃ', 'ᛈ', 'ᛉ', 'ᛋ', 'ᛏ', 'ᛒ', 'ᛖ', 'ᛗ', 'ᛚ', 'ᛜ', 'ᛞ', '✧', '✦', '☽', '☼', '☿', '♀', '♁', '♂'];
+      ctx.fillStyle = c;
+      ctx.font = 'bold 36px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const count = 32;
+      for (let i = 0; i < count; i++) {
+        const a = (Math.PI * 2 / count) * i;
+        const rx = 512 + Math.cos(a) * 375;
+        const ry = 512 + Math.sin(a) * 375;
+        ctx.save();
+        ctx.translate(rx, ry);
+        ctx.rotate(a + Math.PI / 2);
+        ctx.fillText(runes[i % runes.length], 0, 0);
+        ctx.restore();
+      }
+
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    // Procedural specular air bubble texture generator tailored per hero archetype
+    function createBubbleTexture(accentHex, styleType) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 128;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, 128, 128);
+
+      const hexStr = '#' + accentHex.toString(16).padStart(6, '0');
+
+      // 1. Translucent liquid sphere gradient
+      const grad = ctx.createRadialGradient(54, 54, 12, 64, 64, 58);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 0.22)');
+      grad.addColorStop(0.65, hexToRgba(hexStr, 0.14));
+      grad.addColorStop(0.88, hexToRgba(hexStr, 0.50));
+      grad.addColorStop(1.0, hexToRgba(hexStr, 0.85));
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(64, 64, 56, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. Glossy iridescent rim membrane
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(64, 64, 56, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // 3. Primary sharp specular reflection glint (top-left)
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(45, 38, 16, 8, -Math.PI / 4, 0, Math.PI * 2);
+      const specGrad = ctx.createRadialGradient(45, 38, 1, 45, 38, 16);
+      specGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+      specGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.65)');
+      specGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = specGrad;
+      ctx.fill();
+      ctx.restore();
+
+      // 4. Secondary soft bounce crescent reflection (bottom-right)
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(64, 64, 51, Math.PI * 0.15, Math.PI * 0.48);
+      ctx.strokeStyle = hexToRgba(hexStr, 0.85);
+      ctx.lineWidth = 3.5;
+      ctx.stroke();
+      ctx.restore();
+
+      // 5. Hero-specific internal energy nucleus
+      if (styleType === 'electric_spark') {
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(56, 54); ctx.lineTo(63, 62); ctx.lineTo(60, 65); ctx.lineTo(70, 74);
+        ctx.stroke();
+      } else if (styleType === 'biohazard_culture') {
+        ctx.fillStyle = '#76ff03';
+        ctx.beginPath();
+        ctx.arc(61, 62, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.arc(71, 69, 4, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (styleType === 'pathogen_spore') {
+        ctx.fillStyle = 'rgba(206, 147, 216, 0.9)';
+        ctx.beginPath();
+        ctx.arc(64, 64, 8, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (styleType === 'womb_aurora') {
+        ctx.fillStyle = 'rgba(255, 192, 203, 0.9)';
+        ctx.beginPath();
+        ctx.arc(64, 64, 7, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (styleType === 'marrow_cyan') {
+        ctx.fillStyle = 'rgba(128, 222, 234, 0.85)';
+        ctx.beginPath();
+        ctx.arc(64, 64, 7, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    // Master Hero Profiles: Distinct lighting, glow, and bubble physics
+    const HERO_PROFILES = {
+      axiom: {
+        keyColor: 0xe0f7fa, keyIntensity: 2.5,
+        fillColor: 0x37474f, fillIntensity: 0.95,
+        rimColor: 0x00e5ff, rimIntensity: 4.2,
+        underglowColor: 0x00b0ff, underglowIntensity: 3.2,
+        fogColor: 0x020a14, fogDensity: 0.052,
+        bubbleStyle: 'marrow_cyan', bubbleColor: 0x00e5ff,
+        bubbleCount: 44, bubbleSpeed: 0.0050, bubbleWobble: 1.8
+      },
+      pulse: {
+        keyColor: 0xffffff, keyIntensity: 2.8,
+        fillColor: 0x0d47a1, fillIntensity: 1.1,
+        rimColor: 0xffd700, rimIntensity: 4.6,
+        underglowColor: 0x00e5ff, underglowIntensity: 3.8,
+        fogColor: 0x03081a, fogDensity: 0.050,
+        bubbleStyle: 'electric_spark', bubbleColor: 0x00ffff,
+        bubbleCount: 48, bubbleSpeed: 0.0075, bubbleWobble: 3.2
+      },
+      catalyst: {
+        keyColor: 0xffebee, keyIntensity: 2.4,
+        fillColor: 0x4a148c, fillIntensity: 0.95,
+        rimColor: 0xba68c8, rimIntensity: 4.0,
+        underglowColor: 0x9c27b0, underglowIntensity: 3.2,
+        fogColor: 0x090312, fogDensity: 0.052,
+        bubbleStyle: 'effervescent_alchemy', bubbleColor: 0xce93d8,
+        bubbleCount: 50, bubbleSpeed: 0.0080, bubbleWobble: 2.4
+      },
+      necros: {
+        keyColor: 0xf3e5f5, keyIntensity: 2.2,
+        fillColor: 0x260e3a, fillIntensity: 0.85,
+        rimColor: 0x7e57c2, rimIntensity: 4.2,
+        underglowColor: 0x673ab7, underglowIntensity: 3.2,
+        fogColor: 0x07020d, fogDensity: 0.056,
+        bubbleStyle: 'pathogen_spore', bubbleColor: 0xb388ff,
+        bubbleCount: 40, bubbleSpeed: 0.0042, bubbleWobble: 1.4
+      },
+      pharma: {
+        keyColor: 0xe8f5e9, keyIntensity: 2.5,
+        fillColor: 0x004d40, fillIntensity: 0.95,
+        rimColor: 0x00e676, rimIntensity: 4.0,
+        underglowColor: 0x1de9b6, underglowIntensity: 3.2,
+        fogColor: 0x020f0a, fogDensity: 0.050,
+        bubbleStyle: 'elixir_serum', bubbleColor: 0x69f0ae,
+        bubbleCount: 44, bubbleSpeed: 0.0055, bubbleWobble: 2.0
+      },
+      microx: {
+        keyColor: 0xf1f8e9, keyIntensity: 2.6,
+        fillColor: 0x1b5e20, fillIntensity: 1.05,
+        rimColor: 0x76ff03, rimIntensity: 4.8,
+        underglowColor: 0x64dd17, underglowIntensity: 3.6,
+        fogColor: 0x021004, fogDensity: 0.052,
+        bubbleStyle: 'biohazard_culture', bubbleColor: 0x76ff03,
+        bubbleCount: 46, bubbleSpeed: 0.0062, bubbleWobble: 2.5
+      },
+      verdict: {
+        keyColor: 0xfff8e1, keyIntensity: 2.7,
+        fillColor: 0x3e2723, fillIntensity: 0.85,
+        rimColor: 0xff9800, rimIntensity: 4.0,
+        underglowColor: 0xffa726, underglowIntensity: 3.0,
+        fogColor: 0x0d0702, fogDensity: 0.054,
+        bubbleStyle: 'forensic_amber', bubbleColor: 0xffb74d,
+        bubbleCount: 40, bubbleSpeed: 0.0048, bubbleWobble: 1.6
+      },
+      cura: {
+        keyColor: 0xe0f2f1, keyIntensity: 2.5,
+        fillColor: 0x004d40, fillIntensity: 0.9,
+        rimColor: 0x26a69a, rimIntensity: 4.2,
+        underglowColor: 0x00bfa5, underglowIntensity: 3.4,
+        fogColor: 0x020e0e, fogDensity: 0.050,
+        bubbleStyle: 'ocean_biosphere', bubbleColor: 0x80cbc4,
+        bubbleCount: 44, bubbleSpeed: 0.0052, bubbleWobble: 2.2
+      },
+      medicus: {
+        keyColor: 0xffffff, keyIntensity: 2.7,
+        fillColor: 0x0d47a1, fillIntensity: 1.05,
+        rimColor: 0x00e5ff, rimIntensity: 4.5,
+        underglowColor: 0x2979ff, underglowIntensity: 3.5,
+        fogColor: 0x030a16, fogDensity: 0.048,
+        bubbleStyle: 'healing_azure', bubbleColor: 0x40c4ff,
+        bubbleCount: 46, bubbleSpeed: 0.0058, bubbleWobble: 2.0
+      },
+      surgon: {
+        keyColor: 0xffffff, keyIntensity: 3.0,
+        fillColor: 0x1a237e, fillIntensity: 0.95,
+        rimColor: 0x00b0ff, rimIntensity: 4.2,
+        underglowColor: 0x00e5ff, underglowIntensity: 3.2,
+        fogColor: 0x020712, fogDensity: 0.050,
+        bubbleStyle: 'cryo_saline', bubbleColor: 0xb3e5fc,
+        bubbleCount: 42, bubbleSpeed: 0.0062, bubbleWobble: 1.5
+      },
+      vita: {
+        keyColor: 0xfff0f5, keyIntensity: 2.6,
+        fillColor: 0x4a148c, fillIntensity: 0.9,
+        rimColor: 0xf48fb1, rimIntensity: 4.6,
+        underglowColor: 0xff80ab, underglowIntensity: 3.5,
+        fogColor: 0x0c040a, fogDensity: 0.048,
+        bubbleStyle: 'womb_aurora', bubbleColor: 0xff80ab,
+        bubbleCount: 48, bubbleSpeed: 0.0045, bubbleWobble: 2.6
+      },
+      pedia: {
+        keyColor: 0xfffde7, keyIntensity: 2.6,
+        fillColor: 0x1a237e, fillIntensity: 0.85,
+        rimColor: 0xffd700, rimIntensity: 4.2,
+        underglowColor: 0xffca28, underglowIntensity: 3.2,
+        fogColor: 0x0a0902, fogDensity: 0.050,
+        bubbleStyle: 'rainbow_soap', bubbleColor: 0xffe082,
+        bubbleCount: 48, bubbleSpeed: 0.0050, bubbleWobble: 3.0
+      },
+      osteon: {
+        keyColor: 0xf5f5f5, keyIntensity: 2.6,
+        fillColor: 0x263238, fillIntensity: 0.9,
+        rimColor: 0x90caf9, rimIntensity: 4.0,
+        underglowColor: 0x64b5f6, underglowIntensity: 3.2,
+        fogColor: 0x040810, fogDensity: 0.052,
+        bubbleStyle: 'calcium_crystal', bubbleColor: 0x90caf9,
+        bubbleCount: 42, bubbleSpeed: 0.0055, bubbleWobble: 1.7
+      },
+      optix: {
+        keyColor: 0xe0f7fa, keyIntensity: 2.8,
+        fillColor: 0x006064, fillIntensity: 0.95,
+        rimColor: 0x00e5ff, rimIntensity: 4.5,
+        underglowColor: 0x18ffff, underglowIntensity: 3.4,
+        fogColor: 0x020a10, fogDensity: 0.050,
+        bubbleStyle: 'marrow_cyan', bubbleColor: 0x00e5ff,
+        bubbleCount: 40, bubbleSpeed: 0.0055, bubbleWobble: 2.0
+      },
+      resona: {
+        keyColor: 0xf3e5f5, keyIntensity: 2.7,
+        fillColor: 0x4a148c, fillIntensity: 0.9,
+        rimColor: 0xba68c8, rimIntensity: 4.4,
+        underglowColor: 0xce93d8, underglowIntensity: 3.3,
+        fogColor: 0x0a0410, fogDensity: 0.050,
+        bubbleStyle: 'pathogen_spore', bubbleColor: 0xba68c8,
+        bubbleCount: 42, bubbleSpeed: 0.0050, bubbleWobble: 2.2
+      },
+      derma: {
+        keyColor: 0xfff3e0, keyIntensity: 2.7,
+        fillColor: 0xe65100, fillIntensity: 0.9,
+        rimColor: 0xffb74d, rimIntensity: 4.3,
+        underglowColor: 0xffa726, underglowIntensity: 3.4,
+        fogColor: 0x0f0802, fogDensity: 0.050,
+        bubbleStyle: 'rainbow_soap', bubbleColor: 0xffb74d,
+        bubbleCount: 44, bubbleSpeed: 0.0055, bubbleWobble: 2.0
+      },
+      synapse: {
+        keyColor: 0xede7f6, keyIntensity: 2.8,
+        fillColor: 0x311b92, fillIntensity: 1.0,
+        rimColor: 0x7e57c2, rimIntensity: 4.6,
+        underglowColor: 0x9575cd, underglowIntensity: 3.5,
+        fogColor: 0x060312, fogDensity: 0.052,
+        bubbleStyle: 'womb_aurora', bubbleColor: 0x7e57c2,
+        bubbleCount: 46, bubbleSpeed: 0.0048, bubbleWobble: 2.5
+      },
+      rayne: {
+        keyColor: 0xe1f5fe, keyIntensity: 2.8,
+        fillColor: 0x01579b, fillIntensity: 0.95,
+        rimColor: 0x29b6f6, rimIntensity: 4.5,
+        underglowColor: 0x4fc3f7, underglowIntensity: 3.4,
+        fogColor: 0x020712, fogDensity: 0.050,
+        bubbleStyle: 'marrow_cyan', bubbleColor: 0x29b6f6,
+        bubbleCount: 44, bubbleSpeed: 0.0055, bubbleWobble: 2.0
+      },
+      somnus: {
+        keyColor: 0xede7f6, keyIntensity: 2.5,
+        fillColor: 0x311b92, fillIntensity: 0.85,
+        rimColor: 0x9575cd, rimIntensity: 4.2,
+        underglowColor: 0xb39ddb, underglowIntensity: 3.2,
+        fogColor: 0x080410, fogDensity: 0.052,
+        bubbleStyle: 'pathogen_spore', bubbleColor: 0x9575cd,
+        bubbleCount: 40, bubbleSpeed: 0.0040, bubbleWobble: 1.8
+      }
+    };
+
+    class DotaStyleHeroShowcase {
+      constructor(container) {
+        this.container = container;
+        this.clock = new THREE.Clock();
+        this.characterSlot = new THREE.Group();
+        this.environmentGroup = new THREE.Group();
+        this.bubbleGroup = new THREE.Group();
+
+        this.currentModelWrapper = null;
+        this.baseScale = 1.0;
+        this.isFullBodyModel = false;
+        this.floatingGems = [];
+        this.airBubbles = [];
+        this.envAnimatedObjects = [];
+        this.monumentAnimatedObjects = [];
+
+        this.pedestalRuneMesh = null;
+        this.pedestalInnerRuneMesh = null;
+        this.auraParticles = null;
+        this.sparksParticles = null;
+        this.currentAccentColor = new THREE.Color(0x00e5ff);
+        this.loadId = 0;
+
+        // 1. Scene Setup with Atmospheric Fog (transparent background to reveal rich backdrop)
+        this.scene = new THREE.Scene();
+        this.scene.background = null;
+        this.scene.fog = new THREE.FogExp2(0x02050f, 0.02);
+
+        // Dedicated slots
+        this.scene.add(this.environmentGroup);
+        this.scene.add(this.characterSlot);
+        this.scene.add(this.bubbleGroup);
+
+        // 2. Compute safe dimensions
+        const w = container.clientWidth || window.innerWidth || 400;
+        const h = container.clientHeight || window.innerHeight || 600;
+
+        // 3. Perspective Camera (Heroic 3/4 framing: targets chest at 0.92, distance 3.8)
+        this.camera = new THREE.PerspectiveCamera(36, w / h, 0.1, 100);
+        this.camera.position.set(0, 1.45, 3.8);
+
+        // 4. Renderer with ACESFilmic Tone Mapping and alpha transparency
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+        this.renderer.setClearColor(0x000000, 0);
+        this.renderer.setSize(w, h);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 1.25;
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(this.renderer.domElement);
+
+        // 5. OrbitControls with smooth inertia
+        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enableDamping = true;
+        this.controls.dampingFactor = 0.06;
+        this.controls.enablePan = false;
+        this.controls.maxPolarAngle = Math.PI / 2 - 0.04;
+        this.controls.minPolarAngle = Math.PI / 4.2;
+        this.controls.autoRotate = true;
+        this.controls.autoRotateSpeed = 0.6;
+        this.controls.minDistance = 2.2;
+        this.controls.maxDistance = 5.2;
+        this.controls.target.set(0, 0.92, 0);
+
+        this.backSigilTexture = createSigilCanvasTexture();
+        this.textureLoader = new THREE.TextureLoader();
+
+        // 6. Build Baseline Subsystems
+        this.initDotaStudioLighting();
+        this.buildDotaPedestal();
+        this.initMagicalSparks();
+
+        window.addEventListener('resize', () => this.onResize());
+        this.animate();
+      }
+
+      getCharacterKey(config) {
+        const idx = config.avatarIndex !== undefined ? Number(config.avatarIndex) : -1;
+        if (idx === 1001) return 'axiom';
+        if (idx === 1002) return 'pulse';
+        if (idx === 1003) return 'catalyst';
+        if (idx === 1004) return 'necros';
+        if (idx === 1005) return 'pharma';
+        if (idx === 1006) return 'microx';
+        if (idx === 1007) return 'verdict';
+        if (idx === 1008) return 'cura';
+        if (idx === 1009) return 'medicus';
+        if (idx === 1010) return 'surgon';
+        if (idx === 1011) return 'vita';
+        if (idx === 1012) return 'pedia';
+        if (idx === 1013) return 'osteon';
+        if (idx === 1014) return 'optix';
+        if (idx === 1015) return 'resona';
+        if (idx === 1016) return 'derma';
+        if (idx === 1017) return 'synapse';
+        if (idx === 1018) return 'rayne';
+        if (idx === 1019) return 'somnus';
+
+        const url = (config.renderConfig && config.renderConfig.modelGlbUrl) ? config.renderConfig.modelGlbUrl.toLowerCase() : '';
+        if (url.includes('axiom')) return 'axiom';
+        if (url.includes('pulse')) return 'pulse';
+        if (url.includes('catalyst')) return 'catalyst';
+        if (url.includes('necros')) return 'necros';
+        if (url.includes('pharma')) return 'pharma';
+        if (url.includes('microx')) return 'microx';
+        if (url.includes('verdict')) return 'verdict';
+        if (url.includes('cura')) return 'cura';
+        if (url.includes('medicus')) return 'medicus';
+        if (url.includes('surgon')) return 'surgon';
+        if (url.includes('vita')) return 'vita';
+        if (url.includes('pedia')) return 'pedia';
+        if (url.includes('osteon')) return 'osteon';
+        if (url.includes('optix')) return 'optix';
+        if (url.includes('resona')) return 'resona';
+        if (url.includes('derma')) return 'derma';
+        if (url.includes('synapse')) return 'synapse';
+        if (url.includes('rayne')) return 'rayne';
+        if (url.includes('somnus')) return 'somnus';
+
+        return 'axiom';
+      }
+
+      disposeHierarchy(rootGroup) {
+        while (rootGroup.children.length > 0) {
+          const obj = rootGroup.children[0];
+          rootGroup.remove(obj);
+          obj.traverse((child) => {
+            if (child.isMesh || child.isSprite || child.isPoints) {
+              if (child.geometry) child.geometry.dispose();
+              if (child.material) {
+                const mats = Array.isArray(child.material) ? child.material : [child.material];
+                mats.forEach(m => {
+                  if (m.map) m.map.dispose();
+                  if (m.normalMap) m.normalMap.dispose();
+                  if (m.roughnessMap) m.roughnessMap.dispose();
+                  if (m.metalnessMap) m.metalnessMap.dispose();
+                  m.dispose();
+                });
+              }
+            }
+          });
+        }
+      }
+
+      clearCharacterSlot() {
+        if (this.mixer) {
+          this.mixer.stopAllAction();
+          this.mixer = null;
+        }
+        this.disposeHierarchy(this.characterSlot);
+        this.disposeHierarchy(this.environmentGroup);
+        this.disposeHierarchy(this.bubbleGroup);
+
+        this.currentModelWrapper = null;
+        this.baseScale = 1.0;
+        this.isFullBodyModel = false;
+        this.airBubbles = [];
+        this.envAnimatedObjects = [];
+        this.monumentAnimatedObjects = [];
+      }
+
+      initDotaStudioLighting() {
+        // Ambient soft celestial fill
+        this.ambient = new THREE.AmbientLight(0xffffff, 0.45);
+        this.scene.add(this.ambient);
+
+        // Key Light: High-angle warm golden spotlight
+        this.keyLight = new THREE.DirectionalLight(0xfffaed, 2.5);
+        this.keyLight.position.set(2.8, 5.5, 3.2);
+        this.keyLight.castShadow = true;
+        this.keyLight.shadow.mapSize.width = 1024;
+        this.keyLight.shadow.mapSize.height = 1024;
+        this.keyLight.shadow.bias = -0.001;
+        this.scene.add(this.keyLight);
+
+        // Fill Light: Low-intensity cool twilight from opposite side
+        this.fillLight = new THREE.DirectionalLight(0x64748b, 0.95);
+        this.fillLight.position.set(-3.2, 2.0, 2.5);
+        this.scene.add(this.fillLight);
+
+        // Back / Rim Light: Hero power archetype accent color
+        this.rimLight = new THREE.DirectionalLight(this.currentAccentColor, 4.0);
+        this.rimLight.position.set(0, 3.8, -3.8);
+        this.scene.add(this.rimLight);
+
+        // Pedestal Underglow: Upward beacon
+        this.pedestalGlow = new THREE.PointLight(this.currentAccentColor, 3.0, 4.5);
+        this.pedestalGlow.position.set(0, 0.35, 0);
+        this.scene.add(this.pedestalGlow);
+
+        // Front Soft Fill for the hero emblem
+        this.frontGlow = new THREE.PointLight(0xffffff, 0.9, 3.5);
+        this.frontGlow.position.set(0, 1.3, 1.8);
+        this.scene.add(this.frontGlow);
+      }
+
+      applyHeroLightingProfile(profile) {
+        if (!profile) return;
+        this.keyLight.color.setHex(profile.keyColor);
+        this.keyLight.intensity = profile.keyIntensity;
+
+        this.fillLight.color.setHex(profile.fillColor);
+        this.fillLight.intensity = profile.fillIntensity;
+
+        this.rimLight.color.setHex(profile.rimColor);
+        this.rimLight.intensity = profile.rimIntensity;
+
+        this.pedestalGlow.color.setHex(profile.underglowColor);
+        this.pedestalGlow.intensity = profile.underglowIntensity;
+
+        // Transparent WebGL scene background allows dedicated hero backdrop to show through
+        this.scene.background = null;
+        if (this.scene.fog) {
+          this.scene.fog.color.setHex(profile.fogColor);
+          this.scene.fog.density = 0.018;
+        }
+      }
+
+      updateHeroBackground(config, key) {
+        const bgEl = document.getElementById('backdrop-img');
+        if (!bgEl) return;
+
+        let bgPath = (config.renderConfig && config.renderConfig.backgroundImageUrl)
+          ? config.renderConfig.backgroundImageUrl
+          : null;
+
+        if (!bgPath) {
+          const charMap = {
+            axiom: 'bg_char01_axiom.jpg',
+            pulse: 'bg_char02_pulse.jpg',
+            catalyst: 'bg_char03_catalyst.jpg',
+            necros: 'bg_char04_necros.jpg',
+            pharma: 'bg_char05_pharma.jpg',
+            microx: 'bg_char06_microx.jpg',
+            verdict: 'bg_char07_verdict.jpg',
+            cura: 'bg_char08_cura.jpg',
+            medicus: 'bg_char09_medicus.jpg',
+            surgon: 'bg_char10_surgon.jpg',
+            vita: 'bg_char11_vita.jpg',
+            pedia: 'bg_char12_pedia.jpg',
+            osteon: 'bg_char13_osteon.jpg',
+            optix: 'bg_char14_optix.jpg',
+            resona: 'bg_char15_resona.jpg',
+            derma: 'bg_char16_derma.jpg',
+            synapse: 'bg_char17_synapse.jpg',
+            rayne: 'bg_char18_rayne.jpg',
+            somnus: 'bg_char19_somnus.jpg'
+          };
+          const fname = charMap[key] || 'bg_char01_axiom.jpg';
+          bgPath = 'backgrounds/' + fname;
+        }
+
+        // Smooth cross-fade to character-specific background
+        bgEl.style.opacity = '0';
+        const img = new Image();
+        img.onload = () => {
+          bgEl.style.backgroundImage = 'url("' + bgPath + '")';
+          bgEl.style.opacity = '0.88';
+        };
+        img.onerror = () => {
+          bgEl.style.backgroundImage = 'url("' + bgPath + '")';
+          bgEl.style.opacity = '0.88';
+        };
+        img.src = bgPath;
+      }
+
+      buildDotaPedestal() {
+        this.pedestalGroup = new THREE.Group();
+
+        // Base Layer: Chiseled Dark Obsidian Altar
+        const baseGeo = new THREE.CylinderGeometry(1.65, 1.8, 0.22, 64);
+        const baseMat = new THREE.MeshStandardMaterial({
+          color: 0x090d16,
+          metalness: 0.85,
+          roughness: 0.25
+        });
+        const base = new THREE.Mesh(baseGeo, baseMat);
+        base.position.y = -0.11;
+        base.receiveShadow = true;
+        this.pedestalGroup.add(base);
+
+        // Gold Filigree Inlay Ring on Base
+        const goldTrimGeo = new THREE.TorusGeometry(1.68, 0.025, 16, 64);
+        const goldMat = new THREE.MeshStandardMaterial({
+          color: 0xd4af37,
+          metalness: 0.95,
+          roughness: 0.15
+        });
+        const goldTrim = new THREE.Mesh(goldTrimGeo, goldMat);
+        goldTrim.rotation.x = Math.PI / 2;
+        goldTrim.position.y = -0.01;
+        this.pedestalGroup.add(goldTrim);
+
+        // Dais Tier 2: Elevated Polished Stone
+        const daisGeo = new THREE.CylinderGeometry(1.35, 1.48, 0.12, 64);
+        const daisMat = new THREE.MeshStandardMaterial({
+          color: 0x111726,
+          metalness: 0.75,
+          roughness: 0.3
+        });
+        const dais = new THREE.Mesh(daisGeo, daisMat);
+        dais.position.y = 0.06;
+        dais.receiveShadow = true;
+        this.pedestalGroup.add(dais);
+
+        // Dynamic Outer Runic Magic Circle
+        const runeGeo = new THREE.PlaneGeometry(2.4, 2.4);
+        this.runeMat = new THREE.MeshBasicMaterial({
+          map: createRunicRingTexture(0x00e5ff),
+          transparent: true,
+          opacity: 0.85,
+          side: THREE.DoubleSide,
+          blending: THREE.AdditiveBlending
+        });
+        this.pedestalRuneMesh = new THREE.Mesh(runeGeo, this.runeMat);
+        this.pedestalRuneMesh.rotation.x = -Math.PI / 2;
+        this.pedestalRuneMesh.position.y = 0.125;
+        this.pedestalGroup.add(this.pedestalRuneMesh);
+
+        // Inner Magic Ring Counter-rotating
+        const innerRingGeo = new THREE.RingGeometry(0.55, 0.68, 48);
+        this.innerRingMat = new THREE.MeshBasicMaterial({
+          color: this.currentAccentColor,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.65,
+          blending: THREE.AdditiveBlending
+        });
+        this.pedestalInnerRuneMesh = new THREE.Mesh(innerRingGeo, this.innerRingMat);
+        this.pedestalInnerRuneMesh.rotation.x = -Math.PI / 2;
+        this.pedestalInnerRuneMesh.position.y = 0.126;
+        this.pedestalGroup.add(this.pedestalInnerRuneMesh);
+
+        // Central Well of Power
+        const centerWellGeo = new THREE.CircleGeometry(0.42, 32);
+        this.centerWellMat = new THREE.MeshBasicMaterial({
+          color: this.currentAccentColor,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.4,
+          blending: THREE.AdditiveBlending
+        });
+        const centerWell = new THREE.Mesh(centerWellGeo, this.centerWellMat);
+        centerWell.rotation.x = -Math.PI / 2;
+        centerWell.position.y = 0.127;
+        this.pedestalGroup.add(centerWell);
+
+        this.scene.add(this.pedestalGroup);
+      }
+
+      initMagicalSparks() {
+        const sparkCount = 70;
+        const geom = new THREE.BufferGeometry();
+        const positions = new Float32Array(sparkCount * 3);
+        const scales = new Float32Array(sparkCount);
+
+        for (let i = 0; i < sparkCount; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const r = 0.35 + Math.random() * 1.1;
+          positions[i * 3 + 0] = Math.cos(a) * r;
+          positions[i * 3 + 1] = 0.15 + Math.random() * 2.8;
+          positions[i * 3 + 2] = Math.sin(a) * r;
+          scales[i] = 0.5 + Math.random() * 0.8;
+        }
+
+        geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geom.setAttribute('scale', new THREE.BufferAttribute(scales, 1));
+
+        this.sparksMat = new THREE.PointsMaterial({
+          color: this.currentAccentColor,
+          size: 0.042,
+          transparent: true,
+          opacity: 0.75,
+          blending: THREE.AdditiveBlending
+        });
+        this.sparksParticles = new THREE.Points(geom, this.sparksMat);
+        this.scene.add(this.sparksParticles);
+      }
+
+      setHeroAccent(hexColor) {
+        this.currentAccentColor.setHex(hexColor);
+        this.rimLight.color.copy(this.currentAccentColor);
+        this.pedestalGlow.color.copy(this.currentAccentColor);
+        this.innerRingMat.color.copy(this.currentAccentColor);
+        this.centerWellMat.color.copy(this.currentAccentColor);
+        this.sparksMat.color.copy(this.currentAccentColor);
+
+        // Regenerate rune texture with new color
+        if (this.runeMat) {
+          this.runeMat.map.dispose();
+          this.runeMat.map = createRunicRingTexture(hexColor);
+          this.runeMat.needsUpdate = true;
+        }
+
+        // Update floating gems
+        this.floatingGems.forEach(gem => {
+          if (gem.material) {
+            gem.material.color.copy(this.currentAccentColor);
+            gem.material.emissive.copy(this.currentAccentColor);
+          }
+        });
+
+        // Update UI category dot
+        const hexStr = '#' + hexColor.toString(16).padStart(6, '0');
+        const dot = document.getElementById('category-dot');
+        if (dot) {
+          dot.style.background = hexStr;
+          dot.style.boxShadow = `0 0 8px ${hexStr}`;
+        }
+        const sub = document.getElementById('hero-sub');
+        if (sub) sub.style.color = hexStr;
+      }
+
+      // =========================================================================
+      // 1. UNIQUE 3D GLB ENVIRONMENTS (HEROIC 3D PROPS & DIORAMAS)
+      // =========================================================================
+      buildHero3DEnvironment(config) {
+        this.disposeHierarchy(this.environmentGroup);
+        this.envAnimatedObjects = [];
+
+        const key = this.getCharacterKey(config);
+
+        if (key === 'axiom') {
+          // ─── AXIOM (1001): Gothic Osteo-Cathedral ───
+          for (let i = 0; i < 4; i++) {
+            const archRadius = 1.35 + i * 0.38;
+            const archGeo = new THREE.TorusGeometry(archRadius, 0.055, 12, 48, Math.PI);
+            const archMat = new THREE.MeshStandardMaterial({
+              color: 0x22303c,
+              metalness: 0.85,
+              roughness: 0.35,
+              emissive: 0x00e5ff,
+              emissiveIntensity: 0.15
+            });
+            const arch = new THREE.Mesh(archGeo, archMat);
+            arch.rotation.x = Math.PI / 2;
+            arch.rotation.z = Math.PI;
+            arch.position.set(0, 0.3 + i * 0.35, -0.65 - i * 0.45);
+            this.environmentGroup.add(arch);
+            this.envAnimatedObjects.push({ obj: arch, type: 'arch_pulse', phase: i * 0.8 });
+          }
+
+          // Flanking Spinal Columns with glowing marrow glyphs (flanked wider so they never block front)
+          [-1.75, 1.75].forEach((xSide) => {
+            const spineGroup = new THREE.Group();
+            spineGroup.position.set(xSide, 0.15, -0.85);
+            for (let v = 0; v < 6; v++) {
+              const discGeo = new THREE.CylinderGeometry(0.11, 0.15, 0.13, 16);
+              const discMat = new THREE.MeshStandardMaterial({
+                color: 0x1a2632,
+                metalness: 0.9,
+                roughness: 0.25,
+                emissive: 0x00e5ff,
+                emissiveIntensity: 0.25
+              });
+              const disc = new THREE.Mesh(discGeo, discMat);
+              disc.position.y = v * 0.26;
+              spineGroup.add(disc);
+            }
+            this.environmentGroup.add(spineGroup);
+          });
+
+        } else if (key === 'pulse') {
+          // ─── PULSE (1002): Cardio Resonance Hologram Ring & High-Voltage Pylons ───
+          const ecgRingGeo = new THREE.TorusGeometry(1.9, 0.038, 16, 64);
+          const ecgRingMat = new THREE.MeshStandardMaterial({
+            color: 0xffd700,
+            emissive: 0xffd700,
+            emissiveIntensity: 0.8,
+            metalness: 0.95,
+            roughness: 0.1
+          });
+          const ecgRing = new THREE.Mesh(ecgRingGeo, ecgRingMat);
+          ecgRing.position.set(0, 1.25, -0.6);
+          this.environmentGroup.add(ecgRing);
+          this.envAnimatedObjects.push({ obj: ecgRing, type: 'spin_z', speed: 0.2 });
+
+          [-1.3, 1.3].forEach((xPos, idx) => {
+            const pylonGroup = new THREE.Group();
+            pylonGroup.position.set(xPos, 0.15, -0.5);
+            const mastGeo = new THREE.CylinderGeometry(0.08, 0.12, 1.8, 16);
+            const mastMat = new THREE.MeshStandardMaterial({ color: 0x0a1628, metalness: 0.9, roughness: 0.2 });
+            const mast = new THREE.Mesh(mastGeo, mastMat);
+            mast.position.y = 0.9;
+            pylonGroup.add(mast);
+
+            for (let c = 0; c < 4; c++) {
+              const coilGeo = new THREE.TorusGeometry(0.18, 0.025, 12, 24);
+              const coilMat = new THREE.MeshStandardMaterial({
+                color: 0x00ffff,
+                emissive: 0x00ffff,
+                emissiveIntensity: 0.9
+              });
+              const coil = new THREE.Mesh(coilGeo, coilMat);
+              coil.rotation.x = Math.PI / 2;
+              coil.position.y = 0.45 + c * 0.35;
+              pylonGroup.add(coil);
+            }
+            this.environmentGroup.add(pylonGroup);
+            this.envAnimatedObjects.push({ obj: pylonGroup, type: 'bob_pylon', phase: idx * Math.PI });
+          });
+
+        } else if (key === 'catalyst') {
+          // ─── CATALYST (1003): Alchemical Celestial Orbit Rings (PERFECT CIRCLES - NO HEXAGONS!) ───
+          for (let r = 0; r < 3; r++) {
+            const ringGeo = new THREE.TorusGeometry(1.4 + r * 0.35, 0.032, 16, 64); // perfectly round torus, zero sharp hexagonal vertices
+            const ringMat = new THREE.MeshStandardMaterial({
+              color: 0xce93d8,
+              emissive: 0x9c27b0,
+              emissiveIntensity: 0.7,
+              metalness: 0.9,
+              roughness: 0.2
+            });
+            const bRing = new THREE.Mesh(ringGeo, ringMat);
+            bRing.position.set(0, 1.25, -0.7);
+            bRing.rotation.x = 0.35 * (r + 1);
+            bRing.rotation.y = 0.25 * r;
+            this.environmentGroup.add(bRing);
+            this.envAnimatedObjects.push({ obj: bRing, type: 'spin_axes', speedX: 0.12 * (r + 1), speedY: -0.15 * (r + 1) });
+          }
+
+          // Floating Alchemical Essence Orbs
+          for (let a = 0; a < 7; a++) {
+            const aGeo = new THREE.SphereGeometry(0.085, 16, 16);
+            const aMat = new THREE.MeshStandardMaterial({
+              color: a % 2 === 0 ? 0xff4081 : 0x00e5ff,
+              emissive: a % 2 === 0 ? 0xff4081 : 0x00e5ff,
+              emissiveIntensity: 0.85
+            });
+            const atom = new THREE.Mesh(aGeo, aMat);
+            atom.position.set(
+              Math.cos(a * 0.9) * 1.35,
+              0.85 + Math.sin(a * 1.3) * 0.65,
+              -0.65 + Math.sin(a * 0.7) * 0.3
+            );
+            this.environmentGroup.add(atom);
+          }
+
+        } else if (key === 'necros') {
+          // ─── NECROS (1004): Histopathology Ocular Halo & Floating Biopsy Discs ───
+          const ocularGeo = new THREE.TorusGeometry(2.0, 0.08, 16, 64);
+          const ocularMat = new THREE.MeshStandardMaterial({
+            color: 0x2e0854,
+            emissive: 0xba68c8,
+            emissiveIntensity: 0.65,
+            metalness: 0.95,
+            roughness: 0.15
+          });
+          const ocular = new THREE.Mesh(ocularGeo, ocularMat);
+          ocular.position.set(0, 1.35, -0.7);
+          this.environmentGroup.add(ocular);
+          this.envAnimatedObjects.push({ obj: ocular, type: 'spin_z', speed: 0.12 });
+
+          for (let i = 0; i < 5; i++) {
+            const slideGeo = new THREE.CircleGeometry(0.35, 16);
+            const slideMat = new THREE.MeshStandardMaterial({
+              color: 0x7e57c2,
+              emissive: 0x7e57c2,
+              emissiveIntensity: 0.4,
+              transparent: true,
+              opacity: 0.55,
+              side: THREE.DoubleSide
+            });
+            const slide = new THREE.Mesh(slideGeo, slideMat);
+            slide.position.set(Math.cos(i * 1.25) * 1.35, 0.7 + i * 0.28, -0.55);
+            slide.rotation.y = i * 0.6;
+            this.environmentGroup.add(slide);
+            this.envAnimatedObjects.push({ obj: slide, type: 'wobble_slide', phase: i * 1.5 });
+          }
+
+        } else if (key === 'pharma') {
+          // ─── PHARMA (1005): Giant Floating Bicolored Capsules & Caduceus Emerald Cross ───
+          const capPositions = [
+            [-1.15, 1.45, -0.5],
+            [1.2, 1.15, -0.4],
+            [-0.85, 0.65, -0.6],
+            [0.95, 1.75, -0.55]
+          ];
+          capPositions.forEach((data, idx) => {
+            const capGroup = new THREE.Group();
+            capGroup.position.set(data[0], data[1], data[2]);
+
+            const halfGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.26, 16);
+            const whiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.15 });
+            const greenMat = new THREE.MeshStandardMaterial({
+              color: 0x00e676,
+              emissive: 0x00e676,
+              emissiveIntensity: 0.6,
+              metalness: 0.85,
+              roughness: 0.2
+            });
+
+            const topHalf = new THREE.Mesh(halfGeo, greenMat);
+            topHalf.position.y = 0.13;
+            const botHalf = new THREE.Mesh(halfGeo, whiteMat);
+            botHalf.position.y = -0.13;
+
+            capGroup.add(topHalf);
+            capGroup.add(botHalf);
+            capGroup.rotation.z = 0.45 + idx * 0.5;
+            capGroup.rotation.x = idx * 0.3;
+            this.environmentGroup.add(capGroup);
+            this.envAnimatedObjects.push({ obj: capGroup, type: 'tumble_capsule', speed: 0.4 + idx * 0.1 });
+          });
+
+          // Emerald Pharmacy Cross
+          const crossGroup = new THREE.Group();
+          crossGroup.position.set(0, 1.75, -0.85);
+          const cVGeo = new THREE.BoxGeometry(0.3, 1.8, 0.04);
+          const cHGeo = new THREE.BoxGeometry(1.8, 0.3, 0.04);
+          const cMat = new THREE.MeshStandardMaterial({
+            color: 0x00e676,
+            emissive: 0x00e676,
+            emissiveIntensity: 0.75,
+            transparent: true,
+            opacity: 0.65
+          });
+          crossGroup.add(new THREE.Mesh(cVGeo, cMat));
+          crossGroup.add(new THREE.Mesh(cHGeo, cMat));
+          this.environmentGroup.add(crossGroup);
+          this.envAnimatedObjects.push({ obj: crossGroup, type: 'pulse_cross' });
+
+        } else if (key === 'microx') {
+          // ─── MICROX (1006): Massive Glowing Biohazard Ring & Floating Spiked Virions ───
+          const petriRingGeo = new THREE.TorusGeometry(1.85, 0.045, 16, 64);
+          const petriMat = new THREE.MeshStandardMaterial({
+            color: 0x76ff03,
+            emissive: 0x76ff03,
+            emissiveIntensity: 0.8,
+            metalness: 0.9,
+            roughness: 0.15
+          });
+          const petriRing = new THREE.Mesh(petriRingGeo, petriMat);
+          petriRing.position.set(0, 1.35, -0.6);
+          this.environmentGroup.add(petriRing);
+
+          [-1.35, -0.65, 0.65, 1.35].forEach((xPylon, idx) => {
+            const pylon = new THREE.Group();
+            pylon.position.set(xPylon, 0.15, -0.5 - (Math.abs(xPylon) * 0.2));
+            const bodyGeo = new THREE.CylinderGeometry(0.06, 0.1, 1.7, 16);
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x212121, metalness: 0.8, roughness: 0.3 });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 0.85;
+            pylon.add(body);
+
+            const crownGeo = new THREE.OctahedronGeometry(0.1);
+            const crownMat = new THREE.MeshStandardMaterial({
+              color: 0x76ff03,
+              emissive: 0x76ff03,
+              emissiveIntensity: 0.9
+            });
+            const crown = new THREE.Mesh(crownGeo, crownMat);
+            crown.position.y = 1.75;
+            pylon.add(crown);
+            this.environmentGroup.add(pylon);
+            this.envAnimatedObjects.push({ obj: crown, type: 'spin_crown', speed: 1.5 + idx * 0.3 });
+          });
+
+          for (let v = 0; v < 4; v++) {
+            const virus = new THREE.Group();
+            virus.position.set(Math.cos(v * 1.5) * 1.25, 0.85 + v * 0.35, -0.45);
+            const coreGeo = new THREE.IcosahedronGeometry(0.12, 1);
+            const coreMat = new THREE.MeshStandardMaterial({
+              color: 0x64dd17,
+              emissive: 0x76ff03,
+              emissiveIntensity: 0.6
+            });
+            virus.add(new THREE.Mesh(coreGeo, coreMat));
+            this.environmentGroup.add(virus);
+            this.envAnimatedObjects.push({ obj: virus, type: 'spin_axes', speedX: 0.5, speedY: 0.7 });
+          }
+
+        } else if (key === 'verdict') {
+          // ─── VERDICT (1007): Magnifying Lens Arch & UV Laser Beam ───
+          const lensRimGeo = new THREE.TorusGeometry(1.6, 0.065, 16, 64);
+          const lensRimMat = new THREE.MeshStandardMaterial({
+            color: 0xff9800,
+            emissive: 0xff9800,
+            emissiveIntensity: 0.65,
+            metalness: 0.95
+          });
+          const lensRim = new THREE.Mesh(lensRimGeo, lensRimMat);
+          lensRim.position.set(0, 1.45, -0.6);
+          this.environmentGroup.add(lensRim);
+
+          const coneGeo = new THREE.ConeGeometry(1.5, 2.2, 32, 1, true);
+          const coneMat = new THREE.MeshBasicMaterial({
+            color: 0xff9800,
+            transparent: true,
+            opacity: 0.15,
+            side: THREE.DoubleSide,
+            blending: THREE.AdditiveBlending
+          });
+          const cone = new THREE.Mesh(coneGeo, coneMat);
+          cone.rotation.x = Math.PI;
+          cone.position.set(0, 1.2, -0.6);
+          this.environmentGroup.add(cone);
+          this.envAnimatedObjects.push({ obj: cone, type: 'pulse_cone' });
+
+          for (let f = 0; f < 3; f++) {
+            const fpGeo = new THREE.RingGeometry(0.4 + f * 0.35, 0.44 + f * 0.35, 48);
+            const fpMat = new THREE.MeshBasicMaterial({
+              color: 0xffb74d,
+              transparent: true,
+              opacity: 0.35,
+              side: THREE.DoubleSide
+            });
+            const fpRing = new THREE.Mesh(fpGeo, fpMat);
+            fpRing.rotation.x = -Math.PI / 2;
+            fpRing.position.y = 0.13;
+            this.environmentGroup.add(fpRing);
+            this.envAnimatedObjects.push({ obj: fpRing, type: 'spin_z', speed: (f % 2 === 0 ? 0.15 : -0.15) });
+          }
+
+        } else if (key === 'cura') {
+          // ─── CURA (1008): Holographic Wireframe Globe & Orbital Health Shields ───
+          const globeGeo = new THREE.SphereGeometry(1.65, 20, 14);
+          const globeMat = new THREE.MeshStandardMaterial({
+            color: 0x00bfa5,
+            emissive: 0x00bfa5,
+            emissiveIntensity: 0.55,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.45
+          });
+          const globe = new THREE.Mesh(globeGeo, globeMat);
+          globe.position.set(0, 1.35, -0.85);
+          this.environmentGroup.add(globe);
+          this.envAnimatedObjects.push({ obj: globe, type: 'spin_y', speed: 0.15 });
+
+          [0.3, -0.3].forEach((tilt, idx) => {
+            const oRingGeo = new THREE.TorusGeometry(1.95, 0.02, 12, 48);
+            const oRingMat = new THREE.MeshStandardMaterial({
+              color: 0x80cbc4,
+              emissive: 0x26a69a,
+              emissiveIntensity: 0.7
+            });
+            const oRing = new THREE.Mesh(oRingGeo, oRingMat);
+            oRing.rotation.x = Math.PI / 2.3 + tilt;
+            oRing.position.set(0, 1.35, -0.85);
+            this.environmentGroup.add(oRing);
+
+            const satGeo = new THREE.OctahedronGeometry(0.08);
+            const satMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x00e676, emissiveIntensity: 0.9 });
+            const sat = new THREE.Mesh(satGeo, satMat);
+            this.environmentGroup.add(sat);
+            this.envAnimatedObjects.push({ obj: sat, type: 'orbit_sat', radius: 1.95, tilt: tilt, speed: 0.6 + idx * 0.2 });
+          });
+
+        } else if (key === 'medicus') {
+          // ─── MEDICUS (1009): Classical Marble Medical Amphitheater Pillars & Gold Caduceus ───
+          [-1.4, -0.75, 0.75, 1.4].forEach(xPillar => {
+            const pillarGroup = new THREE.Group();
+            pillarGroup.position.set(xPillar, 0.15, -0.7);
+            const colGeo = new THREE.CylinderGeometry(0.12, 0.14, 2.2, 20);
+            const colMat = new THREE.MeshStandardMaterial({
+              color: 0xe0e0e0,
+              metalness: 0.65,
+              roughness: 0.35,
+              emissive: 0x00e5ff,
+              emissiveIntensity: 0.12
+            });
+            const col = new THREE.Mesh(colGeo, colMat);
+            col.position.y = 1.1;
+            pillarGroup.add(col);
+
+            const capGeo = new THREE.BoxGeometry(0.35, 0.12, 0.35);
+            const cap = new THREE.Mesh(capGeo, colMat);
+            cap.position.y = 2.2;
+            pillarGroup.add(cap);
+            this.environmentGroup.add(pillarGroup);
+          });
+
+          const caduceus = new THREE.Group();
+          caduceus.position.set(0, 0.4, -0.85);
+          const staffGeo = new THREE.CylinderGeometry(0.035, 0.035, 2.0, 16);
+          const goldMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.95, roughness: 0.15 });
+          const staff = new THREE.Mesh(staffGeo, goldMat);
+          staff.position.y = 1.0;
+          caduceus.add(staff);
+
+          const sphereGeo = new THREE.SphereGeometry(0.12, 16, 16);
+          const sphere = new THREE.Mesh(sphereGeo, goldMat);
+          sphere.position.y = 2.05;
+          caduceus.add(sphere);
+
+          [-1, 1].forEach(side => {
+            const wingGeo = new THREE.TorusGeometry(0.28, 0.03, 12, 24, Math.PI * 0.85);
+            const wing = new THREE.Mesh(wingGeo, goldMat);
+            wing.rotation.y = side * Math.PI / 4;
+            wing.position.set(side * 0.22, 1.88, 0);
+            caduceus.add(wing);
+          });
+          this.environmentGroup.add(caduceus);
+          this.envAnimatedObjects.push({ obj: caduceus, type: 'pulse_caduceus' });
+
+        } else if (key === 'surgon') {
+          // ─── SURGON (1010): Overhead Surgical Quad-Lamp & Laser Grid ───
+          const overheadLamp = new THREE.Group();
+          overheadLamp.position.set(0, 2.35, 0);
+          const lampRimGeo = new THREE.TorusGeometry(1.2, 0.045, 16, 48);
+          const lampRimMat = new THREE.MeshStandardMaterial({ color: 0x90caf9, metalness: 0.9 });
+          overheadLamp.add(new THREE.Mesh(lampRimGeo, lampRimMat));
+
+          for (let l = 0; l < 5; l++) {
+            const angle = (Math.PI * 2 / 5) * l;
+            const headGeo = new THREE.CylinderGeometry(0.14, 0.18, 0.08, 16);
+            const headMat = new THREE.MeshStandardMaterial({
+              color: 0xffffff,
+              emissive: 0x00e5ff,
+              emissiveIntensity: 0.95
+            });
+            const head = new THREE.Mesh(headGeo, headMat);
+            head.position.set(Math.cos(angle) * 0.9, 0, Math.sin(angle) * 0.9);
+            overheadLamp.add(head);
+          }
+          this.environmentGroup.add(overheadLamp);
+
+          const laserGridGeo = new THREE.PlaneGeometry(1.8, 1.8, 8, 8);
+          const laserGridMat = new THREE.MeshBasicMaterial({
+            color: 0x00b0ff,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.32
+          });
+          const laserGrid = new THREE.Mesh(laserGridGeo, laserGridMat);
+          laserGrid.rotation.x = -Math.PI / 2;
+          laserGrid.position.y = 0.13;
+          this.environmentGroup.add(laserGrid);
+          this.envAnimatedObjects.push({ obj: laserGrid, type: 'pulse_laser' });
+
+        } else if (key === 'vita') {
+          // ─── VITA (1011): Aurora Wings & Fetal Heartbeat Halo ───
+          const wingsGroup = new THREE.Group();
+          wingsGroup.position.set(0, 1.35, -0.6);
+          for (let f = 0; f < 4; f++) {
+            const featherGeo = new THREE.TorusGeometry(0.7 + f * 0.2, 0.035, 12, 32, Math.PI * 0.65);
+            const featherMat = new THREE.MeshStandardMaterial({
+              color: 0xf48fb1,
+              emissive: 0xff80ab,
+              emissiveIntensity: 0.8,
+              transparent: true,
+              opacity: 0.7
+            });
+            const leftFeather = new THREE.Mesh(featherGeo, featherMat);
+            leftFeather.rotation.z = Math.PI / 3 - f * 0.15;
+            leftFeather.position.x = -0.3;
+            wingsGroup.add(leftFeather);
+
+            const rightFeather = leftFeather.clone();
+            rightFeather.scale.x = -1;
+            rightFeather.position.x = 0.3;
+            wingsGroup.add(rightFeather);
+          }
+          this.environmentGroup.add(wingsGroup);
+          this.envAnimatedObjects.push({ obj: wingsGroup, type: 'breathe_wings' });
+
+          const coreHaloGeo = new THREE.RingGeometry(0.65, 0.95, 48);
+          const coreHaloMat = new THREE.MeshBasicMaterial({
+            color: 0xf06292,
+            transparent: true,
+            opacity: 0.45,
+            side: THREE.DoubleSide
+          });
+          const coreHalo = new THREE.Mesh(coreHaloGeo, coreHaloMat);
+          coreHalo.position.set(0, 1.35, -0.58);
+          this.environmentGroup.add(coreHalo);
+          this.envAnimatedObjects.push({ obj: coreHalo, type: 'spin_z', speed: 0.25 });
+
+        } else if (key === 'pedia') {
+          // ─── PEDIA (1012): Toy Block Towers & Constellation Stars ───
+          [-1.25, 1.25].forEach(xSide => {
+            const tower = new THREE.Group();
+            tower.position.set(xSide, 0.15, -0.6);
+            const bodyGeo = new THREE.CylinderGeometry(0.25, 0.28, 1.6, 16);
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x5d4037, roughness: 0.6 });
+            tower.add(new THREE.Mesh(bodyGeo, bodyMat));
+
+            const roofGeo = new THREE.ConeGeometry(0.35, 0.55, 16);
+            const roofMat = new THREE.MeshStandardMaterial({
+              color: 0xffd700,
+              emissive: 0xffa000,
+              emissiveIntensity: 0.6
+            });
+            const roof = new THREE.Mesh(roofGeo, roofMat);
+            roof.position.y = 1.05;
+            tower.add(roof);
+            this.environmentGroup.add(tower);
+          });
+
+          for (let s = 0; s < 6; s++) {
+            const starGeo = new THREE.OctahedronGeometry(0.12);
+            const starMat = new THREE.MeshStandardMaterial({
+              color: 0xffeb3b,
+              emissive: 0xffd700,
+              emissiveIntensity: 0.85
+            });
+            const star = new THREE.Mesh(starGeo, starMat);
+            star.position.set(
+              Math.cos(s * 1.05) * 1.4,
+              0.6 + Math.sin(s * 1.4) * 0.7,
+              -0.5 + Math.cos(s * 0.7) * 0.3
+            );
+            this.environmentGroup.add(star);
+            this.envAnimatedObjects.push({ obj: star, type: 'bob_star', phase: s * 1.6 });
+          }
+
+        } else if (key === 'osteon') {
+          // ─── OSTEON (1013): Titanium Orthopedic Scaffolding & Ilizarov Fixator Rings ───
+          [-1.2, 1.2].forEach(xSide => {
+            const girder = new THREE.Group();
+            girder.position.set(xSide, 0.15, -0.6);
+            const strutGeo = new THREE.BoxGeometry(0.12, 1.9, 0.12);
+            const strutMat = new THREE.MeshStandardMaterial({
+              color: 0x78909c,
+              metalness: 0.95,
+              roughness: 0.2,
+              emissive: 0x90caf9,
+              emissiveIntensity: 0.2
+            });
+            const strut = new THREE.Mesh(strutGeo, strutMat);
+            strut.position.y = 0.95;
+            girder.add(strut);
+
+            for (let b = 0; b < 3; b++) {
+              const braceGeo = new THREE.TorusGeometry(0.24, 0.03, 8, 16);
+              const brace = new THREE.Mesh(braceGeo, strutMat);
+              brace.rotation.x = Math.PI / 2;
+              brace.position.y = 0.35 + b * 0.55;
+              girder.add(brace);
+            }
+            this.environmentGroup.add(girder);
+          });
+
+          const fixatorGeo = new THREE.TorusGeometry(1.6, 0.05, 16, 48);
+          const fixatorMat = new THREE.MeshStandardMaterial({
+            color: 0x90caf9,
+            metalness: 0.95,
+            emissive: 0x90caf9,
+            emissiveIntensity: 0.6
+          });
+          const fixator = new THREE.Mesh(fixatorGeo, fixatorMat);
+          fixator.position.set(0, 1.25, -0.6);
+          this.environmentGroup.add(fixator);
+          this.envAnimatedObjects.push({ obj: fixator, type: 'spin_z', speed: 0.18 });
+
+        } else {
+          // ─── CHARACTERS 1014 - 1019: Archetype Prismatic Halos ───
+          for (let p = 0; p < 2; p++) {
+            const ringGeo = new THREE.TorusGeometry(1.5 + p * 0.4, 0.04, 16, 64);
+            const ringMat = new THREE.MeshStandardMaterial({
+              color: this.currentAccentColor,
+              emissive: this.currentAccentColor,
+              emissiveIntensity: 0.65,
+              metalness: 0.9,
+              roughness: 0.2
+            });
+            const pMesh = new THREE.Mesh(ringGeo, ringMat);
+            pMesh.position.set(0, 1.25, -0.6);
+            pMesh.rotation.x = p * (Math.PI / 4);
+            this.environmentGroup.add(pMesh);
+            this.envAnimatedObjects.push({ obj: pMesh, type: 'spin_axes', speedX: 0.2 * (p + 1), speedY: -0.25 * (p + 1) });
+          }
+        }
+      }
+
+      // =========================================================================
+      // 2. LITTLE AIR BUBBLES SYSTEM (STRICTLY ONLY WHERE GLB IS PRESENT)
+      // =========================================================================
+      buildCharacterAirBubbles(config) {
+        this.disposeHierarchy(this.bubbleGroup);
+        this.airBubbles = [];
+
+        // STRICT SAFETY CHECK: NEVER create bubbles for 2D image avatars
+        if (!this.isFullBodyModel) return;
+
+        const key = this.getCharacterKey(config);
+        const profile = HERO_PROFILES[key] || HERO_PROFILES.axiom;
+
+        const bubbleTex = createBubbleTexture(profile.bubbleColor, profile.bubbleStyle);
+        const count = profile.bubbleCount || 45;
+
+        for (let i = 0; i < count; i++) {
+          const spriteMat = new THREE.SpriteMaterial({
+            map: bubbleTex,
+            transparent: true,
+            opacity: 0.85,
+            blending: THREE.AdditiveBlending
+          });
+          const sprite = new THREE.Sprite(spriteMat);
+
+          const angle = Math.random() * Math.PI * 2;
+          const radius = 0.45 + Math.random() * 0.95;
+          const y = 0.15 + Math.random() * 2.3;
+          const scale = 0.055 + Math.random() * 0.085;
+
+          sprite.position.set(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
+          sprite.scale.set(scale, scale, scale);
+
+          sprite.userData = {
+            baseRadius: radius,
+            angle: angle,
+            riseSpeed: profile.bubbleSpeed * (0.8 + Math.random() * 0.5),
+            wobbleSpeed: profile.bubbleWobble * (0.8 + Math.random() * 0.4),
+            wobbleAmp: 0.02 + Math.random() * 0.035,
+            phase: Math.random() * Math.PI * 2,
+            baseScale: scale
+          };
+
+          this.bubbleGroup.add(sprite);
+          this.airBubbles.push(sprite);
+        }
+      }
+
+      // =========================================================================
+      // 3. ENHANCED 3D HOLOGRAPHIC MONUMENT FOR 2D IMAGE AVATARS
+      // =========================================================================
+      loadMedallion(config, currentLoadId) {
+        const imagePath = config.imageAssetPath || 'avatars/avatar_18.png';
+
+        this.textureLoader.load(imagePath, (avatarTex) => {
+          if (currentLoadId !== this.loadId) return;
+
+          // Clear previous character & ENSURE NO BUBBLES OR GLB BACKDROPS EXIST
+          this.clearCharacterSlot();
+          this.isFullBodyModel = false;
+
+          avatarTex.minFilter = THREE.LinearFilter;
+          avatarTex.magFilter = THREE.LinearFilter;
+
+          const monumentRoot = new THREE.Group();
+          monumentRoot.position.set(0, 0, 0);
+
+          // A. Dais Emitter Base
+          const emitterGeo = new THREE.CylinderGeometry(0.5, 0.65, 0.12, 32);
+          const emitterMat = new THREE.MeshStandardMaterial({
+            color: 0x0a1424,
+            metalness: 0.92,
+            roughness: 0.2
+          });
+          const emitter = new THREE.Mesh(emitterGeo, emitterMat);
+          emitter.position.y = 0.18;
+          emitter.receiveShadow = true;
+          monumentRoot.add(emitter);
+
+          // Emitter Crystal Core
+          const crystalGeo = new THREE.OctahedronGeometry(0.12);
+          const crystalMat = new THREE.MeshStandardMaterial({
+            color: this.currentAccentColor,
+            emissive: this.currentAccentColor,
+            emissiveIntensity: 0.95
+          });
+          const crystal = new THREE.Mesh(crystalGeo, crystalMat);
+          crystal.position.y = 0.26;
+          monumentRoot.add(crystal);
+          this.monumentAnimatedObjects.push({ obj: crystal, type: 'spin_y', speed: 1.5 });
+
+          // B. Volumetric Holographic Light Pillar / Cone
+          const coneGeo = new THREE.CylinderGeometry(1.15, 0.35, 1.25, 32, 1, true);
+          const coneMat = new THREE.MeshBasicMaterial({
+            color: this.currentAccentColor,
+            transparent: true,
+            opacity: 0.16,
+            side: THREE.DoubleSide,
+            blending: THREE.AdditiveBlending
+          });
+          const hologramBeam = new THREE.Mesh(coneGeo, coneMat);
+          hologramBeam.position.set(0, 0.85, 0);
+          monumentRoot.add(hologramBeam);
+          this.monumentAnimatedObjects.push({ obj: hologramBeam, type: 'breathe_beam' });
+
+          // C. Elevated Floating Medallion Group
+          const medallionGroup = new THREE.Group();
+          medallionGroup.position.set(0, 1.35, 0);
+
+          const radius = 1.05;
+          const thickness = 0.09;
+
+          // 1. Front Artwork Disc
+          const frontGeo = new THREE.CircleGeometry(radius, 64);
+          const frontMat = new THREE.MeshStandardMaterial({
+            map: avatarTex,
+            transparent: true,
+            roughness: 0.35,
+            metalness: 0.15,
+            side: THREE.FrontSide
+          });
+          const frontMesh = new THREE.Mesh(frontGeo, frontMat);
+          frontMesh.position.z = thickness / 2 + 0.002;
+          frontMesh.castShadow = true;
+          medallionGroup.add(frontMesh);
+
+          // 2. Back Sigil Disc (Astrological seal)
+          const backGeo = new THREE.CircleGeometry(radius, 64);
+          const backMat = new THREE.MeshStandardMaterial({
+            map: this.backSigilTexture,
+            roughness: 0.4,
+            metalness: 0.5,
+            side: THREE.FrontSide
+          });
+          const backMesh = new THREE.Mesh(backGeo, backMat);
+          backMesh.rotation.y = Math.PI;
+          backMesh.position.z = -(thickness / 2 + 0.002);
+          backMesh.castShadow = true;
+          medallionGroup.add(backMesh);
+
+          // 3. Thick Metallic Rim
+          const rimGeo = new THREE.CylinderGeometry(radius, radius, thickness, 64, 1, true);
+          const rimMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.95, roughness: 0.18 });
+          const rimMesh = new THREE.Mesh(rimGeo, rimMat);
+          rimMesh.rotation.x = Math.PI / 2;
+          medallionGroup.add(rimMesh);
+
+          // 4. Heavy Chiseled Outer Bezel Ring
+          const bezelGeo = new THREE.TorusGeometry(radius + 0.02, 0.042, 16, 64);
+          const bezelMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.96, roughness: 0.15 });
+          const bezel = new THREE.Mesh(bezelGeo, bezelMat);
+          bezel.castShadow = true;
+          medallionGroup.add(bezel);
+
+          // 5. 8 Socketed Elemental Gemstones
+          const numSockets = 8;
+          for (let i = 0; i < numSockets; i++) {
+            const angle = (Math.PI * 2 / numSockets) * i;
+            const gemGeo = new THREE.OctahedronGeometry(0.045);
+            const gemMat = new THREE.MeshStandardMaterial({
+              color: this.currentAccentColor,
+              emissive: this.currentAccentColor,
+              emissiveIntensity: 0.85,
+              metalness: 0.9,
+              roughness: 0.1
+            });
+            const gemMesh = new THREE.Mesh(gemGeo, gemMat);
+            gemMesh.position.set(
+              Math.cos(angle) * (radius + 0.035),
+              Math.sin(angle) * (radius + 0.035),
+              0
+            );
+            medallionGroup.add(gemMesh);
+          }
+
+          // D. Concentric 3D Gyroscopic Armillary Rings
+          const ringConfigs = [
+            { r: radius + 0.18, tube: 0.016, axis: 'x', speed: 0.45, color: 0xd4af37 },
+            { r: radius + 0.32, tube: 0.014, axis: 'y', speed: -0.35, color: this.currentAccentColor },
+            { r: radius + 0.46, tube: 0.012, axis: 'z', speed: 0.25, color: 0xf59e0b }
+          ];
+          ringConfigs.forEach(rc => {
+            const rGeo = new THREE.TorusGeometry(rc.r, rc.tube, 12, 64);
+            const rMat = new THREE.MeshStandardMaterial({
+              color: rc.color,
+              emissive: rc.color,
+              emissiveIntensity: 0.5,
+              metalness: 0.95,
+              roughness: 0.15
+            });
+            const ringMesh = new THREE.Mesh(rGeo, rMat);
+            medallionGroup.add(ringMesh);
+            this.monumentAnimatedObjects.push({ obj: ringMesh, type: 'gyro_ring', axis: rc.axis, speed: rc.speed });
+          });
+
+          monumentRoot.add(medallionGroup);
+          this.characterSlot.add(monumentRoot);
+
+          this.currentModelWrapper = medallionGroup;
+          this.baseScale = 1.0;
+
+          // Orbiting mana gems
+          this.buildOrbitingCrystals();
+          this.buildAuraMist();
+        });
+      }
+
+      loadGuardian(config) {
+        this.loadId++;
+        const currentLoadId = this.loadId;
+
+        // Synchronously wipe character slot immediately so old hero vanishes on click
+        this.clearCharacterSlot();
+
+        // Clear previous aura & floating gems
+        if (this.auraParticles) {
+          this.scene.remove(this.auraParticles);
+          if (this.auraParticles.geometry) this.auraParticles.geometry.dispose();
+          if (this.auraParticles.material) this.auraParticles.material.dispose();
+          this.auraParticles = null;
+        }
+        this.floatingGems.forEach(g => {
+          this.scene.remove(g);
+          if (g.geometry) g.geometry.dispose();
+          if (g.material) g.material.dispose();
+        });
+        this.floatingGems = [];
+
+        // Update UI Badge
+        const heroNameEl = document.getElementById('hero-name');
+        if (heroNameEl) heroNameEl.innerText = config.name || 'Curia Guardian';
+        const heroSubEl = document.getElementById('hero-sub-text');
+        if (heroSubEl) heroSubEl.innerText = (config.animal || 'Guardian') + ' • ' + (config.powerCategory || 'ELITE');
+
+        // Determine theme color
+        const rimColor = (config.renderConfig && config.renderConfig.rimColorHex) ? config.renderConfig.rimColorHex : 0x00e5ff;
+        this.setHeroAccent(rimColor);
+
+        // Update dedicated thematic background image
+        const charKey = this.getCharacterKey(config);
+        this.updateHeroBackground(config, charKey);
+
+        // Activate Hero-Specific Thematic Loading Screen
+        const loadOverlay = document.getElementById('hero-loading-screen');
+        const loadSubject = document.getElementById('loading-subject');
+        const loadTitle = document.getElementById('loading-title');
+        const loadMnemonic = document.getElementById('loading-mnemonic');
+        const loadSpinner = document.getElementById('loading-spinner');
+
+        if (loadOverlay) {
+          if (loadSubject) loadSubject.innerText = config.subject || (config.animal ? ('THE ' + config.animal.toUpperCase()) : 'CLINICAL HERO');
+          if (loadTitle) loadTitle.innerText = config.name || 'Hero Champion';
+          if (loadMnemonic) loadMnemonic.innerText = config.mnemonic ? ('💡 ' + config.mnemonic) : 'Mastering clinical medicine, one question at a time.';
+          if (loadSpinner && config.renderConfig && config.renderConfig.rimColorHex) {
+            const hex = '#' + config.renderConfig.rimColorHex.toString(16).padStart(6, '0');
+            loadSpinner.style.borderTopColor = hex;
+            loadSpinner.style.boxShadow = '0 0 16px ' + hex;
+            if (loadSubject) loadSubject.style.color = hex;
+          }
+          loadOverlay.classList.add('active');
+        }
+
+        // Frame camera target to hero chest level
+        if (this.controls) {
+          this.controls.target.set(0, 0.92, 0);
+          this.controls.update();
+        }
+
+        // Check for 3D full-body GLTF model (.glb)
+        if (config.renderConfig && config.renderConfig.modelGlbUrl) {
+          const gltfLoader = new THREE.GLTFLoader();
+          gltfLoader.load(config.renderConfig.modelGlbUrl, (gltf) => {
+            // Drop outdated async loads if user switched characters quickly
+            if (currentLoadId !== this.loadId) return;
+
+            // Clear again right before attaching
+            this.clearCharacterSlot();
+
+            this.isFullBodyModel = true;
+
+            // Apply customized 5-point studio lighting for this hero
+            const key = this.getCharacterKey(config);
+            const profile = HERO_PROFILES[key] || HERO_PROFILES.axiom;
+            this.applyHeroLightingProfile(profile);
+
+            const rawModel = gltf.scene;
+
+            // Strip any skeletal rigs and convert SkinnedMeshes to pure static THREE.Mesh
+            // Character showcase presents pristine rest-pose 3D sculpts with zero rigging/animation
+            const skinnedMeshes = [];
+            rawModel.traverse((child) => {
+              if (child.isSkinnedMesh) {
+                skinnedMeshes.push(child);
+              }
+            });
+
+            skinnedMeshes.forEach((skinned) => {
+              const staticGeo = skinned.geometry.clone();
+              if (staticGeo.attributes.skinIndex) staticGeo.deleteAttribute('skinIndex');
+              if (staticGeo.attributes.skinWeight) staticGeo.deleteAttribute('skinWeight');
+
+              let staticMat = skinned.material;
+              if (Array.isArray(staticMat)) {
+                staticMat = staticMat.map(m => {
+                  const cm = m.clone();
+                  cm.needsUpdate = true;
+                  return cm;
+                });
+              } else if (staticMat) {
+                staticMat = staticMat.clone();
+                staticMat.needsUpdate = true;
+              }
+
+              const staticMesh = new THREE.Mesh(staticGeo, staticMat);
+              staticMesh.name = skinned.name;
+              staticMesh.position.copy(skinned.position);
+              staticMesh.quaternion.copy(skinned.quaternion);
+              staticMesh.scale.copy(skinned.scale);
+              staticMesh.castShadow = true;
+              staticMesh.receiveShadow = true;
+
+              if (skinned.parent) {
+                skinned.parent.add(staticMesh);
+                skinned.parent.remove(skinned);
+              }
+            });
+
+            // Remove all Bone nodes from the scene hierarchy
+            const bonesToRemove = [];
+            rawModel.traverse((child) => {
+              if (child.isBone || child.type === 'Bone') {
+                bonesToRemove.push(child);
+              }
+            });
+            bonesToRemove.forEach((bone) => {
+              if (bone.parent) {
+                bone.parent.remove(bone);
+              }
+            });
+
+            // Compute precise unscaled bounding box
+            const box = new THREE.Box3().setFromObject(rawModel);
+            const size = box.getSize(new THREE.Vector3());
+            const center = box.getCenter(new THREE.Vector3());
+
+            // Target normalized heroic height = 1.60 meters across all champions
+            const targetHeight = 1.60;
+            const scale = (size.y > 0.05) ? (targetHeight / size.y) : 1.0;
+
+            // Center horizontally and put bottom (soles of feet) at local y=0
+            rawModel.position.set(-center.x, -box.min.y, -center.z);
+
+            const wrapper = new THREE.Group();
+            wrapper.add(rawModel);
+
+            // Scale wrapper to normalized heroic size
+            wrapper.scale.set(scale, scale, scale);
+            // Place soles firmly grounded on top surface of the dais (y = 0.125)
+            wrapper.position.set(0, 0.125, 0);
+
+            // Preserve and optimize PBR maps
+            rawModel.traverse((child) => {
+              if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+                const mat = child.material;
+                if (mat && (mat.map || (Array.isArray(mat) && mat.some(m => m.map)))) {
+                  const mats = Array.isArray(mat) ? mat : [mat];
+                  mats.forEach(m => {
+                    m.roughness = m.roughness !== undefined ? Math.min(m.roughness, 0.55) : 0.45;
+                    m.metalness = m.metalness !== undefined ? m.metalness : 0.2;
+                    m.needsUpdate = true;
+                  });
+                } else {
+                  child.material = new THREE.MeshStandardMaterial({
+                    vertexColors: true,
+                    metalness: 0.62,
+                    roughness: 0.38,
+                    emissive: this.currentAccentColor,
+                    emissiveIntensity: 0.08
+                  });
+                }
+              }
+            });
+
+            this.characterSlot.add(wrapper);
+            this.currentModelWrapper = wrapper;
+            this.baseScale = scale;
+
+            // Character showcase: Zero rig and zero animation (pure static rest pose sculpt)
+            this.mixer = null;
+
+            // Build dedicated 3D environment matching GLB
+            this.buildHero3DEnvironment(config);
+
+            // Build little air bubbles (STRICTLY ONLY WHERE GLB IS PRESENT)
+            this.buildCharacterAirBubbles(config);
+
+            this.buildOrbitingCrystals();
+            this.buildAuraMist();
+
+            // Dismiss loading overlay smoothly
+            if (loadOverlay) {
+              setTimeout(() => { loadOverlay.classList.remove('active'); }, 180);
+            }
+          }, undefined, (err) => {
+            if (currentLoadId !== this.loadId) return;
+            console.warn("GLTF load failed, falling back to 3D medallion:", err);
+            if (loadOverlay) loadOverlay.classList.remove('active');
+            this.loadMedallion(config, currentLoadId);
+          });
+        } else {
+          if (loadOverlay) loadOverlay.classList.remove('active');
+          this.loadMedallion(config, currentLoadId);
+        }
+      }
+
+      buildOrbitingCrystals() {
+        const gemCount = 4;
+        for (let i = 0; i < gemCount; i++) {
+          const geo = new THREE.DodecahedronGeometry(0.065);
+          const mat = new THREE.MeshStandardMaterial({
+            color: this.currentAccentColor,
+            emissive: this.currentAccentColor,
+            emissiveIntensity: 0.75,
+            metalness: 0.95,
+            roughness: 0.12
+          });
+          const gem = new THREE.Mesh(geo, mat);
+          gem.castShadow = true;
+
+          const baseAngle = (Math.PI * 2 / gemCount) * i;
+          gem.userData = {
+            angle: baseAngle,
+            speed: 0.75 + (i % 2 === 0 ? 0.2 : -0.15),
+            radiusX: 1.38 + (i * 0.06),
+            radiusZ: 1.15 + (i * 0.04),
+            yCenter: 1.35,
+            tilt: 0.28 * (i % 2 === 0 ? 1 : -1)
+          };
+          this.scene.add(gem);
+          this.floatingGems.push(gem);
+        }
+      }
+
+      buildAuraMist() {
+        const count = 36;
+        const geom = new THREE.BufferGeometry();
+        const positions = new Float32Array(count * 3);
+
+        for (let i = 0; i < count; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const r = 0.6 + Math.random() * 0.65;
+          positions[i * 3 + 0] = Math.cos(a) * r;
+          positions[i * 3 + 1] = 0.7 + Math.random() * 1.3;
+          positions[i * 3 + 2] = (Math.random() - 0.5) * 0.4;
+        }
+
+        geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const mat = new THREE.PointsMaterial({
+          color: this.currentAccentColor,
+          size: 0.055,
+          transparent: true,
+          opacity: 0.7,
+          blending: THREE.AdditiveBlending
+        });
+        this.auraParticles = new THREE.Points(geom, mat);
+        this.scene.add(this.auraParticles);
+      }
+
+      onResize() {
+        this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+      }
+
+      animate = () => {
+        requestAnimationFrame(this.animate);
+        const delta = this.clock.getDelta();
+        const time = this.clock.getElapsedTime();
+
+        // Update character skeletal animation mixer if playing
+        if (this.mixer) {
+          this.mixer.update(delta);
+        }
+
+        // 1. Hero / Medallion Breathing & Bobbing
+        if (this.currentModelWrapper) {
+          if (this.isFullBodyModel) {
+            // Static pure decimated GLB model firmly grounded
+            if (this.baseScale) {
+              this.currentModelWrapper.scale.set(this.baseScale, this.baseScale, this.baseScale);
+            }
+          } else {
+            this.currentModelWrapper.position.y = 1.35 + Math.sin(time * 1.6) * 0.045;
+            this.currentModelWrapper.rotation.z = Math.sin(time * 0.8) * 0.02;
+          }
+        }
+
+        // 2. 3D Holographic Monument Animations (Strictly for 2D image avatars)
+        if (!this.isFullBodyModel && this.monumentAnimatedObjects.length > 0) {
+          this.monumentAnimatedObjects.forEach(item => {
+            if (item.type === 'spin_y') {
+              item.obj.rotation.y += item.speed * delta;
+            } else if (item.type === 'breathe_beam') {
+              item.obj.material.opacity = 0.12 + Math.sin(time * 2.2) * 0.05;
+            } else if (item.type === 'gyro_ring') {
+              if (item.axis === 'x') item.obj.rotation.x += item.speed * delta;
+              else if (item.axis === 'y') item.obj.rotation.y += item.speed * delta;
+              else if (item.axis === 'z') item.obj.rotation.z += item.speed * delta;
+            }
+          });
+        }
+
+        // 3. Unique 3D Environment Animations (Strictly for GLB characters)
+        if (this.isFullBodyModel && this.envAnimatedObjects.length > 0) {
+          this.envAnimatedObjects.forEach(item => {
+            if (item.type === 'spin_z') {
+              item.obj.rotation.z += item.speed * delta;
+            } else if (item.type === 'spin_y') {
+              item.obj.rotation.y += item.speed * delta;
+            } else if (item.type === 'spin_axes') {
+              item.obj.rotation.x += (item.speedX || 0) * delta;
+              item.obj.rotation.y += (item.speedY || 0) * delta;
+            } else if (item.type === 'arch_pulse') {
+              item.obj.material.emissiveIntensity = 0.15 + Math.sin(time * 2.5 + item.phase) * 0.12;
+            } else if (item.type === 'bob_pylon') {
+              item.obj.position.y = 0.15 + Math.sin(time * 2.0 + item.phase) * 0.04;
+            } else if (item.type === 'wobble_slide') {
+              item.obj.rotation.z = Math.sin(time * 1.5 + item.phase) * 0.1;
+            } else if (item.type === 'tumble_capsule') {
+              item.obj.rotation.x += item.speed * delta;
+              item.obj.rotation.y += item.speed * 0.7 * delta;
+            } else if (item.type === 'pulse_cross') {
+              item.obj.children.forEach(c => {
+                c.material.opacity = 0.45 + Math.sin(time * 2.0) * 0.2;
+              });
+            } else if (item.type === 'spin_crown') {
+              item.obj.rotation.y += item.speed * delta;
+            } else if (item.type === 'pulse_cone') {
+              item.obj.material.opacity = 0.12 + Math.sin(time * 2.8) * 0.06;
+            } else if (item.type === 'orbit_sat') {
+              const a = time * item.speed;
+              item.obj.position.x = Math.cos(a) * item.radius;
+              item.obj.position.z = -0.85 + Math.sin(a) * item.radius;
+              item.obj.position.y = 1.35 + Math.sin(a) * item.tilt;
+            } else if (item.type === 'pulse_caduceus') {
+              item.obj.position.y = 0.4 + Math.sin(time * 1.8) * 0.035;
+            } else if (item.type === 'pulse_laser') {
+              item.obj.material.opacity = 0.18 + Math.sin(time * 3.0) * 0.1;
+            } else if (item.type === 'breathe_wings') {
+              item.obj.rotation.y = Math.sin(time * 1.2) * 0.08;
+            } else if (item.type === 'bob_star') {
+              item.obj.position.y += Math.sin(time * 2.2 + item.phase) * 0.001;
+            }
+          });
+        }
+
+        // 4. Little Air Bubbles Physics (STRICTLY ONLY ACTIVE WHERE GLB IS PRESENT)
+        if (this.isFullBodyModel && this.airBubbles.length > 0) {
+          this.airBubbles.forEach(bubble => {
+            const ud = bubble.userData;
+            bubble.position.y += ud.riseSpeed;
+
+            // Gentle sinusoidal buoyancy wobble
+            const currentAngle = ud.angle + Math.sin(time * ud.wobbleSpeed + ud.phase) * 0.15;
+            const currentRadius = ud.baseRadius + Math.sin(time * ud.wobbleSpeed * 0.8 + ud.phase) * ud.wobbleAmp;
+            bubble.position.x = Math.cos(currentAngle) * currentRadius;
+            bubble.position.z = Math.sin(currentAngle) * currentRadius;
+
+            // Elastic bubble scale breathing
+            const sPulse = ud.baseScale * (1.0 + Math.sin(time * 3.5 + ud.phase) * 0.12);
+            bubble.scale.set(sPulse, sPulse, sPulse);
+
+            // Pop and reset at ceiling
+            if (bubble.position.y > 2.5) {
+              bubble.position.y = 0.18 + Math.random() * 0.15;
+              ud.angle = Math.random() * Math.PI * 2;
+              ud.baseRadius = 0.45 + Math.random() * 0.95;
+            }
+          });
+        }
+
+        // 5. Counter-Rotating Pedestal Runic Rings
+        if (this.pedestalRuneMesh) {
+          this.pedestalRuneMesh.rotation.z += 0.0025;
+          const pulse = 0.7 + Math.sin(time * 2.2) * 0.25;
+          this.runeMat.opacity = pulse;
+        }
+        if (this.pedestalInnerRuneMesh) {
+          this.pedestalInnerRuneMesh.rotation.z -= 0.004;
+        }
+
+        // 6. Floating Elemental Crystals Orbiting in 3D Ellipses
+        this.floatingGems.forEach(gem => {
+          const d = gem.userData;
+          d.angle += d.speed * delta;
+          gem.position.x = Math.cos(d.angle) * d.radiusX;
+          gem.position.z = Math.sin(d.angle) * d.radiusZ;
+          gem.position.y = d.yCenter + Math.sin(d.angle) * d.tilt + Math.sin(time * 2.5 + d.angle) * 0.05;
+          gem.rotation.y += 0.05;
+          gem.rotation.x += 0.03;
+        });
+
+        // 7. Ground Sparks Rising
+        if (this.sparksParticles) {
+          const pos = this.sparksParticles.geometry.attributes.position.array;
+          for (let i = 0; i < pos.length; i += 3) {
+            pos[i + 1] += 0.0035;
+            if (pos[i + 1] > 3.0) pos[i + 1] = 0.15;
+          }
+          this.sparksParticles.geometry.attributes.position.needsUpdate = true;
+        }
+
+        // 8. Aura Mist Shimmer
+        if (this.auraParticles) {
+          const apos = this.auraParticles.geometry.attributes.position.array;
+          for (let i = 0; i < apos.length; i += 3) {
+            apos[i + 1] += 0.002;
+            if (apos[i + 1] > 2.2) apos[i + 1] = 0.7;
+          }
+          this.auraParticles.geometry.attributes.position.needsUpdate = true;
+          this.auraParticles.material.opacity = 0.5 + Math.sin(time * 2.8) * 0.2;
+        }
+
+        // Self-healing resize check
+        const curW = this.container.clientWidth || window.innerWidth;
+        const curH = this.container.clientHeight || window.innerHeight;
+        if (curW > 0 && curH > 0) {
+          const domW = this.renderer.domElement.clientWidth;
+          const domH = this.renderer.domElement.clientHeight;
+          if (Math.abs(domW - curW) > 4 || Math.abs(domH - curH) > 4) {
+            this.onResize();
+          }
+        }
+
+        this.controls.update();
+        this.renderer.render(this.scene, this.camera);
+      };
+    }
+
+    let showcase = null;
+    let pendingGuardianConfig = null;
+
+    function initShowcase() {
+      if (showcase) return;
+      const container = document.getElementById('canvas-container');
+      if (!container) return;
+      console.log('initShowcase running, container size:', container.clientWidth, container.clientHeight);
+      showcase = new DotaStyleHeroShowcase(container);
+
+      if (pendingGuardianConfig) {
+        console.log('Applying pendingGuardianConfig:', pendingGuardianConfig);
+        showcase.loadGuardian(pendingGuardianConfig);
+        pendingGuardianConfig = null;
+      }
+    }
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(initShowcase, 1);
+    } else {
+      window.addEventListener('DOMContentLoaded', initShowcase);
+      window.addEventListener('load', initShowcase);
+    }
+
+    // Called from Android with guardian JSON config
+    window.loadGuardian = function(jsonString) {
+      try {
+        console.log('window.loadGuardian received payload');
+        const config = typeof jsonString === 'string' ? JSON.parse(jsonString) : jsonString;
+        if (showcase) {
+          showcase.loadGuardian(config);
+        } else {
+          console.log('showcase not yet initialized, caching config');
+          pendingGuardianConfig = config;
+        }
+      } catch (e) {
+        console.error('Error loading guardian in showcase:', e);
+      }
+    };
+
+    window.toggleTurntable = function(enabled) {
+      if (showcase && showcase.controls) {
+        showcase.controls.autoRotate = !!enabled;
+      }
+    };
+  </script>
+</body>
+</html>
