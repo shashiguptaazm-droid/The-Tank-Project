@@ -793,6 +793,7 @@ struct SubjectTestView: View {
 
     @StateObject private var viewModel: SubjectTestViewModel
     @State private var activeQuiz: Quiz?
+    @State private var launchDedicatedEngine: Bool = false
     @State private var errorMessage: String?
     @State private var hasStarted = false
 
@@ -813,6 +814,17 @@ struct SubjectTestView: View {
             }
             .onDisappear {
                 viewModel.stop()
+            }
+            .fullScreenCover(isPresented: $launchDedicatedEngine) {
+                SubjectTestActivityView(
+                    uniqueId: launch.uniqueId,
+                    subject: launch.subject.isEmpty ? "NEET PG" : launch.subject,
+                    topic: launch.topic,
+                    challengeId: launch.challengeId,
+                    isChallenge: viewModel.mode == .multiplayer,
+                    isHost: launch.isHost,
+                    questionIdList: launch.questionIds
+                )
             }
             .fullScreenCover(item: $activeQuiz) { quiz in
                 TestActivityView(
@@ -863,7 +875,7 @@ struct SubjectTestView: View {
                 loadoutCard
                 intelPreview
                 PrimaryButton(title: startTitle, isSubmit: true) {
-                    activeQuiz = viewModel.buildLaunchQuiz()
+                    launchDedicatedEngine = true
                 }
             }
             .padding(AppTheme.Spacing.lg)

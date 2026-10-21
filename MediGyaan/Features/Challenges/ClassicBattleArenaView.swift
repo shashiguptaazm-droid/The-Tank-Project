@@ -1042,7 +1042,7 @@ struct ClassicBattleArenaView: View {
 
 // MARK: - Floating Combat Item
 
-private struct FloatingCombatItem: Identifiable {
+struct FloatingCombatItem: Identifiable {
     let id = UUID()
     let text: String
     let color: Color
