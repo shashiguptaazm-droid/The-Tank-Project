@@ -21,6 +21,14 @@ struct SubjectTestActivityView: View {
     var isChallenge: Bool = false
     var isHost: Bool = false
     var questionIdList: [Int]? = nil
+    var userWarrior: Warrior? = nil
+
+    @AppStorage("selected_avatar_id") private var selectedAvatarId: Int = 1
+
+    private var equippedHeroKit: GuardianHeroKit {
+        let avatarIdx = GuardianRegistry.avatarIndex(for: userWarrior?.id ?? selectedAvatarId)
+        return GuardianRegistry.getHeroKit(for: avatarIdx) ?? GuardianRegistry.getHeroKit(for: 1001)!
+    }
 
     @EnvironmentObject private var session: SessionStore
     @Environment(\.api) private var api
@@ -265,24 +273,25 @@ struct SubjectTestActivityView: View {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 
-    // MARK: - Hero Powers Bar
+    // MARK: - Hero Powers Bar (Equipped Hero Kit)
 
     private var powersToolbar: some View {
-        HStack(spacing: 10) {
-            // Intel Scan Clue
-            powerBtn(title: "INTEL", icon: "magnifyingglass", charges: intelCharges, cd: intelCooldown, color: Color.cyan) {
+        let kit = equippedHeroKit
+        return HStack(spacing: 10) {
+            // Slot 1: Intel Clue Scan
+            powerBtn(title: kit.intelPower.shortLabel.uppercased(), icon: "magnifyingglass", charges: intelCharges, cd: intelCooldown, color: Color.cyan) {
                 activateIntelScan()
             }
-            // Strike 50-50 Distractor Elimination
-            powerBtn(title: "STRIKE", icon: "bolt.fill", charges: strikeCharges, cd: strikeCooldown, color: Color.orange) {
+            // Slot 2: Strike 50-50 Distractor Elimination
+            powerBtn(title: kit.strikePower.shortLabel.uppercased(), icon: "bolt.fill", charges: strikeCharges, cd: strikeCooldown, color: Color.orange) {
                 activateStrikeDistractorElimination()
             }
-            // Shield Barrier
-            powerBtn(title: "BARRIER", icon: "shield.fill", charges: defenseCharges, cd: defenseCooldown, color: Color.blue) {
+            // Slot 3: Defense Barrier Shield
+            powerBtn(title: kit.defensePower.shortLabel.uppercased(), icon: "shield.fill", charges: defenseCharges, cd: defenseCooldown, color: Color.blue) {
                 activateShield()
             }
-            // Surge Multiplier
-            powerBtn(title: "SURGE", icon: "heart.fill", charges: surgeCharges, cd: surgeCooldown, color: Color.pink) {
+            // Slot 4: Surge Multiplier & Healing
+            powerBtn(title: kit.surgePower.shortLabel.uppercased(), icon: "heart.fill", charges: surgeCharges, cd: surgeCooldown, color: Color.pink) {
                 activateSurge()
             }
         }
@@ -557,30 +566,35 @@ struct SubjectTestActivityView: View {
         .background(Color(hex: "#060A14"))
     }
 
-    // MARK: - Powers Logic
+    // MARK: - Powers Logic (Equipped Hero Kit)
 
     private func activateIntelScan() {
+        let power = equippedHeroKit.intelPower
         guard intelCharges > 0, intelCooldown == 0, let q = currentQuestion else { return }
         intelCharges -= 1
-        intelCooldown = 2
+        intelCooldown = max(1, power.cooldownRounds)
 
-        let highYieldTerms = ["triad", "most common", "pathognomonic", "gold standard", "first line", "sign", "artery", "nerve", "mutation", "receptor"]
-        let found = highYieldTerms.filter { q.text.lowercased().contains($0) }
-        let clue = found.isEmpty
-            ? "💡 High-Yield Clue: Focus on primary clinical signs."
-            : "💡 High-Yield Keyword: '\(found.joined(separator: ", ").uppercased())'"
+        let highYieldTerms = ["triad", "most common", "pathognomonic", "gold standard", "first line", "sign", "acute", "artery", "nerve", "mutation", "receptor"]
+        let found = highYieldTerms.filter { q.text.localizedCaseInsensitiveContains($0) }
+        let clue = !found.isEmpty
+            ? "🔍 \(power.powerName): Focus on [\(found.joined(separator: ", "))]"
+            : "🔍 \(power.powerName): Cross-reference clinical presentation with anatomical plane!"
 
         intelClueText = clue
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
-            intelClueText = nil
+        showCombatFlyout(text: clue, color: Color.cyan)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+            if self.intelClueText == clue {
+                self.intelClueText = nil
+            }
         }
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
     }
 
     private func activateStrikeDistractorElimination() {
+        let power = equippedHeroKit.strikePower
         guard strikeCharges > 0, strikeCooldown == 0, let q = currentQuestion else { return }
         strikeCharges -= 1
-        strikeCooldown = 2
+        strikeCooldown = max(1, power.cooldownRounds)
 
         var wrongIndices: [Int] = []
         for i in 0..<q.options.count {
@@ -589,26 +603,33 @@ struct SubjectTestActivityView: View {
             }
         }
         wrongIndices.shuffle()
-        for idx in wrongIndices.prefix(2) {
+        let eliminated = Array(wrongIndices.prefix(2))
+        for idx in eliminated {
             eliminatedOptionIndices.insert(idx)
         }
+        showCombatFlyout(text: "🎯 \(power.powerName.uppercased())! -\(eliminated.count) DISTRACTORS", color: Color.orange)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
     }
 
     private func activateShield() {
-        guard defenseCharges > 0, defenseCooldown == 0 else { return }
+        let power = equippedHeroKit.defensePower
+        guard defenseCharges > 0, defenseCooldown == 0, shieldRoundsActive == 0 else { return }
         defenseCharges -= 1
-        defenseCooldown = 2
+        defenseCooldown = max(1, power.cooldownRounds)
         shieldRoundsActive = 2
+        showCombatFlyout(text: "🛡️ \(power.powerName.uppercased())! BARRIER ACTIVE (2 rds)", color: Color.cyan)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
     }
 
     private func activateSurge() {
+        let power = equippedHeroKit.surgePower
         guard surgeCharges > 0, surgeCooldown == 0 else { return }
         surgeCharges -= 1
-        surgeCooldown = 3
+        surgeCooldown = max(1, power.cooldownRounds)
         surgeScoreMultiplierActive = true
-        currentHp = min(100, currentHp + 20)
+        let healAmt = 20
+        currentHp = min(100, currentHp + healAmt)
+        showCombatFlyout(text: "⚡ \(power.powerName.uppercased())! +\(healAmt) HP & 1.5x SURGE! 🔥", color: Color.yellow)
         UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
     }
 
@@ -696,6 +717,21 @@ struct SubjectTestActivityView: View {
             mode = .singlePlayer
             remainingTimerSeconds = 30 * 60
         }
+
+        // Initialize 4 Hero Powers from equipped Guardian kit
+        let kit = equippedHeroKit
+        intelCharges = kit.intelPower.chargesPerQuiz
+        strikeCharges = kit.strikePower.chargesPerQuiz
+        defenseCharges = kit.defensePower.chargesPerQuiz
+        surgeCharges = kit.surgePower.chargesPerQuiz
+
+        intelCooldown = 0
+        strikeCooldown = 0
+        defenseCooldown = 0
+        surgeCooldown = 0
+        shieldRoundsActive = 0
+        isShockArmed = false
+        surgeScoreMultiplierActive = false
 
         Task {
             await loadInitialQuestions()

@@ -126,20 +126,28 @@ struct ClassicGameActivityView: View {
     @State private var resolvedOpponentWarrior: Warrior = Warrior.all[1]
     @State private var resolvedUserWarrior: Warrior = Warrior.all[0]
 
-    // ─── 4 Hero Powers ────────────────────────────────────────────────────────
-    @State private var adrenalineCharges: Int = 2
-    @State private var shieldCharges: Int = 2
-    @State private var shockCharges: Int = 2
-    @State private var confuseCharges: Int = 2
+    // ─── 4 Hero Powers (Equipped Hero Kit) ────────────────────────────────────
+    @State private var intelCharges: Int = 3
+    @State private var strikeCharges: Int = 2
+    @State private var defenseCharges: Int = 3
+    @State private var surgeCharges: Int = 1
 
-    @State private var adrenalineCooldown: Int = 0
-    @State private var shieldCooldown: Int = 0
-    @State private var shockCooldown: Int = 0
-    @State private var confuseCooldown: Int = 0
+    @State private var intelCooldown: Int = 0
+    @State private var strikeCooldown: Int = 0
+    @State private var defenseCooldown: Int = 0
+    @State private var surgeCooldown: Int = 0
 
     @State private var shieldRoundsActive: Int = 0
     @State private var isShockCharged: Bool = false
+    @State private var surgeScoreMultiplierActive: Bool = false
+    @State private var intelClueText: String? = nil
     @State private var eliminatedOptionIndices: Set<Int> = []
+
+    private var equippedHeroKit: GuardianHeroKit {
+        let warriorId = resolvedUserWarrior.id
+        let avatarIdx = GuardianRegistry.avatarIndex(for: warriorId)
+        return GuardianRegistry.getHeroKit(for: avatarIdx) ?? GuardianRegistry.getHeroKit(for: 1001)!
+    }
 
     // ─── Question Progression ─────────────────────────────────────────────────
     @State private var questions: [Question] = []
@@ -497,53 +505,54 @@ struct ClassicGameActivityView: View {
     // MARK: - 4 Guardian Powers Toolbar
 
     private var guardianPowersBar: some View {
-        HStack(spacing: 10) {
-            // 1. Adrenaline (Heal +20 HP)
+        let kit = equippedHeroKit
+        return HStack(spacing: 10) {
+            // Slot 1: Intel Power (btnConfuse in Android)
             powerButton(
-                title: "ADRENALINE",
-                icon: "bolt.heart.fill",
-                color: Color.green,
-                charges: adrenalineCharges,
-                cooldown: adrenalineCooldown,
-                isActive: false
-            ) {
-                activateAdrenaline()
-            }
-
-            // 2. Shield Ward (Blocks 50% damage for 2 questions)
-            powerButton(
-                title: "SHIELD",
-                icon: "shield.lefthalf.filled",
-                color: Color.cyan,
-                charges: shieldCharges,
-                cooldown: shieldCooldown,
-                isActive: shieldRoundsActive > 0
-            ) {
-                activateShield()
-            }
-
-            // 3. Shock Strike (+15 Bonus Damage)
-            powerButton(
-                title: "SHOCK",
-                icon: "flame.fill",
-                color: Color.orange,
-                charges: shockCharges,
-                cooldown: shockCooldown,
-                isActive: isShockCharged
-            ) {
-                activateShock()
-            }
-
-            // 4. Neuro Confuse (Disrupts Opponent / Bot -40% Acc)
-            powerButton(
-                title: "CONFUSE",
+                title: kit.intelPower.shortLabel.uppercased(),
                 icon: "waveform.path.ecg",
                 color: Color.purple,
-                charges: confuseCharges,
-                cooldown: confuseCooldown,
+                charges: intelCharges,
+                cooldown: intelCooldown,
                 isActive: false
             ) {
-                activateConfuse()
+                activateIntelPower()
+            }
+
+            // Slot 2: Strike Power (btnShock in Android)
+            powerButton(
+                title: kit.strikePower.shortLabel.uppercased(),
+                icon: "flame.fill",
+                color: Color.orange,
+                charges: strikeCharges,
+                cooldown: strikeCooldown,
+                isActive: isShockCharged
+            ) {
+                activateStrikePower()
+            }
+
+            // Slot 3: Defense Power (btnShield in Android)
+            powerButton(
+                title: kit.defensePower.shortLabel.uppercased(),
+                icon: "shield.lefthalf.filled",
+                color: Color.cyan,
+                charges: defenseCharges,
+                cooldown: defenseCooldown,
+                isActive: shieldRoundsActive > 0
+            ) {
+                activateDefensePower()
+            }
+
+            // Slot 4: Surge Power (btnAdrenaline in Android)
+            powerButton(
+                title: kit.surgePower.shortLabel.uppercased(),
+                icon: "bolt.heart.fill",
+                color: Color.green,
+                charges: surgeCharges,
+                cooldown: surgeCooldown,
+                isActive: surgeScoreMultiplierActive
+            ) {
+                activateSurgePower()
             }
         }
     }
@@ -566,8 +575,8 @@ struct ClassicGameActivityView: View {
                         .overlay(Circle().stroke(isActive ? color : Color.white.opacity(0.2), lineWidth: 1.5))
 
                     if cooldown > 0 {
-                        Text("\(cooldown)s")
-                            .font(.system(size: 11, weight: .heavy, design: .monospaced))
+                        Text("CD:\(cooldown)")
+                            .font(.system(size: 9, weight: .heavy, design: .monospaced))
                             .foregroundStyle(Color.yellow)
                     } else {
                         Image(systemName: icon)
@@ -578,11 +587,12 @@ struct ClassicGameActivityView: View {
 
                 HStack(spacing: 2) {
                     Text(title)
-                        .font(.system(size: 9, weight: .bold))
+                        .font(.system(size: 8.5, weight: .bold))
                         .foregroundStyle(charges > 0 ? Color.white : Color.gray)
+                        .lineLimit(1)
                     if charges > 0 {
                         Text("x\(charges)")
-                            .font(.system(size: 9, weight: .heavy))
+                            .font(.system(size: 8.5, weight: .heavy))
                             .foregroundStyle(color)
                     }
                 }
@@ -614,6 +624,22 @@ struct ClassicGameActivityView: View {
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(Color.white)
                 .fixedSize(horizontal: false, vertical: true)
+
+            // Intel Scan Clue Banner
+            if let clue = intelClueText {
+                HStack(spacing: 6) {
+                    Image(systemName: "lightbulb.fill")
+                        .foregroundStyle(Color.yellow)
+                    Text(clue)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(Color.cyan)
+                        .lineLimit(2)
+                }
+                .padding(8)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(RoundedRectangle(cornerRadius: 8).fill(Color.cyan.opacity(0.12)))
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.cyan.opacity(0.4), lineWidth: 1))
+            }
         }
         .padding(AppTheme.Spacing.md)
         .background(
@@ -742,52 +768,94 @@ struct ClassicGameActivityView: View {
         )
     }
 
-    // MARK: - Combat Power Activation
+    // MARK: - Combat Power Activation (Equipped Hero Kit)
 
-    private func activateAdrenaline() {
-        guard adrenalineCharges > 0, !isAnswerSubmitted else { return }
-        adrenalineCharges -= 1
-        adrenalineCooldown = 20
+    private func activateIntelPower() {
+        let power = equippedHeroKit.intelPower
+        guard intelCharges > 0, intelCooldown <= 0, !isAnswerSubmitted else { return }
+        intelCharges -= 1
+        intelCooldown = max(1, power.cooldownRounds)
 
-        let healAmt = 20
-        playerHp = min(100, playerHp + healAmt)
-        playerGhostHp = Double(playerHp)
-        spawnFloatingText("+\(healAmt) HP ⚡", color: Color.green, isPlayer: true)
-        broadcastAction(type: "HEAL", value: healAmt)
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-    }
+        // Execute Intel Scan Clue on current question stem
+        executeIntelScanClue(powerName: power.powerName)
 
-    private func activateShield() {
-        guard shieldCharges > 0, shieldRoundsActive == 0, !isAnswerSubmitted else { return }
-        shieldCharges -= 1
-        shieldRoundsActive = 2
-        shieldCooldown = 25
-        spawnFloatingText("SHIELD ACTIVE 🛡️", color: Color.cyan, isPlayer: true)
-        broadcastAction(type: "SHIELD", value: 2)
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-    }
-
-    private func activateShock() {
-        guard shockCharges > 0, !isShockCharged, !isAnswerSubmitted else { return }
-        shockCharges -= 1
-        isShockCharged = true
-        shockCooldown = 20
-        spawnFloatingText("SHOCK ARMED 💥", color: Color.orange, isPlayer: true)
-        broadcastAction(type: "SHOCK", value: 15)
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-    }
-
-    private func activateConfuse() {
-        guard confuseCharges > 0, !isAnswerSubmitted else { return }
-        confuseCharges -= 1
-        confuseCooldown = 30
-        spawnFloatingText("CONFUSE CAST! 💫", color: Color.purple, isPlayer: false)
+        // Disrupt opponent bot or send RTDB action
         if var b = botState {
             b.confusedThisRound = true
             self.botState = b
         }
         broadcastAction(type: "CONFUSE", value: 40)
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+    }
+
+    private func activateStrikePower() {
+        let power = equippedHeroKit.strikePower
+        guard strikeCharges > 0, strikeCooldown <= 0, !isAnswerSubmitted else { return }
+        strikeCharges -= 1
+        strikeCooldown = max(1, power.cooldownRounds)
+        isShockCharged = true
+
+        let eliminatedCount = executeStrikeDistractorElimination()
+        let shockDmg = 15
+        spawnFloatingText("🎯 \(power.powerName.uppercased())! -\(eliminatedCount) DISTRACTORS (\(shockDmg) DMG)", color: Color.orange, isPlayer: true)
+        broadcastAction(type: "SHOCK", value: shockDmg)
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+    }
+
+    private func activateDefensePower() {
+        let power = equippedHeroKit.defensePower
+        guard defenseCharges > 0, defenseCooldown <= 0, shieldRoundsActive == 0, !isAnswerSubmitted else { return }
+        defenseCharges -= 1
+        defenseCooldown = max(1, power.cooldownRounds)
+        shieldRoundsActive = 2
+
+        spawnFloatingText("🛡️ \(power.powerName.uppercased())! BARRIER ACTIVE (2 rds)", color: Color.cyan, isPlayer: true)
+        broadcastAction(type: "SHIELD", value: 2)
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+    }
+
+    private func activateSurgePower() {
+        let power = equippedHeroKit.surgePower
+        guard surgeCharges > 0, surgeCooldown <= 0, !isAnswerSubmitted else { return }
+        surgeCharges -= 1
+        surgeCooldown = max(1, power.cooldownRounds)
+        surgeScoreMultiplierActive = true
+
+        let healAmt = 20
+        playerHp = min(100, playerHp + healAmt)
+        playerGhostHp = Double(playerHp)
+        spawnFloatingText("⚡ \(power.powerName.uppercased())! +\(healAmt) HP & 1.5x SURGE! 🔥", color: Color.yellow, isPlayer: true)
+        broadcastAction(type: "HEAL", value: healAmt)
+        UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+    }
+
+    @discardableResult
+    private func executeStrikeDistractorElimination() -> Int {
+        guard let q = currentQuestion else { return 0 }
+        var incorrectIndices = q.options.indices.filter { $0 != q.correctIndex && !eliminatedOptionIndices.contains($0) }
+        incorrectIndices.shuffle()
+        let toEliminate = Array(incorrectIndices.prefix(2))
+        for idx in toEliminate {
+            eliminatedOptionIndices.insert(idx)
+        }
+        return toEliminate.count
+    }
+
+    private func executeIntelScanClue(powerName: String) {
+        guard let q = currentQuestion else { return }
+        let fullText = q.text
+        let highYieldTerms = ["triad", "most common", "pathognomonic", "gold standard", "first line", "sign", "acute", "artery", "nerve", "mutation", "receptor"]
+        let found = highYieldTerms.filter { fullText.localizedCaseInsensitiveContains($0) }
+        let message = !found.isEmpty
+            ? "🔍 \(powerName): Focus on [\(found.joined(separator: ", "))]"
+            : "🔍 \(powerName): Cross-reference clinical presentation with anatomical plane!"
+        intelClueText = message
+        spawnFloatingText(message, color: Color.cyan, isPlayer: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+            if self.intelClueText == message {
+                self.intelClueText = nil
+            }
+        }
     }
 
     // MARK: - Player Answer Submission
@@ -816,7 +884,12 @@ struct ClassicGameActivityView: View {
 
             let basePoints = 10
             let speedBonusPts = isSpeedBonus ? 10 : 0
-            let totalEarned = basePoints + speedBonusPts
+            var totalEarned = basePoints + speedBonusPts
+            if surgeScoreMultiplierActive {
+                totalEarned = Int(Double(totalEarned) * 1.5)
+                surgeScoreMultiplierActive = false
+                spawnFloatingText("1.5x SURGE BONUS!", color: Color.yellow, isPlayer: true)
+            }
             playerScore += totalEarned
 
             spawnFloatingText("+\(totalEarned) PTS 🔥", color: Color.yellow, isPlayer: true)
@@ -939,12 +1012,6 @@ struct ClassicGameActivityView: View {
     // MARK: - Timer Tick & Navigation
 
     private func handleTimerTick() {
-        // Cooldown decrements
-        if adrenalineCooldown > 0 { adrenalineCooldown -= 1 }
-        if shieldCooldown > 0 { shieldCooldown -= 1 }
-        if shockCooldown > 0 { shockCooldown -= 1 }
-        if confuseCooldown > 0 { confuseCooldown -= 1 }
-
         guard isRoundActive, !isAnswerSubmitted else { return }
         if roundTimerSeconds > 0 {
             roundTimerSeconds -= 1
@@ -970,6 +1037,14 @@ struct ClassicGameActivityView: View {
         selectedOptionIndex = nil
         isAnswerSubmitted = false
         eliminatedOptionIndices.removeAll()
+        intelClueText = nil
+
+        // Guardian Power Round-based Cooldown Decrements (Parity with Android lines 1943-1946)
+        if intelCooldown > 0 { intelCooldown -= 1 }
+        if strikeCooldown > 0 { strikeCooldown -= 1 }
+        if defenseCooldown > 0 { defenseCooldown -= 1 }
+        if surgeCooldown > 0 { surgeCooldown -= 1 }
+        if shieldRoundsActive > 0 { shieldRoundsActive -= 1 }
 
         // Check K.O.
         if playerHp <= 0 || opponentHp <= 0 {
@@ -1023,6 +1098,21 @@ struct ClassicGameActivityView: View {
         resolvedUserWarrior = userWarrior ?? Warrior.all.first!
         resolvedOpponentWarrior = opponentWarrior ?? Warrior.all.randomElement()!
         resolvedOpponentName = opponentName ?? Self.BOT_NAME_POOL.randomElement()!
+
+        // Initialize 4 Guardian Hero Powers from equipped kit
+        let kit = equippedHeroKit
+        intelCharges = kit.intelPower.chargesPerQuiz
+        strikeCharges = kit.strikePower.chargesPerQuiz
+        defenseCharges = kit.defensePower.chargesPerQuiz
+        surgeCharges = kit.surgePower.chargesPerQuiz
+
+        intelCooldown = 0
+        strikeCooldown = 0
+        defenseCooldown = 0
+        surgeCooldown = 0
+        shieldRoundsActive = 0
+        isShockCharged = false
+        surgeScoreMultiplierActive = false
 
         // Initialize Bot AI
         let randomPersonality = BotPersonality.allCases.randomElement()!
