@@ -235,6 +235,9 @@ public final class CreditsManager: ObservableObject {
     /// through `addCredits(_:)` / `deductCredits(_:)` / `synchronizeFromStore()`.
     @Published public private(set) var currentCredits: Int = 250
 
+    /// Convenience accessor for current credit balance.
+    public var credits: Int { currentCredits }
+
     private init() {
         currentCredits = readBalanceLocked()
     }

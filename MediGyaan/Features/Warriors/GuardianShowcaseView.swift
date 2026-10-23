@@ -25,7 +25,7 @@ struct GuardianShowcaseView: View {
     @State private var isAutoRotating: Bool = true
     @State private var isFullscreen3D: Bool = false
     @State private var showEquippedToast: Bool = false
-    @State private var creditsBalance: Int = CreditsManager.shared.credits
+    @State private var creditsBalance: Int = CreditsManager.shared.currentCredits
 
     private var allWarriors: [Warrior] {
         Warrior.allWarriors

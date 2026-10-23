@@ -193,18 +193,6 @@ struct CitationValidationState: Equatable {
 
 // MARK: - Poster Generation
 
-struct PosterSectionData: Identifiable, Equatable, Hashable {
-    var id: String { heading }
-    var heading: String
-    var body: String
-}
-
-struct PosterAnalysisData: Equatable {
-    var title: String = ""
-    var subtitle: String = ""
-    var sections: [PosterSectionData] = []
-}
-
 struct PosterGenState: Equatable {
     var ownerTurn: Int = -1
     var source: String = ""
@@ -214,14 +202,6 @@ struct PosterGenState: Equatable {
     var imageUrl: String? = nil
     var imageFile: String? = nil
     var error: String = ""
-}
-
-struct SavedPoster: Identifiable, Equatable {
-    var id: String { file }
-    var ownerTurn: Int
-    var file: String
-    var title: String = ""
-    var sections: [String] = []
 }
 
 // MARK: - Chapter Generator Structured Schema
@@ -306,7 +286,7 @@ struct ChatReferenceJson: Codable, Equatable, Identifiable {
 
 // MARK: - PDF Abstracts & Discovery
 
-struct PdfAbstractSectionJson: Codable, Equatable, Identifiable {
+struct PdfAbstractSectionJson: Codable, Equatable, Identifiable, Hashable {
     var id: String { label }
     var label: String = ""
     var text: String = ""
