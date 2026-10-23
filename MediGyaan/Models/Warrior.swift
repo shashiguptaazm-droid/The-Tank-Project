@@ -77,6 +77,11 @@ struct Warrior: Identifiable, Hashable {
     /// Alias for allWarriors
     static var all: [Warrior] { allWarriors }
 
+    /// Find warrior by ID (1 through 27)
+    static func warrior(for id: Int) -> Warrior? {
+        allWarriors.first(where: { $0.id == id })
+    }
+
     /// All 27 unique characters from the authoritative specification.
     static let allWarriors: [Warrior] = [
         Warrior(

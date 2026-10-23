@@ -15,6 +15,7 @@ struct MatchmakingArenaFlowView: View {
 
     @EnvironmentObject private var session: SessionStore
     @Environment(\.dismiss) private var dismiss
+    @AppStorage("selectedAvatarId") private var selectedAvatarId: Int = 1
 
     enum ArenaStage {
         case searching
@@ -64,11 +65,16 @@ struct MatchmakingArenaFlowView: View {
 
             case .versus:
                 LoadingActivityView(
+                    challengeId: challengeId,
+                    userId: String(session.currentUser?.id ?? 0),
+                    userName: session.currentUser?.name ?? "Dr. Aspirant",
+                    opponentId: opponentId,
+                    opponentName: matchedOpponentName,
                     subject: subject,
                     topic: topic,
-                    opponentName: matchedOpponentName,
-                    opponentWarrior: matchedOpponentWarrior,
-                    userWarrior: userWarrior
+                    isHost: isHost,
+                    isBotMatch: isBotMatch,
+                    questionIds: sharedQuestionIds
                 ) {
                     RemoteLogger.log(
                         tag: "ArenaFlow_BattleStart",
@@ -120,7 +126,7 @@ struct MatchmakingArenaFlowView: View {
     }
 
     private func setupFighters() {
-        if let user = session.currentUser, let w = Warrior.warrior(for: user.avatarWarriorId) {
+        if let w = Warrior.warrior(for: selectedAvatarId) {
             userWarrior = w
         } else {
             userWarrior = Warrior.all.first!
