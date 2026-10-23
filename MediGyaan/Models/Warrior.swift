@@ -30,6 +30,9 @@ struct Warrior: Identifiable, Hashable {
         String(format: "avatar_%02d", id)
     }
 
+    /// Alias for avatarImageName
+    var avatarImage: String { avatarImageName }
+
     /// Corresponding 3D GLB asset filename if available (char01_axiom through char19_somnus)
     var glbModelName: String? {
         let glbMap: [Int: String] = [

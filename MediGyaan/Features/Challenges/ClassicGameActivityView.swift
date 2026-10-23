@@ -388,7 +388,7 @@ struct ClassicGameActivityView: View {
         HStack(spacing: 12) {
             // YOU / Player Card
             fighterHealthPod(
-                name: session.user?.name ?? "Doctor (YOU)",
+                name: session.currentUser?.name ?? "Doctor (YOU)",
                 warrior: resolvedUserWarrior,
                 hp: playerHp,
                 ghostHp: playerGhostHp,
@@ -428,7 +428,7 @@ struct ClassicGameActivityView: View {
         VStack(spacing: 4) {
             HStack(spacing: 8) {
                 if isPlayer {
-                    fighterAvatarView(avatar: warrior.avatarImage, isPlayer: true)
+                    fighterAvatarView(avatar: warrior.avatarImageName, isPlayer: true)
                 }
                 VStack(alignment: isPlayer ? .leading : .trailing, spacing: 2) {
                     Text(name)
@@ -440,7 +440,7 @@ struct ClassicGameActivityView: View {
                         .foregroundStyle(Color.yellow)
                 }
                 if !isPlayer {
-                    fighterAvatarView(avatar: warrior.avatarImage, isPlayer: false)
+                    fighterAvatarView(avatar: warrior.avatarImageName, isPlayer: false)
                 }
             }
 
@@ -610,8 +610,8 @@ struct ClassicGameActivityView: View {
                     .font(.system(size: 11, weight: .heavy, design: .monospaced))
                     .foregroundStyle(Color.yellow)
                 Spacer()
-                if let diff = q.difficulty {
-                    Text(diff.uppercased())
+                if !q.difficulty.isEmpty {
+                    Text(q.difficulty.uppercased())
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(Color.white.opacity(0.6))
                         .padding(.horizontal, 6)
@@ -755,7 +755,7 @@ struct ClassicGameActivityView: View {
                 .background(Capsule().fill(Color.yellow))
             }
 
-            Text(q.explanation?.isEmpty == false ? q.explanation! : "No rationale provided.")
+            Text(!q.explanation.isEmpty ? q.explanation : "No rationale provided.")
                 .font(.system(size: 13, weight: .regular))
                 .foregroundStyle(Color.white.opacity(0.85))
                 .fixedSize(horizontal: false, vertical: true)
@@ -1119,7 +1119,7 @@ struct ClassicGameActivityView: View {
         botState = BotState(
             id: opponentId ?? "bot_\(UUID().uuidString.prefix(6))",
             name: resolvedOpponentName,
-            skin: resolvedOpponentWarrior.avatarImage,
+            skin: resolvedOpponentWarrior.avatarImageName,
             baseAccuracy: 0.75,
             minDelayMs: 3500,
             maxDelayMs: 7500,
