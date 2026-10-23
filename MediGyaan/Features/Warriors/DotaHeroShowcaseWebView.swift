@@ -78,7 +78,7 @@ struct DotaHeroShowcaseWebView: UIViewRepresentable {
             "imageAssetPath": "avatars/char\(String(format: "%02d", avatarIndex - 1000)).png",
             "renderConfig": [
                 "modelGlbUrl": resolvedModelUrl,
-                "rimColorHex": heroKit?.defensePower.renderConfig?.rimColorHex ?? 0x00E5FF,
+                "rimColorHex": heroKit?.defensePower.renderConfig.rimColorHex ?? 0x00E5FF,
                 "cameraDistance": 3.4,
                 "cameraHeight": 1.45
             ]
