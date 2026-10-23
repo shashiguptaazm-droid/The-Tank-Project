@@ -1,10 +1,10 @@
 import Foundation
 
-/// Validates medical reference citations against the NCBI PubMed database.
+/// Validates medical reference citations against the NCBI PubMed database for AI Chat.
 /// Fully ports `PubMedCitationValidator.kt` from Android.
-actor PubMedCitationValidator {
+actor AiChatPubMedValidator {
 
-    static let shared = PubMedCitationValidator()
+    static let shared = AiChatPubMedValidator()
 
     private var cache: [String: PubMedValidationResult] = [:]
 

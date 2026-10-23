@@ -1738,7 +1738,7 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
             userText.lowercased().contains("pubmed") ||
             userText.lowercased().contains("verify")
 
-        let entries = PubMedCitationValidator.shared.extractCitationEntries(from: replyText)
+        let entries = AiChatPubMedValidator.shared.extractCitationEntries(from: replyText)
         guard entries.count >= 2 || (userAsked && !entries.isEmpty) else { return nil }
 
         var state = CitationValidationState(
@@ -1751,7 +1751,7 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
             total: entries.count
         )
 
-        let results = await PubMedCitationValidator.shared.validate(entries: entries) { _, _, _, _ in }
+        let results = await AiChatPubMedValidator.shared.validate(entries: entries) { _, _, _, _ in }
         state.results = results
         state.note = "\(results.filter { $0.found }.count)/\(results.count) verified on PubMed"
         return state
@@ -2427,7 +2427,7 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
     func runCitationValidation(for messageIndex: Int) {
         guard messageIndex >= 0, messageIndex < messages.count else { return }
         let msg = messages[messageIndex]
-        let entries = PubMedCitationValidator.shared.extractCitationEntries(from: msg.text)
+        let entries = AiChatPubMedValidator.shared.extractCitationEntries(from: msg.text)
         guard !entries.isEmpty else {
             showToast("No citations found in this message")
             return
@@ -2445,7 +2445,7 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
         messages[messageIndex].citationCard = state
 
         Task {
-            let results = await PubMedCitationValidator.shared.validate(entries: entries) { [weak self] cur, tot, note, _ in
+            let results = await AiChatPubMedValidator.shared.validate(entries: entries) { [weak self] cur, tot, note, _ in
                 Task { @MainActor in
                     guard let self, messageIndex < self.messages.count else { return }
                     self.messages[messageIndex].citationCard?.current = cur
