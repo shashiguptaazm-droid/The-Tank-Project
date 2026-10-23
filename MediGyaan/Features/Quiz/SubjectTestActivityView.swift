@@ -476,7 +476,7 @@ struct SubjectTestActivityView: View {
                 }
             }
 
-            Text(q.explanation?.isEmpty == false ? q.explanation! : "No rationale provided.")
+            Text(!q.explanation.isEmpty ? q.explanation : "No rationale provided.")
                 .font(.system(size: 13, weight: .regular))
                 .foregroundStyle(Color.white.opacity(0.85))
                 .fixedSize(horizontal: false, vertical: true)
@@ -567,6 +567,16 @@ struct SubjectTestActivityView: View {
     }
 
     // MARK: - Powers Logic (Equipped Hero Kit)
+
+    private func showCombatFlyout(text: String, color: Color) {
+        floatingBannerText = text
+        floatingBannerColor = color
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.8) {
+            if self.floatingBannerText == text {
+                self.floatingBannerText = nil
+            }
+        }
+    }
 
     private func activateIntelScan() {
         let power = equippedHeroKit.intelPower

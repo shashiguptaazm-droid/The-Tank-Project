@@ -820,10 +820,10 @@ struct SubjectTestView: View {
                     uniqueId: launch.uniqueId,
                     subject: launch.subject.isEmpty ? "NEET PG" : launch.subject,
                     topic: launch.topic,
-                    challengeId: launch.challengeId,
+                    challengeId: launch.rawChallengeID,
                     isChallenge: viewModel.mode == .multiplayer,
                     isHost: launch.isHost,
-                    questionIdList: launch.questionIds
+                    questionIdList: launch.questionIdList
                 )
             }
             .fullScreenCover(item: $activeQuiz) { quiz in
