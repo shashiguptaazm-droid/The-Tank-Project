@@ -65,7 +65,7 @@ struct DotaHeroShowcaseWebView: UIViewRepresentable {
     }
 
     private func dispatchGuardianToWebView(_ webView: WKWebView, avatarIndex: Int) {
-        let heroKit = GuardianRegistry.getHeroKit(avatarIndex)
+        let heroKit = GuardianRegistry.getHeroKit(for: avatarIndex)
         let modelGlbName = getGlbModelName(avatarIndex)
         let resolvedModelUrl = resolveGlbUrl(modelGlbName)
 

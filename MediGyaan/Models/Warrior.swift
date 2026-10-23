@@ -85,6 +85,11 @@ struct Warrior: Identifiable, Hashable {
         allWarriors.first(where: { $0.id == id })
     }
 
+    /// Find warrior by ID (unlabeled parameter overload)
+    static func warrior(_ id: Int) -> Warrior? {
+        allWarriors.first(where: { $0.id == id })
+    }
+
     /// All 27 unique characters from the authoritative specification.
     static let allWarriors: [Warrior] = [
         Warrior(

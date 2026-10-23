@@ -1033,6 +1033,11 @@ enum GuardianRegistry {
         return heroKits[mappedIndex]
     }
 
+    /// Retrieve the 4-power hero kit (unlabeled argument overload)
+    static func getHeroKit(_ avatarIndex: Int) -> GuardianHeroKit? {
+        getHeroKit(for: avatarIndex)
+    }
+
     /// Tactical text analysis for any power.
     static func tacticalDynamicsText(for power: GuardianPower) -> String {
         switch power.powerId {
