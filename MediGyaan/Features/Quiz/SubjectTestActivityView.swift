@@ -1384,7 +1384,10 @@ struct SubjectTestActivityView: View {
             questionReviews: reviewItems
         )
         self.resultSummaryData = summary
-        self.showResultSummary = true
-        onFinish?(summary)
+        if let finish = onFinish {
+            finish(summary)
+        } else {
+            self.showResultSummary = true
+        }
     }
 }

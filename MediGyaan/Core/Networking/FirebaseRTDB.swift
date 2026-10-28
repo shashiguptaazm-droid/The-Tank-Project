@@ -99,7 +99,24 @@ public final class FirebaseRTDB {
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+
+        let bodyData: Data
+        if JSONSerialization.isValidJSONObject(payload) {
+            bodyData = try JSONSerialization.data(withJSONObject: payload)
+        } else if let b = payload as? Bool {
+            bodyData = Data((b ? "true" : "false").utf8)
+        } else if let num = payload as? NSNumber {
+            bodyData = Data(num.stringValue.utf8)
+        } else if let str = payload as? String {
+            if let enc = try? JSONSerialization.data(withJSONObject: [str]) {
+                bodyData = enc.subdata(in: 1..<(enc.count - 1))
+            } else {
+                bodyData = Data("\"\(str)\"".utf8)
+            }
+        } else {
+            bodyData = Data("\(payload)".utf8)
+        }
+        request.httpBody = bodyData
 
         let (data, response) = try await URLSession.shared.data(for: request)
         if let httpRes = response as? HTTPURLResponse, httpRes.statusCode >= 400 {

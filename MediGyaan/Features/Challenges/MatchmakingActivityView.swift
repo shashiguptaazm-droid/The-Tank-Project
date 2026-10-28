@@ -577,37 +577,38 @@ struct MatchmakingActivityView: View {
 
     private func waitForChallengeReady(cid: String) async {
         statusMsg = "Joining opponent's arena..."
-        for _ in 0..<20 {
+        for _ in 0..<30 {
             try? await Task.sleep(nanoseconds: 1_000_000_000)
-            if let obj = try? await FirebaseRTDB.shared.get(path: "challenges/\(cid)") as? [String: Any],
-               (obj["status"] as? String) == "ready" {
-
-                if let players = obj["players"] as? [String: [String: Any]] {
-                    for (uid, info) in players where uid != queueUserId && uid != queueId {
-                        self.opponentId = uid
-                        self.opponentName = info["name"] as? String ?? "Opponent"
-                        self.isBotMatch = false
-                        break
-                    }
-                }
-
-                if let qIds = obj["question_ids"] as? [Int] {
-                    self.sharedQuestionIds = qIds
-                }
-
-                RemoteLogger.log(tag: "Matchmaking_Guest_Joined", message: "Joined ready challenge \(cid) vs \(opponentName)")
-                await MainActor.run {
-                    self.countdownTimer?.invalidate()
-                    self.statusMsg = "⚔ Match Found: \(self.opponentName)!"
-                    self.timerMsg = "Entering Battle Arena..."
-                    self.showMatchReadyDialog = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                        if !self.isLaunchingGame {
-                            self.launchGame()
+            if let obj = try? await FirebaseRTDB.shared.get(path: "challenges/\(cid)") as? [String: Any] {
+                let st = obj["status"] as? String ?? ""
+                if st == "ready" || st == "started" {
+                    if let players = obj["players"] as? [String: [String: Any]] {
+                        for (uid, info) in players where uid != queueUserId && uid != queueId {
+                            self.opponentId = uid
+                            self.opponentName = info["name"] as? String ?? "Opponent"
+                            self.isBotMatch = false
+                            break
                         }
                     }
+
+                    if let qIds = obj["question_ids"] as? [Int] {
+                        self.sharedQuestionIds = qIds
+                    }
+
+                    RemoteLogger.log(tag: "Matchmaking_Guest_Joined", message: "Joined ready challenge \(cid) vs \(opponentName) (status=\(st))")
+                    await MainActor.run {
+                        self.countdownTimer?.invalidate()
+                        self.statusMsg = "⚔ Match Found: \(self.opponentName)!"
+                        self.timerMsg = "Entering Battle Arena..."
+                        self.showMatchReadyDialog = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                            if !self.isLaunchingGame {
+                                self.launchGame()
+                            }
+                        }
+                    }
+                    return
                 }
-                return
             }
         }
 

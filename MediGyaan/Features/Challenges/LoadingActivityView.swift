@@ -66,6 +66,7 @@ struct LoadingActivityView: View {
     @State private var opponentCardScale: CGFloat = 0.0
     @State private var vsScale: CGFloat = 0.0
     @State private var loadingProgress: Double = 0.0
+    @State private var hasProceeded: Bool = false
 
     // ─── Dynamic Telemetry Messages ───────────────────────────────────────────
     private let dynamicMessages = [
@@ -207,14 +208,20 @@ struct LoadingActivityView: View {
             }
         }
         .onReceive(progressTimer) { _ in
+            guard !hasProceeded else { return }
             if loadingProgress < 1.0 {
                 loadingProgress += 0.025
             } else {
+                hasProceeded = true
                 statusText = "Match Confirmed! Entering Arena…"
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                     onProceedToGame?()
                 }
             }
+        }
+        .onDisappear {
+            progressTimer.upstream.connect().cancel()
+            messageTimer.upstream.connect().cancel()
         }
     }
 
