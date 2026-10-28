@@ -11,21 +11,21 @@ import UIKit
 /// - Decodes Google JWT id_token claims (`email`, `name`, `sub`/`firebase_uid`).
 /// - Direct fast-login fallback for testing and simulator environments.
 @MainActor
-public final class GoogleAuthService: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
+final class GoogleAuthService: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
 
-    public static let shared = GoogleAuthService()
+    static let shared = GoogleAuthService()
 
     private let clientId = "556329611895-lmvuolfoqlb6n8asgc759mi1tuacgdbu.apps.googleusercontent.com"
     private let reversedClientId = "com.googleusercontent.apps.556329611895-lmvuolfoqlb6n8asgc759mi1tuacgdbu"
     private let callbackUrlScheme = "com.googleusercontent.apps.556329611895-lmvuolfoqlb6n8asgc759mi1tuacgdbu"
     private let backendUrl = "https://medigyaan.com/Neurons/google-callback.php"
 
-    @Published public var isAuthenticating: Bool = false
-    @Published public var errorMessage: String? = nil
+    @Published var isAuthenticating: Bool = false
+    @Published var errorMessage: String? = nil
 
     private var currentAuthSession: ASWebAuthenticationSession?
 
-    public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first(where: { $0.isKeyWindow }) else {
             return ASPresentationAnchor()
@@ -34,7 +34,7 @@ public final class GoogleAuthService: NSObject, ObservableObject, ASWebAuthentic
     }
 
     /// Initiates Google OAuth2 authentication via Apple's standard ASWebAuthenticationSession.
-    public func startGoogleSignIn(sessionStore: SessionStore) {
+    func startGoogleSignIn(sessionStore: SessionStore) {
         isAuthenticating = true
         errorMessage = nil
 
@@ -80,13 +80,13 @@ public final class GoogleAuthService: NSObject, ObservableObject, ASWebAuthentic
     }
 
     /// Handles incoming redirect URLs from onOpenURL
-    public func handleRedirect(url: URL) -> Bool {
+    func handleRedirect(url: URL) -> Bool {
         guard url.scheme == callbackUrlScheme else { return false }
         return true
     }
 
     /// Parses token and claims from OAuth callback URL and synchronizes with MediGyaan backend
-    public func processOAuthCallback(url: URL, sessionStore: SessionStore) async {
+    func processOAuthCallback(url: URL, sessionStore: SessionStore) async {
         let fragment = url.fragment ?? url.query ?? ""
         var params: [String: String] = [:]
         for item in fragment.split(separator: "&") {
@@ -131,7 +131,7 @@ public final class GoogleAuthService: NSObject, ObservableObject, ASWebAuthentic
     }
 
     /// Directly synchronizes user credentials with MediGyaan's google-callback.php backend script.
-    public func syncWithBackend(uid: String, email: String, name: String, sessionStore: SessionStore) async {
+    func syncWithBackend(uid: String, email: String, name: String, sessionStore: SessionStore) async {
         isAuthenticating = true
         defer { isAuthenticating = false }
 
