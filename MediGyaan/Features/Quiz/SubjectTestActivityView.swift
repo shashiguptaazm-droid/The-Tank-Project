@@ -1191,7 +1191,7 @@ struct SubjectTestActivityView: View {
                 // A. Poll Players
                 if let pDict = try? await FirebaseRTDB.shared.get(path: "challenges/\(challengeId)/players") as? [String: [String: Any]] {
                     for (pId, info) in pDict {
-                        if pId != myUid && pId != String(session.userId) {
+                        if pId != myUid {
                             let oHp = info["hp"] as? Int ?? 100
                             let oScore = info["score"] as? Int ?? 0
                             let oName = info["name"] as? String ?? opponentName

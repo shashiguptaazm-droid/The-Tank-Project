@@ -545,7 +545,15 @@ struct MatchmakingActivityView: View {
 
             RemoteLogger.log(tag: "Matchmaking_Challenge_Ready", message: "Challenge \(challengeId) created with \(qIds.count) questions")
             await MainActor.run {
+                self.countdownTimer?.invalidate()
+                self.statusMsg = "⚔ Match Found: \(self.opponentName)!"
+                self.timerMsg = "Entering Battle Arena..."
                 self.showMatchReadyDialog = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                    if !self.isLaunchingGame {
+                        self.launchGame()
+                    }
+                }
             }
         } catch {
             RemoteLogger.log(tag: "Matchmaking_Create_Error", message: error.localizedDescription)
@@ -576,9 +584,11 @@ struct MatchmakingActivityView: View {
                (obj["status"] as? String) == "ready" {
 
                 if let players = obj["players"] as? [String: [String: Any]] {
-                    for (uid, info) in players where uid != queueUserId && uid != String(userId) {
+                    for (uid, info) in players where uid != queueUserId && uid != queueId {
                         self.opponentId = uid
                         self.opponentName = info["name"] as? String ?? "Opponent"
+                        self.isBotMatch = false
+                        break
                     }
                 }
 
@@ -588,7 +598,15 @@ struct MatchmakingActivityView: View {
 
                 RemoteLogger.log(tag: "Matchmaking_Guest_Joined", message: "Joined ready challenge \(cid) vs \(opponentName)")
                 await MainActor.run {
+                    self.countdownTimer?.invalidate()
+                    self.statusMsg = "⚔ Match Found: \(self.opponentName)!"
+                    self.timerMsg = "Entering Battle Arena..."
                     self.showMatchReadyDialog = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                        if !self.isLaunchingGame {
+                            self.launchGame()
+                        }
+                    }
                 }
                 return
             }
