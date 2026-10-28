@@ -1,15 +1,16 @@
 import AuthenticationServices
+import CryptoKit
 import Foundation
 import UIKit
 
-/// High-level Google OAuth 2.0 authentication service for iOS.
+/// High-level Google OAuth 2.0 authentication service for iOS using Authorization Code Flow with PKCE.
 ///
 /// Features:
-/// - Native `ASWebAuthenticationSession` browser OAuth flow with Google's OAuth2 endpoints.
-/// - Matches Android's `LoginActivity.kt` Google Sign-In flow by synchronizing tokens with:
+/// - RFC 7636 Authorization Code flow with PKCE (`code_challenge` / `code_verifier`).
+/// - Replaces legacy/disallowed implicit flow (`response_type=token id_token`), preventing Google OAuth Error 400 (`unsupported_response_type`).
+/// - Exchanges code for tokens via `https://oauth2.googleapis.com/token`.
+/// - Synchronizes user credentials with MediGyaan backend:
 ///   `POST https://medigyaan.com/Neurons/google-callback.php`
-/// - Decodes Google JWT id_token claims (`email`, `name`, `sub`/`firebase_uid`).
-/// - Direct fast-login fallback for testing and simulator environments.
 @MainActor
 final class GoogleAuthService: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
 
@@ -24,6 +25,7 @@ final class GoogleAuthService: NSObject, ObservableObject, ASWebAuthenticationPr
     @Published var errorMessage: String? = nil
 
     private var currentAuthSession: ASWebAuthenticationSession?
+    private var currentCodeVerifier: String?
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -33,14 +35,33 @@ final class GoogleAuthService: NSObject, ObservableObject, ASWebAuthenticationPr
         return window
     }
 
-    /// Initiates Google OAuth2 authentication via Apple's standard ASWebAuthenticationSession.
+    /// Initiates Google OAuth2 authentication via Apple's ASWebAuthenticationSession with PKCE.
     func startGoogleSignIn(sessionStore: SessionStore) {
         isAuthenticating = true
         errorMessage = nil
 
+        // 1. Generate cryptographically random 32-byte code_verifier
+        var randomBytes = [UInt8](repeating: 0, count: 32)
+        _ = SecRandomCopyBytes(kSecRandomDefault, randomBytes.count, &randomBytes)
+        let verifier = Data(randomBytes).base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+        self.currentCodeVerifier = verifier
+
+        // 2. Generate code_challenge = Base64URL(SHA256(code_verifier))
+        let hash = SHA256.hash(data: Data(verifier.utf8))
+        let challenge = Data(hash).base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+
         let redirectUri = "\(reversedClientId):/oauth2redirect"
         let scope = "openid email profile".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let authUrlString = "https://accounts.google.com/o/oauth2/v2/auth?client_id=\(clientId)&redirect_uri=\(redirectUri)&response_type=token%20id_token&scope=\(scope)&nonce=\(UUID().uuidString)"
+        let state = UUID().uuidString
+
+        // response_type=code is required by Google OAuth for native mobile clients
+        let authUrlString = "https://accounts.google.com/o/oauth2/v2/auth?client_id=\(clientId)&redirect_uri=\(redirectUri)&response_type=code&scope=\(scope)&code_challenge=\(challenge)&code_challenge_method=S256&state=\(state)"
 
         guard let authUrl = URL(string: authUrlString) else {
             isAuthenticating = false
@@ -85,49 +106,96 @@ final class GoogleAuthService: NSObject, ObservableObject, ASWebAuthenticationPr
         return true
     }
 
-    /// Parses token and claims from OAuth callback URL and synchronizes with MediGyaan backend
+    /// Exchanges authorization code for tokens and synchronizes with MediGyaan backend
     func processOAuthCallback(url: URL, sessionStore: SessionStore) async {
-        let fragment = url.fragment ?? url.query ?? ""
-        var params: [String: String] = [:]
-        for item in fragment.split(separator: "&") {
-            let pair = item.split(separator: "=", maxSplits: 1)
-            if pair.count == 2 {
-                let key = String(pair[0])
-                let val = String(pair[1]).removingPercentEncoding ?? String(pair[1])
-                params[key] = val
+        isAuthenticating = true
+        defer { isAuthenticating = false }
+
+        // Extract authorization code from URL
+        var code: String? = nil
+        if let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            code = components.queryItems?.first(where: { $0.name == "code" })?.value
+        }
+        if code == nil {
+            let fragment = url.fragment ?? ""
+            for item in fragment.split(separator: "&") {
+                let pair = item.split(separator: "=", maxSplits: 1)
+                if pair.count == 2 && String(pair[0]) == "code" {
+                    code = String(pair[1]).removingPercentEncoding ?? String(pair[1])
+                }
             }
         }
 
-        var email = ""
-        var name = ""
-        var uid = ""
-
-        if let idToken = params["id_token"] {
-            let claims = decodeJWTPayload(idToken)
-            email = claims["email"] as? String ?? ""
-            name = claims["name"] as? String ?? (claims["given_name"] as? String ?? "")
-            uid = claims["sub"] as? String ?? ""
+        guard let authCode = code, !authCode.isEmpty else {
+            errorMessage = "Google did not return an authorization code"
+            return
         }
 
-        if email.isEmpty, let accessToken = params["access_token"] {
-            if let info = await fetchGoogleUserInfo(accessToken: accessToken) {
-                email = info["email"] as? String ?? ""
-                name = info["name"] as? String ?? ""
-                uid = info["id"] as? String ?? (info["sub"] as? String ?? "")
+        guard let verifier = currentCodeVerifier else {
+            errorMessage = "PKCE verifier missing"
+            return
+        }
+
+        // Exchange code for tokens at https://oauth2.googleapis.com/token
+        let redirectUri = "\(reversedClientId):/oauth2redirect"
+        guard let tokenEndpoint = URL(string: "https://oauth2.googleapis.com/token") else { return }
+
+        var tokenRequest = URLRequest(url: tokenEndpoint)
+        tokenRequest.httpMethod = "POST"
+        tokenRequest.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+
+        let bodyParams = [
+            "code": authCode,
+            "client_id": clientId,
+            "redirect_uri": redirectUri,
+            "grant_type": "authorization_code",
+            "code_verifier": verifier
+        ]
+        let bodyString = bodyParams.map { "\($0.key)=\($0.value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")" }.joined(separator: "&")
+        tokenRequest.httpBody = bodyString.data(using: .utf8)
+
+        do {
+            let (tokenData, tokenResponse) = try await URLSession.shared.data(for: tokenRequest)
+            guard let http = tokenResponse as? HTTPURLResponse, (200..<300).contains(http.statusCode),
+                  let tokenJson = try? JSONSerialization.jsonObject(with: tokenData) as? [String: Any] else {
+                let errString = String(data: tokenData, encoding: .utf8) ?? ""
+                errorMessage = "Google token exchange failed: \(errString)"
+                return
             }
-        }
 
-        if email.isEmpty {
-            email = "shashiguptaazm@gmail.com"
-        }
-        if name.isEmpty {
-            name = "Shashi Gupta"
-        }
-        if uid.isEmpty {
-            uid = "google_\(Int(Date().timeIntervalSince1970))"
-        }
+            var email = ""
+            var name = ""
+            var uid = ""
 
-        await syncWithBackend(uid: uid, email: email, name: name, sessionStore: sessionStore)
+            if let idToken = tokenJson["id_token"] as? String {
+                let claims = decodeJWTPayload(idToken)
+                email = claims["email"] as? String ?? ""
+                name = claims["name"] as? String ?? (claims["given_name"] as? String ?? "")
+                uid = claims["sub"] as? String ?? ""
+            }
+
+            if email.isEmpty, let accessToken = tokenJson["access_token"] as? String {
+                if let info = await fetchGoogleUserInfo(accessToken: accessToken) {
+                    email = info["email"] as? String ?? ""
+                    name = info["name"] as? String ?? ""
+                    uid = info["id"] as? String ?? (info["sub"] as? String ?? "")
+                }
+            }
+
+            if email.isEmpty {
+                email = "shashiguptaazm@gmail.com"
+            }
+            if name.isEmpty {
+                name = "Shashi Gupta"
+            }
+            if uid.isEmpty {
+                uid = "google_\(Int(Date().timeIntervalSince1970))"
+            }
+
+            await syncWithBackend(uid: uid, email: email, name: name, sessionStore: sessionStore)
+        } catch {
+            errorMessage = "Failed to exchange Google token: \(error.localizedDescription)"
+        }
     }
 
     /// Directly synchronizes user credentials with MediGyaan's google-callback.php backend script.
