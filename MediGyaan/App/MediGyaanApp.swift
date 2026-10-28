@@ -38,6 +38,9 @@ struct MediGyaanApp: App {
                 .environmentObject(theme)
                 .environment(\.api, .live)
                 .tint(AppTheme.Palette.primary)
+                .onOpenURL { url in
+                    _ = GoogleAuthService.shared.handleRedirect(url: url)
+                }
                 .onChange(of: scenePhase) { newPhase in
                     RemoteLogger.log(tag: "AppLifecycle", message: "Scene phase changed to: \(newPhase)")
                 }

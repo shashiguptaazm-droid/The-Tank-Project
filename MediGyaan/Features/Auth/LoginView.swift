@@ -29,6 +29,7 @@ struct LoginView: View {
     @Environment(\.api) private var api
 
     @StateObject private var viewModel = LoginViewModel()
+    @StateObject private var googleAuth = GoogleAuthService.shared
     /// Stands in for `emailField.requestFocus()` / `passwordField.requestFocus()`.
     @FocusState private var focusedField: LoginField?
     @State private var isShowingRegister = false
@@ -53,7 +54,13 @@ struct LoginView: View {
                 ForgotPasswordView()
             }
         }
-        .errorAlert(message: $viewModel.errorMessage)
+        .errorAlert(message: Binding(
+            get: { viewModel.errorMessage ?? googleAuth.errorMessage },
+            set: { val in
+                viewModel.errorMessage = val
+                googleAuth.errorMessage = val
+            }
+        ))
     }
 
     // MARK: - Sections
@@ -156,6 +163,59 @@ struct LoginView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity)
                     .padding(.top, AppTheme.Spacing.xs)
+            }
+
+            // Divider with OR (ports activity_login.xml divider)
+            HStack {
+                Rectangle()
+                    .fill(AppTheme.Palette.outline.opacity(0.6))
+                    .frame(height: 1)
+                Text("OR")
+                    .font(AppTheme.Font.caption.weight(.bold))
+                    .foregroundStyle(AppTheme.Palette.textSecondary)
+                    .padding(.horizontal, AppTheme.Spacing.xs)
+                Rectangle()
+                    .fill(AppTheme.Palette.outline.opacity(0.6))
+                    .frame(height: 1)
+            }
+            .padding(.vertical, AppTheme.Spacing.xs)
+
+            // Continue with Google Button (1:1 port of activity_login.xml googleSignInBtn)
+            Button {
+                googleAuth.startGoogleSignIn(sessionStore: session)
+            } label: {
+                HStack(spacing: 12) {
+                    Image("ic_google_logo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20, height: 20)
+
+                    Text("Continue with Google")
+                        .font(AppTheme.Font.callout.weight(.semibold))
+                        .foregroundStyle(AppTheme.Palette.textPrimary)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(AppTheme.Palette.cardBackground)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(AppTheme.Palette.outline, lineWidth: 1)
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(viewModel.isSubmitting || googleAuth.isAuthenticating)
+
+            if googleAuth.isAuthenticating {
+                HStack(spacing: 8) {
+                    ProgressView()
+                    Text("Connecting to Google...")
+                        .font(AppTheme.Font.caption)
+                        .foregroundStyle(AppTheme.Palette.textSecondary)
+                }
+                .frame(maxWidth: .infinity)
             }
 
             registerRow
