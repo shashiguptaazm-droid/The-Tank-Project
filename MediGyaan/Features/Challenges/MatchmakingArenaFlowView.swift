@@ -74,14 +74,14 @@ struct MatchmakingArenaFlowView: View {
                     challengeId: challengeId,
                     userId: String(session.currentUser?.id ?? 0),
                     userName: session.userName,
-                    userRank: session.currentUser?.course.isEmpty == false ? (session.currentUser?.course ?? "Master") : "Master",
                     opponentId: opponentId,
                     opponentName: matchedOpponentName,
                     subject: subject,
                     topic: topic,
                     isHost: isHost,
                     isBotMatch: isBotMatch,
-                    questionIds: sharedQuestionIds
+                    questionIds: sharedQuestionIds,
+                    userRank: session.currentUser?.course.isEmpty == false ? (session.currentUser?.course ?? "Master") : "Master"
                 ) {
                     RemoteLogger.log(
                         tag: "ArenaFlow_BattleStart",

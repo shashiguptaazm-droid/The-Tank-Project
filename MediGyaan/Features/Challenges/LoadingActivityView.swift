@@ -23,8 +23,36 @@ struct LoadingActivityView: View {
     let isHost: Bool
     let isBotMatch: Bool
     let questionIds: [Int]
-    var userRank: String = "Master"
+    var userRank: String
     var onProceedToGame: (() -> Void)?
+
+    init(
+        challengeId: String,
+        userId: String,
+        userName: String,
+        opponentId: String,
+        opponentName: String,
+        subject: String,
+        topic: String?,
+        isHost: Bool,
+        isBotMatch: Bool,
+        questionIds: [Int],
+        userRank: String = "Master",
+        onProceedToGame: (() -> Void)? = nil
+    ) {
+        self.challengeId = challengeId
+        self.userId = userId
+        self.userName = userName
+        self.opponentId = opponentId
+        self.opponentName = opponentName
+        self.subject = subject
+        self.topic = topic
+        self.isHost = isHost
+        self.isBotMatch = isBotMatch
+        self.questionIds = questionIds
+        self.userRank = userRank
+        self.onProceedToGame = onProceedToGame
+    }
 
     @EnvironmentObject private var session: SessionStore
     @Environment(\.dismiss) private var dismiss
