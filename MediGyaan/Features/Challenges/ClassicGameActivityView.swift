@@ -1237,25 +1237,25 @@ struct ClassicGameActivityView: View {
     }
 
     private func sendHeartbeat() {
-        guard let url = URL(string: "https://medigyaan-11cba-default-rtdb.firebaseio.com/challenges/\(challengeId)/heartbeat/\(session.userId).json") else { return }
-        var req = URLRequest(url: url)
-        req.httpMethod = "PUT"
-        req.httpBody = "\(Int(Date().timeIntervalSince1970 * 1000))".data(using: .utf8)
-        URLSession.shared.dataTask(with: req).resume()
+        guard !challengeId.isEmpty else { return }
+        let uid = "\(session.userId)_ios"
+        Task.detached {
+            try? await FirebaseRTDB.shared.put(path: "challenges/\(challengeId)/heartbeat/\(uid)", payload: Int(Date().timeIntervalSince1970 * 1000))
+        }
     }
 
     private func broadcastAction(type: String, value: Int) {
         guard !challengeId.isEmpty else { return }
-        guard let url = URL(string: "https://medigyaan-11cba-default-rtdb.firebaseio.com/challenges/\(challengeId)/actions.json") else { return }
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
         let payload: [String: Any] = [
+            "action_id": UUID().uuidString,
             "type": type,
-            "senderId": "\(session.userId)",
+            "actor_id": "\(session.userId)_ios",
+            "actor_name": session.userName,
             "value": value,
             "timestamp": Int(Date().timeIntervalSince1970 * 1000)
         ]
-        req.httpBody = try? JSONSerialization.data(withJSONObject: payload)
-        URLSession.shared.dataTask(with: req).resume()
+        Task.detached {
+            try? await FirebaseRTDB.shared.put(path: "challenges/\(challengeId)/last_action", payload: payload)
+        }
     }
 }
