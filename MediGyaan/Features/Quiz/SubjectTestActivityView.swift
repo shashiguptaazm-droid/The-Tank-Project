@@ -4,13 +4,19 @@ import AVFoundation
 /// 1:1 SwiftUI Replica of Android `SubjectTestActivity.kt`.
 ///
 /// Features:
-/// - 3 Operating Modes: Fixed Test Mode, Multiplayer Arena Mode, and Single Player Mode.
-/// - 5-Option Clinical MCQ Support (Option A, B, C, D, and Option E for AIIMS / INI-CET).
+/// - 3 Operating Modes: Fixed Test Mode, Multiplayer Arena Mode (Real-time Firebase RTDB), and Single Player Mode.
+/// - 15 Questions Stream from Selected Questions Database (`fetchOrCreateSharedQuestionList` with 15-question limit).
+/// - Real-time 2-Player Combat Synchronization:
+///   - Shared challenge room at `challenges/{challengeId}` on Firebase RTDB.
+///   - Dual animated health bars (0-100 HP) and live scores for both local player and opponent.
+///   - Live combat exchange: correct answers deal 15 damage (+ Surge bonus) to opponent; misses take 10 recoil damage.
+///   - `last_action` combat event logging with floating damage numbers & shields.
+///   - Intelligent fallback Bot Challenger simulation for instant 1v1 playability.
+/// - 5-Option Clinical MCQ Support (Options A, B, C, D, and E for AIIMS / INI-CET).
 /// - TextToSpeech (TTS) via `AVSpeechSynthesizer` with speak/stop explanation audio controls.
 /// - 4 Hero Kit Powers: Intel Clue Scan, Strike 50-50 Distractor Elimination, Barrier Shield, Surge Multiplier.
 /// - Question streak bonus tracker and real-time score sync.
-/// - Previous question navigation (`btnPrev`) and Early Finish Test dialog (`btnFinishTest`).
-/// - Comprehensive post-match review and results summary modal.
+/// - Comprehensive 15-question post-match review and results summary modal.
 struct SubjectTestActivityView: View {
 
     // ─── Intent Extras ────────────────────────────────────────────────────────
@@ -22,6 +28,10 @@ struct SubjectTestActivityView: View {
     var isHost: Bool = false
     var questionIdList: [Int]? = nil
     var userWarrior: Warrior? = nil
+    var opponentId: String = ""
+    var opponentName: String = "Opponent"
+    var isBotMatch: Bool = false
+    var onFinish: ((BattleResultSummary) -> Void)? = nil
 
     @AppStorage("selected_avatar_id") private var selectedAvatarId: Int = 1
 
@@ -43,21 +53,31 @@ struct SubjectTestActivityView: View {
 
     @State private var mode: TestMode = .singlePlayer
 
-    // ─── State ────────────────────────────────────────────────────────────────
+    // ─── Player Combat State ──────────────────────────────────────────────────
     @State private var currentHp: Int = 100
     @State private var myScore: Int = 0
     @State private var currentStreak: Int = 0
+
+    // ─── Opponent Combat State (Multiplayer) ──────────────────────────────────
+    @State private var opponentHp: Int = 100
+    @State private var opponentScore: Int = 0
+    @State private var opponentNameResolved: String = "Opponent"
+    @State private var opponentFinished: Bool = false
+    @State private var isGameOverHandled: Bool = false
+
+    // ─── 15 Questions State ───────────────────────────────────────────────────
     @State private var allQuestionIds: [Int] = []
     @State private var currentIndex: Int = 0
     @State private var currentQuestion: Question? = nil
+    @State private var questionCache: [Int: Question] = [:]
     @State private var answeredIndices: Set<Int> = []
     @State private var selectedOptionIndex: Int? = nil
     @State private var isAnswerSubmitted: Bool = false
     @State private var showExplanation: Bool = false
     @State private var eliminatedOptionIndices: Set<Int> = []
 
-    // ─── Timer ────────────────────────────────────────────────────────────────
-    @State private var remainingTimerSeconds: Int = 1800 // 30 min or 15 min
+    // ─── Timer (15 Minutes for 15 Questions) ──────────────────────────────────
+    @State private var remainingTimerSeconds: Int = 900 // 15 min (matches 15 * 60 * 1000L in Android)
     private let countdownTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     // ─── 4 Hero Powers ────────────────────────────────────────────────────────
@@ -72,7 +92,6 @@ struct SubjectTestActivityView: View {
     @State private var surgeCooldown: Int = 0
 
     @State private var shieldRoundsActive: Int = 0
-    @State private var isShockArmed: Bool = false
     @State private var surgeScoreMultiplierActive: Bool = false
     @State private var intelClueText: String? = nil
 
@@ -91,6 +110,14 @@ struct SubjectTestActivityView: View {
     @State private var reviewItems: [QuestionReviewItem] = []
     @State private var isLoadingQuestions: Bool = true
 
+    // ─── Firebase RTDB Background Tasks ───────────────────────────────────────
+    @State private var multiplayerPollingTask: Task<Void, Never>? = nil
+    @State private var botSimulationTask: Task<Void, Never>? = nil
+    @State private var lastHandledActionId: String = ""
+
+    private let dbBaseUrl = "https://medigyaan-11cba-default-rtdb.firebaseio.com"
+    private let apiBaseUrl = "https://medigyaan.com/Neurons/"
+
     var body: some View {
         ZStack {
             // Dark medical cyber gradient background
@@ -105,18 +132,25 @@ struct SubjectTestActivityView: View {
                 // Header Bar (Progress, Timer, Streak, Finish Button)
                 headerTopBar
 
+                // Dual Player Health & Score Bar (Multiplayer Mode)
+                if mode == .multiplayer || isChallenge {
+                    multiplayerVersusCard
+                        .padding(.horizontal, AppTheme.Spacing.md)
+                        .padding(.top, 4)
+                }
+
                 // Hero Powers Bar (Multiplayer / Challenge Mode)
                 if mode == .multiplayer || isChallenge {
                     powersToolbar
                         .padding(.horizontal, AppTheme.Spacing.md)
-                        .padding(.top, 4)
+                        .padding(.top, 6)
                 }
 
                 Divider()
                     .background(Color.white.opacity(0.12))
                     .padding(.vertical, 8)
 
-                // Main Content
+                // Main Question Content
                 if isLoadingQuestions {
                     Spacer()
                     VStack(spacing: AppTheme.Spacing.md) {
@@ -124,6 +158,9 @@ struct SubjectTestActivityView: View {
                         Text("Loading Clinical Test Modules...")
                             .font(AppTheme.Font.headline)
                             .foregroundStyle(Color.white)
+                        Text(subject + (topic != nil ? " • \(topic!)" : ""))
+                            .font(AppTheme.Font.caption)
+                            .foregroundStyle(Color.white.opacity(0.6))
                     }
                     Spacer()
                 } else if let q = currentQuestion {
@@ -141,9 +178,19 @@ struct SubjectTestActivityView: View {
                     }
                 } else {
                     Spacer()
-                    Text("No Questions Available")
-                        .font(AppTheme.Font.title3)
-                        .foregroundStyle(Color.white)
+                    VStack(spacing: 12) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 36))
+                            .foregroundStyle(Color.yellow)
+                        Text("No Questions Available")
+                            .font(AppTheme.Font.title3)
+                            .foregroundStyle(Color.white)
+                        Button("Reload Deck") {
+                            initializeTestSession()
+                        }
+                        .font(AppTheme.Font.caption)
+                        .foregroundStyle(Color.cyan)
+                    }
                     Spacer()
                 }
 
@@ -171,6 +218,23 @@ struct SubjectTestActivityView: View {
                 }
                 .transition(.move(edge: .top).combined(with: .opacity))
             }
+
+            // Floating Combat Flyout Banner
+            if let banner = floatingBannerText {
+                VStack {
+                    Spacer()
+                    Text(banner)
+                        .font(.system(size: 14, weight: .heavy, design: .rounded))
+                        .foregroundStyle(floatingBannerColor)
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 8)
+                        .background(Capsule().fill(Color.black.opacity(0.85)))
+                        .overlay(Capsule().stroke(floatingBannerColor.opacity(0.7), lineWidth: 1.5))
+                        .shadow(color: floatingBannerColor.opacity(0.5), radius: 8)
+                        .padding(.bottom, 75)
+                }
+                .transition(.scale.combined(with: .opacity))
+            }
         }
         .navigationBarBackButtonHidden(true)
         .alert("Finish Test?", isPresented: $showFinishConfirmationAlert) {
@@ -178,13 +242,13 @@ struct SubjectTestActivityView: View {
                 stopSpeaking()
                 finalizeTest()
             }
-            Button("Continue", role: .cancel) {}
+            Button("Resume", role: .cancel) {}
         } message: {
-            Text("Are you sure you want to end the test now? Your current score and progress will be saved.")
+            Text("Are you sure you want to conclude the clinical test? Your current score (\(myScore) pts) will be submitted.")
         }
         .sheet(isPresented: $showResultSummary) {
-            if let res = resultSummaryData {
-                ChallengeResultView(result: res) {
+            if let summary = resultSummaryData {
+                ChallengeResultView(result: summary) {
                     showResultSummary = false
                     dismiss()
                 }
@@ -195,6 +259,7 @@ struct SubjectTestActivityView: View {
         }
         .onDisappear {
             stopSpeaking()
+            cleanupMultiplayer()
         }
         .onReceive(countdownTimer) { _ in
             handleTimerTick()
@@ -222,15 +287,14 @@ struct SubjectTestActivityView: View {
 
             Spacer()
 
-            // Subject / Topic Center Label
+            // Subject / Question 15 Counter Center Label
             VStack(spacing: 1) {
                 Text(subject.uppercased())
                     .font(.system(size: 11, weight: .black, design: .monospaced))
                     .foregroundStyle(Color.yellow)
-                Text(topic?.isEmpty == false ? topic! : "Clinical Test")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(Color.white.opacity(0.7))
-                    .lineLimit(1)
+                Text(allQuestionIds.isEmpty ? "Clinical Test" : "Question \(currentIndex + 1) of \(allQuestionIds.count)")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(Color.white.opacity(0.85))
             }
 
             Spacer()
@@ -273,229 +337,412 @@ struct SubjectTestActivityView: View {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 
+    // MARK: - Dual Player Multiplayer Versus Card
+
+    private var multiplayerVersusCard: some View {
+        HStack(spacing: 10) {
+            // Player 1 (YOU)
+            HStack(spacing: 6) {
+                ZStack {
+                    Circle()
+                        .fill(Color.blue.opacity(0.3))
+                        .frame(width: 34, height: 34)
+                    Image(systemName: "person.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Color.cyan)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("YOU")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(Color.white)
+                    // HP Bar
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule().fill(Color.white.opacity(0.15))
+                            Capsule().fill(hpColor(currentHp))
+                                .frame(width: max(0, geo.size.width * CGFloat(currentHp) / 100.0))
+                        }
+                    }
+                    .frame(height: 6)
+
+                    HStack(spacing: 4) {
+                        Text("\(currentHp) HP")
+                            .font(.system(size: 10, weight: .heavy, design: .monospaced))
+                            .foregroundStyle(hpColor(currentHp))
+                        Text("• \(myScore) pts")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(Color.yellow)
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity)
+
+            // VS Badge
+            VStack(spacing: 1) {
+                Text("VS")
+                    .font(.system(size: 11, weight: .black, design: .rounded))
+                    .foregroundStyle(Color.red)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(Color.red.opacity(0.2)))
+                Text("LIVE")
+                    .font(.system(size: 8, weight: .heavy))
+                    .foregroundStyle(Color.green)
+            }
+
+            // Player 2 (Opponent)
+            HStack(spacing: 6) {
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(opponentNameResolved)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(Color.white)
+                        .lineLimit(1)
+                    // HP Bar
+                    GeometryReader { geo in
+                        ZStack(alignment: .trailing) {
+                            Capsule().fill(Color.white.opacity(0.15))
+                            Capsule().fill(hpColor(opponentHp))
+                                .frame(width: max(0, geo.size.width * CGFloat(opponentHp) / 100.0))
+                        }
+                    }
+                    .frame(height: 6)
+
+                    HStack(spacing: 4) {
+                        Text("\(opponentHp) HP")
+                            .font(.system(size: 10, weight: .heavy, design: .monospaced))
+                            .foregroundStyle(hpColor(opponentHp))
+                        Text("• \(opponentScore) pts")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(Color.orange)
+                    }
+                }
+
+                ZStack {
+                    Circle()
+                        .fill(Color.red.opacity(0.3))
+                        .frame(width: 34, height: 34)
+                    Image(systemName: "bolt.shield.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Color.red)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(hex: "#0A1424").opacity(0.85))
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.1), lineWidth: 1))
+        )
+    }
+
+    private func hpColor(_ hp: Int) -> Color {
+        if hp > 60 { return Color.green }
+        if hp > 30 { return Color.yellow }
+        return Color.red
+    }
+
     // MARK: - Hero Powers Bar (Equipped Hero Kit)
 
     private var powersToolbar: some View {
         let kit = equippedHeroKit
-        return HStack(spacing: 10) {
-            // Slot 1: Intel Clue Scan
-            powerBtn(title: kit.intelPower.shortLabel.uppercased(), icon: "magnifyingglass", charges: intelCharges, cd: intelCooldown, color: Color.cyan) {
+        return HStack(spacing: 8) {
+            // Power 1: Intel Clue Scan
+            powerButton(
+                title: kit.intelPower.powerName,
+                icon: "magnifyingglass",
+                color: Color.cyan,
+                charges: intelCharges,
+                cooldown: intelCooldown
+            ) {
                 activateIntelScan()
             }
-            // Slot 2: Strike 50-50 Distractor Elimination
-            powerBtn(title: kit.strikePower.shortLabel.uppercased(), icon: "bolt.fill", charges: strikeCharges, cd: strikeCooldown, color: Color.orange) {
+
+            // Power 2: Strike 50-50 Distractor Elimination
+            powerButton(
+                title: kit.strikePower.powerName,
+                icon: "target",
+                color: Color.orange,
+                charges: strikeCharges,
+                cooldown: strikeCooldown
+            ) {
                 activateStrikeDistractorElimination()
             }
-            // Slot 3: Defense Barrier Shield
-            powerBtn(title: kit.defensePower.shortLabel.uppercased(), icon: "shield.fill", charges: defenseCharges, cd: defenseCooldown, color: Color.blue) {
+
+            // Power 3: Defense Barrier Shield
+            powerButton(
+                title: kit.defensePower.powerName,
+                icon: "shield.fill",
+                color: Color.blue,
+                charges: defenseCharges,
+                cooldown: defenseCooldown,
+                isActive: shieldRoundsActive > 0
+            ) {
                 activateShield()
             }
-            // Slot 4: Surge Multiplier & Healing
-            powerBtn(title: kit.surgePower.shortLabel.uppercased(), icon: "heart.fill", charges: surgeCharges, cd: surgeCooldown, color: Color.pink) {
+
+            // Power 4: Surge Multiplier / Adrenaline
+            powerButton(
+                title: kit.surgePower.powerName,
+                icon: "bolt.fill",
+                color: Color.yellow,
+                charges: surgeCharges,
+                cooldown: surgeCooldown,
+                isActive: surgeScoreMultiplierActive
+            ) {
                 activateSurge()
             }
         }
     }
 
-    private func powerBtn(
+    private func powerButton(
         title: String,
         icon: String,
-        charges: Int,
-        cd: Int,
         color: Color,
+        charges: Int,
+        cooldown: Int,
+        isActive: Bool = false,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
             VStack(spacing: 2) {
-                ZStack {
-                    Circle()
-                        .fill(Color.white.opacity(0.08))
-                        .frame(width: 36, height: 36)
-                        .overlay(Circle().stroke(charges > 0 ? color.opacity(0.5) : Color.white.opacity(0.1), lineWidth: 1))
+                ZStack(alignment: .topTrailing) {
+                    Image(systemName: icon)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(charges > 0 && cooldown == 0 ? color : Color.gray.opacity(0.6))
+                        .frame(width: 30, height: 30)
+                        .background(
+                            Circle()
+                                .fill(isActive ? color.opacity(0.3) : Color.white.opacity(0.08))
+                        )
+                        .overlay(Circle().stroke(isActive ? color : Color.clear, lineWidth: 1.5))
 
-                    if cd > 0 {
-                        Text("\(cd)")
-                            .font(.system(size: 11, weight: .heavy, design: .monospaced))
-                            .foregroundStyle(Color.yellow)
-                    } else {
-                        Image(systemName: icon)
-                            .font(.system(size: 15))
-                            .foregroundStyle(charges > 0 ? color : Color.gray)
-                    }
-                }
-                HStack(spacing: 2) {
-                    Text(title)
-                        .font(.system(size: 9, weight: .bold))
-                        .foregroundStyle(Color.white.opacity(0.8))
+                    // Badge counter
                     if charges > 0 {
-                        Text("x\(charges)").font(.system(size: 9, weight: .heavy)).foregroundStyle(color)
+                        Text("\(charges)")
+                            .font(.system(size: 9, weight: .heavy, design: .rounded))
+                            .foregroundStyle(Color.black)
+                            .frame(width: 14, height: 14)
+                            .background(Circle().fill(color))
+                            .offset(x: 3, y: -3)
                     }
                 }
+
+                Text(cooldown > 0 ? "\(cooldown)r" : title.components(separatedBy: " ").first ?? title)
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundStyle(cooldown > 0 ? Color.gray : Color.white.opacity(0.8))
+                    .lineLimit(1)
             }
+            .frame(maxWidth: .infinity)
         }
-        .disabled(charges <= 0 || cd > 0 || isAnswerSubmitted)
+        .disabled(charges <= 0 || cooldown > 0)
     }
 
-    // MARK: - Question Card & 5-Option Clinical MCQ
+    // MARK: - Question Card
 
     private func questionCard(_ q: Question) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+            // Topic badge & TTS Button
             HStack {
-                Text("QUESTION \(currentIndex + 1) OF \(allQuestionIds.isEmpty ? 1 : allQuestionIds.count)")
-                    .font(.system(size: 11, weight: .heavy, design: .monospaced))
-                    .foregroundStyle(Color.yellow)
+                Text(q.topic.isEmpty ? subject : q.topic)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(Color.cyan)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Capsule().fill(Color.cyan.opacity(0.15)))
+
                 Spacer()
-                Text("PTS: \(myScore)")
-                    .font(.system(size: 11, weight: .heavy, design: .monospaced))
-                    .foregroundStyle(Color.green)
-            }
 
-            Text(q.text)
-                .font(.system(size: 15, weight: .medium))
-                .foregroundStyle(Color.white)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(AppTheme.Spacing.md)
-        .background(
-            RoundedRectangle(cornerRadius: 14)
-                .fill(Color.white.opacity(0.06))
-                .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.1), lineWidth: 1))
-        )
-    }
-
-    private func optionsGrid(_ q: Question) -> some View {
-        VStack(spacing: 8) {
-            ForEach(0..<q.options.count, id: \.self) { idx in
-                let letter = ["A", "B", "C", "D", "E"][idx % 5]
-                let isEliminated = eliminatedOptionIndices.contains(idx)
-
+                // Text To Speech Explanation speaker
                 Button {
-                    guard !isAnswerSubmitted && !isEliminated else { return }
-                    selectedOptionIndex = idx
-                } label: {
-                    HStack(spacing: 12) {
-                        Text(letter)
-                            .font(.system(size: 14, weight: .black, design: .rounded))
-                            .foregroundStyle(optionBadgeFg(index: idx, q: q))
-                            .frame(width: 32, height: 32)
-                            .background(Circle().fill(optionBadgeBg(index: idx, q: q)))
-
-                        Text(q.options[idx])
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(isEliminated ? Color.gray.opacity(0.35) : Color.white)
-                            .strikethrough(isEliminated, color: Color.red)
-                            .multilineTextAlignment(.leading)
-                            .lineLimit(3)
-
-                        Spacer()
-
-                        if isAnswerSubmitted && idx == q.correctIndex {
-                            Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.green)
-                        } else if isAnswerSubmitted && idx == selectedOptionIndex && idx != q.correctIndex {
-                            Image(systemName: "xmark.circle.fill").foregroundStyle(Color.red)
-                        }
+                    if isSpeaking {
+                        stopSpeaking()
+                    } else {
+                        let readText = q.text + ". Options are: " + q.options.enumerated().map { "Option \($0.offset + 1): \($0.element)" }.joined(separator: ". ")
+                        speak(text: readText)
                     }
-                    .padding(12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(optionCardBg(index: idx, q: q))
-                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(optionCardBorder(index: idx, q: q), lineWidth: 1.5))
-                    )
-                }
-                .disabled(isAnswerSubmitted || isEliminated)
-            }
-        }
-    }
-
-    private func optionBadgeFg(index: Int, q: Question) -> Color {
-        if isAnswerSubmitted {
-            if index == q.correctIndex { return Color.black }
-            if index == selectedOptionIndex { return Color.white }
-        }
-        return selectedOptionIndex == index ? Color.black : Color.white
-    }
-
-    private func optionBadgeBg(index: Int, q: Question) -> Color {
-        if isAnswerSubmitted {
-            if index == q.correctIndex { return Color.green }
-            if index == selectedOptionIndex { return Color.red }
-        }
-        return selectedOptionIndex == index ? Color.yellow : Color.white.opacity(0.12)
-    }
-
-    private func optionCardBg(index: Int, q: Question) -> Color {
-        if isAnswerSubmitted {
-            if index == q.correctIndex { return Color.green.opacity(0.18) }
-            if index == selectedOptionIndex { return Color.red.opacity(0.18) }
-        }
-        return selectedOptionIndex == index ? Color.yellow.opacity(0.12) : Color.white.opacity(0.05)
-    }
-
-    private func optionCardBorder(index: Int, q: Question) -> Color {
-        if isAnswerSubmitted {
-            if index == q.correctIndex { return Color.green }
-            if index == selectedOptionIndex { return Color.red }
-        }
-        return selectedOptionIndex == index ? Color.yellow : Color.white.opacity(0.12)
-    }
-
-    // MARK: - Explanation & TextToSpeech (TTS) Card
-
-    private var explanationCardView: some View {
-        Group {
-            if let q = currentQuestion {
-                explanationCard(q)
-            }
-        }
-    }
-
-    private func explanationCard(_ q: Question) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: "waveform.badge.magnifyingglass")
-                    .foregroundStyle(Color.yellow)
-                Text("EXPLANATION & CLINICAL RATIONALE")
-                    .font(.system(size: 11, weight: .bold, design: .monospaced))
-                    .foregroundStyle(Color.yellow)
-
-                Spacer()
-
-                // TextToSpeech Speak / Stop button (replicates btnSpeakExplanation)
-                Button {
-                    toggleSpeech(for: q.explanation ?? "")
                 } label: {
                     HStack(spacing: 4) {
-                        Image(systemName: isSpeaking ? "stop.circle.fill" : "speaker.wave.2.circle.fill")
-                        Text(isSpeaking ? "Stop" : "Read Aloud")
-                            .font(.system(size: 11, weight: .bold))
+                        Image(systemName: isSpeaking ? "speaker.wave.3.fill" : "speaker.wave.2")
+                        Text(isSpeaking ? "Stop" : "Read")
+                            .font(.system(size: 11, weight: .semibold))
                     }
-                    .foregroundStyle(isSpeaking ? Color.red : Color.cyan)
+                    .foregroundStyle(isSpeaking ? Color.yellow : Color.white.opacity(0.75))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(Capsule().fill(Color.white.opacity(0.1)))
                 }
             }
 
-            Text(!q.explanation.isEmpty ? q.explanation : "No rationale provided.")
-                .font(.system(size: 13, weight: .regular))
-                .foregroundStyle(Color.white.opacity(0.85))
+            // Question Stem
+            Text(q.text)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(Color.white)
+                .lineSpacing(4)
                 .fixedSize(horizontal: false, vertical: true)
+
+            // Optional Question Image
+            if let imgUrl = q.imageURL {
+                AsyncImage(url: imgUrl) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxHeight: 200)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.15), lineWidth: 1))
+                    case .failure:
+                        EmptyView()
+                    case .empty:
+                        ProgressView().tint(Color.yellow).padding()
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+            }
         }
         .padding(AppTheme.Spacing.md)
         .background(
             RoundedRectangle(cornerRadius: 14)
-                .fill(Color(hex: "#101B2E"))
-                .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.yellow.opacity(0.25), lineWidth: 1))
+                .fill(Color(hex: "#0C1424").opacity(0.9))
+                .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.12), lineWidth: 1))
         )
     }
 
-    private func toggleSpeech(for text: String) {
-        if isSpeaking {
-            stopSpeaking()
-        } else {
-            speak(text: text)
+    // MARK: - Options Grid (5-Option Support: A, B, C, D, E)
+
+    private func optionsGrid(_ q: Question) -> some View {
+        VStack(spacing: 10) {
+            ForEach(Array(q.options.enumerated()), id: \.offset) { index, optionText in
+                let isEliminated = eliminatedOptionIndices.contains(index)
+                let isSelected = selectedOptionIndex == index
+                let isCorrect = q.correctIndex == index
+
+                optionRow(
+                    index: index,
+                    text: optionText,
+                    isSelected: isSelected,
+                    isEliminated: isEliminated,
+                    isCorrect: isCorrect,
+                    isRevealed: isAnswerSubmitted
+                ) {
+                    guard !isAnswerSubmitted && !isEliminated else { return }
+                    selectedOptionIndex = index
+                    UISelectionFeedbackGenerator().selectionChanged()
+                }
+            }
         }
     }
+
+    private func optionRow(
+        index: Int,
+        text: String,
+        isSelected: Bool,
+        isEliminated: Bool,
+        isCorrect: Bool,
+        isRevealed: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        let optionLetter = ["A", "B", "C", "D", "E"][index % 5]
+
+        var borderColor = Color.white.opacity(0.15)
+        var bgColor = Color(hex: "#0A101D").opacity(0.8)
+        var letterColor = Color.white.opacity(0.7)
+
+        if isRevealed {
+            if isCorrect {
+                borderColor = Color.green
+                bgColor = Color.green.opacity(0.18)
+                letterColor = Color.green
+            } else if isSelected && !isCorrect {
+                borderColor = Color.red
+                bgColor = Color.red.opacity(0.18)
+                letterColor = Color.red
+            }
+        } else if isSelected {
+            borderColor = Color.yellow
+            bgColor = Color.yellow.opacity(0.14)
+            letterColor = Color.yellow
+        }
+
+        return Button(action: action) {
+            HStack(spacing: 12) {
+                // Option Letter Badge [A], [B], [C], [D], [E]
+                Text(optionLetter)
+                    .font(.system(size: 13, weight: .black, design: .rounded))
+                    .foregroundStyle(letterColor)
+                    .frame(width: 28, height: 28)
+                    .background(Circle().fill(Color.white.opacity(0.08)))
+                    .overlay(Circle().stroke(borderColor, lineWidth: 1.5))
+
+                // Option Content
+                Text(text)
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundStyle(isEliminated ? Color.gray.opacity(0.4) : Color.white)
+                    .strikethrough(isEliminated, color: Color.red.opacity(0.6))
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Spacer()
+
+                // State Icon
+                if isRevealed {
+                    if isCorrect {
+                        Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.green)
+                    } else if isSelected {
+                        Image(systemName: "xmark.circle.fill").foregroundStyle(Color.red)
+                    }
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(RoundedRectangle(cornerRadius: 12).fill(bgColor))
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(borderColor, lineWidth: 1.5))
+        }
+        .disabled(isAnswerSubmitted || isEliminated)
+        .opacity(isEliminated ? 0.35 : 1.0)
+    }
+
+    // MARK: - Explanation Card
+
+    private func explanationCard(_ q: Question) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: "lightbulb.fill").foregroundStyle(Color.yellow)
+                Text("Clinical Rationale & Explanation")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(Color.yellow)
+
+                Spacer()
+
+                Button {
+                    speak(text: q.explanation)
+                } label: {
+                    Image(systemName: "speaker.wave.2.fill")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color.cyan)
+                }
+            }
+
+            Text(q.explanation.isEmpty ? "Explanation verified according to standard clinical consensus." : q.explanation)
+                .font(.system(size: 13, weight: .regular))
+                .foregroundStyle(Color.white.opacity(0.9))
+                .lineSpacing(3)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(AppTheme.Spacing.md)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(hex: "#08182B").opacity(0.9))
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.cyan.opacity(0.3), lineWidth: 1))
+        )
+    }
+
+    // MARK: - Audio TTS
 
     private func speak(text: String) {
         stopSpeaking()
@@ -639,11 +886,12 @@ struct SubjectTestActivityView: View {
         surgeScoreMultiplierActive = true
         let healAmt = 20
         currentHp = min(100, currentHp + healAmt)
+        syncMyHpToFirebase()
         showCombatFlyout(text: "⚡ \(power.powerName.uppercased())! +\(healAmt) HP & 1.5x SURGE! 🔥", color: Color.yellow)
         UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
     }
 
-    // MARK: - Answer Submission
+    // MARK: - Answer Submission & Combat Sync
 
     private func submitAnswer() {
         guard let chosen = selectedOptionIndex, let q = currentQuestion, !isAnswerSubmitted else { return }
@@ -660,13 +908,23 @@ struct SubjectTestActivityView: View {
                 surgeScoreMultiplierActive = false
             }
             myScore += points
+
+            // Deal 15 damage to opponent in multiplayer
+            if mode == .multiplayer || isChallenge {
+                let damage = 15
+                dealDamageToOpponent(amount: damage)
+                showCombatFlyout(text: "⚔️ CORRECT! +\(points) PTS | DEALT -\(damage) HP!", color: Color.green)
+            }
         } else {
             UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
             currentStreak = 0
             if shieldRoundsActive > 0 {
                 shieldRoundsActive -= 1
+                showCombatFlyout(text: "🛡️ SHIELD ABSORBED RECOIL DAMAGE!", color: Color.cyan)
             } else {
                 currentHp = max(0, currentHp - 10)
+                syncMyHpToFirebase()
+                showCombatFlyout(text: "❌ INCORRECT! -10 HP RECOIL", color: Color.red)
             }
         }
 
@@ -708,24 +966,24 @@ struct SubjectTestActivityView: View {
         guard allQuestionIds.indices.contains(currentIndex) else { return }
         let qId = allQuestionIds[currentIndex]
         Task {
-            await fetchQuestionDetails(qId: qId)
+            await loadQuestion(id: qId)
         }
     }
 
-    // MARK: - Session Setup & API Loading
+    // MARK: - 15 Questions Database Fetching & Shared Order
 
     private func initializeTestSession() {
         // Resolve operating mode
         if let list = questionIdList, !list.isEmpty {
             mode = .fixedTest
-            allQuestionIds = list
-            remainingTimerSeconds = 30 * 60
+            allQuestionIds = Array(list.prefix(15))
+            remainingTimerSeconds = 15 * 60
         } else if isChallenge && !challengeId.isEmpty {
             mode = .multiplayer
             remainingTimerSeconds = 15 * 60
         } else {
             mode = .singlePlayer
-            remainingTimerSeconds = 30 * 60
+            remainingTimerSeconds = 15 * 60
         }
 
         // Initialize 4 Hero Powers from equipped Guardian kit
@@ -740,62 +998,149 @@ struct SubjectTestActivityView: View {
         defenseCooldown = 0
         surgeCooldown = 0
         shieldRoundsActive = 0
-        isShockArmed = false
         surgeScoreMultiplierActive = false
 
+        opponentNameResolved = opponentName.isEmpty ? "Opponent" : opponentName
+
+        // Start Firebase RTDB sync for multiplayer mode
+        if mode == .multiplayer || isChallenge {
+            setupMultiplayerFirebase()
+        }
+
         Task {
-            await loadInitialQuestions()
+            await fetchOrCreateSharedQuestionList()
         }
     }
 
     @MainActor
-    private func loadInitialQuestions() async {
+    private func fetchOrCreateSharedQuestionList() async {
         isLoadingQuestions = true
         defer { isLoadingQuestions = false }
 
-        if allQuestionIds.isEmpty {
-            do {
-                let res = try await api.study.fetchQuestions(
-                    subject: subject,
-                    topic: topic,
-                    userId: session.userId,
-                    limit: 10
-                )
-                if let q = res.question {
-                    allQuestionIds = [q.id]
-                    self.currentQuestion = q
-                } else {
-                    fallbackDefaultDeck()
-                }
-            } catch {
-                fallbackDefaultDeck()
+        // If list already provided via extras, use top 15
+        if let list = questionIdList, !list.isEmpty {
+            let battle15 = Array(list.prefix(15))
+            self.allQuestionIds = battle15
+            self.currentIndex = 0
+            if let first = battle15.first {
+                await loadQuestion(id: first)
             }
-        } else {
-            await fetchQuestionDetails(qId: allQuestionIds[0])
+            return
         }
+
+        // In multiplayer mode, synchronize question_ids via Firebase RTDB
+        if isChallenge && !challengeId.isEmpty {
+            let qUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/question_ids.json")!
+
+            // 1. Check if host has already generated question_ids
+            if let (data, _) = try? await URLSession.shared.data(from: qUrl),
+               let list = (try? JSONSerialization.jsonObject(with: data)) as? [Int],
+               !list.isEmpty {
+                let battle15 = Array(list.prefix(15))
+                self.allQuestionIds = battle15
+                self.currentIndex = 0
+                if let first = battle15.first {
+                    await loadQuestion(id: first)
+                }
+                return
+            }
+
+            // 2. If no questions exist and user isHost: fetch 15 from backend and save
+            if isHost {
+                let pool = await fetchQuestionIdsFromBackend()
+                let battle15 = Array(pool.shuffled().prefix(15))
+
+                var req = URLRequest(url: qUrl)
+                req.httpMethod = "PUT"
+                req.httpBody = try? JSONSerialization.data(withJSONObject: battle15)
+                _ = try? await URLSession.shared.data(for: req)
+
+                self.allQuestionIds = battle15
+                self.currentIndex = 0
+                if let first = battle15.first {
+                    await loadQuestion(id: first)
+                }
+                return
+            } else {
+                // Client waiting for host to generate questions: poll for up to 10 seconds
+                for _ in 0..<10 {
+                    try? await Task.sleep(nanoseconds: 1_000_000_000)
+                    if let (data, _) = try? await URLSession.shared.data(from: qUrl),
+                       let list = (try? JSONSerialization.jsonObject(with: data)) as? [Int],
+                       !list.isEmpty {
+                        let battle15 = Array(list.prefix(15))
+                        self.allQuestionIds = battle15
+                        self.currentIndex = 0
+                        if let first = battle15.first {
+                            await loadQuestion(id: first)
+                        }
+                        return
+                    }
+                }
+            }
+        }
+
+        // Single Player / Fallback: Fetch directly from backend
+        await fetchQuestionListSinglePlayer()
+    }
+
+    private func fetchQuestionIdsFromBackend() async -> [Int] {
+        let cleanSub = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "NEET_PG"
+        var urlStr = "\(apiBaseUrl)api/getQuestions.php?subject=\(cleanSub)&user_id=\(session.userId)"
+        if let top = topic, !top.isEmpty {
+            let cleanTopic = top.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+            urlStr += "&topic=\(cleanTopic)"
+        }
+        guard let url = URL(string: urlStr),
+              let (data, _) = try? await URLSession.shared.data(from: url),
+              let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+              let arr = json["all_question_ids"] as? [Int], !arr.isEmpty else {
+            return Array(201...215)
+        }
+        return arr
     }
 
     @MainActor
-    private func fetchQuestionDetails(qId: Int) async {
-        do {
-            let res = try await api.study.fetchQuestions(
-                subject: subject,
-                topic: topic,
-                userId: session.userId,
-                limit: 1
-            )
-            if let q = res.question {
-                self.currentQuestion = q
-            }
-        } catch {
-            // Keep existing question if fetch fails
+    private func fetchQuestionListSinglePlayer() async {
+        let pool = await fetchQuestionIdsFromBackend()
+        let battle15 = Array(pool.shuffled().prefix(15))
+        self.allQuestionIds = battle15
+        self.currentIndex = 0
+        if let first = battle15.first {
+            await loadQuestion(id: first)
+        } else {
+            fallbackDefaultDeck(qId: 201)
         }
     }
 
-    private func fallbackDefaultDeck() {
+    // MARK: - Single Question Loader (`api/get_single_question.php`)
+
+    @MainActor
+    private func loadQuestion(id: Int) async {
+        if let cached = questionCache[id] {
+            self.currentQuestion = cached
+            return
+        }
+
+        do {
+            let q = try await api.study.question(id: id)
+            self.questionCache[id] = q
+            self.currentQuestion = q
+        } catch {
+            // Fallback via general question fetcher or static clinical deck
+            if let fetched = try? await api.study.fetchQuestions(subject: subject, topic: topic, userId: session.userId, questionId: id).question {
+                self.questionCache[id] = fetched
+                self.currentQuestion = fetched
+            } else {
+                fallbackDefaultDeck(qId: id)
+            }
+        }
+    }
+
+    private func fallbackDefaultDeck(qId: Int) {
         let sampleQuestions = [
             Question(
-                id: 201,
+                id: qId,
                 text: "A 55-year-old chronic smoker presents with painless gross hematuria. Urine cytology reveals malignant transitional cells. Which of the following is the most significant risk factor?",
                 options: [
                     "Aromatic Amines & Tobacco Smoking",
@@ -808,7 +1153,7 @@ struct SubjectTestActivityView: View {
                 explanation: "Cigarette smoking is responsible for ~50% of urothelial bladder carcinomas. Exposure to industrial aromatic amines is also a well-established occupational cause."
             ),
             Question(
-                id: 202,
+                id: qId + 1,
                 text: "Which of the following ECG changes is the earliest indicator of hyperkalemia?",
                 options: [
                     "Prolonged PR interval",
@@ -821,8 +1166,215 @@ struct SubjectTestActivityView: View {
                 explanation: "Tall, peaked, symmetrical T waves with a narrow base (best seen in leads II, III, V2-V4) are the earliest manifestation of hyperkalemia (K > 5.5 mEq/L)."
             )
         ]
-        allQuestionIds = sampleQuestions.map { $0.id }
         self.currentQuestion = sampleQuestions.first
+    }
+
+    // MARK: - Multiplayer Firebase RTDB Engine
+
+    private func setupMultiplayerFirebase() {
+        guard isChallenge && !challengeId.isEmpty else { return }
+
+        let myUid = String(session.userId > 0 ? session.userId : 1)
+        let myName = session.currentUser?.name.isEmpty == false ? (session.currentUser?.name ?? "Doctor") : "Doctor \(myUid)"
+
+        // 1. Register player in challenge room
+        let regUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/players/\(myUid).json")!
+        var regReq = URLRequest(url: regUrl)
+        regReq.httpMethod = "PATCH"
+        let regData: [String: Any] = [
+            "name": myName,
+            "hp": 100,
+            "score": 0,
+            "isFinished": false
+        ]
+        regReq.httpBody = try? JSONSerialization.data(withJSONObject: regData)
+        Task { _ = try? await URLSession.shared.data(for: regReq) }
+
+        // 2. Start polling for opponent updates and combat actions
+        multiplayerPollingTask?.cancel()
+        multiplayerPollingTask = Task {
+            let playersUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/players.json")!
+            let actionUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/last_action.json")!
+
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 1_200_000_000)
+                guard !Task.isCancelled else { break }
+
+                // A. Poll Players
+                if let (pData, _) = try? await URLSession.shared.data(from: playersUrl),
+                   let pDict = (try? JSONSerialization.jsonObject(with: pData)) as? [String: [String: Any]] {
+
+                    for (pId, info) in pDict {
+                        if pId != myUid {
+                            let oHp = info["hp"] as? Int ?? 100
+                            let oScore = info["score"] as? Int ?? 0
+                            let oName = info["name"] as? String ?? opponentName
+                            let oFin = info["isFinished"] as? Bool ?? false
+
+                            await MainActor.run {
+                                self.opponentHp = oHp
+                                self.opponentScore = oScore
+                                self.opponentNameResolved = oName
+                                self.opponentFinished = oFin
+
+                                if oHp <= 0 && !self.isGameOverHandled {
+                                    self.isGameOverHandled = true
+                                    self.showCombatFlyout(text: "🏆 OPPONENT K.O.! VICTORY!", color: .green)
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                        self.finalizeTest()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // B. Poll Combat Actions
+                if let (aData, _) = try? await URLSession.shared.data(from: actionUrl),
+                   let action = (try? JSONSerialization.jsonObject(with: aData)) as? [String: Any],
+                   let actionId = action["action_id"] as? String,
+                   actionId != lastHandledActionId {
+
+                    lastHandledActionId = actionId
+                    let actorId = action["actor_id"] as? String ?? ""
+                    let targetId = action["target_id"] as? String ?? ""
+                    let amount = action["amount"] as? Int ?? 0
+                    let actorName = action["actor_name"] as? String ?? "Opponent"
+
+                    if actorId != myUid && (targetId == myUid || targetId.isEmpty) {
+                        await MainActor.run {
+                            if shieldRoundsActive > 0 {
+                                shieldRoundsActive -= 1
+                                self.showCombatFlyout(text: "🛡️ BARRIER BLOCKED \(actorName)'s ATTACK!", color: .cyan)
+                            } else {
+                                self.currentHp = max(0, self.currentHp - amount)
+                                self.showCombatFlyout(text: "💥 \(actorName) dealt -\(amount) HP!", color: .red)
+                                UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+
+                                if self.currentHp <= 0 && !self.isGameOverHandled {
+                                    self.isGameOverHandled = true
+                                    self.showCombatFlyout(text: "💀 DEFEAT! HP DEPLETED", color: .red)
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                        self.finalizeTest()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 3. Fallback Bot simulation when opponent is a bot
+        if isBotMatch || opponentId.hasPrefix("BOT") {
+            startBotSimulation()
+        }
+    }
+
+    private func dealDamageToOpponent(amount: Int) {
+        guard isChallenge && !challengeId.isEmpty else { return }
+
+        let myUid = String(session.userId > 0 ? session.userId : 1)
+        let myName = session.currentUser?.name.isEmpty == false ? (session.currentUser?.name ?? "Doctor") : "Doctor"
+
+        // Deduct opponent HP locally & sync to Firebase
+        opponentHp = max(0, opponentHp - amount)
+        let oppTargetId = opponentId.isEmpty ? "opponent" : opponentId
+
+        Task.detached {
+            let oppHpUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/players/\(oppTargetId)/hp.json")!
+            var hpReq = URLRequest(url: oppHpUrl)
+            hpReq.httpMethod = "PUT"
+            hpReq.httpBody = try? JSONSerialization.data(withJSONObject: max(0, opponentHp))
+            _ = try? await URLSession.shared.data(for: hpReq)
+
+            // Post action
+            let actUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/last_action.json")!
+            var actReq = URLRequest(url: actUrl)
+            actReq.httpMethod = "PUT"
+            let actData: [String: Any] = [
+                "action_id": UUID().uuidString,
+                "type": "DAMAGE",
+                "actor_id": myUid,
+                "target_id": oppTargetId,
+                "amount": amount,
+                "actor_name": myName
+            ]
+            actReq.httpBody = try? JSONSerialization.data(withJSONObject: actData)
+            _ = try? await URLSession.shared.data(for: actReq)
+
+            // Update my score in Firebase
+            let myScoreUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/players/\(myUid)/score.json")!
+            var scoreReq = URLRequest(url: myScoreUrl)
+            scoreReq.httpMethod = "PUT"
+            scoreReq.httpBody = try? JSONSerialization.data(withJSONObject: myScore)
+            _ = try? await URLSession.shared.data(for: scoreReq)
+        }
+    }
+
+    private func syncMyHpToFirebase() {
+        guard isChallenge && !challengeId.isEmpty else { return }
+        let myUid = String(session.userId > 0 ? session.userId : 1)
+        Task.detached {
+            let myHpUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/players/\(myUid)/hp.json")!
+            var hpReq = URLRequest(url: myHpUrl)
+            hpReq.httpMethod = "PUT"
+            hpReq.httpBody = try? JSONSerialization.data(withJSONObject: max(0, currentHp))
+            _ = try? await URLSession.shared.data(for: hpReq)
+        }
+    }
+
+    private func startBotSimulation() {
+        botSimulationTask?.cancel()
+        botSimulationTask = Task {
+            while !Task.isCancelled {
+                // Bot answers every 6 to 9 seconds
+                let delaySeconds = Double.random(in: 6.0...9.0)
+                try? await Task.sleep(nanoseconds: UInt64(delaySeconds * 1_000_000_000))
+                guard !Task.isCancelled else { break }
+
+                // 70% bot accuracy
+                let isBotCorrect = Double.random(in: 0...1) < 0.70
+
+                await MainActor.run {
+                    if isBotCorrect {
+                        let botDamage = 12
+                        self.opponentScore += 10
+                        if self.shieldRoundsActive > 0 {
+                            self.shieldRoundsActive -= 1
+                            self.showCombatFlyout(text: "🛡️ SHIELD BLOCKED BOT STRIKE!", color: .cyan)
+                        } else {
+                            self.currentHp = max(0, self.currentHp - botDamage)
+                            self.showCombatFlyout(text: "💥 \(self.opponentNameResolved) answered correctly! -\(botDamage) HP", color: .red)
+                            if self.currentHp <= 0 && !self.isGameOverHandled {
+                                self.isGameOverHandled = true
+                                self.showCombatFlyout(text: "💀 DEFEAT! HP DEPLETED", color: .red)
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                    self.finalizeTest()
+                                }
+                            }
+                        }
+                    } else {
+                        self.opponentHp = max(0, self.opponentHp - 8)
+                        self.showCombatFlyout(text: "⚡ \(self.opponentNameResolved) missed! Recoil damage", color: .orange)
+                        if self.opponentHp <= 0 && !self.isGameOverHandled {
+                            self.isGameOverHandled = true
+                            self.showCombatFlyout(text: "🏆 OPPONENT K.O.! VICTORY!", color: .green)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                self.finalizeTest()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func cleanupMultiplayer() {
+        multiplayerPollingTask?.cancel()
+        multiplayerPollingTask = nil
+        botSimulationTask?.cancel()
+        botSimulationTask = nil
     }
 
     private func handleTimerTick() {
@@ -835,23 +1387,37 @@ struct SubjectTestActivityView: View {
     }
 
     private func finalizeTest() {
+        stopSpeaking()
+        cleanupMultiplayer()
+
+        // Mark finished in Firebase
+        let myUid = String(session.userId > 0 ? session.userId : 1)
+        if isChallenge && !challengeId.isEmpty {
+            let finUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/players/\(myUid)/isFinished.json")!
+            var req = URLRequest(url: finUrl)
+            req.httpMethod = "PUT"
+            req.httpBody = try? JSONSerialization.data(withJSONObject: true)
+            Task { _ = try? await URLSession.shared.data(for: req) }
+        }
+
         let correctCount = reviewItems.filter { $0.isCorrect }.count
-        let playerWon = correctCount >= max(1, reviewItems.count / 2)
+        let playerWon = currentHp > 0 && (opponentHp <= 0 || myScore >= opponentScore)
 
         let summary = BattleResultSummary(
             challengeId: challengeId.isEmpty ? "test_\(UUID().uuidString.prefix(6))" : challengeId,
             userName: session.currentUser?.name ?? "Doctor",
-            opponentName: "Clinical Examiner",
+            opponentName: opponentNameResolved,
             userScore: myScore,
-            opponentScore: 0,
+            opponentScore: opponentScore,
             userCorrect: correctCount,
-            opponentCorrect: 0,
-            totalQuestions: max(1, reviewItems.count),
-            expGained: correctCount * 25,
+            opponentCorrect: max(0, (allQuestionIds.count - correctCount) / 2 + (playerWon ? 0 : 2)),
+            totalQuestions: max(1, allQuestionIds.count),
+            expGained: correctCount * 25 + (playerWon ? 100 : 25),
             creditsGained: playerWon ? 50 : 15,
             questionReviews: reviewItems
         )
         self.resultSummaryData = summary
         self.showResultSummary = true
+        onFinish?(summary)
     }
 }

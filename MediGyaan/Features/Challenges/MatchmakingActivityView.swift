@@ -561,14 +561,18 @@ struct MatchmakingActivityView: View {
 
     private func fetchQuestionIds() async -> [Int] {
         let cleanSub = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "NEET_PG"
-        let urlStr = "\(apiBaseUrl)api/getQuestions.php?subject=\(cleanSub)&user_id=\(session.userId)"
+        var urlStr = "\(apiBaseUrl)api/getQuestions.php?subject=\(cleanSub)&user_id=\(session.userId)"
+        if let top = topic, !top.isEmpty {
+            let cleanTopic = top.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+            urlStr += "&topic=\(cleanTopic)"
+        }
         guard let url = URL(string: urlStr),
               let (data, _) = try? await URLSession.shared.data(from: url),
               let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
               let arr = json["all_question_ids"] as? [Int], !arr.isEmpty else {
-            return Array(1...15).shuffled()
+            return Array(201...215).shuffled()
         }
-        return Array(arr.prefix(15))
+        return Array(arr.shuffled().prefix(15))
     }
 
     // MARK: - Game Launch

@@ -12,10 +12,16 @@ struct MatchmakingArenaFlowView: View {
 
     var subject: String = "NEET PG"
     var topic: String? = nil
+    var battleStyle: BattleStyle = .subjectTest
 
     @EnvironmentObject private var session: SessionStore
     @Environment(\.dismiss) private var dismiss
     @AppStorage("selectedAvatarId") private var selectedAvatarId: Int = 1
+
+    enum BattleStyle {
+        case subjectTest   // 15-question subject duel replicating SubjectTestActivity.kt
+        case classicArena  // endless arena combat replicating ClassicGameActivity.kt
+    }
 
     enum ArenaStage {
         case searching
@@ -86,21 +92,41 @@ struct MatchmakingArenaFlowView: View {
                 }
 
             case .battle:
-                ClassicGameActivityView(
-                    challengeId: challengeId,
-                    subject: subject,
-                    topic: topic,
-                    isHost: isHost,
-                    isChallenge: true,
-                    realMultiplayer: !isBotMatch,
-                    opponentId: opponentId,
-                    opponentName: matchedOpponentName,
-                    opponentWarrior: matchedOpponentWarrior,
-                    userWarrior: userWarrior
-                ) { result in
-                    self.battleResult = result
-                    withAnimation {
-                        self.currentStage = .result
+                if battleStyle == .subjectTest {
+                    SubjectTestActivityView(
+                        subject: subject,
+                        topic: topic,
+                        challengeId: challengeId,
+                        isChallenge: true,
+                        isHost: isHost,
+                        questionIdList: sharedQuestionIds,
+                        userWarrior: userWarrior,
+                        opponentId: opponentId,
+                        opponentName: matchedOpponentName,
+                        isBotMatch: isBotMatch
+                    ) { result in
+                        self.battleResult = result
+                        withAnimation {
+                            self.currentStage = .result
+                        }
+                    }
+                } else {
+                    ClassicGameActivityView(
+                        challengeId: challengeId,
+                        subject: subject,
+                        topic: topic,
+                        isHost: isHost,
+                        isChallenge: true,
+                        realMultiplayer: !isBotMatch,
+                        opponentId: opponentId,
+                        opponentName: matchedOpponentName,
+                        opponentWarrior: matchedOpponentWarrior,
+                        userWarrior: userWarrior
+                    ) { result in
+                        self.battleResult = result
+                        withAnimation {
+                            self.currentStage = .result
+                        }
                     }
                 }
 
