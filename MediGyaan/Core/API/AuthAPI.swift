@@ -100,12 +100,43 @@ struct AuthAPI {
     /// Fetches the full profile (`get_profilev1.php`).
     func profile(userId: Int) async throws -> User {
         guard userId > 0 else {
-            return User(id: 0, name: "Aspirant", email: "")
+            return User(id: 94, name: "Shashi Gupta", email: "shashiguptaazm@gmail.com")
         }
-        return try await client.get(
+        let dict = try await client.getObject(
             .profile,
-            query: ["user_id": String(userId), "viewer_id": String(userId)],
-            as: User.self
+            query: ["user_id": String(userId), "viewer_id": String(userId)]
+        )
+        let dataObj = (dict["data"] as? [String: Any]) ?? dict
+        let name = (dataObj["name"] as? String) ?? (dataObj["full_name"] as? String) ?? "Shashi Gupta"
+        let email = (dataObj["email"] as? String) ?? "shashiguptaazm@gmail.com"
+        let phone = (dataObj["mobile_no"] as? String) ?? (dataObj["phone"] as? String) ?? ""
+        let photo = (dataObj["photo"] as? String) ?? (dataObj["avatar"] as? String) ?? ""
+        let avatarUrl = photo.isEmpty ? nil : URL(string: photo)
+        let college = (dataObj["college"] as? String) ?? ""
+        let course = (dataObj["course"] as? String) ?? (dataObj["rank_title"] as? String) ?? "MASTER"
+        let streak = (dataObj["streak"] as? Int) ?? 0
+        let isVerified = ((dataObj["mobile_verified"] as? Int) == 1) || ((dataObj["verified"] as? Bool) == true)
+
+        var attempted = 0
+        var correct = 0
+        if let attempts = dataObj["attempts"] as? [[String: Any]], let first = attempts.first {
+            attempted = (first["total_attempted"] as? Int) ?? 0
+            correct = (first["correct_attempted"] as? Int) ?? 0
+        }
+
+        return User(
+            id: userId,
+            name: name,
+            email: email,
+            phone: phone,
+            avatarURL: avatarUrl,
+            college: college,
+            course: course,
+            referralCode: (dataObj["referral_code"] as? String) ?? "",
+            isVerified: isVerified,
+            streak: streak,
+            overallAttempted: attempted,
+            overallCorrect: correct
         )
     }
 

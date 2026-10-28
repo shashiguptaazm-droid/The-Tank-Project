@@ -73,7 +73,8 @@ struct MatchmakingArenaFlowView: View {
                 LoadingActivityView(
                     challengeId: challengeId,
                     userId: String(session.currentUser?.id ?? 0),
-                    userName: session.currentUser?.name ?? "Dr. Aspirant",
+                    userName: session.userName,
+                    userRank: session.currentUser?.course.isEmpty == false ? (session.currentUser?.course ?? "Master") : "Master",
                     opponentId: opponentId,
                     opponentName: matchedOpponentName,
                     subject: subject,

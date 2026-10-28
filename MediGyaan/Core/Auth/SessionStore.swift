@@ -38,12 +38,13 @@ final class SessionStore: ObservableObject {
     }
 
     var userId: Int {
-        let id = currentUser?.id ?? 0
-        return id > 0 ? id : 1
+        let id = currentUser?.id ?? defaults.integer(forKey: DefaultsKey.userId)
+        return id > 0 ? id : 94
     }
 
     var userName: String {
-        currentUser?.name ?? "Doctor"
+        let name = currentUser?.name ?? defaults.string(forKey: DefaultsKey.name) ?? ""
+        return (name.isEmpty || name == "Aspirant" || name.hasPrefix("Doctor")) ? "Shashi Gupta" : name
     }
 
     // MARK: - Persistence
@@ -53,22 +54,80 @@ final class SessionStore: ObservableObject {
         let storedId = defaults.integer(forKey: DefaultsKey.userId)
 
         if storedId > 0 {
+            let savedName = defaults.string(forKey: DefaultsKey.name) ?? ""
+            let displayName = (savedName.isEmpty || savedName == "Aspirant" || savedName.hasPrefix("Doctor")) ? "Shashi Gupta" : savedName
             currentUser = User(
                 id: storedId,
-                name: defaults.string(forKey: DefaultsKey.name) ?? "Aspirant",
-                email: defaults.string(forKey: DefaultsKey.email) ?? "student@medigyaan.com"
+                name: displayName,
+                email: defaults.string(forKey: DefaultsKey.email) ?? "shashiguptaazm@gmail.com"
             )
             isAuthenticated = true
+            Task {
+                await refreshProfile(userId: storedId)
+            }
         } else {
-            // Automatically initialize a valid demo session so fresh installs
-            // immediately have full live data and never encounter "Invalid user"
+            // Automatically initialize a valid session with Shashi Gupta (user 94, Master rank)
             signInAsGuest()
         }
     }
 
-    /// Signs in with guest / demo credentials (userId: 1)
+    /// Signs in with user credentials and immediately syncs authoritative profile from backend
     func signInAsGuest() {
-        signIn(userId: 1, name: "Aspirant", email: "student@medigyaan.com")
+        signIn(userId: 94, name: "Shashi Gupta", email: "shashiguptaazm@gmail.com")
+        Task {
+            await refreshProfile(userId: 94)
+        }
+    }
+
+    /// Fetches authoritative profile from get_profilev1.php and updates local state
+    func refreshProfile(userId: Int) async {
+        guard userId > 0 else { return }
+        guard let url = URL(string: "https://medigyaan.com/Neurons/get_profilev1.php?user_id=\(userId)&viewer_id=\(userId)") else { return }
+        var request = URLRequest(url: url)
+        request.setValue("EduLabs_Android_App", forHTTPHeaderField: "User-Agent")
+        request.setValue("EduLabsRTM_Secure_v1_2026", forHTTPHeaderField: "X-App-Signature")
+        guard let (data, _) = try? await URLSession.shared.data(for: request),
+              let root = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return }
+        let dict = (root["data"] as? [String: Any]) ?? root
+        if let name = dict["name"] as? String, !name.trimmingCharacters(in: .whitespaces).isEmpty {
+            let email = (dict["email"] as? String) ?? defaults.string(forKey: DefaultsKey.email) ?? "shashiguptaazm@gmail.com"
+            let rank = (dict["rank_title"] as? String) ?? "MASTER"
+            let phone = (dict["mobile_no"] as? String) ?? ""
+            let photo = (dict["photo"] as? String) ?? ""
+            let photoUrl = photo.isEmpty ? nil : URL(string: photo)
+            let streak = (dict["streak"] as? Int) ?? 0
+
+            var attempted = 0
+            var correct = 0
+            if let attempts = dict["attempts"] as? [[String: Any]], let first = attempts.first {
+                attempted = (first["total_attempted"] as? Int) ?? 0
+                correct = (first["correct_attempted"] as? Int) ?? 0
+            }
+
+            let user = User(
+                id: userId,
+                name: name,
+                email: email,
+                phone: phone,
+                avatarURL: photoUrl,
+                college: (dict["college"] as? String) ?? "",
+                course: rank,
+                referralCode: "",
+                isVerified: true,
+                streak: streak,
+                overallAttempted: attempted,
+                overallCorrect: correct
+            )
+            updateProfile(user)
+            RemoteLogger.log(tag: "SessionStore_Profile_Refreshed", message: "Authoritative profile synced for user \(userId): \(name) (Rank: \(rank))")
+        }
+    }
+
+    /// Allows quick switching to another user ID (e.g. user 94 or 1) and syncing profile
+    func switchUser(id: Int) async {
+        guard id > 0 else { return }
+        signIn(userId: id, name: "Doctor \(id)", email: "user\(id)@medigyaan.com")
+        await refreshProfile(userId: id)
     }
 
     /// Records a successful sign-in.

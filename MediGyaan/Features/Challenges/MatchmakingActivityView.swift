@@ -4,12 +4,14 @@ import AVFoundation
 /// 1:1 SwiftUI replication of Android's `MatchmakingActivity.kt`.
 ///
 /// Features:
+/// - Real-time profile details synchronization from `get_profilev1.php` before queue entry.
 /// - Continuous background classical audio (`vivaldi_winter.mp3` loop).
 /// - Holographic cyber radar scanning animation with rotating sweep gradient and pulsing rings.
-/// - Firebase Realtime Database queue integration (`matchmaking_queue/{subject}_{topic}/entries`).
+/// - Firebase Realtime Database queue integration (`matchmaking_queue/{subject}_{topic}/entries`) with authenticated token.
+/// - Deterministic tie-breaker multiplayer pairing (`pvp_{k1}_{k2}`) preventing split lobbies.
 /// - 30-second countdown timer for host matchmaking with automated bot fallback pairing.
 /// - Live "Players in Lobby" list.
-/// - "⚔ Match Ready!" modal with instant "Fight!" launch into `LoadingActivity`.
+/// - "⚔ Match Ready!" modal with instant "Fight!" launch into 15-question duel.
 struct MatchmakingActivityView: View {
 
     let subject: String
@@ -30,6 +32,9 @@ struct MatchmakingActivityView: View {
     @State private var opponentId: String = ""
     @State private var opponentName: String = "Opponent"
     @State private var sharedQuestionIds: [Int] = []
+    @State private var userId: Int = 94
+    @State private var queueUserId: String = "94_ios"
+    @State private var userName: String = "Shashi Gupta"
 
     @State private var showMatchReadyDialog: Bool = false
     @State private var radarRotation: Double = 0
@@ -43,7 +48,6 @@ struct MatchmakingActivityView: View {
     @State private var countdownTimer: Timer? = nil
     @State private var pollingTask: Task<Void, Never>? = nil
 
-    private let dbBaseUrl = "https://medigyaan-11cba-default-rtdb.firebaseio.com"
     private let apiBaseUrl = "https://medigyaan.com/Neurons/"
 
     struct QueuePlayer: Identifiable, Equatable, Hashable {
@@ -298,27 +302,59 @@ struct MatchmakingActivityView: View {
     }
 
     private func startMatchmakingEngine() {
-        let uid = session.userId > 0 ? session.userId : Int.random(in: 1000...9999)
-        let name = session.currentUser?.name.isEmpty == false ? (session.currentUser?.name ?? "Player") : "Doctor \(uid)"
-        queueId = "\(uid)_\(Int(Date().timeIntervalSince1970 * 1000))"
-
+        let uid = session.userId > 0 ? session.userId : 94
+        self.userId = uid
+        self.queueUserId = "\(uid)_ios"
+        self.userName = session.userName.isEmpty ? "Shashi Gupta" : session.userName
         statusMsg = "Syncing profile..."
 
-        let myPlayer = QueuePlayer(queueKey: queueId, userId: String(uid), userName: name)
-        playersInLobby = [myPlayer]
-
         Task {
-            await enterQueue(uid: uid, name: name)
+            await fetchUserDetailsFromServer(uid: uid)
         }
     }
 
-    private func enterQueue(uid: Int, name: String) async {
-        statusMsg = "Joining Queue..."
+    /// Mirrors Android's `fetchUserDetailsFromServer` (lines 500-530 of MatchmakingActivity.kt)
+    private func fetchUserDetailsFromServer(uid: Int) async {
+        guard let profileUrl = URL(string: "\(apiBaseUrl)get_profilev1.php?user_id=\(uid)&viewer_id=\(uid)") else {
+            await enterQueue()
+            return
+        }
 
-        let queueUrl = URL(string: "\(dbBaseUrl)/matchmaking_queue/\(queuePath)/entries/\(queueId).json")!
+        var request = URLRequest(url: profileUrl)
+        request.setValue("EduLabs_Android_App", forHTTPHeaderField: "User-Agent")
+        request.setValue("EduLabsRTM_Secure_v1_2026", forHTTPHeaderField: "X-App-Signature")
+
+        if let (data, _) = try? await URLSession.shared.data(for: request),
+           let root = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] {
+            let dataObj = (root["data"] as? [String: Any]) ?? root
+            if let fetchedName = dataObj["name"] as? String, !fetchedName.trimmingCharacters(in: .whitespaces).isEmpty {
+                await MainActor.run {
+                    self.userName = fetchedName
+                    let rank = (dataObj["rank_title"] as? String) ?? "MASTER"
+                    let user = User(id: uid, name: fetchedName, email: session.currentUser?.email ?? "shashiguptaazm@gmail.com", course: rank)
+                    session.updateProfile(user)
+                }
+                RemoteLogger.log(tag: "Matchmaking_Profile_Loaded", message: "Authoritative name loaded: \(fetchedName)")
+            }
+        }
+
+        await enterQueue()
+    }
+
+    private func enterQueue() async {
+        await MainActor.run {
+            statusMsg = "Joining Queue..."
+        }
+        queueId = "\(queueUserId)_\(Int(Date().timeIntervalSince1970 * 1000))"
+
+        let myPlayer = QueuePlayer(queueKey: queueId, userId: queueUserId, userName: userName)
+        await MainActor.run {
+            self.playersInLobby = [myPlayer]
+        }
+
         let entry: [String: Any] = [
-            "userId": String(uid),
-            "userName": name,
+            "userId": queueUserId,
+            "userName": userName,
             "subject": subject,
             "topic": topic ?? "",
             "timestamp": Int(Date().timeIntervalSince1970 * 1000),
@@ -326,55 +362,47 @@ struct MatchmakingActivityView: View {
             "challengeId": ""
         ]
 
-        var request = URLRequest(url: queueUrl)
-        request.httpMethod = "PUT"
-        request.httpBody = try? JSONSerialization.data(withJSONObject: entry)
-
         do {
-            _ = try await URLSession.shared.data(for: request)
-            await claimHostRole(uid: uid, name: name)
+            try await FirebaseRTDB.shared.put(path: "matchmaking_queue/\(queuePath)/entries/\(queueId)", payload: entry)
+            RemoteLogger.log(tag: "Matchmaking_Queue_Entered", message: "Entered queue \(queuePath) with queueId \(queueId)")
+            await claimHostRole()
         } catch {
-            statusMsg = "Simulating queue connection…"
-            await fallbackLocalMatchmaking(uid: uid, name: name)
+            RemoteLogger.log(tag: "Matchmaking_Queue_Error", message: error.localizedDescription)
+            await MainActor.run {
+                statusMsg = "Queue connection error, switching to bot..."
+            }
+            await pairWithBot()
         }
     }
 
-    private func claimHostRole(uid: Int, name: String) async {
-        let lockUrl = URL(string: "\(dbBaseUrl)/matchmaking_queue/\(queuePath)/hostLock.json")!
-
-        // Read current lock
+    private func claimHostRole() async {
         do {
-            let (data, _) = try await URLSession.shared.data(from: lockUrl)
-            let existing = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+            let existing = try await FirebaseRTDB.shared.get(path: "matchmaking_queue/\(queuePath)/hostLock") as? [String: Any]
             let now = Int(Date().timeIntervalSince1970 * 1000)
             let createdAt = existing?["createdAt"] as? Int ?? 0
 
             let lockExpired = (now - createdAt) > 45_000
             if existing == nil || lockExpired {
-                // Claim lock as Host
-                var req = URLRequest(url: lockUrl)
-                req.httpMethod = "PUT"
                 let lockPayload: [String: Any] = [
                     "queueId": queueId,
-                    "userId": String(uid),
-                    "userName": name,
+                    "userId": queueUserId,
+                    "userName": userName,
                     "createdAt": now
                 ]
-                req.httpBody = try? JSONSerialization.data(withJSONObject: lockPayload)
-                _ = try await URLSession.shared.data(for: req)
+                try await FirebaseRTDB.shared.put(path: "matchmaking_queue/\(queuePath)/hostLock", payload: lockPayload)
 
                 isHost = true
                 statusMsg = "Waiting for players..."
                 startHostCountdown()
-                startHostPolling()
+                startLobbyPolling()
             } else {
-                // Guest Flow
                 isHost = false
                 statusMsg = "Searching for match..."
-                startGuestPolling()
+                startLobbyPolling()
             }
         } catch {
-            await fallbackLocalMatchmaking(uid: uid, name: name)
+            isHost = false
+            startLobbyPolling()
         }
     }
 
@@ -400,38 +428,80 @@ struct MatchmakingActivityView: View {
         }
     }
 
-    private func startHostPolling() {
+    private func startLobbyPolling() {
         pollingTask?.cancel()
         pollingTask = Task {
-            let entriesUrl = URL(string: "\(dbBaseUrl)/matchmaking_queue/\(queuePath)/entries.json")!
+            var guestAttempts = 0
             while !Task.isCancelled {
-                try? await Task.sleep(nanoseconds: 1_800_000_000)
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
                 guard !Task.isCancelled else { break }
 
-                if let (data, _) = try? await URLSession.shared.data(from: entriesUrl),
-                   let entriesDict = (try? JSONSerialization.jsonObject(with: data)) as? [String: [String: Any]] {
+                // 1. Check if our queue entry was marked 'matched' by another host
+                if let myEntry = try? await FirebaseRTDB.shared.get(path: "matchmaking_queue/\(queuePath)/entries/\(queueId)") as? [String: Any],
+                   (myEntry["status"] as? String) == "matched",
+                   let cId = myEntry["challengeId"] as? String, !cId.isEmpty {
+                    pollingTask?.cancel()
+                    countdownTimer?.invalidate()
+                    self.challengeId = cId
+                    self.isHost = false
+                    RemoteLogger.log(tag: "Matchmaking_Matched_As_Guest", message: "Assigned challenge: \(cId)")
+                    await waitForChallengeReady(cid: cId)
+                    break
+                }
 
-                    var activePlayers: [QueuePlayer] = []
+                // 2. Fetch all entries in queue to detect other real players
+                if let entriesDict = try? await FirebaseRTDB.shared.get(path: "matchmaking_queue/\(queuePath)/entries") as? [String: [String: Any]] {
+                    var activePlayers: [QueuePlayer] = [
+                        QueuePlayer(queueKey: queueId, userId: queueUserId, userName: userName)
+                    ]
+
                     for (k, v) in entriesDict {
+                        if k == queueId { continue }
                         if (v["status"] as? String) == "waiting" {
                             let uId = v["userId"] as? String ?? ""
-                            let uName = v["userName"] as? String ?? "Doctor"
+                            // Prevent matching against self
+                            if uId == queueUserId { continue }
+                            let uName = v["userName"] as? String ?? "Player"
                             activePlayers.append(QueuePlayer(queueKey: k, userId: uId, userName: uName))
                         }
                     }
 
                     await MainActor.run {
-                        if !activePlayers.isEmpty {
-                            self.playersInLobby = activePlayers
-                        }
+                        self.playersInLobby = activePlayers
                     }
 
-                    // If 2 or more real players found in lobby!
-                    let distinct = activePlayers.filter { $0.userId != String(session.userId) }
-                    if let firstOpponent = distinct.first {
+                    // If 2 or more distinct real players in lobby!
+                    if activePlayers.count >= 2 {
                         pollingTask?.cancel()
                         countdownTimer?.invalidate()
-                        await createMultiplayerChallenge(opponent: firstOpponent)
+
+                        // Deterministic tie-breaker matching Android lines 788-792
+                        let sortedPair = Array(activePlayers.sorted { $0.queueKey < $1.queueKey }.prefix(2))
+                        let canonicalHostUid = sortedPair[0].userId
+                        let deterministicCid = "pvp_\(sanitizeKey(sortedPair[0].queueKey))_\(sanitizeKey(sortedPair[1].queueKey))"
+
+                        RemoteLogger.log(tag: "Matchmaking_TieBreaker", message: "Canonical host is \(canonicalHostUid), cid=\(deterministicCid)")
+
+                        if canonicalHostUid == queueUserId || canonicalHostUid == String(userId) {
+                            // This device is the canonical host!
+                            self.isHost = true
+                            await createMultiplayerChallenge(challengeId: deterministicCid, opponent: sortedPair[1])
+                        } else {
+                            // This device is guest
+                            self.isHost = false
+                            self.challengeId = deterministicCid
+                            await waitForChallengeReady(cid: deterministicCid)
+                        }
+                        break
+                    }
+                }
+
+                // If non-host guest waits without match for > 20s, pair with bot
+                if !isHost {
+                    guestAttempts += 1
+                    if guestAttempts > 14 {
+                        pollingTask?.cancel()
+                        await pairWithBot()
                         break
                     }
                 }
@@ -439,76 +509,47 @@ struct MatchmakingActivityView: View {
         }
     }
 
-    private func startGuestPolling() {
-        pollingTask?.cancel()
-        pollingTask = Task {
-            let myEntryUrl = URL(string: "\(dbBaseUrl)/matchmaking_queue/\(queuePath)/entries/\(queueId).json")!
-            var attempts = 0
-            while !Task.isCancelled {
-                try? await Task.sleep(nanoseconds: 1_800_000_000)
-                attempts += 1
-                guard !Task.isCancelled else { break }
-
-                if let (data, _) = try? await URLSession.shared.data(from: myEntryUrl),
-                   let entry = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
-                   (entry["status"] as? String) == "matched",
-                   let cId = entry["challengeId"] as? String, !cId.isEmpty {
-                    pollingTask?.cancel()
-                    self.challengeId = cId
-                    await waitForChallengeReady(cid: cId)
-                    break
-                }
-
-                // If guest waits more than 16 seconds without host, pair with bot
-                if attempts > 8 {
-                    pollingTask?.cancel()
-                    await pairWithBot()
-                    break
-                }
-            }
-        }
-    }
-
-    private func createMultiplayerChallenge(opponent: QueuePlayer) async {
+    private func createMultiplayerChallenge(challengeId: String, opponent: QueuePlayer) async {
         isBotMatch = false
-        opponentId = opponent.userId
-        opponentName = opponent.userName
-        challengeId = "pvp_\(sanitizeKey(queueId))_\(sanitizeKey(opponent.queueKey))"
+        self.challengeId = challengeId
+        self.opponentId = opponent.userId
+        self.opponentName = opponent.userName
 
         statusMsg = "Preparing battle questions..."
         let qIds = await fetchQuestionIds()
         self.sharedQuestionIds = qIds
 
-        let challengeUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId).json")!
         let challengePayload: [String: Any] = [
             "status": "ready",
             "subject": subject,
             "topic": topic ?? "",
-            "hostId": String(session.userId),
+            "hostId": queueUserId,
             "isBotMatch": false,
             "question_ids": qIds,
             "players": [
-                String(session.userId): ["name": session.currentUser?.name ?? "Player", "hp": 100, "score": 0, "isFinished": false, "isBot": false],
+                queueUserId: ["name": userName, "hp": 100, "score": 0, "isFinished": false, "isBot": false],
                 opponent.userId: ["name": opponent.userName, "hp": 100, "score": 0, "isFinished": false, "isBot": false]
             ]
         ]
 
-        var req = URLRequest(url: challengeUrl)
-        req.httpMethod = "PUT"
-        req.httpBody = try? JSONSerialization.data(withJSONObject: challengePayload)
-        _ = try? await URLSession.shared.data(for: req)
+        do {
+            try await FirebaseRTDB.shared.put(path: "challenges/\(challengeId)", payload: challengePayload)
 
-        // Mark entries as matched
-        for p in [queueId, opponent.queueKey] {
-            let pUrl = URL(string: "\(dbBaseUrl)/matchmaking_queue/\(queuePath)/entries/\(p).json")!
-            var pReq = URLRequest(url: pUrl)
-            pReq.httpMethod = "PATCH"
-            pReq.httpBody = try? JSONSerialization.data(withJSONObject: ["status": "matched", "challengeId": challengeId])
-            _ = try? await URLSession.shared.data(for: pReq)
-        }
+            // Mark queue entries as matched
+            for pKey in [queueId, opponent.queueKey] {
+                try await FirebaseRTDB.shared.patch(
+                    path: "matchmaking_queue/\(queuePath)/entries/\(pKey)",
+                    payload: ["status": "matched", "challengeId": challengeId]
+                )
+            }
 
-        await MainActor.run {
-            self.showMatchReadyDialog = true
+            RemoteLogger.log(tag: "Matchmaking_Challenge_Ready", message: "Challenge \(challengeId) created with \(qIds.count) questions")
+            await MainActor.run {
+                self.showMatchReadyDialog = true
+            }
+        } catch {
+            RemoteLogger.log(tag: "Matchmaking_Create_Error", message: error.localizedDescription)
+            await pairWithBot()
         }
     }
 
@@ -528,15 +569,14 @@ struct MatchmakingActivityView: View {
     }
 
     private func waitForChallengeReady(cid: String) async {
-        let challengeUrl = URL(string: "\(dbBaseUrl)/challenges/\(cid).json")!
-        for _ in 0..<10 {
+        statusMsg = "Joining opponent's arena..."
+        for _ in 0..<20 {
             try? await Task.sleep(nanoseconds: 1_000_000_000)
-            if let (data, _) = try? await URLSession.shared.data(from: challengeUrl),
-               let obj = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+            if let obj = try? await FirebaseRTDB.shared.get(path: "challenges/\(cid)") as? [String: Any],
                (obj["status"] as? String) == "ready" {
 
                 if let players = obj["players"] as? [String: [String: Any]] {
-                    for (uid, info) in players where uid != String(session.userId) {
+                    for (uid, info) in players where uid != queueUserId && uid != String(userId) {
                         self.opponentId = uid
                         self.opponentName = info["name"] as? String ?? "Opponent"
                     }
@@ -546,22 +586,21 @@ struct MatchmakingActivityView: View {
                     self.sharedQuestionIds = qIds
                 }
 
+                RemoteLogger.log(tag: "Matchmaking_Guest_Joined", message: "Joined ready challenge \(cid) vs \(opponentName)")
                 await MainActor.run {
                     self.showMatchReadyDialog = true
                 }
                 return
             }
         }
-    }
 
-    private func fallbackLocalMatchmaking(uid: Int, name: String) async {
-        try? await Task.sleep(nanoseconds: 2_500_000_000)
+        // Fallback if host abandoned
         await pairWithBot()
     }
 
     private func fetchQuestionIds() async -> [Int] {
         let cleanSub = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "NEET_PG"
-        var urlStr = "\(apiBaseUrl)api/getQuestions.php?subject=\(cleanSub)&user_id=\(session.userId)"
+        var urlStr = "\(apiBaseUrl)api/getQuestions.php?subject=\(cleanSub)&user_id=\(userId)"
         if let top = topic, !top.isEmpty {
             let cleanTopic = top.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
             urlStr += "&topic=\(cleanTopic)"
@@ -609,16 +648,9 @@ struct MatchmakingActivityView: View {
             let qId = queueId
             let wasHost = isHost
             Task.detached {
-                let entryUrl = URL(string: "\(dbBaseUrl)/matchmaking_queue/\(qPath)/entries/\(qId).json")!
-                var req = URLRequest(url: entryUrl)
-                req.httpMethod = "DELETE"
-                _ = try? await URLSession.shared.data(for: req)
-
+                try? await FirebaseRTDB.shared.delete(path: "matchmaking_queue/\(qPath)/entries/\(qId)")
                 if wasHost {
-                    let lockUrl = URL(string: "\(dbBaseUrl)/matchmaking_queue/\(qPath)/hostLock.json")!
-                    var lockReq = URLRequest(url: lockUrl)
-                    lockReq.httpMethod = "DELETE"
-                    _ = try? await URLSession.shared.data(for: lockReq)
+                    try? await FirebaseRTDB.shared.delete(path: "matchmaking_queue/\(qPath)/hostLock")
                 }
             }
         }

@@ -23,6 +23,7 @@ struct LoadingActivityView: View {
     let isHost: Bool
     let isBotMatch: Bool
     let questionIds: [Int]
+    var userRank: String = "Master"
     var onProceedToGame: (() -> Void)?
 
     @EnvironmentObject private var session: SessionStore
@@ -110,8 +111,8 @@ struct LoadingActivityView: View {
                 HStack(spacing: 12) {
                     // Left: YOU Pod
                     playerFighterCard(
-                        name: userName.isEmpty ? (session.currentUser?.name ?? "YOU") : userName,
-                        rank: "Aspirant",
+                        name: userName.isEmpty ? session.userName : userName,
+                        rank: userRank,
                         warrior: playerWarrior,
                         isMe: true,
                         accentColor: Color(hex: 0x00E5FF)

@@ -1028,13 +1028,10 @@ struct SubjectTestActivityView: View {
             return
         }
 
-        // In multiplayer mode, synchronize question_ids via Firebase RTDB
+        // In multiplayer mode, synchronize question_ids via Firebase RTDB with auth
         if isChallenge && !challengeId.isEmpty {
-            let qUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/question_ids.json")!
-
             // 1. Check if host has already generated question_ids
-            if let (data, _) = try? await URLSession.shared.data(from: qUrl),
-               let list = (try? JSONSerialization.jsonObject(with: data)) as? [Int],
+            if let list = try? await FirebaseRTDB.shared.get(path: "challenges/\(challengeId)/question_ids") as? [Int],
                !list.isEmpty {
                 let battle15 = Array(list.prefix(15))
                 self.allQuestionIds = battle15
@@ -1050,10 +1047,7 @@ struct SubjectTestActivityView: View {
                 let pool = await fetchQuestionIdsFromBackend()
                 let battle15 = Array(pool.shuffled().prefix(15))
 
-                var req = URLRequest(url: qUrl)
-                req.httpMethod = "PUT"
-                req.httpBody = try? JSONSerialization.data(withJSONObject: battle15)
-                _ = try? await URLSession.shared.data(for: req)
+                try? await FirebaseRTDB.shared.put(path: "challenges/\(challengeId)/question_ids", payload: battle15)
 
                 self.allQuestionIds = battle15
                 self.currentIndex = 0
@@ -1065,8 +1059,7 @@ struct SubjectTestActivityView: View {
                 // Client waiting for host to generate questions: poll for up to 10 seconds
                 for _ in 0..<10 {
                     try? await Task.sleep(nanoseconds: 1_000_000_000)
-                    if let (data, _) = try? await URLSession.shared.data(from: qUrl),
-                       let list = (try? JSONSerialization.jsonObject(with: data)) as? [Int],
+                    if let list = try? await FirebaseRTDB.shared.get(path: "challenges/\(challengeId)/question_ids") as? [Int],
                        !list.isEmpty {
                         let battle15 = Array(list.prefix(15))
                         self.allQuestionIds = battle15
@@ -1174,38 +1167,31 @@ struct SubjectTestActivityView: View {
     private func setupMultiplayerFirebase() {
         guard isChallenge && !challengeId.isEmpty else { return }
 
-        let myUid = String(session.userId > 0 ? session.userId : 1)
-        let myName = session.currentUser?.name.isEmpty == false ? (session.currentUser?.name ?? "Doctor") : "Doctor \(myUid)"
+        let myUid = "\(session.userId)_ios"
+        let myName = session.userName
 
         // 1. Register player in challenge room
-        let regUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/players/\(myUid).json")!
-        var regReq = URLRequest(url: regUrl)
-        regReq.httpMethod = "PATCH"
         let regData: [String: Any] = [
             "name": myName,
             "hp": 100,
             "score": 0,
             "isFinished": false
         ]
-        regReq.httpBody = try? JSONSerialization.data(withJSONObject: regData)
-        Task { _ = try? await URLSession.shared.data(for: regReq) }
+        Task {
+            try? await FirebaseRTDB.shared.patch(path: "challenges/\(challengeId)/players/\(myUid)", payload: regData)
+        }
 
         // 2. Start polling for opponent updates and combat actions
         multiplayerPollingTask?.cancel()
         multiplayerPollingTask = Task {
-            let playersUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/players.json")!
-            let actionUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/last_action.json")!
-
             while !Task.isCancelled {
                 try? await Task.sleep(nanoseconds: 1_200_000_000)
                 guard !Task.isCancelled else { break }
 
                 // A. Poll Players
-                if let (pData, _) = try? await URLSession.shared.data(from: playersUrl),
-                   let pDict = (try? JSONSerialization.jsonObject(with: pData)) as? [String: [String: Any]] {
-
+                if let pDict = try? await FirebaseRTDB.shared.get(path: "challenges/\(challengeId)/players") as? [String: [String: Any]] {
                     for (pId, info) in pDict {
-                        if pId != myUid {
+                        if pId != myUid && pId != String(session.userId) {
                             let oHp = info["hp"] as? Int ?? 100
                             let oScore = info["score"] as? Int ?? 0
                             let oName = info["name"] as? String ?? opponentName
@@ -1230,8 +1216,7 @@ struct SubjectTestActivityView: View {
                 }
 
                 // B. Poll Combat Actions
-                if let (aData, _) = try? await URLSession.shared.data(from: actionUrl),
-                   let action = (try? JSONSerialization.jsonObject(with: aData)) as? [String: Any],
+                if let action = try? await FirebaseRTDB.shared.get(path: "challenges/\(challengeId)/last_action") as? [String: Any],
                    let actionId = action["action_id"] as? String,
                    actionId != lastHandledActionId {
 
@@ -1241,7 +1226,7 @@ struct SubjectTestActivityView: View {
                     let amount = action["amount"] as? Int ?? 0
                     let actorName = action["actor_name"] as? String ?? "Opponent"
 
-                    if actorId != myUid && (targetId == myUid || targetId.isEmpty) {
+                    if actorId != myUid && actorId != String(session.userId) && (targetId == myUid || targetId == String(session.userId) || targetId.isEmpty) {
                         await MainActor.run {
                             if shieldRoundsActive > 0 {
                                 shieldRoundsActive -= 1
@@ -1274,24 +1259,17 @@ struct SubjectTestActivityView: View {
     private func dealDamageToOpponent(amount: Int) {
         guard isChallenge && !challengeId.isEmpty else { return }
 
-        let myUid = String(session.userId > 0 ? session.userId : 1)
-        let myName = session.currentUser?.name.isEmpty == false ? (session.currentUser?.name ?? "Doctor") : "Doctor"
+        let myUid = "\(session.userId)_ios"
+        let myName = session.userName
 
         // Deduct opponent HP locally & sync to Firebase
         opponentHp = max(0, opponentHp - amount)
         let oppTargetId = opponentId.isEmpty ? "opponent" : opponentId
 
         Task.detached {
-            let oppHpUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/players/\(oppTargetId)/hp.json")!
-            var hpReq = URLRequest(url: oppHpUrl)
-            hpReq.httpMethod = "PUT"
-            hpReq.httpBody = try? JSONSerialization.data(withJSONObject: max(0, opponentHp))
-            _ = try? await URLSession.shared.data(for: hpReq)
+            try? await FirebaseRTDB.shared.put(path: "challenges/\(challengeId)/players/\(oppTargetId)/hp", payload: max(0, opponentHp))
 
             // Post action
-            let actUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/last_action.json")!
-            var actReq = URLRequest(url: actUrl)
-            actReq.httpMethod = "PUT"
             let actData: [String: Any] = [
                 "action_id": UUID().uuidString,
                 "type": "DAMAGE",
@@ -1300,27 +1278,18 @@ struct SubjectTestActivityView: View {
                 "amount": amount,
                 "actor_name": myName
             ]
-            actReq.httpBody = try? JSONSerialization.data(withJSONObject: actData)
-            _ = try? await URLSession.shared.data(for: actReq)
+            try? await FirebaseRTDB.shared.put(path: "challenges/\(challengeId)/last_action", payload: actData)
 
             // Update my score in Firebase
-            let myScoreUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/players/\(myUid)/score.json")!
-            var scoreReq = URLRequest(url: myScoreUrl)
-            scoreReq.httpMethod = "PUT"
-            scoreReq.httpBody = try? JSONSerialization.data(withJSONObject: myScore)
-            _ = try? await URLSession.shared.data(for: scoreReq)
+            try? await FirebaseRTDB.shared.put(path: "challenges/\(challengeId)/players/\(myUid)/score", payload: myScore)
         }
     }
 
     private func syncMyHpToFirebase() {
         guard isChallenge && !challengeId.isEmpty else { return }
-        let myUid = String(session.userId > 0 ? session.userId : 1)
+        let myUid = "\(session.userId)_ios"
         Task.detached {
-            let myHpUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/players/\(myUid)/hp.json")!
-            var hpReq = URLRequest(url: myHpUrl)
-            hpReq.httpMethod = "PUT"
-            hpReq.httpBody = try? JSONSerialization.data(withJSONObject: max(0, currentHp))
-            _ = try? await URLSession.shared.data(for: hpReq)
+            try? await FirebaseRTDB.shared.put(path: "challenges/\(challengeId)/players/\(myUid)/hp", payload: max(0, currentHp))
         }
     }
 
@@ -1391,13 +1360,11 @@ struct SubjectTestActivityView: View {
         cleanupMultiplayer()
 
         // Mark finished in Firebase
-        let myUid = String(session.userId > 0 ? session.userId : 1)
+        let myUid = "\(session.userId)_ios"
         if isChallenge && !challengeId.isEmpty {
-            let finUrl = URL(string: "\(dbBaseUrl)/challenges/\(challengeId)/players/\(myUid)/isFinished.json")!
-            var req = URLRequest(url: finUrl)
-            req.httpMethod = "PUT"
-            req.httpBody = try? JSONSerialization.data(withJSONObject: true)
-            Task { _ = try? await URLSession.shared.data(for: req) }
+            Task {
+                try? await FirebaseRTDB.shared.put(path: "challenges/\(challengeId)/players/\(myUid)/isFinished", payload: true)
+            }
         }
 
         let correctCount = reviewItems.filter { $0.isCorrect }.count
