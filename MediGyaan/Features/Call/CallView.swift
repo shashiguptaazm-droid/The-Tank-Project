@@ -74,11 +74,10 @@ private struct CallRoomContent: View {
             switch phase {
             case .connected:
                 connectedAt = Date()
-            case .ended where model.errorMessage != nil:
-                // A failure has nothing left to show; surface it briefly, then
-                // close so the user is not stranded on a dead screen.
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3) { dismiss() }
-            case .connecting, .ended:
+            case .ended:
+                // Auto dismiss after 1.5 seconds on hangup or call ending (matching Android parity)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { dismiss() }
+            case .connecting:
                 break
             }
         }
@@ -300,7 +299,8 @@ private struct CallRoomContent: View {
     // MARK: - Controls
 
     private var controls: some View {
-        HStack(spacing: AppTheme.Spacing.lg) {
+        HStack(spacing: AppTheme.Spacing.md) {
+            // Mute / Unmute
             controlButton(
                 systemImage: model.microphoneEnabled ? "mic.fill" : "mic.slash.fill",
                 label: model.microphoneEnabled ? "Mute" : "Unmute",
@@ -309,7 +309,17 @@ private struct CallRoomContent: View {
                 Task { await model.toggleMicrophone() }
             }
 
-            if model.kind == .video {
+            // Speaker / Earpiece
+            controlButton(
+                systemImage: model.isSpeakerOn ? "speaker.wave.3.fill" : "speaker.slash.fill",
+                label: model.isSpeakerOn ? "Speaker" : "Earpiece",
+                isActive: model.isSpeakerOn
+            ) {
+                model.toggleSpeaker()
+            }
+
+            if model.kind == .video || model.cameraEnabled {
+                // Camera On / Off
                 controlButton(
                     systemImage: model.cameraEnabled ? "video.fill" : "video.slash.fill",
                     label: model.cameraEnabled ? "Camera off" : "Camera on",
@@ -318,6 +328,7 @@ private struct CallRoomContent: View {
                     Task { await model.toggleCamera() }
                 }
 
+                // Flip Camera
                 controlButton(
                     systemImage: "arrow.triangle.2.circlepath.camera.fill",
                     label: "Flip",
@@ -325,8 +336,18 @@ private struct CallRoomContent: View {
                 ) {
                     Task { await model.flipCamera() }
                 }
+            } else {
+                // Upgrade Audio Call to Video Call
+                controlButton(
+                    systemImage: "video.fill",
+                    label: "Video",
+                    isActive: false
+                ) {
+                    Task { await model.upgradeToVideo() }
+                }
             }
 
+            // End Call Button
             Button {
                 Task {
                     await model.end()
@@ -336,7 +357,7 @@ private struct CallRoomContent: View {
                 Image(systemName: "phone.down.fill")
                     .font(.system(size: 22, weight: .semibold))
                     .foregroundStyle(.white)
-                    .frame(width: 64, height: 64)
+                    .frame(width: 58, height: 58)
                     .background(Circle().fill(AppTheme.Palette.error))
             }
             .accessibilityLabel("End call")

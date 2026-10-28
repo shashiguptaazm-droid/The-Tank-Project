@@ -150,6 +150,19 @@ final class CallLogManager {
         saveCalls(list)
     }
 
+    func updateCallCompletion(roomName: String, durationSeconds: Int, status: CallStatus = .connected) {
+        var list = getAllCalls()
+        if let idx = list.firstIndex(where: { $0.roomName == roomName }) {
+            var item = list[idx]
+            item.durationSeconds = durationSeconds
+            item.status = status
+            item.dataUsageBytes = item.isVideo ? Int64(durationSeconds * 280_000) : Int64(durationSeconds * 16_000)
+            list[idx] = item
+            saveCalls(list)
+            RemoteLogger.log(tag: "CallLog_Update", message: "Updated call \(roomName): duration=\(durationSeconds)s, status=\(status.rawValue)")
+        }
+    }
+
     func deleteCall(callId: String) {
         var list = getAllCalls()
         list.removeAll { $0.id == callId }

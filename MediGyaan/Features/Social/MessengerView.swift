@@ -59,8 +59,20 @@ struct MessengerView: View {
     @State private var selectedPhotoItem: PhotosPickerItem? = nil
     @State private var fullscreenImageURL: URL? = nil
 
+/// Represents an active incoming call banner/cover.
+struct IncomingCallData: Identifiable {
+    let id: String
+    let room: String
+    let isVideo: Bool
+    let peerId: Int
+    let peerName: String
+    let peerAvatar: String
+}
+
     // AI & Calling
     @State private var pendingCall: PendingCall? = nil
+    @State private var activeIncomingCall: IncomingCallData? = nil
+    @State private var dismissedCallInviteIds: Set<String> = []
     @State private var showAiSuggestion = false
     @State private var isAiThinking = false
     @State private var pollingTask: Task<Void, Never>? = nil
@@ -93,6 +105,55 @@ struct MessengerView: View {
                     api: api,
                     session: session
                 )
+            )
+        }
+        .fullScreenCover(item: $activeIncomingCall) { incoming in
+            IncomingCallView(
+                peerName: incoming.peerName,
+                peerAvatar: incoming.peerAvatar,
+                isVideo: incoming.isVideo,
+                roomName: incoming.room,
+                onAccept: {
+                    CallRingtoneManager.shared.stopRinging()
+                    dismissedCallInviteIds.insert(incoming.id)
+                    let callItem = CallLogItem(
+                        peerId: incoming.peerId,
+                        peerName: incoming.peerName,
+                        peerAvatar: incoming.peerAvatar,
+                        roomName: incoming.room,
+                        callType: incoming.isVideo ? "VIDEO" : "AUDIO",
+                        direction: .incoming,
+                        timestamp: Int64(Date().timeIntervalSince1970 * 1000),
+                        durationSeconds: 0,
+                        dataUsageBytes: 0,
+                        status: .connected
+                    )
+                    CallLogManager.shared.addCall(callItem)
+                    activeIncomingCall = nil
+                    pendingCall = PendingCall(
+                        room: incoming.room,
+                        kind: incoming.isVideo ? .video : .audio,
+                        peerName: incoming.peerName
+                    )
+                },
+                onDecline: {
+                    CallRingtoneManager.shared.stopRinging()
+                    dismissedCallInviteIds.insert(incoming.id)
+                    let callItem = CallLogItem(
+                        peerId: incoming.peerId,
+                        peerName: incoming.peerName,
+                        peerAvatar: incoming.peerAvatar,
+                        roomName: incoming.room,
+                        callType: incoming.isVideo ? "VIDEO" : "AUDIO",
+                        direction: .missed,
+                        timestamp: Int64(Date().timeIntervalSince1970 * 1000),
+                        durationSeconds: 0,
+                        dataUsageBytes: 0,
+                        status: .declined
+                    )
+                    CallLogManager.shared.addCall(callItem)
+                    activeIncomingCall = nil
+                }
             )
         }
         .sheet(isPresented: $showCallsList) {
@@ -409,8 +470,8 @@ struct MessengerView: View {
                         ForEach(messages) { message in
                             MessageBubbleCard(
                                 message: message,
-                                onCallInviteClick: { room in
-                                    joinCallInvite(room: room, peer: user)
+                                onCallInviteClick: { room, isVideo in
+                                    joinCallInvite(room: room, isVideo: isVideo, peer: user)
                                 },
                                 onImageClick: { url in
                                     fullscreenImageURL = url
@@ -602,6 +663,25 @@ struct MessengerView: View {
             let fetched = try await api.social.messages(conversationId: String(user.id), userId: session.userId)
             if fetched != self.messages {
                 self.messages = fetched
+            }
+            // Check for fresh incoming call invite
+            if let latest = fetched.last,
+               !latest.isMine,
+               (latest.text.starts(with: "VIDEO_CALL_INVITE:") || latest.text.starts(with: "AUDIO_CALL_INVITE:")),
+               abs(Date().timeIntervalSince(latest.sentAt)) < 45,
+               !dismissedCallInviteIds.contains(latest.id),
+               pendingCall == nil,
+               activeIncomingCall == nil {
+                let isVideo = latest.text.starts(with: "VIDEO_CALL_INVITE:")
+                let room = isVideo ? latest.text.replacingOccurrences(of: "VIDEO_CALL_INVITE:", with: "") : latest.text.replacingOccurrences(of: "AUDIO_CALL_INVITE:", with: "")
+                activeIncomingCall = IncomingCallData(
+                    id: latest.id,
+                    room: room,
+                    isVideo: isVideo,
+                    peerId: user.id,
+                    peerName: user.name,
+                    peerAvatar: user.image
+                )
             }
         } catch {
             // Silently keep current messages during background polling
@@ -795,9 +875,8 @@ struct MessengerView: View {
         )
     }
 
-    private func joinCallInvite(room: String, peer: ChatUserItem) {
-        let isVideo = !room.lowercased().contains("audio")
-        RemoteLogger.log(tag: "Messenger_Call_Joined", message: "Joining call room \(room)")
+    private func joinCallInvite(room: String, isVideo: Bool, peer: ChatUserItem) {
+        RemoteLogger.log(tag: "Messenger_Call_Joined", message: "Joining \(isVideo ? "video" : "audio") call room \(room)")
 
         let callItem = CallLogItem(
             peerId: peer.id,
@@ -1029,7 +1108,7 @@ private struct ChatUserRow: View {
 
 private struct MessageBubbleCard: View {
     let message: ChatMessage
-    let onCallInviteClick: (String) -> Void
+    let onCallInviteClick: (String, Bool) -> Void
     let onImageClick: (URL) -> Void
     let onAskAiAboutDoc: (String, String) -> Void
     let onDelete: (ChatMessage) -> Void
@@ -1142,7 +1221,7 @@ private struct MessageBubbleCard: View {
         let room = isVideo ? message.text.replacingOccurrences(of: "VIDEO_CALL_INVITE:", with: "") : message.text.replacingOccurrences(of: "AUDIO_CALL_INVITE:", with: "")
 
         return Button {
-            onCallInviteClick(room)
+            onCallInviteClick(room, isVideo)
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: isVideo ? "video.circle.fill" : "phone.circle.fill")
