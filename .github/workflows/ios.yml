@@ -123,8 +123,16 @@ jobs:
           cp -r "build/MediGyaan.xcarchive/Products/Applications/MediGyaan.app" build/Payload/
 
           if command -v codesign &>/dev/null; then
-            echo "Applying ad-hoc signature to payload..."
-            codesign --force --deep --sign - "build/Payload/MediGyaan.app" 2>/dev/null || true
+            echo "Applying ad-hoc signature to frameworks and payload..."
+            if [ -d "build/Payload/MediGyaan.app/Frameworks" ]; then
+              for fw in build/Payload/MediGyaan.app/Frameworks/*; do
+                if [ -d "$fw" ]; then
+                  echo "Signing embedded framework: $fw"
+                  codesign --force --sign - --timestamp=none "$fw" 2>/dev/null || true
+                fi
+              done
+            fi
+            codesign --force --sign - --timestamp=none "build/Payload/MediGyaan.app" 2>/dev/null || true
           fi
 
           cd build

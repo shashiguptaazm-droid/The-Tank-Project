@@ -58,6 +58,9 @@ targets:
         AD_HOC_CODE_SIGNING_ALLOWED: YES
         TARGETED_DEVICE_FAMILY: "1,2"
         SWIFT_EMIT_LOC_STRINGS: YES
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "@executable_path/Frameworks"
 
   MediGyaanTests:
     type: bundle.unit-test

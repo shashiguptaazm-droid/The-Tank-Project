@@ -317,4 +317,10 @@ extension View {
     func appColorScheme() -> some View {
         modifier(AppColorSchemeModifier())
     }
+
+    /// Direct overload that applies the color scheme without requiring an
+    /// ancestor EnvironmentObject.
+    func appColorScheme(_ theme: ThemeController) -> some View {
+        preferredColorScheme(theme.colorScheme)
+    }
 }

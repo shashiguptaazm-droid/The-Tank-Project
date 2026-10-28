@@ -33,11 +33,11 @@ struct MediGyaanApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .preferredColorScheme(theme.colorScheme)
                 .environmentObject(session)
                 .environmentObject(theme)
                 .environment(\.api, .live)
                 .tint(AppTheme.Palette.primary)
-                .appColorScheme()
                 .onChange(of: scenePhase) { newPhase in
                     RemoteLogger.log(tag: "AppLifecycle", message: "Scene phase changed to: \(newPhase)")
                 }
