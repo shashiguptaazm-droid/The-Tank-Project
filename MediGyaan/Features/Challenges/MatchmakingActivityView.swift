@@ -35,6 +35,7 @@ struct MatchmakingActivityView: View {
     @State private var userId: Int = 94
     @State private var queueUserId: String = "94_ios"
     @State private var userName: String = "Shashi Gupta"
+    @State private var isLaunchingGame: Bool = false
 
     @State private var showMatchReadyDialog: Bool = false
     @State private var radarRotation: Double = 0
@@ -459,8 +460,6 @@ struct MatchmakingActivityView: View {
                         if k == queueId { continue }
                         if (v["status"] as? String) == "waiting" {
                             let uId = v["userId"] as? String ?? ""
-                            // Prevent matching against self
-                            if uId == queueUserId { continue }
                             let uName = v["userName"] as? String ?? "Player"
                             activePlayers.append(QueuePlayer(queueKey: k, userId: uId, userName: uName))
                         }
@@ -475,14 +474,14 @@ struct MatchmakingActivityView: View {
                         pollingTask?.cancel()
                         countdownTimer?.invalidate()
 
-                        // Deterministic tie-breaker matching Android lines 788-792
+                        // Deterministic tie-breaker matching Android
                         let sortedPair = Array(activePlayers.sorted { $0.queueKey < $1.queueKey }.prefix(2))
-                        let canonicalHostUid = sortedPair[0].userId
                         let deterministicCid = "pvp_\(sanitizeKey(sortedPair[0].queueKey))_\(sanitizeKey(sortedPair[1].queueKey))"
 
-                        RemoteLogger.log(tag: "Matchmaking_TieBreaker", message: "Canonical host is \(canonicalHostUid), cid=\(deterministicCid)")
+                        RemoteLogger.log(tag: "Matchmaking_TieBreaker", message: "Canonical host is \(sortedPair[0].queueKey), cid=\(deterministicCid)")
 
-                        if canonicalHostUid == queueUserId || canonicalHostUid == String(userId) {
+                        let amIHost = (sortedPair[0].queueKey == queueId)
+                        if amIHost {
                             // This device is the canonical host!
                             self.isHost = true
                             await createMultiplayerChallenge(challengeId: deterministicCid, opponent: sortedPair[1])
@@ -635,6 +634,8 @@ struct MatchmakingActivityView: View {
     // MARK: - Game Launch
 
     private func launchGame() {
+        guard !isLaunchingGame else { return }
+        isLaunchingGame = true
         stopContinuousMusic()
         cleanupQueue()
 
