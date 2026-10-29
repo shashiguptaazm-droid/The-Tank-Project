@@ -1,16 +1,16 @@
 import Foundation
 
 /// Ports Android's `RagChunk` from `RagHelper.kt`.
-public struct RagChunk: Codable, Equatable, Hashable {
-    public let book: String
-    public let bookId: String
-    public let page: String
-    public let section: String
-    public let chunkId: String
-    public let text: String
-    public let pages: Int
+struct RagChunk: Codable, Equatable, Hashable {
+    let book: String
+    let bookId: String
+    let page: String
+    let section: String
+    let chunkId: String
+    let text: String
+    let pages: Int
 
-    public init(
+    init(
         book: String,
         bookId: String,
         page: String,
@@ -40,16 +40,16 @@ public struct RagChunk: Codable, Equatable, Hashable {
 }
 
 /// Ports Android's `RagFigure` from `RagHelper.kt`.
-public struct RagFigure: Codable, Equatable, Hashable {
-    public let figureId: String
-    public let book: String
-    public let bookId: String
-    public let page: Int
-    public let label: String
-    public let caption: String
-    public let path: String
+struct RagFigure: Codable, Equatable, Hashable {
+    let figureId: String
+    let book: String
+    let bookId: String
+    let page: Int
+    let label: String
+    let caption: String
+    let path: String
 
-    public init(
+    init(
         figureId: String,
         book: String,
         bookId: String,
@@ -79,11 +79,11 @@ public struct RagFigure: Codable, Equatable, Hashable {
 }
 
 /// Ports Android's `RagSearchResult` from `RagHelper.kt`.
-public struct RagSearchResult: Equatable {
-    public let results: [RagChunk]
-    public let figures: [RagFigure]
+struct RagSearchResult: Equatable {
+    let results: [RagChunk]
+    let figures: [RagFigure]
 
-    public init(results: [RagChunk] = [], figures: [RagFigure] = []) {
+    init(results: [RagChunk] = [], figures: [RagFigure] = []) {
         self.results = results
         self.figures = figures
     }
@@ -91,8 +91,8 @@ public struct RagSearchResult: Equatable {
 
 /// 1:1 Swift port of Android's `RagHelper.kt`.
 /// Connects to VPS RAG search endpoint at `https://medigyaan.com/webai/ragpage/search`.
-public final class RagHelper {
-    public static let shared = RagHelper()
+final class RagHelper {
+    static let shared = RagHelper()
 
     private let ragSearchURL = URL(string: "https://medigyaan.com/webai/ragpage/search")!
     private let maxContextChars = 6500
@@ -101,7 +101,7 @@ public final class RagHelper {
     private init() {}
 
     /// Searches the MediGyaan textbook corpus for excerpts and figures matching the query.
-    public func search(query: String, k: Int = 8) async -> RagSearchResult {
+    func search(query: String, k: Int = 8) async -> RagSearchResult {
         let cleanQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleanQuery.isEmpty else {
             return RagSearchResult()
@@ -180,7 +180,7 @@ public final class RagHelper {
     }
 
     /// Formats the textbook excerpts into system prompt context.
-    public func buildContext(results: [RagChunk], figures: [RagFigure] = []) -> String {
+    func buildContext(results: [RagChunk], figures: [RagFigure] = []) -> String {
         guard !results.isEmpty else { return "" }
         var out = "BOOK LIBRARY EXCERPTS (MediGyaan ingestion corpus — treat as your primary source):\n\n"
         var len = out.count
@@ -216,7 +216,7 @@ public final class RagHelper {
     }
 
     /// Replaces inline `(Book Title, p. X)` citations with clickable marker tokens `[RAGLINK:bookId:page:pages|label]`.
-    public func linkifyCitations(reply: String, results: [RagChunk]) -> String {
+    func linkifyCitations(reply: String, results: [RagChunk]) -> String {
         var text = reply
         guard !text.isEmpty, !results.isEmpty else { return text }
 
@@ -254,7 +254,7 @@ public final class RagHelper {
     }
 
     /// Generates a "**Sources:** ..." footer from the results.
-    public func sourcesFooter(results: [RagChunk]) -> String {
+    func sourcesFooter(results: [RagChunk]) -> String {
         var seen = Set<String>()
         var lines: [String] = []
 
@@ -276,7 +276,7 @@ public final class RagHelper {
     }
 
     /// Appends `[RAGFIG:...]` markers to the reply text for downstream extraction and UI display.
-    public func figureMarkers(figures: [RagFigure]) -> String {
+    func figureMarkers(figures: [RagFigure]) -> String {
         guard !figures.isEmpty else { return "" }
         let clean: (String) -> String = { s in
             s.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -301,7 +301,7 @@ public final class RagHelper {
 
     /// Extracts RAG book sources, links, and figures for UI card rendering.
     /// Ports Android's `extractRagBookSources` from `AiChatActivity.kt`.
-    public static func extractRagBookSources(ownerTurn: Int, content: String) -> [RagBookSource] {
+    static func extractRagBookSources(ownerTurn: Int, content: String) -> [RagBookSource] {
         guard !content.isEmpty else { return [] }
 
         // [RAGFIG:bid:page|label|caption|path|book]
