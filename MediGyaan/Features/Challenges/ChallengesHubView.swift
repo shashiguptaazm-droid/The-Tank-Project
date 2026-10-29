@@ -197,7 +197,7 @@ struct TopicChallengePickerView: View {
                 ForEach(Array((state.value ?? []).enumerated()), id: \.element.id) { index, topic in
                     if mode == .challenge {
                         NavigationLink {
-                            MatchmakingArenaFlowView(
+                            TopicChallengeSelectionView(
                                 subject: subject.isEmpty ? "NEET PG" : subject,
                                 topic: topic.name
                             )
