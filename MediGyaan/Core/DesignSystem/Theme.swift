@@ -192,6 +192,8 @@ enum AppTheme {
         static let error = Color(hex: 0xFF1744)
         /// `#00E5FF` — cyan accent.
         static let cyan = Color(hex: 0x00E5FF)
+        /// Alias for cyan accent.
+        static let primaryCyan = cyan
 
         // BATTLE MODE CARDS (distinct tint per mode)
         /// `#251B45` — Ranked battle.

@@ -436,6 +436,29 @@ enum AiChatIntentDetector {
         return nil
     }
 
+    /// Ports Android's `detectCitationList` — detects if user provided references to validate or asked for citations.
+    static func detectCitationList(userText: String, assistantReply: String) -> [PubMedCitationEntry]? {
+        let patternWants = #"(?i)(?:validate|check|verify|confirm|look\s*up|are\s*these|are\s*the|is\s*this|is\s*that)\b[^\n]{0,90}\b(?:reference|citation|source|pubmed|pmid|doi)\b"#
+        let patternAsking = #"(?i)\b(?:list|give|provide|need|write|format|find|share|suggest|include)\b[^\n]{0,50}\b(?:references|citations|sources|pubmed)\b"#
+
+        let userWantsValidation = userText.range(of: patternWants, options: .regularExpression) != nil
+        let userAskingForReferences = userText.range(of: patternAsking, options: .regularExpression) != nil
+        let userAskedForCitationWork = userWantsValidation || userAskingForReferences
+
+        let userEntries = AiChatPubMedValidator.shared.extractCitationEntries(from: userText)
+        let userHasRealList = AiChatPubMedValidator.shared.looksLikeReferenceBlock(userText) && userEntries.count >= 2
+
+        if userHasRealList && userAskedForCitationWork {
+            return userEntries
+        }
+
+        if userAskedForCitationWork && AiChatPubMedValidator.shared.looksLikeReferenceBlock(assistantReply) {
+            let aiEntries = AiChatPubMedValidator.shared.extractCitationEntries(from: assistantReply)
+            if aiEntries.count >= 2 { return aiEntries }
+        }
+        return nil
+    }
+
     /// Ports `fallbackKeywords` — client-side keyword tokens used when the marker is missing.
     static func fallbackKeywords(_ userText: String) -> [String] {
         let cleaned = userText.lowercased()
@@ -1491,13 +1514,13 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
                 processedReply = RagHelper.shared.linkifyCitations(reply: processedReply, results: ragResult.results)
                 let footer = RagHelper.shared.sourcesFooter(results: ragResult.results)
                 if !footer.isEmpty && !processedReply.contains("**Sources:**") {
-                    processedReply = processedReply.trimEnd() + "\n\n" + footer
+                    processedReply = processedReply.trimmingCharacters(in: .whitespacesAndNewlines) + "\n\n" + footer
                 }
             }
             if !ragResult.figures.isEmpty {
                 let figMarkers = RagHelper.shared.figureMarkers(figures: ragResult.figures)
                 if !figMarkers.isEmpty && !processedReply.contains("[RAGFIG:") {
-                    processedReply = processedReply.trimEnd() + figMarkers
+                    processedReply = processedReply.trimmingCharacters(in: .whitespacesAndNewlines) + figMarkers
                 }
             }
 
