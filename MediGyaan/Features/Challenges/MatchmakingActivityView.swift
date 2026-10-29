@@ -498,7 +498,7 @@ struct MatchmakingActivityView: View {
                 // If non-host guest waits without match for > 20s, pair with bot
                 if !isHost {
                     guestAttempts += 1
-                    if guestAttempts > 14 {
+                    if guestAttempts > 35 {
                         pollingTask?.cancel()
                         await pairWithBot()
                         break
@@ -577,7 +577,7 @@ struct MatchmakingActivityView: View {
 
     private func waitForChallengeReady(cid: String) async {
         statusMsg = "Joining opponent's arena..."
-        for _ in 0..<30 {
+        for _ in 0..<45 {
             try? await Task.sleep(nanoseconds: 1_000_000_000)
             if let obj = try? await FirebaseRTDB.shared.get(path: "challenges/\(cid)") as? [String: Any] {
                 let st = obj["status"] as? String ?? ""
