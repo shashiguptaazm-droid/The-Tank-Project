@@ -98,6 +98,8 @@ struct AiChatView: View {
     @State private var renameTarget: AiChatSessionMeta?
     @State private var renameText = ""
     @State private var sharePayload: AiChatShareSheet?
+    @State private var activePdfViewer: ActivePdfPageViewer? = nil
+    @State private var activeFigureDetail: ChatFigureJson? = nil
 
     /// Ports `shareSession` — the `ACTION_SEND` transcript handed to the share sheet.
     private struct AiChatShareSheet: Identifiable {
@@ -173,6 +175,19 @@ struct AiChatView: View {
                         onDismiss: { viewModel.isVariablesModalPresented = false }
                     )
                 }
+            }
+            .sheet(item: $activePdfViewer) { viewer in
+                RagPdfPageSheet(viewer: viewer) {
+                    activePdfViewer = nil
+                }
+            }
+            .sheet(item: $activeFigureDetail) { fig in
+                FigureDetailSheet(figure: fig, onDismiss: {
+                    activeFigureDetail = nil
+                }, onViewPage: { bookId, page in
+                    activeFigureDetail = nil
+                    activePdfViewer = ActivePdfPageViewer(bookId: bookId, bookTitle: fig.bookReference, page: page, totalPages: 0)
+                })
             }
             .fileImporter(
                 isPresented: $isShowingDocPicker,
@@ -439,9 +454,9 @@ struct AiChatView: View {
         .background(AiChatPalette.chrome)
     }
 
-    /// Ports the chip callbacks — "📄 Upload Doc" opens the document picker.
+    /// Ports the chip callbacks — "📄 Chat PDF" / "📄 Upload Doc" opens the document picker.
     private func handleChip(_ chip: String) {
-        if chip == "📄 Upload Doc" {
+        if chip == "📄 Chat PDF" || chip == "📄 Upload Doc" {
             isShowingDocPicker = true
             return
         }
@@ -636,7 +651,7 @@ struct AiChatView: View {
                 .padding(.top, 2)
 
                 VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-                    Text(message.text)
+                    Text(cleanAssistantTextForDisplay(message.text))
                         .font(AppTheme.Font.body)
                         .foregroundStyle(AppTheme.Ink.textPrimary)
                         .lineSpacing(3)
@@ -760,6 +775,11 @@ struct AiChatView: View {
             }
             if let pdfAbstracts = message.pdfAbstractsCard {
                 pdfAbstractsCard(pdfAbstracts)
+            }
+            if !message.ragBooks.isEmpty {
+                ForEach(message.ragBooks) { ragBook in
+                    ragBookCard(ragBook)
+                }
             }
             if !message.relatedQuestions.isEmpty {
                 relatedQuestionsCard(message.relatedQuestions)
@@ -2371,5 +2391,426 @@ struct ShareSheet: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
+// MARK: - RAG Textbook & Figures Components
+
+extension AiChatView {
+    func cleanAssistantTextForDisplay(_ text: String) -> String {
+        // Strip [RAGFIG:...] blocks from displayed text
+        let figPattern = #"\b?\[RAGFIG:[^\]]+\]"#
+        var cleaned = text.replacingOccurrences(of: figPattern, with: "", options: .regularExpression)
+        // Convert [RAGLINK:bid:page:pages|label] to plain label for display
+        let linkPattern = #"\b?\[RAGLINK:[^:]+:\d+:\d+\|([^\]]+)\]"#
+        cleaned = cleaned.replacingOccurrences(of: linkPattern, with: "$1", options: .regularExpression)
+        return cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    @ViewBuilder
+    func ragBookCard(_ ragBook: RagBookSource) -> some View {
+        RagBookCardView(
+            ragBook: ragBook,
+            onViewBookPage: { bookId, page in
+                activePdfViewer = ActivePdfPageViewer(
+                    bookId: bookId,
+                    bookTitle: ragBook.bookTitle,
+                    page: page,
+                    totalPages: 0
+                )
+            },
+            onFigureClick: { fig in
+                activeFigureDetail = fig
+            }
+        )
+    }
+}
+
+/// Ports Android's `RagBookCard` from `AiChatActivity.kt`.
+struct RagBookCardView: View {
+    let ragBook: RagBookSource
+    let onViewBookPage: (String, Int) -> Void
+    let onFigureClick: (ChatFigureJson) -> Void
+
+    @State private var figurePage: Int = 0
+    private let pageSize = 4
+
+    var body: some View {
+        let figures = ragBook.figures
+        let totalPages = (figures.count + pageSize - 1) / max(1, pageSize)
+        let safePage = min(max(0, figurePage), max(0, totalPages - 1))
+        let currentFigures = Array(figures.dropFirst(safePage * pageSize).prefix(pageSize))
+
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+            // Book header row
+            HStack(alignment: .center, spacing: AppTheme.Spacing.sm) {
+                Text("📖")
+                    .font(.system(size: 18))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(ragBook.bookTitle.isEmpty ? "Medical Reference" : ragBook.bookTitle)
+                        .font(AppTheme.Font.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundStyle(AppTheme.Ink.textPrimary)
+                        .lineLimit(1)
+
+                    if !ragBook.pageNumber.isEmpty {
+                        Text("Page \(ragBook.pageNumber)")
+                            .font(AppTheme.Font.caption)
+                            .foregroundStyle(AppTheme.Ink.textHint)
+                    }
+                }
+
+                Spacer()
+
+                let bookId = ragBook.bookId.isEmpty ? ragBook.extractedText : ragBook.bookId
+                let pageInt = Int(ragBook.pageNumber) ?? 1
+                if !bookId.isEmpty {
+                    Button {
+                        onViewBookPage(bookId, pageInt)
+                    } label: {
+                        Text("View Page")
+                            .font(AppTheme.Font.caption)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(AppTheme.Ink.primaryCyan)
+                            .padding(.horizontal, AppTheme.Spacing.sm)
+                            .padding(.vertical, 6)
+                            .background(AppTheme.Ink.primaryCyan.opacity(0.15))
+                            .clipShape(Capsule())
+                    }
+                }
+            }
+
+            // Figures and diagrams section
+            if !figures.isEmpty {
+                Divider()
+                    .overlay(AiChatPalette.bubbleStroke)
+
+                HStack {
+                    Text("Figures & Diagrams (\(figures.count))")
+                        .font(AppTheme.Font.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(AppTheme.Ink.primaryCyan)
+
+                    Spacer()
+
+                    if totalPages > 1 {
+                        Text("Page \(safePage + 1) of \(totalPages)")
+                            .font(AppTheme.Font.micro)
+                            .foregroundStyle(AppTheme.Ink.textHint)
+                    }
+                }
+
+                // 2x2 grid of 4 figures per page
+                LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
+                    ForEach(currentFigures) { fig in
+                        Button {
+                            onFigureClick(fig)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                let figUrl = fig.imageUrl.hasPrefix("http") ? fig.imageUrl : "https://medigyaan.com/webai/ragpage/figure?path=\(fig.imageUrl)"
+                                AsyncImage(url: URL(string: figUrl)) { phase in
+                                    switch phase {
+                                    case .empty:
+                                        ProgressView()
+                                            .frame(maxWidth: .infinity, minHeight: 90)
+                                    case .success(let image):
+                                        image
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                            .frame(height: 90)
+                                            .clipped()
+                                    case .failure:
+                                        Color.black.opacity(0.2)
+                                            .frame(height: 90)
+                                            .overlay(Image(systemName: "photo").foregroundStyle(.gray))
+                                    @unknown default:
+                                        Color.clear.frame(height: 90)
+                                    }
+                                }
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+
+                                Text(fig.title.isEmpty ? "Figure" : fig.title)
+                                    .font(AppTheme.Font.micro)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(AppTheme.Ink.textPrimary)
+                                    .lineLimit(1)
+
+                                if !fig.caption.isEmpty {
+                                    Text(fig.caption)
+                                        .font(.system(size: 10))
+                                        .foregroundStyle(AppTheme.Ink.textHint)
+                                        .lineLimit(1)
+                                }
+                            }
+                            .padding(6)
+                            .background(AiChatPalette.card)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(AiChatPalette.chipStroke, lineWidth: 0.8))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+
+                // Pagination controls when figures > 4
+                if totalPages > 1 {
+                    HStack {
+                        Button {
+                            if safePage > 0 { figurePage = safePage - 1 }
+                        } label: {
+                            Text("◀ Prev")
+                                .font(AppTheme.Font.micro)
+                                .foregroundStyle(safePage > 0 ? AppTheme.Ink.primaryCyan : AppTheme.Ink.textHint)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(AiChatPalette.chip)
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                        }
+                        .disabled(safePage <= 0)
+
+                        Spacer()
+
+                        Text("\(safePage * pageSize + 1)–\(min((safePage + 1) * pageSize, figures.count)) of \(figures.count)")
+                            .font(AppTheme.Font.micro)
+                            .foregroundStyle(AppTheme.Ink.textHint)
+
+                        Spacer()
+
+                        Button {
+                            if safePage < totalPages - 1 { figurePage = safePage + 1 }
+                        } label: {
+                            Text("Next ▶")
+                                .font(AppTheme.Font.micro)
+                                .foregroundStyle(safePage < totalPages - 1 ? AppTheme.Ink.primaryCyan : AppTheme.Ink.textHint)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(AiChatPalette.chip)
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                        }
+                        .disabled(safePage >= totalPages - 1)
+                    }
+                    .padding(.top, 2)
+                }
+            }
+        }
+        .padding(AppTheme.Spacing.md)
+        .background(AiChatPalette.bubble)
+        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md))
+        .overlay(RoundedRectangle(cornerRadius: AppTheme.Radius.md).stroke(AiChatPalette.bubbleStroke, lineWidth: 1))
+    }
+}
+
+/// Ports Android's `RagPdfPageDialog` from `AiChatActivity.kt`.
+struct RagPdfPageSheet: View {
+    let viewer: ActivePdfPageViewer
+    let onDismiss: () -> Void
+
+    @State private var currentPage: Int = 1
+
+    init(viewer: ActivePdfPageViewer, onDismiss: @escaping () -> Void) {
+        self.viewer = viewer
+        self.onDismiss = onDismiss
+        _currentPage = State(initialValue: max(1, viewer.page))
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                // Textbook Page Viewer
+                GeometryReader { geo in
+                    ScrollView([.horizontal, .vertical]) {
+                        let pageUrl = "https://medigyaan.com/webai/ragpage/page?book=\(viewer.bookId)&n=\(currentPage)"
+                        AsyncImage(url: URL(string: pageUrl)) { phase in
+                            switch phase {
+                            case .empty:
+                                VStack(spacing: 12) {
+                                    ProgressView()
+                                        .tint(.cyan)
+                                    Text("Loading Textbook Page \(currentPage)…")
+                                        .font(AppTheme.Font.caption)
+                                        .foregroundStyle(.gray)
+                                }
+                                .frame(width: geo.size.width, height: geo.size.height)
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(minWidth: geo.size.width)
+                            case .failure:
+                                VStack(spacing: 12) {
+                                    Image(systemName: "exclamationmark.triangle")
+                                        .font(.largeTitle)
+                                        .foregroundStyle(.orange)
+                                    Text("Could not load page \(currentPage)")
+                                        .font(AppTheme.Font.caption)
+                                        .foregroundStyle(.gray)
+                                }
+                                .frame(width: geo.size.width, height: geo.size.height)
+                            @unknown default:
+                                EmptyView()
+                            }
+                        }
+                    }
+                }
+                .background(Color(hex: 0x1E1E1E))
+
+                // Bottom pagination bar
+                HStack {
+                    Button {
+                        if currentPage > 1 { currentPage -= 1 }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "chevron.left")
+                            Text("Prev")
+                        }
+                        .font(AppTheme.Font.subheadline)
+                        .foregroundStyle(currentPage > 1 ? AppTheme.Ink.primaryCyan : .gray)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(AiChatPalette.chip)
+                        .clipShape(Capsule())
+                    }
+                    .disabled(currentPage <= 1)
+
+                    Spacer()
+
+                    Text("Page \(currentPage)\(viewer.totalPages > 0 ? " of \(viewer.totalPages)" : "")")
+                        .font(AppTheme.Font.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.white)
+
+                    Spacer()
+
+                    Button {
+                        currentPage += 1
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text("Next")
+                            Image(systemName: "chevron.right")
+                        }
+                        .font(AppTheme.Font.subheadline)
+                        .foregroundStyle(AppTheme.Ink.primaryCyan)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(AiChatPalette.chip)
+                        .clipShape(Capsule())
+                    }
+                }
+                .padding()
+                .background(AiChatPalette.chrome)
+            }
+            .navigationTitle(viewer.bookTitle.isEmpty ? "Textbook Reference" : viewer.bookTitle)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        onDismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title3)
+                            .foregroundStyle(.gray)
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Ports Android's figure detail dialog from `AiChatActivity.kt`.
+struct FigureDetailSheet: View {
+    let figure: ChatFigureJson
+    let onDismiss: () -> Void
+    let onViewPage: (String, Int) -> Void
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                    let figUrl = figure.imageUrl.hasPrefix("http") ? figure.imageUrl : "https://medigyaan.com/webai/ragpage/figure?path=\(figure.imageUrl)"
+                    AsyncImage(url: URL(string: figUrl)) { phase in
+                        switch phase {
+                        case .empty:
+                            ProgressView()
+                                .frame(maxWidth: .infinity, minHeight: 220)
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(maxWidth: .infinity)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                        case .failure:
+                            Color.black.opacity(0.3)
+                                .frame(height: 200)
+                                .overlay(Image(systemName: "photo").font(.largeTitle).foregroundStyle(.gray))
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                        @unknown default:
+                            EmptyView()
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(figure.title.isEmpty ? "Figure" : figure.title)
+                            .font(AppTheme.Font.headline)
+                            .fontWeight(.bold)
+                            .foregroundStyle(AppTheme.Ink.textPrimary)
+
+                        if !figure.caption.isEmpty {
+                            Text(figure.caption)
+                                .font(AppTheme.Font.body)
+                                .foregroundStyle(AppTheme.Ink.textPrimary.opacity(0.85))
+                        }
+
+                        if !figure.bookReference.isEmpty {
+                            Divider().padding(.vertical, 4)
+                            HStack {
+                                Text("Source: \(figure.bookReference)")
+                                    .font(AppTheme.Font.caption)
+                                    .foregroundStyle(AppTheme.Ink.textHint)
+                                Spacer()
+                                if !figure.pages.isEmpty {
+                                    Text("Page \(figure.pages)")
+                                        .font(AppTheme.Font.caption)
+                                        .foregroundStyle(AppTheme.Ink.primaryCyan)
+                                }
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(AiChatPalette.bubble)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                    let pageInt = Int(figure.pages) ?? 1
+                    if !figure.sourceUrl.isEmpty {
+                        Button {
+                            onViewPage(figure.sourceUrl, pageInt)
+                        } label: {
+                            HStack {
+                                Image(systemName: "book.fill")
+                                Text("View in Textbook (Page \(pageInt))")
+                            }
+                            .font(AppTheme.Font.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.black)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(AppTheme.Ink.primaryCyan)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                        .padding(.top, 4)
+                    }
+                }
+                .padding()
+            }
+            .background(AiChatPalette.canvas.ignoresSafeArea())
+            .navigationTitle("Figure & Diagram")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") {
+                        onDismiss()
+                    }
+                }
+            }
+        }
+    }
 }
 

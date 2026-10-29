@@ -22,6 +22,7 @@ struct AiChatMessage: Identifiable, Equatable {
     var pdfAbstractsCard: PdfAbstractsState?
     var skillOutcome: SkillOutcome?
     var skillName: String?
+    var ragBooks: [RagBookSource] = []
 
     enum MessageRole: String, Codable {
         case user
@@ -48,7 +49,8 @@ struct AiChatMessage: Identifiable, Equatable {
         similarArticlesCard: SimilarArticlesState? = nil,
         pdfAbstractsCard: PdfAbstractsState? = nil,
         skillOutcome: SkillOutcome? = nil,
-        skillName: String? = nil
+        skillName: String? = nil,
+        ragBooks: [RagBookSource] = []
     ) {
         self.id = id
         self.role = role
@@ -69,6 +71,7 @@ struct AiChatMessage: Identifiable, Equatable {
         self.pdfAbstractsCard = pdfAbstractsCard
         self.skillOutcome = skillOutcome
         self.skillName = skillName
+        self.ragBooks = ragBooks
     }
 
     var isUser: Bool { role == .user }
@@ -247,11 +250,38 @@ struct ChatTableJson: Codable, Equatable, Identifiable {
 }
 
 struct ChatFigureJson: Codable, Equatable, Identifiable {
-    var id: String { figureNumber + title }
+    var id: String { (figureNumber + title + imageUrl).isEmpty ? UUID().uuidString : (figureNumber + title + imageUrl) }
     var figureNumber: String = ""
     var title: String = ""
     var caption: String = ""
     var imageSearchQuery: String = ""
+    var imageUrl: String = ""
+    var bookReference: String = ""
+    var pages: String = ""
+    var sourceUrl: String = ""
+}
+
+/// Ports Android's `RagBookSource` from `AiChatActivity.kt`.
+struct RagBookSource: Codable, Equatable, Identifiable {
+    var id: String { "\(ownerTurn)_\(bookId)_\(pageNumber)" }
+    var ownerTurn: Int = 0
+    var bookId: String = ""
+    var bookTitle: String = ""
+    var pageNumber: String = ""
+    var subject: String = ""
+    var authors: String = ""
+    var publisher: String = ""
+    var extractedText: String = ""
+    var figures: [ChatFigureJson] = []
+}
+
+/// Ports Android's `ActivePdfPageViewer` from `AiChatActivity.kt`.
+struct ActivePdfPageViewer: Equatable, Identifiable {
+    var id: String { "\(bookId)_\(page)" }
+    var bookId: String = ""
+    var bookTitle: String = ""
+    var page: Int = 1
+    var totalPages: Int = 0
 }
 
 struct ChatChartPointJson: Codable, Equatable, Identifiable {

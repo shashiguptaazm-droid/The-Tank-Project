@@ -550,38 +550,27 @@ enum AiChatGateway {
         "openrouter", "cohere", "cerebras", "groq", "deepseek", "mistral", "huggingface"
     ]
 
-    /// Ports `AI_CHAT_SYSTEM_PROMPT`.
+    /// Ports Android's `AI_CHAT_SYSTEM_PROMPT` verbatim from `AiChatActivity.kt`.
     static let systemPrompt = """
-    You are Medigyaan AI, a friendly medical exam assistant and specialized Research/Thesis Agent. \
-    Answer clearly and concisely in plain text (no markdown tables). Use short paragraphs or \
-    bullets when helpful.
+    You are Medigyaan AI, a friendly medical exam assistant helping NEET PG aspirants. Answer clearly and concisely in plain text (no markdown tables). Use short paragraphs or bullets when helpful. If the question is outside medicine, still answer briefly and helpfully. Users often type quickly on mobile, so silently understand typos, misspellings, and phonetic medical terms (e.g. 'glucoma' means glaucoma, 'tyfoid' means typhoid) — never correct them out loud, just answer the intended question.
 
-    RESEARCH AGENT CAPABILITIES: You have access to 50 specialized medical research skills, including: \
-    Research Analyzer, PICO Extraction, PubMed Searching, PMID/DOI Validation, Vancouver Formatting, \
-    Entity Extraction, Statistical Analysis Planning, and Thesis Writing. \
-    The app runs these skills automatically before you see the user's message if a research intent is detected. \
-    If you see 'SKILL_OUTCOME' in the context, treat it as the verified source of truth. \
-    Never hallucinate PMIDs, DOIs, or citations. If a skill failed or didn't find results, inform the user.
-
-    WORKSPACE MANAGEMENT: You manage the Research OS workspace. To update it, append markers to your reply:
-    • [RESEARCH_QUESTION: text] - Updates the main research goal.
-    • [PICO: P=..., I=..., C=..., O=...] - Updates the PICO structure.
-    • [SECTION: Name] - Switches the user's view to a specific section (e.g. Literature, Evidence, Audit).
-
-    BUILT-IN FEATURES (Legacy):
-    • Poster generation: user says 'generate a poster'
-    • Chapter writing: user says 'write the discussion chapter'
+    BUILT-IN FEATURES: The app has these special features that are handled automatically when the user phrases them correctly — you don't need to explain or activate them:
+    • Poster generation: user says 'generate a poster' + pastes an abstract
+    • Chapter writing: user says 'write the discussion chapter' (requires uploaded PDF)
     • Thesis topic search: user says 'search thesis topics on <subject>'
+    • Citation validation: user pastes a reference list and says 'validate these references'
+    • NEET PG college predictor / counseling: user says 'predict colleges / counseling' and mentions their rank plus course/category/state, e.g. 'rank 12000 GEN, want MD Medicine in Karnataka' — the college-option card appears automatically
+    If the user seems to want one of these but the app didn't trigger it (maybe due to typos), gently suggest the exact phrasing, e.g. 'Try typing: search thesis topics on glaucoma'.
 
-    SEARCH MARKER RULES: Append [SEARCH: keyword] as the LAST line of your reply to attach MCQ/Community questions.
-    """ + ResearchSkillRegistry.systemPromptExtension
+    SEARCH MARKER RULES: When the user asks a genuine medical or academic question (about a disease, drug, procedure, anatomy, exam topic, etc.), append [SEARCH: keyword] as the LAST line of your reply (e.g. [SEARCH: typhoid fever], [SEARCH: vitamin b12 deficiency]). The app uses it to fetch matching MCQs from its 280,000 question bank and display them right below your answer. Do NOT append [SEARCH: ...] for greetings, casual chat, or follow-ups that don't need questions.
+    """
 
     /// Ports `requestAiChat` — builds the message list then delegates to ``rotate``.
     static func chat(
         turns: [AiChatTurn],
         pdfContext: AiChatPdfContext?,
         attachment: AiChatAttachment?,
-        skillOutcome: SkillOutcome?,
+        ragContext: String = "",
         providerPool: String,
         userId: Int
     ) async throws -> String {
@@ -598,10 +587,10 @@ enum AiChatGateway {
                 content: "The user attached \(attachment.name) (\(attachment.kind)). Its contents:\n\(String(attachment.text.prefix(40000)))"
             ))
         }
-        if let skillOutcome {
+        if !ragContext.isEmpty {
             messages.append(LegacyAIMessage(
                 role: "system",
-                content: "SKILL_OUTCOME: The research skill execution results are below. Use this verified data in your reply:\n\(skillOutcome.contextText)"
+                content: ragContext
             ))
         }
         messages.append(LegacyAIMessage(role: "system", content: systemPrompt))
@@ -617,7 +606,7 @@ enum AiChatGateway {
         )
     }
 
-    /// Ports `rotateAiRequest` — the normal pool first, then the emergency pool.
+    /// Ports `rotateAiRequest` — prioritizing fast reliable providers (OpenRouter Gemini 2.5 Flash), then the pool.
     static func rotate(
         messages: [LegacyAIMessage],
         maxTokens: Int,
@@ -628,7 +617,15 @@ enum AiChatGateway {
         var errors: [String] = []
         var tried = Set<String>()
 
-        for candidate in ModelRotator.shared.buildPool(provider: providerPool) where chatProviders.contains(candidate.provider) {
+        var pool = ModelRotator.shared.buildPool(provider: providerPool).filter { chatProviders.contains($0.provider) }
+        // Ensure OpenRouter gemini-2.5-flash is tried first for auto mode
+        if providerPool == "auto" {
+            let top = ModelCandidate(provider: "openrouter", model: "google/gemini-2.5-flash")
+            pool.removeAll { $0 == top }
+            pool.insert(top, at: 0)
+        }
+
+        for candidate in pool {
             tried.insert(candidate.provider)
             let outcome = await attempt(candidate, messages, maxTokens, source, userId)
             if let reply = outcome.reply { return reply }
@@ -637,11 +634,11 @@ enum AiChatGateway {
 
         let emergency = [
             ModelCandidate(provider: "openrouter", model: "google/gemini-2.5-flash"),
-            ModelCandidate(provider: "cohere", model: "command-a-03-2025"),
-            ModelCandidate(provider: "cerebras", model: "gpt-oss-120b"),
-            ModelCandidate(provider: "groq", model: "llama-3.1-8b-instant"),
             ModelCandidate(provider: "deepseek", model: "deepseek-chat"),
-            ModelCandidate(provider: "mistral", model: "mistral-large-latest")
+            ModelCandidate(provider: "groq", model: "llama-3.1-8b-instant"),
+            ModelCandidate(provider: "cerebras", model: "gpt-oss-120b"),
+            ModelCandidate(provider: "mistral", model: "mistral-large-latest"),
+            ModelCandidate(provider: "cohere", model: "command-a-03-2025")
         ].filter { !tried.contains($0.provider) }
 
         for candidate in emergency {
@@ -1159,22 +1156,14 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
 
     // MARK: Static content
 
-    /// Ports the `ToolChip(...)` row of `AiChatScreen`.
+    /// Ports the 6 `ToolChip(...)` buttons of Android's `AiChatActivity.kt`.
     let toolChips: [String] = [
-        "📄 Upload Doc",
-        "🧬 PICO",
+        "📄 Chat PDF",
         "🔬 PubMed",
-        "✅ Evidence",
-        "🧪 Entities",
         "🎓 Thesis",
         "🎯 Counselor",
         "🖼️ Poster",
-        "📚 Chapter",
-        "🛡️ Audit",
-        "⚖️ Ethics",
-        "📊 Stats (n)",
-        "🤖 Coding Agent",
-        "📜 Diff Viewer"
+        "📚 Chapter"
     ]
 
     /// Ports `ChatWelcomeHint`'s one-tap prompts.
@@ -1231,19 +1220,13 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
 
     // MARK: - Tool chips
 
-    /// Ports the `onPico` / `onLiterature` / … lambdas behind each tool chip.
+    /// Ports the callbacks behind each tool chip in Android's `AiChatActivity.kt`.
     func onToolChipTapped(_ chip: String) {
         switch chip {
-        case "📄 Upload Doc":
+        case "📄 Chat PDF", "📄 Upload Doc":
             showToast("Choose a PDF, slide deck or case sheet to chat with 📎")
-        case "🧬 PICO":
-            input = "Extract PICO from: "
         case "🔬 PubMed":
-            input = "Search PubMed for: "
-        case "✅ Evidence":
-            input = "Validate these claims: "
-        case "🧪 Entities":
-            input = "Extract medical entities from: "
+            input = "Validate these references with PubMed:\n"
         case "🎓 Thesis":
             input = "Search thesis topics on: "
         case "🎯 Counselor":
@@ -1252,20 +1235,10 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
             input = "Generate a poster from this abstract:\n"
         case "📚 Chapter":
             if pdfContext == nil {
-                showToast("First upload a PDF via 📄 Upload Doc")
+                showToast("First upload a PDF via 📄 Chat PDF")
             } else {
                 input = "Generate the Methodology chapter from my uploaded PDF with a figure, table and chart"
             }
-        case "🛡️ Audit":
-            input = "Perform a formal protocol audit on my thesis methodology and results."
-        case "⚖️ Ethics":
-            input = "Check my research for IRB and Informed Consent compliance."
-        case "📊 Stats (n)":
-            input = "Calculate the required sample size for my study."
-        case "🤖 Coding Agent":
-            input = "Run Autonomous Coding Agent on: "
-        case "📜 Diff Viewer":
-            input = "Show diff for the following change:\n"
         default:
             input = chip + ": "
         }
@@ -1366,49 +1339,184 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
         activeTask = Task { [weak self] in
             guard let self else { return }
 
-            let skillName = ResearchSkillHandler.routeToSkill(text: text, hasPdf: document != nil)
-            var outcome: SkillOutcome?
-            if skillName != "NONE" {
-                activeSkillName = skillName
-                enrichmentNote = "Executing Skill: \(skillName)…"
-                outcome = await ResearchSkillHandler.executeSkill(
-                    skillName: Self.executableSkill(skillName),
-                    userInput: text,
-                    pdfText: document?.textPreview ?? ""
-                )
-                isThinking = false
+            let skill = await routeToSkill(text: text, pdfContext: document, userId: userId)
+
+            switch skill {
+            case "COUNSELOR":
+                activeSkillName = "NEET PG Counselor"
+                enrichmentNote = "Consulting NEET PG predictor…"
+                let counselCard = await runCounselModule(text: text, userId: userId)
+                activeSkillName = nil
                 enrichmentNote = ""
+                isLoading = false
+                isThinking = false
+                activeTask = nil
+                if let counselCard {
+                    messages.append(AiChatMessage(
+                        role: .assistant,
+                        text: "🎯 **NEET PG Counselor** prediction ready.",
+                        counselCard: counselCard
+                    ))
+                    persistSession(userId: userId)
+                    return
+                }
+
+            case "THESIS_SEARCH":
+                activeSkillName = "Thesis Topic Search"
+                enrichmentNote = "Searching catalog…"
+                let thesisCard = await runThesisModule(text: text, userId: userId)
+                activeSkillName = nil
+                enrichmentNote = ""
+                isLoading = false
+                isThinking = false
+                activeTask = nil
+                if let thesisCard {
+                    messages.append(AiChatMessage(
+                        role: .assistant,
+                        text: "🎓 **Thesis Topics** found for your search.",
+                        thesisCard: thesisCard
+                    ))
+                    persistSession(userId: userId)
+                    return
+                }
+
+            case "POSTER":
+                activeSkillName = "Poster Generator"
+                enrichmentNote = "🖼️ Designing Research Poster…"
+                let posterCard = await runPosterModule(text: text, document: document, userId: userId)
+                activeSkillName = nil
+                enrichmentNote = ""
+                isLoading = false
+                isThinking = false
+                activeTask = nil
+                if let posterCard {
+                    messages.append(AiChatMessage(
+                        role: .assistant,
+                        text: "🎨 **Poster generated** from your abstract.",
+                        posterCard: posterCard
+                    ))
+                    persistSession(userId: userId)
+                    return
+                }
+
+            case "CHAPTER":
+                activeSkillName = "Chapter Generator"
+                enrichmentNote = "📚 Synthesizing Chapter…"
+                let (chapterCard, chapterDetails) = await runChapterModuleWithJson(text: text, document: document, userId: userId)
+                activeSkillName = nil
+                enrichmentNote = ""
+                isLoading = false
+                isThinking = false
+                activeTask = nil
+                if let chapterCard {
+                    messages.append(AiChatMessage(
+                        role: .assistant,
+                        text: "📚 **Chapter generated** from your PDF.",
+                        chapterCard: chapterCard,
+                        chapterDetails: chapterDetails
+                    ))
+                    persistSession(userId: userId)
+                    return
+                }
+
+            case "PUBMED_VALIDATE":
+                activeSkillName = "PubMed Validator"
+                enrichmentNote = "Validating citations…"
+                let citationCard = await runCitationModule(userText: text, replyText: text)
+                activeSkillName = nil
+                enrichmentNote = ""
+                isLoading = false
+                isThinking = false
+                activeTask = nil
+                if let citationCard {
+                    messages.append(AiChatMessage(
+                        role: .assistant,
+                        text: "🔬 **PubMed Reference Validation** complete.",
+                        citationCard: citationCard
+                    ))
+                    persistSession(userId: userId)
+                    return
+                }
+
+            case "SIMILAR_ARTICLES":
+                activeSkillName = "Similar Articles"
+                enrichmentNote = "Finding similar research…"
+                let similarCard = await runSimilarArticlesModule(userText: text, document: document)
+                activeSkillName = nil
+                enrichmentNote = ""
+                isLoading = false
+                isThinking = false
+                activeTask = nil
+                if let similarCard {
+                    messages.append(AiChatMessage(
+                        role: .assistant,
+                        text: "📄 **Similar research articles** found.",
+                        similarArticlesCard: similarCard
+                    ))
+                    persistSession(userId: userId)
+                    return
+                }
+
+            default:
+                break
             }
 
-            let counselCard = await runCounselModule(text: text, userId: userId)
-            let thesisCard = await runThesisModule(text: text, userId: userId)
-            let (chapterCard, chapterDetails) = await runChapterModuleWithJson(text: text, document: document, userId: userId)
-            let posterCard = await runPosterModule(text: text, document: document, userId: userId)
-
+            // Normal chat fallback with RAG:
             isThinking = true
             let started = Date()
-            let raw = await replyText(history: history, document: document, attachment: attachment, outcome: outcome, userId: userId, api: api)
+
+            // 1. RAG Search — ALWAYS grounding normal medical conversations with textbook library excerpts & figures
+            let ragResult: RagSearchResult
+            if document == nil && attachment == nil {
+                ragResult = await RagHelper.shared.search(query: text)
+            } else {
+                ragResult = RagSearchResult()
+            }
+            let ragContext = RagHelper.shared.buildContext(results: ragResult.results, figures: ragResult.figures)
+
+            // 2. Chat Request with full history turns in chronological order
+            let raw = await replyText(
+                history: history,
+                document: document,
+                attachment: attachment,
+                ragContext: ragContext,
+                userId: userId,
+                api: api
+            )
             if Task.isCancelled { stopGenerating(); return }
 
-            let verified = await audit(raw: raw, skillName: skillName, original: text)
-            workspace = ResearchSkillHandler.updateWorkspace(current: workspace, aiOutput: verified)
-            activeSkillName = nil
+            // 3. Post-process citations, sources footer and figures markers
+            var processedReply = raw
+            if !ragResult.results.isEmpty {
+                processedReply = RagHelper.shared.linkifyCitations(reply: processedReply, results: ragResult.results)
+                let footer = RagHelper.shared.sourcesFooter(results: ragResult.results)
+                if !footer.isEmpty && !processedReply.contains("**Sources:**") {
+                    processedReply = processedReply.trimEnd() + "\n\n" + footer
+                }
+            }
+            if !ragResult.figures.isEmpty {
+                let figMarkers = RagHelper.shared.figureMarkers(figures: ragResult.figures)
+                if !figMarkers.isEmpty && !processedReply.contains("[RAGFIG:") {
+                    processedReply = processedReply.trimEnd() + figMarkers
+                }
+            }
 
-            let keyword = AiChatIntentDetector.parseSearchKeyword(raw)
+            let keyword = AiChatIntentDetector.parseSearchKeyword(processedReply)
                 ?? AiChatIntentDetector.explicitQuestionTopic(text)
                 ?? AiChatIntentDetector.findMedicalCondition(text)
             let postsOnlyKeyword = keyword == nil ? AiChatIntentDetector.explicitPostsTopic(text) : nil
 
-            let cleaned = AiChatGateway.strippingMarkers(verified)
+            let cleaned = AiChatGateway.strippingMarkers(processedReply)
             let reply = cleaned.isEmpty ? "⚠ AI gave an empty reply. Try again." : cleaned
 
             isThinking = false
             await revealStreaming(reply)
             if Task.isCancelled { stopGenerating(); return }
 
-            let citationCard = await runCitationModule(userText: text, replyText: reply)
-            let similarArticlesCard = await runSimilarArticlesModule(userText: text, document: document)
+            // 4. Extract RAG books and figures for card rendering
+            let ragBooks = RagHelper.extractRagBookSources(ownerTurn: messages.count, content: processedReply)
 
+            // 5. Related questions from 280k bank and community posts
             var related: [AiRelatedQuestion] = []
             if let keyword {
                 searchPhase = .searching
@@ -1429,15 +1537,7 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
                 relatedQuestions: related.map { Self.question(from: $0) },
                 isStreaming: false,
                 responseTimeMs: elapsed,
-                counselCard: counselCard,
-                thesisCard: thesisCard,
-                chapterCard: chapterCard,
-                chapterDetails: chapterDetails,
-                citationCard: citationCard,
-                posterCard: posterCard,
-                similarArticlesCard: similarArticlesCard,
-                skillOutcome: outcome,
-                skillName: skillName == "NONE" ? nil : skillName
+                ragBooks: ragBooks
             ))
 
             isLoading = false
@@ -1449,13 +1549,66 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
         }
     }
 
-    /// Ports the `try { requestAiChat(...) } catch` branch of `send()`, plus the
-    /// `ask_ai2.php` last resort so a total gateway outage still answers.
+    /// Intent router prioritizing fast local heuristics, then the LLM router.
+    /// Strictly ports Android's `routeToSkill` in `AiChatActivity.kt`.
+    private func routeToSkill(text: String, pdfContext: AiChatPdfContext?, userId: Int) async -> String {
+        let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !t.isEmpty else { return "NONE" }
+
+        if AiChatIntentDetector.detectCounselQuery(t) != nil { return "COUNSELOR" }
+        if AiChatIntentDetector.detectThesisTopicSearch(t) != nil { return "THESIS_SEARCH" }
+        if AiChatIntentDetector.detectPosterAbstract(userText: t, pdfContext: pdfContext) != nil { return "POSTER" }
+        if let pdf = pdfContext, AiChatIntentDetector.detectChapterRequest(text: t, pdfContext: pdf) != nil { return "CHAPTER" }
+        if AiChatIntentDetector.detectCitationList(userText: t, assistantReply: t) != nil { return "PUBMED_VALIDATE" }
+
+        let lower = t.lowercased()
+        if pdfContext != nil && (lower.contains("similar article") || lower.contains("related study") || lower.contains("more research") || lower.contains("find evidence")) {
+            return "SIMILAR_ARTICLES"
+        }
+
+        let system = """
+        You are an intent router for MediGyaan AI. 
+        Categorize the user's request into exactly one of these categories:
+        - SIMILAR_ARTICLES: asking for more research, similar studies, evidence discovery, or finding more abstracts based on the PDF.
+        - CHAPTER: asking to generate a specific thesis chapter (e.g. introduction, methodology, discussion, epidemiology).
+        - POSTER: asking to generate a scientific poster from an abstract.
+        - THESIS_SEARCH: searching for new thesis topics, project ideas, or research titles.
+        - COUNSELOR: asking about NEET PG ranks, colleges, bonds, or counseling advice.
+        - PUBMED_VALIDATE: asking to check if references/PMIDs mentioned are real.
+        - NONE: a normal chat conversation, general medical question, or follow-up.
+
+        Reply with ONLY the category name.
+        """
+        let userMsg = "User Input: \"\(t)\"\nPDF Uploaded: \(pdfContext != nil)"
+        do {
+            let res = try await AiChatGateway.rotate(
+                messages: [
+                    LegacyAIMessage(role: "system", content: system),
+                    LegacyAIMessage(role: "user", content: userMsg)
+                ],
+                maxTokens: 20,
+                source: "skill_router",
+                providerPool: modelMode.provider,
+                userId: userId
+            )
+            let cat = res.uppercased().trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: "- ", with: "")
+                .replacingOccurrences(of: "* ", with: "")
+            if ["SIMILAR_ARTICLES", "CHAPTER", "POSTER", "THESIS_SEARCH", "COUNSELOR", "PUBMED_VALIDATE"].contains(cat) {
+                return cat
+            }
+            return "NONE"
+        } catch {
+            return "NONE"
+        }
+    }
+
+    /// Ports `requestAiChat` — runs with complete multi-turn history and textbook RAG context.
     private func replyText(
         history: [AiChatTurn],
         document: AiChatPdfContext?,
         attachment: AiChatAttachment?,
-        outcome: SkillOutcome?,
+        ragContext: String,
         userId: Int,
         api: MediGyaanAPI
     ) async -> String {
@@ -1464,7 +1617,7 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
                 turns: history,
                 pdfContext: document,
                 attachment: attachment,
-                skillOutcome: outcome,
+                ragContext: ragContext,
                 providerPool: modelMode.provider,
                 userId: userId
             )
@@ -1479,8 +1632,8 @@ final class AiChatViewModel: NSObject, ObservableObject, AVSpeechSynthesizerDele
             if let document {
                 context += document.contextPrompt() + "\n"
             }
-            if let outcome {
-                context += "SKILL_OUTCOME:\n\(outcome.contextText)\n"
+            if !ragContext.isEmpty {
+                context += ragContext + "\n"
             }
             context += AiChatGateway.systemPrompt + "\n"
             for turn in history {
