@@ -36,6 +36,7 @@ struct MatchmakingActivityView: View {
     @State private var queueUserId: String = "94_ios"
     @State private var userName: String = "Shashi Gupta"
     @State private var isLaunchingGame: Bool = false
+    @State private var isMatchFound: Bool = false
 
     @State private var showMatchReadyDialog: Bool = false
     @State private var radarRotation: Double = 0
@@ -415,13 +416,17 @@ struct MatchmakingActivityView: View {
 
         countdownTimer?.invalidate()
         countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [self] timer in
+            guard !isMatchFound && !isLaunchingGame else {
+                timer.invalidate()
+                return
+            }
             if countdownRemaining > 1 {
                 countdownRemaining -= 1
                 timerMsg = "Starting in: \(countdownRemaining)s"
             } else {
                 timer.invalidate()
                 timerMsg = ""
-                // Countdown expired: Pair with bot fallback!
+                guard !isMatchFound && !isLaunchingGame else { return }
                 Task {
                     await pairWithBot()
                 }
@@ -441,8 +446,11 @@ struct MatchmakingActivityView: View {
                 if let myEntry = try? await FirebaseRTDB.shared.get(path: "matchmaking_queue/\(queuePath)/entries/\(queueId)") as? [String: Any],
                    (myEntry["status"] as? String) == "matched",
                    let cId = myEntry["challengeId"] as? String, !cId.isEmpty {
-                    pollingTask?.cancel()
-                    countdownTimer?.invalidate()
+                    await MainActor.run {
+                        self.isMatchFound = true
+                        self.countdownTimer?.invalidate()
+                        self.countdownTimer = nil
+                    }
                     self.challengeId = cId
                     self.isHost = false
                     RemoteLogger.log(tag: "Matchmaking_Matched_As_Guest", message: "Assigned challenge: \(cId)")
@@ -471,8 +479,11 @@ struct MatchmakingActivityView: View {
 
                     // If 2 or more distinct real players in lobby!
                     if activePlayers.count >= 2 {
-                        pollingTask?.cancel()
-                        countdownTimer?.invalidate()
+                        await MainActor.run {
+                            self.isMatchFound = true
+                            self.countdownTimer?.invalidate()
+                            self.countdownTimer = nil
+                        }
 
                         // Deterministic tie-breaker matching Android
                         let sortedPair = Array(activePlayers.sorted { $0.queueKey < $1.queueKey }.prefix(2))
@@ -495,11 +506,11 @@ struct MatchmakingActivityView: View {
                     }
                 }
 
-                // If non-host guest waits without match for > 20s, pair with bot
-                if !isHost {
+                // If non-host guest waits without match for > 45s, pair with bot
+                if !isHost && !isMatchFound {
                     guestAttempts += 1
                     if guestAttempts > 35 {
-                        pollingTask?.cancel()
+                        guard !isMatchFound else { break }
                         await pairWithBot()
                         break
                     }
@@ -509,12 +520,15 @@ struct MatchmakingActivityView: View {
     }
 
     private func createMultiplayerChallenge(challengeId: String, opponent: QueuePlayer) async {
+        guard !isLaunchingGame else { return }
         isBotMatch = false
         self.challengeId = challengeId
         self.opponentId = opponent.userId
         self.opponentName = opponent.userName
 
-        statusMsg = "Preparing battle questions..."
+        await MainActor.run {
+            self.statusMsg = "Preparing battle questions..."
+        }
         let qIds = await fetchQuestionIds()
         self.sharedQuestionIds = qIds
 
@@ -526,8 +540,8 @@ struct MatchmakingActivityView: View {
             "isBotMatch": false,
             "question_ids": qIds,
             "players": [
-                queueUserId: ["name": userName, "hp": 100, "score": 0, "isFinished": false, "isBot": false],
-                opponent.userId: ["name": opponent.userName, "hp": 100, "score": 0, "isFinished": false, "isBot": false]
+                queueUserId: ["name": userName, "hp": 100, "score": 0, "isFinished": false, "isBot": false, "skin": "Axiom"],
+                opponent.userId: ["name": opponent.userName, "hp": 100, "score": 0, "isFinished": false, "isBot": false, "skin": "Verdict"]
             ]
         ]
 
@@ -542,9 +556,10 @@ struct MatchmakingActivityView: View {
                 )
             }
 
-            RemoteLogger.log(tag: "Matchmaking_Challenge_Ready", message: "Challenge \(challengeId) created with \(qIds.count) questions")
+            RemoteLogger.log(tag: "Matchmaking_Challenge_Ready", message: "Challenge \(challengeId) created with \(qIds.count) questions vs \(opponent.userName)")
             await MainActor.run {
                 self.countdownTimer?.invalidate()
+                self.countdownTimer = nil
                 self.statusMsg = "⚔ Match Found: \(self.opponentName)!"
                 self.timerMsg = "Entering Battle Arena..."
                 self.showMatchReadyDialog = true
@@ -555,12 +570,36 @@ struct MatchmakingActivityView: View {
                 }
             }
         } catch {
-            RemoteLogger.log(tag: "Matchmaking_Create_Error", message: error.localizedDescription)
-            await pairWithBot()
+            RemoteLogger.log(tag: "Matchmaking_Create_Error", message: "Failed to create challenge \(challengeId): \(error.localizedDescription)")
+            // Retry once before giving up
+            do {
+                try await Task.sleep(nanoseconds: 1_000_000_000)
+                try await FirebaseRTDB.shared.put(path: "challenges/\(challengeId)", payload: challengePayload)
+                for pKey in [queueId, opponent.queueKey] {
+                    try await FirebaseRTDB.shared.patch(
+                        path: "matchmaking_queue/\(queuePath)/entries/\(pKey)",
+                        payload: ["status": "matched", "challengeId": challengeId]
+                    )
+                }
+                await MainActor.run {
+                    self.showMatchReadyDialog = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                        if !self.isLaunchingGame { self.launchGame() }
+                    }
+                }
+            } catch {
+                RemoteLogger.log(tag: "Matchmaking_Create_Retry_Failed", message: error.localizedDescription)
+                guard !isLaunchingGame && !isMatchFound else { return }
+                await pairWithBot()
+            }
         }
     }
 
     private func pairWithBot() async {
+        guard !isMatchFound && !isLaunchingGame else {
+            RemoteLogger.log(tag: "Matchmaking_Bot_Ignored", message: "pairWithBot ignored because match already in progress")
+            return
+        }
         isBotMatch = true
         let botPool = ["Dr. Vihaan", "Dr. Ayesha", "Dr. Rohan", "Dr. Neha", "Dr. Arjun", "Dr. Kavya", "Dr. Kabir", "Dr. Ananya"]
         opponentName = botPool.randomElement() ?? "Dr. AI Challenger"
@@ -572,13 +611,21 @@ struct MatchmakingActivityView: View {
 
         await MainActor.run {
             self.showMatchReadyDialog = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                if !self.isLaunchingGame {
+                    self.launchGame()
+                }
+            }
         }
     }
 
     private func waitForChallengeReady(cid: String) async {
-        statusMsg = "Joining opponent's arena..."
-        for _ in 0..<45 {
+        await MainActor.run {
+            self.statusMsg = "Joining opponent's arena..."
+        }
+        for attempt in 0..<45 {
             try? await Task.sleep(nanoseconds: 1_000_000_000)
+            guard !isLaunchingGame else { return }
             if let obj = try? await FirebaseRTDB.shared.get(path: "challenges/\(cid)") as? [String: Any] {
                 let st = obj["status"] as? String ?? ""
                 if st == "ready" || st == "started" {
@@ -598,6 +645,7 @@ struct MatchmakingActivityView: View {
                     RemoteLogger.log(tag: "Matchmaking_Guest_Joined", message: "Joined ready challenge \(cid) vs \(opponentName) (status=\(st))")
                     await MainActor.run {
                         self.countdownTimer?.invalidate()
+                        self.countdownTimer = nil
                         self.statusMsg = "⚔ Match Found: \(self.opponentName)!"
                         self.timerMsg = "Entering Battle Arena..."
                         self.showMatchReadyDialog = true
@@ -613,6 +661,7 @@ struct MatchmakingActivityView: View {
         }
 
         // Fallback if host abandoned
+        guard !isLaunchingGame && !isMatchFound else { return }
         await pairWithBot()
     }
 
